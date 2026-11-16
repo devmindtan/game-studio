@@ -69,30 +69,39 @@ trong `layers/`; `art run` kiểm tra ghép lớp trùng từng pixel với stri
 
 ## Xem trên web (`./serve-viewer.sh`)
 
-`./serve-viewer.sh` (trong `sprite-lab/`) mở http://localhost:8765/viewer.html: danh sách mọi sprite theo nhóm,
-khung xem lớn (tỉ lệ "Vừa khung", nền caro/tối/sáng/cỏ, đường đất + điểm neo), dải frame có thời lượng từng
-frame (bấm để nhảy tới), GIF và preview sheet. Phát đúng `durations_ms`.
+`./serve-viewer.sh` (trong `sprite-lab/`) chạy server ở gốc workspace (chỉ `127.0.0.1`) và mở
+http://localhost:8765/sprite-lab/viewer.html. `NO_OPEN=1 ./serve-viewer.sh` thì không mở trình duyệt (agent, test).
+
+### Sprite Lab (`viewer.html`)
+
+Danh sách mọi sprite theo nhóm, khung xem lớn (tỉ lệ "Vừa khung", nền caro/tối/sáng/cỏ, đường đất + điểm neo),
+dải frame có thời lượng từng frame (bấm để nhảy tới), GIF và preview sheet. Phát đúng `durations_ms`.
 
 - **Tự cập nhật**: mỗi 2 giây viewer đọc lại manifest; `gamekit art run <tên>` tạo lại manifest, nên sprite vừa
   vẽ hiện ngay, không cần F5. URL ảnh mang `?v=<mtime>` nên trình duyệt không dùng ảnh cũ.
 - **Đường dẫn nhớ vị trí**: `viewer.html#mage/attack`.
 - **Phím**: Space phát/dừng · ←/→ frame · ↑/↓ animation · 1–9 chọn animation · `[` `]` sprite trước/sau ·
-  `+`/`-` tỉ lệ · B nền · R từ đầu · `/` tìm.
+  `+`/`-` tỉ lệ · B nền · V chế độ màu · R từ đầu · `/` tìm.
 
-### Tab Games — quản lý game và demo chiêu
+### Game dashboard (`games.html`)
 
-Nút **Games** trên thanh đầu chuyển sang bảng điều khiển: danh sách mọi game có `project.godot`
-(đọc từ `games/*/`), chọn game → danh sách chiêu từ `upgrades_<class>.json`, chọn chiêu → animation
-mô phỏng từ lúc ra chiêu đến lúc quái trúng đòn.
+Toàn bộ những gì một game đang có, đọc thẳng từ repo game (`build_games_manifest.py`, server dựng lại mỗi lần
+trang tải), để xem và **đánh giá có áp dụng vào game không**:
 
-- Demo **dựng từ data thật**, không vẽ tay: `build_games_manifest.py` quét `classes.json`,
-  `upgrades_<class>.json`, `monsters.json` và hitbox/frame timing trong `sprites/*/<tên>.json`.
-  Khi game thêm chiêu hoặc đổi `cast_range`, chỉ cần chạy lại script (serve script tự chạy lúc mở,
-  viewer tự cập nhật sau vài giây).
-- Sân khấu có 4 pha **Ra chiêu → Triển khai → Trúng đòn → Kết thúc**, thanh tua, phát lại, đổi tốc độ,
-  chọn bậc I–V và bật hitbox. Chỉ quái nằm trong hitbox (theo đúng `shape`/`radius`/`active` của bậc
-  đang chọn) mới hiện dấu trúng và số sát thương.
-- Script này **chỉ đọc** repo game; không tự promote sprite hay sửa `src/`/`assets/data/` của game.
+| Mục | Nội dung |
+|---|---|
+| Tổng quan | pitch, thể loại, câu hỏi thiết kế, bảng "Đã quyết" của roadmap, ảnh mới nhất |
+| Luật gameplay | luật trong `games/<g>/assets/data/gameplay_rules.json` + bảng chấm mọi kỹ năng và hiệu ứng trong kho |
+| Giao diện | ảnh chụp game (`production/qa/evidence/`) theo nhóm, bấm để phóng to |
+| Bản đồ & ải | bãi đấu vẽ đúng nền cỏ của game, vòng spawn, khung màn hình; biểu đồ đợt quái theo thời gian |
+| Nhân vật | animation, các lớp (bật/tắt từng lớp = chỗ đồ mặc thay vào), chỉ số kèm icon |
+| Quái vật | animation cùng tỉ lệ game, thân đo từ pixel, chỉ số, xuất hiện ở ải nào |
+| Kỹ năng | demo ra chiêu theo hitbox + nhịp frame, bảng giá trị từng cấp (như `PlayerStats`), nâng cấp chỉ số |
+| Hiệu ứng | hiệu ứng game đang dùng và kho Sprite Lab chưa dùng, chấm theo luật gameplay |
+
+Mỗi mục có **Dùng / Cân nhắc / Không dùng + ghi chú**; bấm là lưu (`POST /api/review`) vào
+`games/<g>/design/review.json`. Agent đọc file đó khi làm game tiếp, và commit nó vào repo game.
+Script dựng manifest **chỉ đọc** repo game; server chỉ ghi đúng file `design/review.json`.
 
 ## Trình thử (`gamekit art lab [<tên>] [sheet|move]`)
 

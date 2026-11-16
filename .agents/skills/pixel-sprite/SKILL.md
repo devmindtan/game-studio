@@ -125,6 +125,12 @@ Không báo "xong" khi chưa xem `preview.png`, ảnh `sheet` và ảnh `move`.
   mặt, biểu tượng. Công thức (vòng lặp co giãn, lệch theo k²…) chỉ dùng để đặt vị trí và tạo chuyển động; dựng
   hình dáng bằng công thức cho ra bậc thang lởm chởm (bài học 2026-11-16: nón pháp sư "méo xẹo"). Cần biến thể
   (gió, nghiêng) thì vẽ thêm một bản đồ, đừng uốn bằng công thức.
+- **Luật gameplay của game là điều kiện xong**: Bách Ải chốt luật ở `games/bach-ai/design/gameplay-rules.md` (số liệu
+  `assets/data/gameplay_rules.json`: tự động, hitbox pixel, tầm trong màn hình, ra đòn nhanh, 4 hướng, mạnh theo
+  cấp, khung nhỏ, đúng class, cân bằng DPS). Vẽ hiệu ứng cho game nào thì mở dashboard
+  (`sprite-lab/serve-viewer.sh` → `games.html`, tab **Luật gameplay**) và chỉ báo xong khi hiệu ứng **đạt luật bắt
+  buộc**; `gamekit test <g>` fail nếu kỹ năng trong game vi phạm. Đánh giá của người dùng nằm ở
+  `games/<g>/design/review.json`: đọc trước khi đề xuất hay promote.
 - **Skill phải khớp gameplay Bách Ải (bắt buộc trước khi vẽ)**: đọc `games/bach-ai/assets/data/classes.json`, `upgrades_<class>.json` và cách game nạp FX trong `src/run/run.gd` (`sheets` load theo **tên sprite**, `_add_fx(sprite, anim, ...)`). Checklist:
   - **Tên sprite** phải đúng `skills.<id>.sprite` trong data. Game `sheets.get(name)` trả `null` và **bỏ qua lặng lẽ** nếu sai tên — không có lỗi để phát hiện.
   - **Animation**: đòn định hướng có `slash_right/left/up/down` (game gọi qua `_slash_anim()`); AOE/cấp bậc dùng **một animation một lần** (`burst`/`spell`, `loop:false`) đặt **neo tại tâm người chơi**; skill duy trì như `whirlwind` dùng `spin`.
