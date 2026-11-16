@@ -125,13 +125,12 @@ Không báo "xong" khi chưa xem `preview.png`, ảnh `sheet` và ảnh `move`.
   mặt, biểu tượng. Công thức (vòng lặp co giãn, lệch theo k²…) chỉ dùng để đặt vị trí và tạo chuyển động; dựng
   hình dáng bằng công thức cho ra bậc thang lởm chởm (bài học 2026-11-16: nón pháp sư "méo xẹo"). Cần biến thể
   (gió, nghiêng) thì vẽ thêm một bản đồ, đừng uốn bằng công thức.
-- **Quy ước chiêu thức nâng cấp I–V** (khi một chiêu có nhiều bậc): mỗi bậc là một sprite riêng `<tên>-i`…`<tên>-v`, **không giữ bản không đánh số**. Thiết kế phải khác biệt rõ, không phải cùng một vòng phóng to dần:
-  - **I** = bản khởi đầu, đọc được ngay (tầm nhỏ, ít chi tiết).
-  - **II** = đổi **silhouette/hình dáng** (vd nổ → hoa, quét → chẻ).
-  - **III** = thêm **cấu trúc/khối 3D** (cọc, trụ, mảnh đá, mặt phẳng có bóng).
-  - **IV** = thêm **chuyển động** (xoáy, xoay, kéo theo hạt) thay vì chỉ phóng to.
-  - **V** = **chiêu hoàn toàn khác**, tinh chỉnh nhất (nhiều lớp, glyph/lưỡi/hạt, ultimate); không được là bản I phóng to.
-  - Mọi bậc có hitbox đo từ pixel (shape đúng hình thật), neo giữ nguyên trục, đăng ký nhãn `tier-I`…`tier-V` trong `sprite-tags.json`, cat/tags phải nằm trong `CATS` của viewer.
+- **Chiêu thức nâng cấp I–V — chống "cùng một khuôn đổi màu"**: I–V là **nhịp tiến hóa**, KHÔNG phải bản thiết kế chung. Trước khi vẽ, phải chốt **DNA riêng của dòng chiêu** (từ nguyên tố/chất liệu) và ghi ngay vào docstring `gen.py` của cả 5 bậc, ví dụ:
+  - **Băng/frost**: kết tinh, **đối xứng tròn**, cạnh sắc, phát sáng lạnh, tuyết.
+  - **Đất/earth**: **đứt gãy, dịch chuyển khối, bất đối xứng, nặng**, tảng đá có mặt phẳng/đường vân, bụi, magma lộ ra — KHÔNG được là vòng tròn đối xứng kiểu băng.
+  - **Lửa**: ngọn lửa liếc lên, sóng nhiệt, khói, màu nóng chảy. **Sét**: tia thẳng/gãy, chớp tức thời, điểm chạm. **Độc**: chất lỏng loang, bọt, hơi. **Ánh sáng**: chùm tia, halo, lõi trắng.
+- Mỗi bậc phải đổi **silhouette/hành vi**, không chỉ palette hay kích thước. Cấm dùng lại cấu trúc của dòng khác (vd `vòng → hoa → cột → xoáy → mandala` cho cả băng lẫn đất). Khi thiết kế bậc nào, **render và đặt cạnh bậc tương đương của ít nhất một dòng khác**; nếu silhouette giống nhau thì đổi một trong hai trước khi commit. Ghi trong commit message dòng đã so sánh với ai.
+- Quy ước bậc (chỉ là gợi ý nhịp, phải diễn giải theo DNA ở trên): I = ý tưởng nền tảng đọc được ngay; II = đổi hướng/silhouette; III = khối/cấu trúc đặc trưng của chất liệu; IV = chuyển động của chính chất liệu đó (đất = trượt/sạt, băng = xoáy/tuyết…); V = **chiêu hoàn toàn mới**, bố cục khác hẳn mọi V khác, tinh chỉnh nhất. Mọi bậc có hitbox đo từ pixel, neo giữ trục, tag `tier-I`…`tier-V`, **không giữ bản không đánh số**.
 
 - **Vũ khí đối xứng (kiếm, đại kiếm, dao găm) vẽ thẳng đứng**, trục là tâm lưỡi; guard/cán/pommel nằm cùng trục. **Tự kiểm tra bằng script**: với mỗi hàng, tập pixel active (alpha ≥ 96) phải khớp tập phản chiếu qua trục (mirror `x' = 2*axis - x`); xem preview trước khi báo xong. Không tự đo thì không được nói là đã xong.
 - **Đường chéo đặc (lưỡi kiếm, vệt chém…) điền theo từng cột**: với mỗi cột `x`, tính tâm `y` rồi tô một
