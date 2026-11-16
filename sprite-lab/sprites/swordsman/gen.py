@@ -173,15 +173,15 @@ def jump(i):
 
 
 ATTACK_MS = [140, 50, 60, 90, 150]   # long wind-up, fast swing, hold the hit, settle
+# The slash trail is a separate effect sprite (sword-slash, with its hitbox), never drawn
+# into the body frames: drawn here too, the game showed two slashes (2026-11-16).
 
 
 def attack(i):
     return [
         frame(bob=1, lean=-1, feet=((-4, 0), (3, 0)), hands=((-3, 5), (-1, -3)), weapon=-120),
-        frame(bob=0, lean=2, feet=((-4, 0), (4, 0)), hands=((-2, 6), (5, 0)), weapon=-25,
-              fx="slash", fx_t=0.5),
-        frame(bob=1, lean=3, feet=((-4, 0), (5, 0)), hands=((-2, 6), (6, 4)), weapon=40,
-              fx="slash", fx_t=1.0),
+        frame(bob=0, lean=2, feet=((-4, 0), (4, 0)), hands=((-2, 6), (5, 0)), weapon=-25),
+        frame(bob=1, lean=3, feet=((-4, 0), (5, 0)), hands=((-2, 6), (6, 4)), weapon=40),
         frame(bob=1, lean=2, feet=((-4, 0), (5, 0)), hands=((-2, 7), (4, 6)), weapon=80),
         frame(bob=0, lean=1, feet=((-3, 0), (3, 0)), hands=((-2, 7), (3, 5)), weapon=20),
     ][i]
