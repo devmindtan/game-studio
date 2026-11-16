@@ -8,9 +8,11 @@
 :root{--bg:#0e1014;--panel:#161a22;--panel2:#1d2330;--panel3:#242c3b;--text:#e9eef8;--muted:#93a0b8;--accent:#7ef0ff;--accent2:#b06cff;--border:#283142;--good:#6ee06e;--warn:#ffd36b}
 *{box-sizing:border-box} html,body{height:100%} body{margin:0;font:13px/1.4 system-ui,-apple-system,Segoe UI,Roboto,sans-serif;background:var(--bg);color:var(--text)}
 button,input,select{font:inherit;color:var(--text)}
+kbd{font:11px ui-monospace,monospace;background:var(--panel3);border:1px solid var(--border);border-bottom-width:2px;border-radius:4px;padding:0 4px;color:var(--text)}
 header{height:44px;padding:0 12px;border-bottom:1px solid var(--border);display:flex;gap:10px;align-items:center;background:#0e1014f5;position:sticky;top:0;z-index:10}
 header h1{font-size:14px;margin:0;font-weight:700;letter-spacing:.02em} header .sub{color:var(--muted);font-size:12px}
-#status{margin-left:auto;font-size:12px}
+#status{margin-left:auto;font-size:12px;display:flex;gap:10px;align-items:center}
+#live{font-size:11px;color:var(--muted)} #live.flash{color:var(--good)}
 .layout{display:grid;grid-template-columns:280px 1fr;height:calc(100vh - 44px);min-height:0}
 aside{border-right:1px solid var(--border);display:flex;flex-direction:column;min-height:0;height:100%;overflow:hidden}
 .sideTop{padding:8px;border-bottom:1px solid var(--border);display:flex;flex-direction:column;gap:6px;flex:0 0 auto}
@@ -22,8 +24,7 @@ aside{border-right:1px solid var(--border);display:flex;flex-direction:column;mi
 #list::-webkit-scrollbar, main::-webkit-scrollbar{width:8px;height:8px}
 #list::-webkit-scrollbar-track, main::-webkit-scrollbar-track{background:transparent}
 #list::-webkit-scrollbar-thumb, main::-webkit-scrollbar-thumb{background:#2e3a50;border-radius:999px;border:2px solid transparent;background-clip:padding-box}
-#list::-webkit-scrollbar-thumb:hover, main::-webkit-scrollbar-thumb:hover{background:#465a78;border:2px solid transparent;background-clip:padding-box}
-main{scrollbar-width:thin;scrollbar-color:#3a4a63 transparent}
+main{scrollbar-width:thin;scrollbar-color:#3a4a63 transparent;padding:10px;overflow:auto;min-height:0}
 .group{margin-bottom:4px}
 .groupHead{display:flex;align-items:center;gap:6px;padding:4px 6px;cursor:pointer;color:var(--muted);font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;border-radius:6px;user-select:none}
 .groupHead:hover{background:var(--panel);color:var(--text)}
@@ -32,13 +33,12 @@ main{scrollbar-width:thin;scrollbar-color:#3a4a63 transparent}
 .groupBody.collapsed{display:none}
 .item{padding:5px 6px;border:1px solid transparent;border-radius:7px;cursor:pointer;display:flex;gap:8px;align-items:center}
 .item:hover{background:var(--panel);border-color:var(--border)} .item.active{background:#152636;border-color:#2b7d91}
-.thumb{width:32px;height:32px;flex:0 0 32px;border-radius:6px;border:1px solid var(--border);background:#10141c;image-rendering:pixelated;image-rendering:crisp-edges;object-fit:contain}
+.thumb{width:32px;height:32px;flex:0 0 32px;border-radius:6px;border:1px solid var(--border);background:#10141c;image-rendering:pixelated;object-fit:contain}
 .item .info{min-width:0;flex:1}
 .item .row1{display:flex;gap:6px;align-items:center}
 .item .name{font-weight:600;font-size:13px;flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .item .tag{font-size:10px;color:var(--muted);background:var(--panel3);border-radius:4px;padding:0 5px}
 .item .meta{color:var(--muted);font-size:11px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:1px}
-main{padding:10px;overflow:auto;min-height:0}
 .card{background:var(--panel);border:1px solid var(--border);border-radius:10px}
 .empty{padding:24px;color:var(--muted)}
 .topbar{padding:8px 10px;border-bottom:1px solid var(--border);display:flex;gap:8px;align-items:center;flex-wrap:wrap}
@@ -47,44 +47,52 @@ main{padding:10px;overflow:auto;min-height:0}
 .animBar{padding:8px 10px;border-bottom:1px solid var(--border);display:flex;gap:6px;flex-wrap:wrap;align-items:center}
 .animBtn{background:var(--panel2);border:1px solid var(--border);border-radius:7px;padding:5px 9px;font-size:12px;cursor:pointer}
 .animBtn:hover{border-color:#43506a} .animBtn.active{background:#2f2550;border-color:#7658c8;color:#fff}
-.animBtn .sub{color:var(--muted);font-size:10px;margin-left:4px} .animBtn.active .sub{color:#d9ccff}
-.work{display:grid;grid-template-columns:auto 1fr;gap:10px;padding:10px}
-.player{display:flex;flex-direction:column;gap:6px;align-items:flex-start}
-canvas{image-rendering:pixelated;image-rendering:crisp-edges;border:1px solid var(--border);border-radius:8px;background:
-  linear-gradient(45deg,#191f2b 25%,transparent 25%),linear-gradient(-45deg,#191f2b 25%,transparent 25%),
-  linear-gradient(45deg,transparent 75%,#191f2b 75%),linear-gradient(-45deg,transparent 75%,#191f2b 75%);
-  background-size:12px 12px;background-position:0 0,0 6px,6px -6px,-6px 0px}
-.controls{display:flex;gap:4px;flex-wrap:wrap;align-items:center}
-.btn{background:var(--panel2);border:1px solid var(--border);border-radius:7px;padding:5px 9px;cursor:pointer;font-size:12px}
-.btn:hover{border-color:#43506a} .btn.primary{background:#1b4655;border-color:#2b7d91}
+.animBtn .key{color:var(--muted);font-size:10px;margin-right:5px}
+.animBtn .sub{color:var(--muted);font-size:10px;margin-left:4px} .animBtn.active .sub,.animBtn.active .key{color:#d9ccff}
+.work{display:grid;grid-template-columns:minmax(320px,auto) 1fr;gap:12px;padding:10px}
+.player{display:flex;flex-direction:column;gap:8px;min-width:0}
+.stage{border:1px solid var(--border);border-radius:8px;display:flex;align-items:center;justify-content:center;padding:12px;min-height:300px}
+.stage.bg-checker{background:linear-gradient(45deg,#191f2b 25%,transparent 25%),linear-gradient(-45deg,#191f2b 25%,transparent 25%),linear-gradient(45deg,transparent 75%,#191f2b 75%),linear-gradient(-45deg,transparent 75%,#191f2b 75%);background-color:#121722;background-size:16px 16px;background-position:0 0,0 8px,8px -8px,-8px 0}
+.stage.bg-dark{background:#1b1e27} .stage.bg-light{background:#d9dce4} .stage.bg-green{background:#3d6b45}
+canvas{image-rendering:pixelated;display:block}
+.controls{display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+.btn{background:var(--panel2);border:1px solid var(--border);border-radius:7px;padding:5px 10px;cursor:pointer;font-size:12px}
+.btn:hover{border-color:#43506a} .btn.primary{background:#1b4655;border-color:#2b7d91;min-width:70px}
 select.ctrl{background:var(--panel2);border:1px solid var(--border);border-radius:7px;padding:5px 7px;font-size:12px}
 label.ctrlLbl{font-size:11px;color:var(--muted);display:flex;align-items:center;gap:4px}
-.scrubRow{display:flex;gap:6px;align-items:center;width:100%;max-width:420px}
-#scrub{flex:1;accent-color:var(--accent)}
-#frameInfo{font-size:12px;color:var(--muted);min-height:18px}
+#frameInfo{font-size:12px;color:var(--text);min-height:18px}
+.film{display:flex;gap:4px;flex-wrap:wrap}
+.film canvas{border:2px solid transparent;border-radius:5px;background:#10141c;cursor:pointer}
+.film canvas.cur{border-color:var(--accent)}
+.film canvas:hover{border-color:#43506a}
+.film .ms{font-size:10px;color:var(--muted);text-align:center}
+.keys{font-size:11px;color:var(--muted);line-height:1.9}
 .sidePane{display:flex;flex-direction:column;gap:8px;min-width:0}
 .panel{background:var(--panel2);border:1px solid var(--border);border-radius:8px}
-.panelHead{padding:6px 8px;font-size:11px;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:.04em;border-bottom:1px solid var(--border);display:flex;align-items:center}
+.panelHead{padding:6px 8px;font-size:11px;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:.04em;border-bottom:1px solid var(--border);display:flex;align-items:center;cursor:pointer;user-select:none}
+.panelHead:hover{color:var(--text)}
+.panelHead .hint{margin-left:auto;font-weight:500;text-transform:none;letter-spacing:0}
+.panel.closed .panelBody{display:none} .panel.closed .panelHead{border-bottom:none}
 .panelBody{padding:8px}
 .previewBox img{image-rendering:pixelated;max-width:100%;border:1px solid var(--border);border-radius:6px;background:#121720;display:block}
 .gifRow{display:flex;gap:8px;flex-wrap:wrap}
-.gifRow figure{margin:0} .gifRow img{image-rendering:pixelated;border:1px solid var(--border);border-radius:6px;background:#121720;height:88px}
+.gifRow figure{margin:0;cursor:pointer} .gifRow img{image-rendering:pixelated;border:1px solid var(--border);border-radius:6px;background:#121720;height:88px}
+.gifRow figure.cur img{border-color:var(--accent2)}
 .gifRow figcaption{font-size:11px;color:var(--muted);margin-top:2px;text-align:center}
 .err{color:#ff9f9f} .ok{color:var(--good)}
-.toggle{margin-left:auto;font-size:11px;cursor:pointer;color:var(--accent);font-weight:600;text-transform:none;letter-spacing:0}
 @media (max-width:980px){.layout{grid-template-columns:1fr} aside{border-right:none;border-bottom:1px solid var(--border);max-height:36vh} .work{grid-template-columns:1fr}}
 </style>
 </head>
 <body>
 <header>
   <h1>Sprite Lab Viewer</h1>
-  <div class="sub">Chọn sprite → bấm animation → Play/Step</div>
-  <div id="status" class="sub"></div>
+  <div class="sub">Chọn sprite → chọn animation → xem / tua từng frame</div>
+  <div id="status"><span id="live" title="Tự kiểm tra sprite mới mỗi 2 giây">● tự cập nhật</span><span id="count" class="sub"></span></div>
 </header>
 <div class="layout">
   <aside>
     <div class="sideTop">
-      <input id="q" class="search" placeholder="Tìm sprite…" />
+      <input id="q" class="search" placeholder="Tìm sprite…  ( / )" />
       <div class="filters" id="filters"></div>
     </div>
     <div id="list"></div>
@@ -100,27 +108,29 @@ label.ctrlLbl{font-size:11px;color:var(--muted);display:flex;align-items:center;
       <div class="animBar" id="animBar"></div>
       <div class="work">
         <div class="player">
-          <canvas id="cv" width="128" height="128"></canvas>
-          <div class="scrubRow"><input id="scrub" type="range" min="0" max="0" value="0"><span id="scrubLabel" class="metaText"></span></div>
+          <div class="stage bg-checker" id="stage"><canvas id="cv" width="128" height="128"></canvas></div>
           <div class="controls">
-            <button id="btnPlay" class="btn primary" title="Space">Play</button>
-            <button id="btnPause" class="btn" title="Space">Pause</button>
-            <button id="btnStep" class="btn" title="→">Step</button>
-            <button id="btnRestart" class="btn" title="R">Restart</button>
-            <label class="ctrlLbl">Scale <select id="scaleSel" class="ctrl"><option>2</option><option>3</option><option selected>4</option><option>6</option><option>8</option></select></label>
-            <label class="ctrlLbl">Tốc độ <select id="speedSel" class="ctrl"><option value="0.5">0.5×</option><option value="1" selected>1×</option><option value="1.5">1.5×</option><option value="2">2×</option></select></label>
-            <label class="ctrlLbl"><input type="checkbox" id="showAnchor" checked> Neo</label>
+            <button id="btnPlay" class="btn primary" title="Space">⏸ Dừng</button>
+            <button id="btnPrev" class="btn" title="←">◀ Frame</button>
+            <button id="btnNext" class="btn" title="→">Frame ▶</button>
+            <button id="btnRestart" class="btn" title="R">↺ Từ đầu</button>
+            <label class="ctrlLbl">Tỉ lệ <select id="scaleSel" class="ctrl"><option value="fit" selected>Vừa khung</option><option>2</option><option>3</option><option>4</option><option>6</option><option>8</option><option>10</option></select></label>
+            <label class="ctrlLbl">Tốc độ <select id="speedSel" class="ctrl"><option value="0.25">0.25×</option><option value="0.5">0.5×</option><option value="1" selected>1×</option><option value="1.5">1.5×</option><option value="2">2×</option></select></label>
+            <label class="ctrlLbl">Nền <select id="bgSel" class="ctrl"><option value="checker">Caro</option><option value="dark">Tối</option><option value="light">Sáng</option><option value="green">Cỏ</option></select></label>
+            <label class="ctrlLbl"><input type="checkbox" id="showAnchor" checked> Neo + đất</label>
           </div>
           <div id="frameInfo"></div>
+          <div class="film" id="film"></div>
+          <div class="keys"><kbd>Space</kbd> phát/dừng · <kbd>←</kbd><kbd>→</kbd> frame · <kbd>↑</kbd><kbd>↓</kbd> animation · <kbd>1</kbd>–<kbd>9</kbd> chọn animation · <kbd>[</kbd><kbd>]</kbd> sprite trước/sau · <kbd>+</kbd><kbd>-</kbd> tỉ lệ · <kbd>B</kbd> nền · <kbd>R</kbd> từ đầu · <kbd>/</kbd> tìm</div>
         </div>
         <div class="sidePane">
-          <div class="panel">
-            <div class="panelHead">GIF <span class="toggle" id="gifToggle"></span></div>
-            <div class="panelBody" id="gifWrap"><div id="gifRow" class="gifRow"></div></div>
+          <div class="panel" id="gifPanel">
+            <div class="panelHead">GIF <span class="hint metaText">bấm để chọn</span></div>
+            <div class="panelBody"><div id="gifRow" class="gifRow"></div></div>
           </div>
-          <div class="panel">
-            <div class="panelHead">Preview sheet <span class="toggle" id="prevToggle"></span></div>
-            <div class="panelBody previewBox" id="prevWrap"><img id="previewImg" alt="preview"></div>
+          <div class="panel" id="prevPanel">
+            <div class="panelHead">Preview sheet <span class="hint metaText">mỗi animation một hàng</span></div>
+            <div class="panelBody previewBox"><img id="previewImg" alt="preview"></div>
           </div>
         </div>
       </div>
@@ -130,8 +140,9 @@ label.ctrlLbl{font-size:11px;color:var(--muted);display:flex;align-items:center;
 <script>
 let data=null,current=null,img=null;
 let anims=[],animIdx=0,frameInAnim=0,playing=true,acc=0,lastT=0,scale=4,speed=1,showAnchor=true;
-let activeFilter='all';
+let activeFilter='all',lastManifest='';
 const collapsed={};
+const BGS=['checker','dark','light','green'];
 const $=id=>document.getElementById(id);
 const cv=$('cv'),ctx=cv.getContext('2d');
 
@@ -145,10 +156,11 @@ const CATS=[
   {id:'character',label:'Nhân vật'},
   {id:'base',label:'Vật phẩm/Môi trường'}
 ];
+const ORDER=['character','weapon','armor','projectile','aoe','buff','base'];
 
 function categoryOf(s){
   const n=s.name, aNames=(s.meta.animations||[]).map(a=>a.name);
-  if(n==='mage' || n==='swordsman') return 'character';
+  if(n==='mage' || n==='swordsman' || s.meta.ground) return 'character';
   if(/^(iron-sword|greatsword|battle-axe|war-hammer|oak-bow|magic-staff)$/.test(n) || /sword|axe|hammer|bow|staff|dagger|spear|mace|wand/.test(n)) return 'weapon';
   if(/helmet|hood|cap|chestplate|robe|tunic|armor|gloves|gauntlets|boots|greaves|shield$|cuirass|leggings|pauldron/.test(n) && !/magnetic/.test(n)) return 'armor';
   if(aNames.includes('fly')) return 'projectile';
@@ -161,20 +173,48 @@ function categoryOf(s){
 }
 function catLabel(id){const c=CATS.find(x=>x.id===id);return c?c.label:id;}
 
+// --- manifest + live reload --------------------------------------------------------
+async function fetchManifest(){
+  const res=await fetch('sprites-manifest.json',{cache:'no-store'});
+  if(!res.ok) throw new Error('HTTP '+res.status);
+  const text=await res.text();
+  return {text, json:JSON.parse(text)};
+}
 async function init(){
   buildFilters();
   try{
-    const res=await fetch('sprites-manifest.json',{cache:'no-store'});
-    if(!res.ok) throw new Error('HTTP '+res.status);
-    data=await res.json();
-    data.sprites.forEach(s=>s._cat=categoryOf(s));
-    $('status').innerHTML='<span class="ok">'+data.sprites.length+' sprites</span>';
-    renderList();
+    const m=await fetchManifest(); lastManifest=m.text; setData(m.json);
+    const [name,anim]=decodeURIComponent(location.hash.slice(1)).split('/');
+    const s=data.sprites.find(x=>x.name===name);
+    if(s) selectSprite(s,anim);
   }catch(e){
-    $('status').innerHTML='<span class="err">Cần server</span>';
+    $('count').innerHTML='<span class="err">Cần server</span>';
     $('empty').innerHTML='<span class="err">Không tải được manifest: '+e.message+'</span><br><br>Chạy <code>./serve-viewer.sh</code> trong <code>sprite-lab/</code> rồi mở trang trong trình duyệt.';
   }
+  setInterval(poll,2000);
 }
+function setData(json){
+  data=json; data.sprites.forEach(s=>s._cat=categoryOf(s));
+  $('count').innerHTML='<span class="ok">'+data.sprites.length+' sprites</span>';
+  renderList();
+}
+// `gamekit art run` rewrites the manifest; a re-rendered sprite has new ?v= URLs.
+async function poll(){
+  let m; try{ m=await fetchManifest(); }catch(e){ return; }
+  if(m.text===lastManifest) return;
+  lastManifest=m.text; setData(m.json);
+  if(current){
+    const fresh=data.sprites.find(x=>x.name===current.name);
+    if(fresh && (fresh.strip!==current.strip || JSON.stringify(fresh.meta)!==JSON.stringify(current.meta))){
+      const anim=currentAnim()&&currentAnim().name;
+      selectSprite(fresh,anim,true);
+      const live=$('live'); live.textContent='● đã cập nhật '+new Date().toLocaleTimeString();
+      live.classList.add('flash'); setTimeout(()=>live.classList.remove('flash'),2500);
+    }
+  }
+}
+
+// --- sidebar -------------------------------------------------------------------------
 function buildFilters(){
   const wrap=$('filters'); wrap.innerHTML='';
   CATS.forEach(c=>{
@@ -187,120 +227,199 @@ function filtered(){
   const q=$('q').value.toLowerCase().trim();
   return data.sprites.filter(s=>(activeFilter==='all'||s._cat===activeFilter)&&(!q||s.name.includes(q)));
 }
+function visibleOrder(){ // sprites in the order the list shows them (for [ and ])
+  const items=filtered(), out=[];
+  ORDER.forEach(cat=>items.filter(s=>s._cat===cat&&!collapsed[cat]).forEach(s=>out.push(s)));
+  return out;
+}
 function renderList(){
   const list=$('list'); list.innerHTML='';
   const items=filtered();
   const groups={}; items.forEach(s=>{(groups[s._cat]=groups[s._cat]||[]).push(s);});
-  const order=['weapon','armor','projectile','aoe','buff','character','base'];
   let any=false;
-  order.forEach(cat=>{
+  ORDER.forEach(cat=>{
     const arr=groups[cat]; if(!arr||!arr.length) return; any=true;
     const g=document.createElement('div'); g.className='group';
     const head=document.createElement('div'); head.className='groupHead';
     const isCol=!!collapsed[cat];
-    head.innerHTML='<span>'+ (isCol?'▸':'▾') +'</span><span>'+catLabel(cat)+'</span><span class="count">'+arr.length+'</span>';
+    head.innerHTML='<span>'+(isCol?'▸':'▾')+'</span><span>'+catLabel(cat)+'</span><span class="count">'+arr.length+'</span>';
     head.onclick=()=>{collapsed[cat]=!collapsed[cat]; renderList();};
     const body=document.createElement('div'); body.className='groupBody'+(isCol?' collapsed':'');
     arr.forEach(s=>{
       const d=document.createElement('div'); d.className='item'+(current&&current.name===s.name?' active':'');
-      const a=(s.meta.animations||[]).map(x=>x.name).join(', ');
+      const a=(s.meta.animations||[]).map(x=>x.name).join(', ')||'1 animation';
       const fs=(s.meta.frame_size||[]).join('×');
       const thumb=s.thumb||('sprites/'+s.name+'/'+s.name+'.png');
       d.innerHTML='<img class="thumb" src="'+thumb+'" alt="" loading="lazy"><div class="info"><div class="row1"><div class="name">'+s.name+'</div><div class="tag">'+fs+'</div></div><div class="meta">'+a+'</div></div>';
-      const im=d.querySelector('img.thumb');
-      im.onerror=()=>{im.style.visibility='hidden';};
+      const im=d.querySelector('img.thumb'); im.onerror=()=>{im.style.visibility='hidden';};
       d.onclick=()=>selectSprite(s); body.appendChild(d);
     });
     g.appendChild(head); g.appendChild(body); list.appendChild(g);
   });
   if(!any) list.innerHTML='<div class="metaText" style="padding:8px">Không có sprite phù hợp.</div>';
+  const act=list.querySelector('.item.active'); if(act) act.scrollIntoView({block:'nearest'});
 }
-function selectSprite(s){
+
+// --- sprite view ---------------------------------------------------------------------
+function selectSprite(s,animName,keepFrame){
+  const prevFrame=frameInAnim;
   current=s; renderList();
   $('empty').style.display='none'; $('view').style.display='block';
   $('vName').textContent=s.name;
   $('vCat').textContent=catLabel(s._cat);
   const fs=s.meta.frame_size||[0,0];
-  $('vMeta').textContent=fs[0]+'×'+fs[1]+' · neo ['+(s.meta.anchor||[]).join(', ')+'] · '+(s.meta.frame_count||'?')+'f';
+  const nAnim=(s.meta.animations||[]).length||1;
+  $('vMeta').textContent=fs[0]+'×'+fs[1]+' px · '+(s.meta.frames||'?')+' frame · '+nAnim+' animation · neo ['+(s.meta.anchor||[]).join(', ')+']'+(s.meta.ground?' · đứng trên đất':'');
   $('previewImg').src=s.preview||'';
-  const gr=$('gifRow'); gr.innerHTML='';
-  const gifs=Object.entries(s.gifs||{});
-  if(!gifs.length){ gr.innerHTML='<span class="metaText">Không có GIF.</span>'; }
-  gifs.forEach(([name,src])=>{const f=document.createElement('figure'); f.innerHTML='<img src="'+src+'"><figcaption>'+name+'</figcaption>'; gr.appendChild(f);});
-  anims=(s.meta.animations&&s.meta.animations.length)?s.meta.animations:[{name:'default',start:0,frames:s.meta.frame_count||1,fps:8,loop:true}];
-  animIdx=0; frameInAnim=0; acc=0; buildAnimBtns();
+  anims=(s.meta.animations&&s.meta.animations.length)?s.meta.animations:[{name:'default',start:0,frames:s.meta.frames||1,fps:s.meta.fps||8,loop:s.meta.loop!==false}];
+  animIdx=Math.max(0,anims.findIndex(a=>a.name===animName));
+  frameInAnim=keepFrame?Math.min(prevFrame,anims[animIdx].frames-1):0; acc=0;
+  buildAnimBtns(); buildGifs();
   img=new Image();
-  img.onload=()=>{resizeCanvas(); playing=true;};
+  img.onload=()=>{resizeCanvas(); buildFilm(); if(!keepFrame) playing=true; updatePlayBtn();};
   img.src=s.strip;
+  updateHash();
 }
+function updateHash(){ if(current) history.replaceState(null,'','#'+current.name+'/'+(currentAnim()?currentAnim().name:'')); }
+function buildGifs(){
+  const gr=$('gifRow'); gr.innerHTML='';
+  const gifs=Object.entries(current.gifs||{});
+  if(!gifs.length){ gr.innerHTML='<span class="metaText">Không có GIF.</span>'; return; }
+  gifs.forEach(([name,src])=>{
+    const f=document.createElement('figure'); f.dataset.anim=name;
+    f.innerHTML='<img src="'+src+'"><figcaption>'+name+'</figcaption>';
+    f.onclick=()=>{const i=anims.findIndex(a=>a.name===name); if(i>=0) setAnim(i);};
+    gr.appendChild(f);
+  });
+  markGif();
+}
+function markGif(){ document.querySelectorAll('#gifRow figure').forEach(f=>f.classList.toggle('cur',currentAnim()&&f.dataset.anim===currentAnim().name)); }
 function buildAnimBtns(){
   const wrap=$('animBar'); wrap.innerHTML='';
   anims.forEach((a,i)=>{
     const b=document.createElement('button'); b.className='animBtn'+(i===animIdx?' active':'');
-    b.innerHTML=a.name+'<span class="sub">'+a.frames+'f · '+a.fps+'fps'+(a.loop===false?' · 1×':'')+'</span>';
-    b.onclick=()=>{animIdx=i; frameInAnim=0; acc=0; playing=true; buildAnimBtns(); updateScrub();};
+    const timing=a.durations_ms?'nhịp riêng':(a.fps+'fps');
+    b.innerHTML=(i<9?'<span class="key">'+(i+1)+'</span>':'')+a.name+'<span class="sub">'+a.frames+'f · '+timing+(a.loop===false?' · 1 lần':'')+'</span>';
+    b.onclick=()=>setAnim(i);
     wrap.appendChild(b);
   });
-  updateScrub();
+}
+function setAnim(i){
+  if(i<0||i>=anims.length) return;
+  animIdx=i; frameInAnim=0; acc=0; playing=true;
+  buildAnimBtns(); buildFilm(); markGif(); updatePlayBtn(); updateHash();
 }
 function currentAnim(){return anims[animIdx]||anims[0];}
+function frameMs(a,i){ return a.durations_ms? a.durations_ms[i] : 1000/Math.max(1,a.fps||8); }
 function resizeCanvas(){
   if(!current) return; const fs=current.meta.frame_size||[32,32];
-  scale=parseInt($('scaleSel').value,10)||4;
+  const v=$('scaleSel').value;
+  scale = v==='fit' ? Math.max(1,Math.min(12,Math.floor(300/Math.max(fs[0],fs[1])))) : (parseInt(v,10)||4);
   cv.width=fs[0]*scale; cv.height=fs[1]*scale; ctx.imageSmoothingEnabled=false;
 }
-function updateScrub(){
-  const a=currentAnim(); if(!a) return;
-  $('scrub').max=Math.max(0,a.frames-1); $('scrub').value=frameInAnim;
-  $('scrubLabel').textContent=(frameInAnim+1)+'/'+a.frames;
+function stepScale(d){
+  const sel=$('scaleSel'); const opts=[...sel.options].map(o=>o.value).filter(v=>v!=='fit').map(Number);
+  const cur=sel.value==='fit'?scale:Number(sel.value);
+  let next=d>0?opts.find(v=>v>cur):[...opts].reverse().find(v=>v<cur);
+  if(next){ sel.value=String(next); resizeCanvas(); }
 }
+// Filmstrip: every frame of the current animation, click to jump.
+function buildFilm(){
+  const film=$('film'); film.innerHTML='';
+  if(!current||!img||!img.complete) return;
+  const fs=current.meta.frame_size||[32,32], a=currentAnim();
+  const k=Math.max(1,Math.floor(56/Math.max(fs[0],fs[1])));
+  for(let i=0;i<a.frames;i++){
+    const wrap=document.createElement('div');
+    const c=document.createElement('canvas'); c.width=fs[0]*k; c.height=fs[1]*k;
+    const x=c.getContext('2d'); x.imageSmoothingEnabled=false;
+    x.drawImage(img,((a.start||0)+i)*fs[0],0,fs[0],fs[1],0,0,fs[0]*k,fs[1]*k);
+    c.title='frame '+(i+1)+' · '+Math.round(frameMs(a,i))+' ms';
+    c.onclick=()=>{frameInAnim=i; playing=false; acc=0; updatePlayBtn();};
+    const ms=document.createElement('div'); ms.className='ms'; ms.textContent=Math.round(frameMs(a,i))+'ms';
+    wrap.appendChild(c); wrap.appendChild(ms); film.appendChild(wrap);
+  }
+}
+function markFilm(){ [...$('film').querySelectorAll('canvas')].forEach((c,i)=>c.classList.toggle('cur',i===frameInAnim)); }
+function updatePlayBtn(){ $('btnPlay').textContent=playing?'⏸ Dừng':'▶ Phát'; }
+
 function draw(){
   if(!current||!img||!img.complete) return;
   const fs=current.meta.frame_size||[32,32];
   const a=currentAnim(); if(!a) return;
   const globalFrame=(a.start||0)+frameInAnim;
-  const sx=globalFrame*fs[0];
   ctx.clearRect(0,0,cv.width,cv.height);
-  ctx.drawImage(img,sx,0,fs[0],fs[1],0,0,fs[0]*scale,fs[1]*scale);
-  if(showAnchor && s.meta){
-    const anc=s.meta.anchor||[fs[0]/2,fs[1]/2];
-    const ax=Math.round(anc[0]*scale), ay=Math.round(anc[1]*scale);
-    ctx.strokeStyle='#ff4fd8'; ctx.lineWidth=Math.max(1,Math.floor(scale/2));
-    ctx.beginPath(); ctx.moveTo(ax-3*scale/2,ay); ctx.lineTo(ax+3*scale/2,ay); ctx.stroke();
-    ctx.beginPath(); ctx.moveTo(ax,ay-3*scale/2); ctx.lineTo(ax,ay+3*scale/2); ctx.stroke();
+  if(showAnchor && current.meta.ground){ // ground line at the anchor height
+    const gy=Math.round((current.meta.anchor||[0,fs[1]])[1]*scale);
+    ctx.fillStyle='rgba(110,224,110,.55)'; ctx.fillRect(0,gy,cv.width,Math.max(1,Math.floor(scale/3)));
   }
-  $('frameInfo').textContent=a.name+' · frame '+(frameInAnim+1)+'/'+a.frames+' (global '+globalFrame+') · '+a.fps+'fps · '+(a.loop===false?'one-shot':'loop')+' '+(playing?'▶':'⏸');
-  $('scrub').value=frameInAnim; $('scrubLabel').textContent=(frameInAnim+1)+'/'+a.frames;
+  ctx.drawImage(img,globalFrame*fs[0],0,fs[0],fs[1],0,0,fs[0]*scale,fs[1]*scale);
+  if(showAnchor){
+    const anc=current.meta.anchor||[fs[0]/2,fs[1]/2];
+    const ax=Math.round(anc[0]*scale), ay=Math.round(anc[1]*scale);
+    ctx.strokeStyle='#ff4fd8'; ctx.lineWidth=Math.max(1,Math.floor(scale/3));
+    ctx.beginPath(); ctx.moveTo(ax-scale*1.5,ay); ctx.lineTo(ax+scale*1.5,ay); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(ax,ay-scale*1.5); ctx.lineTo(ax,ay+scale*1.5); ctx.stroke();
+  }
+  $('frameInfo').innerHTML='<b>'+a.name+'</b> · frame '+(frameInAnim+1)+'/'+a.frames+' · '+Math.round(frameMs(a,frameInAnim))+' ms'+
+    ' · '+(a.loop===false?'phát 1 lần':'lặp')+' · frame '+globalFrame+' trên strip';
+  markFilm();
 }
-const s={get meta(){return current?current.meta:null}};
 function tick(t){
   requestAnimationFrame(tick);
   if(!current||!img||!img.complete) return;
   const a=currentAnim(); if(!a) return;
   if(playing){
-    if(!lastT) lastT=t; const dt=(t-lastT)/1000; lastT=t; acc+=dt*speed;
-    const dur=1/Math.max(1,a.fps||8);
-    while(acc>=dur){ acc-=dur; if(frameInAnim<a.frames-1) frameInAnim++; else { if(a.loop===false){playing=false; frameInAnim=a.frames-1;} else {frameInAnim=0;} } }
+    if(!lastT) lastT=t; const dt=(t-lastT)/1000; lastT=t; acc+=dt*speed*1000;
+    while(acc>=frameMs(a,frameInAnim)){
+      acc-=frameMs(a,frameInAnim);
+      if(frameInAnim<a.frames-1) frameInAnim++;
+      else if(a.loop===false){ playing=false; acc=0; updatePlayBtn(); break; }
+      else frameInAnim=0;
+    }
   } else { lastT=t; }
   draw();
 }
+function stepFrame(d){
+  playing=false; acc=0; updatePlayBtn();
+  const a=currentAnim(); frameInAnim=(frameInAnim+d+a.frames)%a.frames;
+}
+function stepSprite(d){
+  const order=visibleOrder(); if(!order.length) return;
+  const i=current?order.findIndex(s=>s.name===current.name):-1;
+  selectSprite(order[(i+d+order.length)%order.length]);
+}
+function setBg(v){ const st=$('stage'); BGS.forEach(b=>st.classList.remove('bg-'+b)); st.classList.add('bg-'+v); $('bgSel').value=v; try{localStorage.setItem('viewerBg',v);}catch(e){} }
 
 $('q').addEventListener('input',renderList);
-$('scaleSel').addEventListener('change',resizeCanvas);
-$('speedSel').addEventListener('change',e=>{speed=parseFloat(e.target.value)||1;});
+$('scaleSel').addEventListener('change',()=>{resizeCanvas(); $('scaleSel').blur();});
+$('speedSel').addEventListener('change',e=>{speed=parseFloat(e.target.value)||1; e.target.blur();});
+$('bgSel').addEventListener('change',e=>{setBg(e.target.value); e.target.blur();});
 $('showAnchor').addEventListener('change',e=>{showAnchor=e.target.checked;});
-$('scrub').addEventListener('input',e=>{frameInAnim=parseInt(e.target.value,10)||0; playing=false; acc=0;});
-$('btnPlay').onclick=()=>{playing=true;};
-$('btnPause').onclick=()=>{playing=false;};
-$('btnStep').onclick=()=>{playing=false; const a=currentAnim(); if(frameInAnim<a.frames-1) frameInAnim++; else if(a.loop!==false) frameInAnim=0;};
-$('btnRestart').onclick=()=>{frameInAnim=0; acc=0; playing=true;};
+$('btnPlay').onclick=()=>{ const a=currentAnim(); if(!playing && a && a.loop===false && frameInAnim===a.frames-1) frameInAnim=0; playing=!playing; updatePlayBtn(); };
+$('btnPrev').onclick=()=>stepFrame(-1);
+$('btnNext').onclick=()=>stepFrame(1);
+$('btnRestart').onclick=()=>{frameInAnim=0; acc=0; playing=true; updatePlayBtn();};
+document.querySelectorAll('.panelHead').forEach(h=>h.onclick=()=>h.parentElement.classList.toggle('closed'));
 document.addEventListener('keydown',e=>{
-  if(e.target.tagName==='INPUT' && e.target.type!=='range' && e.target.type!=='checkbox') return;
-  if(e.code==='Space'){e.preventDefault(); playing=!playing;}
-  if(e.code==='ArrowRight'){e.preventDefault(); $('btnStep').onclick();}
-  if(e.code==='ArrowLeft'){e.preventDefault(); playing=false; frameInAnim=Math.max(0,frameInAnim-1);}
-  if(e.key==='r'||e.key==='R'){ $('btnRestart').onclick(); }
+  if(e.target===$('q')){ if(e.key==='Escape'){ $('q').blur(); } return; }
+  if(e.ctrlKey||e.metaKey||e.altKey) return;
+  if(e.key==='/'){ e.preventDefault(); $('q').focus(); return; }
+  if(!current) return;
+  if(e.code==='Space'){ e.preventDefault(); $('btnPlay').onclick(); }
+  else if(e.key==='ArrowRight'){ e.preventDefault(); stepFrame(1); }
+  else if(e.key==='ArrowLeft'){ e.preventDefault(); stepFrame(-1); }
+  else if(e.key==='ArrowDown'){ e.preventDefault(); setAnim((animIdx+1)%anims.length); }
+  else if(e.key==='ArrowUp'){ e.preventDefault(); setAnim((animIdx-1+anims.length)%anims.length); }
+  else if(e.key>='1'&&e.key<='9'){ setAnim(Number(e.key)-1); }
+  else if(e.key===']'){ stepSprite(1); }
+  else if(e.key==='['){ stepSprite(-1); }
+  else if(e.key==='+'||e.key==='='){ stepScale(1); }
+  else if(e.key==='-'){ stepScale(-1); }
+  else if(e.key==='b'||e.key==='B'){ setBg(BGS[(BGS.indexOf($('bgSel').value)+1)%BGS.length]); }
+  else if(e.key==='r'||e.key==='R'){ $('btnRestart').onclick(); }
 });
+try{ const b=localStorage.getItem('viewerBg'); if(b&&BGS.includes(b)) setBg(b); }catch(e){}
 
 init();
 requestAnimationFrame(tick);

@@ -63,6 +63,18 @@ không đổi giữa các animation. Có sẵn thân `tunic` (áo + quần) và 
 nháy trắng khi trúng đòn (giữ viền), ngã xoay về đất, và `keep_above_floor` để vũ khí không xuyên đất.
 Nhân vật dùng `write_anim_meta(..., ground=True)`: `art run` kiểm tra mọi frame chạm đất.
 
+## Xem trên web (`./serve-viewer.sh`)
+
+`./serve-viewer.sh` (trong `sprite-lab/`) mở http://localhost:8765/viewer.html: danh sách mọi sprite theo nhóm,
+khung xem lớn (tỉ lệ "Vừa khung", nền caro/tối/sáng/cỏ, đường đất + điểm neo), dải frame có thời lượng từng
+frame (bấm để nhảy tới), GIF và preview sheet. Phát đúng `durations_ms`.
+
+- **Tự cập nhật**: mỗi 2 giây viewer đọc lại manifest; `gamekit art run <tên>` tạo lại manifest, nên sprite vừa
+  vẽ hiện ngay, không cần F5. URL ảnh mang `?v=<mtime>` nên trình duyệt không dùng ảnh cũ.
+- **Đường dẫn nhớ vị trí**: `viewer.html#mage/attack`.
+- **Phím**: Space phát/dừng · ←/→ frame · ↑/↓ animation · 1–9 chọn animation · `[` `]` sprite trước/sau ·
+  `+`/`-` tỉ lệ · B nền · R từ đầu · `/` tìm.
+
 ## Trình thử (`gamekit art lab [<tên>] [sheet|move]`)
 
 - **sheet**: mọi animation cạnh nhau, mỗi cái lặp lại (animation một lần thì nghỉ 0,6 giây rồi chạy lại),
