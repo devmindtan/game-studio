@@ -1,0 +1,910 @@
+{
+  "arcane-bolt": {
+    "cat": "projectile",
+    "tags": [
+      "magic",
+      "arcane",
+      "4-dir"
+    ]
+  },
+  "arcane-circle": {
+    "cat": "aoe",
+    "tags": [
+      "magic",
+      "arcane"
+    ]
+  },
+  "arcane-empower": {
+    "cat": "buff",
+    "tags": [
+      "power"
+    ]
+  },
+  "arcane-sigil": {
+    "cat": "aoe",
+    "tags": [
+      "magic",
+      "arcane"
+    ]
+  },
+  "arrow": {
+    "cat": "projectile",
+    "tags": [
+      "physical",
+      "4-dir"
+    ]
+  },
+  "arrow-rain": {
+    "cat": "aoe",
+    "tags": [
+      "physical",
+      "arrow"
+    ]
+  },
+  "assassin-armor": {
+    "cat": "armor",
+    "tags": [
+      "armor",
+      "assassin"
+    ]
+  },
+  "assassin-boots": {
+    "cat": "armor",
+    "tags": [
+      "armor",
+      "assassin"
+    ]
+  },
+  "assassin-gloves": {
+    "cat": "armor",
+    "tags": [
+      "armor",
+      "assassin"
+    ]
+  },
+  "assassin-hood": {
+    "cat": "armor",
+    "tags": [
+      "armor",
+      "assassin"
+    ]
+  },
+  "axe-chop": {
+    "cat": "strike",
+    "tags": [
+      "melee",
+      "blunt",
+      "4-dir"
+    ]
+  },
+  "axe-gold": {
+    "cat": "weapon",
+    "tags": [
+      "axe",
+      "gold"
+    ]
+  },
+  "axe-iron": {
+    "cat": "weapon",
+    "tags": [
+      "axe",
+      "iron"
+    ]
+  },
+  "axe-wood": {
+    "cat": "weapon",
+    "tags": [
+      "axe",
+      "wood"
+    ]
+  },
+  "bat": {
+    "cat": "character",
+    "tags": [
+      "enemy"
+    ]
+  },
+  "battle-axe": {
+    "cat": "weapon",
+    "tags": [
+      "axe"
+    ]
+  },
+  "bow-gold": {
+    "cat": "weapon",
+    "tags": [
+      "bow",
+      "gold"
+    ]
+  },
+  "bow-iron": {
+    "cat": "weapon",
+    "tags": [
+      "bow",
+      "iron"
+    ]
+  },
+  "bow-wood": {
+    "cat": "weapon",
+    "tags": [
+      "bow",
+      "wood"
+    ]
+  },
+  "cleave-wave": {
+    "cat": "strike",
+    "tags": [
+      "melee",
+      "slash",
+      "4-dir"
+    ]
+  },
+  "dagger-gold": {
+    "cat": "weapon",
+    "tags": [
+      "dagger",
+      "gold"
+    ]
+  },
+  "dagger-iron": {
+    "cat": "weapon",
+    "tags": [
+      "dagger",
+      "iron"
+    ]
+  },
+  "dagger-slash": {
+    "cat": "strike",
+    "tags": [
+      "melee",
+      "slash",
+      "4-dir"
+    ]
+  },
+  "dagger-wood": {
+    "cat": "weapon",
+    "tags": [
+      "dagger",
+      "wood"
+    ]
+  },
+  "earth-spikes": {
+    "cat": "aoe",
+    "tags": [
+      "nature",
+      "poison"
+    ]
+  },
+  "earthquake-rift": {
+    "cat": "aoe",
+    "tags": [
+      "nature",
+      "poison"
+    ]
+  },
+  "exp-gem": {
+    "cat": "item",
+    "tags": [
+      "pickup"
+    ]
+  },
+  "fireball": {
+    "cat": "projectile",
+    "tags": [
+      "magic",
+      "fire",
+      "4-dir"
+    ]
+  },
+  "firefly": {
+    "cat": "base",
+    "tags": [
+      "particle"
+    ]
+  },
+  "flame-geyser": {
+    "cat": "aoe",
+    "tags": [
+      "magic",
+      "fire"
+    ]
+  },
+  "frost-nova": {
+    "cat": "aoe",
+    "tags": [
+      "magic",
+      "ice"
+    ]
+  },
+  "frost-nova-i": {
+    "cat": "aoe",
+    "tags": [
+      "magic",
+      "ice",
+      "upgrade",
+      "tier-I"
+    ]
+  },
+  "frost-nova-ii": {
+    "cat": "aoe",
+    "tags": [
+      "magic",
+      "ice",
+      "upgrade",
+      "tier-II"
+    ]
+  },
+  "frost-nova-iii": {
+    "cat": "aoe",
+    "tags": [
+      "magic",
+      "ice",
+      "upgrade",
+      "tier-III"
+    ]
+  },
+  "frost-nova-iv": {
+    "cat": "aoe",
+    "tags": [
+      "magic",
+      "ice",
+      "upgrade",
+      "tier-IV"
+    ]
+  },
+  "frost-nova-v": {
+    "cat": "aoe",
+    "tags": [
+      "magic",
+      "ice",
+      "upgrade",
+      "tier-V"
+    ]
+  },
+  "frost-shard": {
+    "cat": "projectile",
+    "tags": [
+      "magic",
+      "ice",
+      "4-dir"
+    ]
+  },
+  "goblin": {
+    "cat": "character",
+    "tags": [
+      "enemy"
+    ]
+  },
+  "gold-coin": {
+    "cat": "item",
+    "tags": [
+      "pickup"
+    ]
+  },
+  "greatsword": {
+    "cat": "weapon",
+    "tags": [
+      "sword",
+      "large"
+    ]
+  },
+  "greatsword-gold": {
+    "cat": "weapon",
+    "tags": [
+      "sword",
+      "large",
+      "gold"
+    ]
+  },
+  "greatsword-iron": {
+    "cat": "weapon",
+    "tags": [
+      "sword",
+      "large",
+      "iron"
+    ]
+  },
+  "greatsword-wood": {
+    "cat": "weapon",
+    "tags": [
+      "sword",
+      "large",
+      "wood"
+    ]
+  },
+  "ground-slam": {
+    "cat": "strike",
+    "tags": [
+      "melee",
+      "blunt"
+    ]
+  },
+  "hammer-gold": {
+    "cat": "weapon",
+    "tags": [
+      "hammer",
+      "gold"
+    ]
+  },
+  "hammer-iron": {
+    "cat": "weapon",
+    "tags": [
+      "hammer",
+      "iron"
+    ]
+  },
+  "hammer-strike": {
+    "cat": "strike",
+    "tags": [
+      "melee",
+      "blunt",
+      "4-dir"
+    ]
+  },
+  "hammer-wood": {
+    "cat": "weapon",
+    "tags": [
+      "hammer",
+      "wood"
+    ]
+  },
+  "haste-rune": {
+    "cat": "buff",
+    "tags": [
+      "power"
+    ]
+  },
+  "heal-bloom": {
+    "cat": "buff",
+    "tags": [
+      "heal"
+    ]
+  },
+  "holy-column": {
+    "cat": "aoe",
+    "tags": [
+      "magic",
+      "holy"
+    ]
+  },
+  "hunter-snare": {
+    "cat": "aoe",
+    "tags": [
+      "physical",
+      "arrow"
+    ]
+  },
+  "ice-pillar": {
+    "cat": "aoe",
+    "tags": [
+      "magic",
+      "ice"
+    ]
+  },
+  "iron-sword": {
+    "cat": "weapon",
+    "tags": [
+      "sword",
+      "small"
+    ]
+  },
+  "knight-gauntlets": {
+    "cat": "armor",
+    "tags": [
+      "armor",
+      "knight"
+    ]
+  },
+  "knight-greaves": {
+    "cat": "armor",
+    "tags": [
+      "armor",
+      "knight"
+    ]
+  },
+  "knight-helmet": {
+    "cat": "armor",
+    "tags": [
+      "armor",
+      "knight"
+    ]
+  },
+  "laser-bolt": {
+    "cat": "projectile",
+    "tags": [
+      "magic",
+      "laser",
+      "4-dir"
+    ]
+  },
+  "laser-lance": {
+    "cat": "projectile",
+    "tags": [
+      "magic",
+      "laser",
+      "4-dir"
+    ]
+  },
+  "lightning-storm": {
+    "cat": "aoe",
+    "tags": [
+      "magic",
+      "lightning"
+    ]
+  },
+  "lightning-strike": {
+    "cat": "aoe",
+    "tags": [
+      "magic",
+      "lightning"
+    ]
+  },
+  "mage": {
+    "cat": "character",
+    "tags": [
+      "player"
+    ]
+  },
+  "mage-boots": {
+    "cat": "armor",
+    "tags": [
+      "armor",
+      "mage"
+    ]
+  },
+  "mage-gloves": {
+    "cat": "armor",
+    "tags": [
+      "armor",
+      "mage"
+    ]
+  },
+  "mage-hood": {
+    "cat": "armor",
+    "tags": [
+      "armor",
+      "mage"
+    ]
+  },
+  "mage-robe": {
+    "cat": "armor",
+    "tags": [
+      "armor",
+      "mage"
+    ]
+  },
+  "magic-staff": {
+    "cat": "weapon",
+    "tags": [
+      "staff",
+      "magic"
+    ]
+  },
+  "magic-staff-gold": {
+    "cat": "weapon",
+    "tags": [
+      "staff",
+      "magic",
+      "gold"
+    ]
+  },
+  "magic-staff-iron": {
+    "cat": "weapon",
+    "tags": [
+      "staff",
+      "magic",
+      "iron"
+    ]
+  },
+  "magic-staff-wood": {
+    "cat": "weapon",
+    "tags": [
+      "staff",
+      "magic",
+      "wood"
+    ]
+  },
+  "magnetic-shield": {
+    "cat": "buff",
+    "tags": [
+      "power"
+    ]
+  },
+  "meteor-burst": {
+    "cat": "aoe",
+    "tags": [
+      "magic",
+      "arcane"
+    ]
+  },
+  "meteor-fall": {
+    "cat": "aoe",
+    "tags": [
+      "magic",
+      "arcane"
+    ]
+  },
+  "mote": {
+    "cat": "base",
+    "tags": [
+      "particle"
+    ]
+  },
+  "oak-bow": {
+    "cat": "weapon",
+    "tags": [
+      "bow"
+    ]
+  },
+  "piercing-arrow": {
+    "cat": "projectile",
+    "tags": [
+      "physical",
+      "4-dir"
+    ]
+  },
+  "plasma-ray": {
+    "cat": "projectile",
+    "tags": [
+      "magic",
+      "laser",
+      "4-dir"
+    ]
+  },
+  "poison-arrow": {
+    "cat": "projectile",
+    "tags": [
+      "physical",
+      "4-dir"
+    ]
+  },
+  "poison-dart": {
+    "cat": "projectile",
+    "tags": [
+      "physical",
+      "4-dir"
+    ]
+  },
+  "raindrop": {
+    "cat": "aoe",
+    "tags": [
+      "physical",
+      "ground"
+    ]
+  },
+  "ranger-boots": {
+    "cat": "armor",
+    "tags": [
+      "armor",
+      "ranger"
+    ]
+  },
+  "ranger-cap": {
+    "cat": "armor",
+    "tags": [
+      "armor",
+      "ranger"
+    ]
+  },
+  "ranger-gloves": {
+    "cat": "armor",
+    "tags": [
+      "armor",
+      "ranger"
+    ]
+  },
+  "ranger-tunic": {
+    "cat": "armor",
+    "tags": [
+      "armor",
+      "ranger"
+    ]
+  },
+  "round-shield": {
+    "cat": "weapon",
+    "tags": [
+      "shield"
+    ]
+  },
+  "scatter-volley": {
+    "cat": "aoe",
+    "tags": [
+      "physical",
+      "arrow",
+      "4-dir"
+    ]
+  },
+  "shadow-dash": {
+    "cat": "aoe",
+    "tags": [
+      "shadow",
+      "4-dir"
+    ]
+  },
+  "shadow-slash": {
+    "cat": "strike",
+    "tags": [
+      "melee",
+      "slash",
+      "4-dir"
+    ]
+  },
+  "shield-gold": {
+    "cat": "weapon",
+    "tags": [
+      "shield",
+      "gold"
+    ]
+  },
+  "shield-iron": {
+    "cat": "weapon",
+    "tags": [
+      "shield",
+      "iron"
+    ]
+  },
+  "shield-wood": {
+    "cat": "weapon",
+    "tags": [
+      "shield",
+      "wood"
+    ]
+  },
+  "shuriken": {
+    "cat": "projectile",
+    "tags": [
+      "physical",
+      "4-dir"
+    ]
+  },
+  "slime": {
+    "cat": "character",
+    "tags": [
+      "enemy"
+    ]
+  },
+  "smoke-bomb": {
+    "cat": "aoe",
+    "tags": [
+      "shadow"
+    ]
+  },
+  "solar-ray": {
+    "cat": "projectile",
+    "tags": [
+      "magic",
+      "laser",
+      "4-dir"
+    ]
+  },
+  "splash": {
+    "cat": "aoe",
+    "tags": [
+      "physical",
+      "ground"
+    ]
+  },
+  "staff-gold": {
+    "cat": "weapon",
+    "tags": [
+      "staff",
+      "martial",
+      "gold"
+    ]
+  },
+  "staff-iron": {
+    "cat": "weapon",
+    "tags": [
+      "staff",
+      "martial",
+      "iron"
+    ]
+  },
+  "staff-strike": {
+    "cat": "strike",
+    "tags": [
+      "melee",
+      "magic",
+      "4-dir"
+    ]
+  },
+  "staff-wood": {
+    "cat": "weapon",
+    "tags": [
+      "staff",
+      "martial",
+      "wood"
+    ]
+  },
+  "status-atk-down": {
+    "cat": "status",
+    "tags": [
+      "debuff"
+    ]
+  },
+  "status-atk-up": {
+    "cat": "status",
+    "tags": [
+      "buff"
+    ]
+  },
+  "status-bleed": {
+    "cat": "status",
+    "tags": [
+      "debuff"
+    ]
+  },
+  "status-burn": {
+    "cat": "status",
+    "tags": [
+      "debuff"
+    ]
+  },
+  "status-def-down": {
+    "cat": "status",
+    "tags": [
+      "debuff"
+    ]
+  },
+  "status-def-up": {
+    "cat": "status",
+    "tags": [
+      "buff"
+    ]
+  },
+  "status-freeze": {
+    "cat": "status",
+    "tags": [
+      "debuff"
+    ]
+  },
+  "status-poison": {
+    "cat": "status",
+    "tags": [
+      "debuff"
+    ]
+  },
+  "status-regen": {
+    "cat": "status",
+    "tags": [
+      "buff"
+    ]
+  },
+  "status-shield": {
+    "cat": "status",
+    "tags": [
+      "buff"
+    ]
+  },
+  "status-silence": {
+    "cat": "status",
+    "tags": [
+      "debuff"
+    ]
+  },
+  "status-slow": {
+    "cat": "status",
+    "tags": [
+      "debuff"
+    ]
+  },
+  "status-speed-up": {
+    "cat": "status",
+    "tags": [
+      "buff"
+    ]
+  },
+  "status-stun": {
+    "cat": "status",
+    "tags": [
+      "debuff"
+    ]
+  },
+  "status-weaken": {
+    "cat": "status",
+    "tags": [
+      "debuff"
+    ]
+  },
+  "steel-chestplate": {
+    "cat": "armor",
+    "tags": [
+      "armor",
+      "heavy"
+    ]
+  },
+  "sword-gold": {
+    "cat": "weapon",
+    "tags": [
+      "sword",
+      "small",
+      "gold"
+    ]
+  },
+  "sword-iron": {
+    "cat": "weapon",
+    "tags": [
+      "sword",
+      "small",
+      "iron"
+    ]
+  },
+  "sword-slash": {
+    "cat": "strike",
+    "tags": [
+      "melee",
+      "slash",
+      "4-dir"
+    ]
+  },
+  "sword-wood": {
+    "cat": "weapon",
+    "tags": [
+      "sword",
+      "small",
+      "wood"
+    ]
+  },
+  "swordsman": {
+    "cat": "character",
+    "tags": [
+      "player"
+    ]
+  },
+  "throwing-knife": {
+    "cat": "projectile",
+    "tags": [
+      "physical",
+      "4-dir"
+    ]
+  },
+  "thunder-javelin": {
+    "cat": "projectile",
+    "tags": [
+      "physical",
+      "4-dir"
+    ]
+  },
+  "tower-shield": {
+    "cat": "weapon",
+    "tags": [
+      "shield"
+    ]
+  },
+  "venom-pool": {
+    "cat": "aoe",
+    "tags": [
+      "nature",
+      "poison"
+    ]
+  },
+  "void-orb": {
+    "cat": "projectile",
+    "tags": [
+      "magic",
+      "arcane",
+      "4-dir"
+    ]
+  },
+  "war-hammer": {
+    "cat": "weapon",
+    "tags": [
+      "hammer"
+    ]
+  },
+  "war-hammer-strike": {
+    "cat": "strike",
+    "tags": [
+      "melee",
+      "blunt",
+      "4-dir"
+    ]
+  },
+  "whirlwind": {
+    "cat": "strike",
+    "tags": [
+      "melee",
+      "slash"
+    ]
+  }
+}
