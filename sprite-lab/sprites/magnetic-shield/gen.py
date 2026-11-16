@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
-"""Generator cho sprite "magnetic-shield": khiên từ trường của pháp sư.
+"""Generator cho sprite "magnetic-shield": khiên từ trường bao bọc quanh pháp sư.
 
-  form   5 frame một lần: vòng năng lượng hình thành từ tâm ra;
-  loop   8 frame lặp: màng khiên lục giác xoay, tia từ trường chạy dọc viền;
-  break  6 frame một lần: vỡ mảnh, tia điện tắt dần.
+  form   6 frame một lần: màn từ trường hiện dần và khép kín quanh người;
+  loop   8 frame lặp: màng khiên lục giác xoay tại chỗ, tia từ trường chạy viền;
+  break  6 frame một lần: nứt vỡ và tan rã tại chỗ (không bay đi).
 
-Neo (16, 16) tại tâm khiên (sprite 32x32), để game đặt quanh nhân vật.
+Neo (16, 16) tại tâm khiên (sprite 32x32), để game đặt bao quanh nhân vật.
 
 Chạy:  gamekit art run magnetic-shield
 """
@@ -97,22 +97,51 @@ def field(c, phase, r=11, strength=2, inner=True):
 
 
 def form(i):
+    """Hiện dần và khép kín quanh người, không phóng ra từ tâm."""
     c = Canvas(SIZE, SIZE)
+    r = 11
+    rot = i * 6
     if i == 0:
-        glow(c, CX, CY, 3, "#7ef0ff33")
-        c.ellipse(CX - 2, CY - 2, CX + 2, CY + 2, CYAN_M)
-        p(c, CX, CY, CORE)
+        # viền mờ xuất hiện rải rác quanh vị trí khiên
+        glow(c, CX, CY, 6, "#2f8fd614")
+        for k in (0, 2, 4):
+            a = math.radians(rot + k * 60)
+            x = round(CX + math.cos(a) * r)
+            y = round(CY + math.sin(a) * r)
+            p(c, x, y, CYAN_M)
+            p(c, x + (1 if math.cos(a) > 0 else -1), y, BLUE)
         return c
-    r = 4 + i * 2
-    glow(c, CX, CY, r // 2, "#37b9e822")
-    draw_poly(c, hex_points(CX, CY, r, i * 10), CYAN_M if i < 3 else BLUE)
-    draw_poly(c, hex_points(CX, CY, max(2, r - 2), -i * 8), CYAN)
-    if i >= 2:
+    if i == 1:
+        glow(c, CX, CY, 6, "#2f8fd618")
+        # các đoạn cung lục giác bắt đầu khép
+        pts = hex_points(CX, CY, r, rot)
+        for k in (0, 1, 3, 4):
+            x0, y0 = pts[k]; x1, y1 = pts[(k + 1) % 6]
+            c.line(x0, y0, x1, y1, BLUE)
         for k in range(6):
-            a = math.radians(k * 60 + i * 15)
-            p(c, round(CX + math.cos(a) * r), round(CY + math.sin(a) * r), CORE)
-    if i == 4:
-        field(c, 0, r=11, inner=True)
+            if k % 2 == 0:
+                a = math.radians(rot + k * 60)
+                p(c, round(CX + math.cos(a) * r), round(CY + math.sin(a) * r), CYAN)
+        return c
+    if i == 2:
+        glow(c, CX, CY, 6, "#2f8fd61a")
+        draw_poly(c, hex_points(CX, CY, r, rot), BLUE)
+        # lồng trong còn chập chờn
+        pts = hex_points(CX, CY, r - 2, -rot * 0.5)
+        for k in (0, 2, 3, 5):
+            x0, y0 = pts[k]; x1, y1 = pts[(k + 1) % 6]
+            c.line(x0, y0, x1, y1, CYAN_M)
+        return c
+    if i == 3:
+        glow(c, CX, CY, 6, "#2f8fd61c")
+        draw_poly(c, hex_points(CX, CY, r, rot), BLUE)
+        draw_poly(c, hex_points(CX, CY, r - 2, -rot * 0.6), CYAN_M)
+        for k in range(6):
+            a = math.radians(rot + k * 60)
+            p(c, round(CX + math.cos(a) * r), round(CY + math.sin(a) * r), CYAN)
+        return c
+    # i == 4: kín hoàn chỉnh, màng trong mờ xuất hiện
+    field(c, 1, r=11, inner=True)
     return c
 
 
@@ -127,6 +156,7 @@ def loop(i):
 
 
 def break_anim(i):
+    """Nứt và tan rã tại chỗ, mảnh rơi xuống thay vì bay đi."""
     c = Canvas(SIZE, SIZE)
     if i == 0:
         field(c, 7, r=11, inner=True)
@@ -135,35 +165,45 @@ def break_anim(i):
             p(c, round(CX + math.cos(a) * 11), round(CY + math.sin(a) * 11), CORE)
         return c
     if i == 1:
-        # nứt
+        # nứt lan trên bề mặt, vẫn giữ hình bao bọc
         draw_poly(c, hex_points(CX, CY, 11, 50), CYAN_M)
+        draw_poly(c, hex_points(CX, CY, 9, -20), BLUE)
         for a in (20, 80, 140, 220, 300):
             rad = math.radians(a)
-            c.line(CX, CY, round(CX + math.cos(rad) * 10), round(CY + math.sin(rad) * 10), BLUE)
+            c.line(round(CX + math.cos(rad) * 4), round(CY + math.sin(rad) * 4),
+                   round(CX + math.cos(rad) * 10), round(CY + math.sin(rad) * 10), CYAN)
         return c
-    frags = [(10, 0), (-10, 1), (5, -9), (-6, 9), (8, 7), (-8, -7), (3, 10), (-4, -10)]
+    frags = [(9, -2), (-9, 0), (5, -8), (-6, 7), (7, 6), (-7, -6), (2, 9), (-3, -9)]
     if i == 2:
+        # vỡ thành mảnh nhưng còn quanh vị trí cũ
         for dx, dy in frags:
             p(c, CX + dx, CY + dy, CYAN)
-            p(c, CX + dx//2, CY + dy//2, CYAN_M)
+            p(c, CX + dx // 2, CY + dy // 2, CYAN_M)
+        glow(c, CX, CY, 3, "#7ef0ff18")
         return c
     if i == 3:
+        # mảnh rơi/xẹp xuống nhẹ
         for dx, dy in frags:
-            p(c, CX + dx + (1 if dx > 0 else -1), CY + dy + (1 if dy > 0 else -1), BLUE)
+            p(c, CX + dx, CY + dy + 1, BLUE)
+            p(c, CX + dx // 2, CY + dy // 2 + 1, CYAN_M)
         return c
     if i == 4:
-        for dx, dy in frags[::2]:
-            p(c, CX + dx + (2 if dx > 0 else -2), CY + dy, DEEP)
+        for j, (dx, dy) in enumerate(frags):
+            if j % 2 == 0:
+                p(c, CX + dx, CY + dy + 2, DEEP)
+            else:
+                p(c, CX + dx // 2, CY + dy // 2 + 2, BLUE)
         return c
-    for dx, dy in frags[1::3]:
-        p(c, CX + dx + (2 if dx > 0 else -2), CY + dy, DEEP)
+    for j, (dx, dy) in enumerate(frags):
+        if j % 3 == 0:
+            p(c, CX + dx // 2, CY + dy // 2 + 3, DEEP)
     return c
 
 
 ANIMATIONS = [
-    ("form", [form(i) for i in range(5)], 14, False),
+    ("form", [form(i) for i in range(6)], 12, False),
     ("loop", [loop(i) for i in range(8)], 10, True),
-    ("break", [break_anim(i) for i in range(6)], 14, False),
+    ("break", [break_anim(i) for i in range(6)], 12, False),
 ]
 
 
