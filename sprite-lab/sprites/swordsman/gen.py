@@ -230,6 +230,154 @@ def death(i):
     ][i]
 
 
+# --- front (facing down) and back (facing up) views ---------------------------------
+# Same proportions as the side view: head 8 px, torso 8 px wide from row 28 to the hip
+# (36), legs to the sole (42), outline on row 43, so the anchor (24, 44) and the floor
+# stay the same. Symmetric about x = 24. Front: the sword is in the hand on the
+# viewer's left (the hero's right hand); back: on the viewer's right.
+
+def _legs_fb(c, bob, lifts):
+    for (x0, lift), back in zip(((21, lifts[0]), (25, lifts[1])), (False, False)):
+        sole = mf.SOLE - lift
+        rect(c, x0, mf.HIP_Y + bob, x0 + 1, sole - 2, PAL["pants"])
+        rect(c, x0 - (1 if x0 < 24 else 0), sole - 1, x0 + 1 + (1 if x0 > 24 else 0), sole, PAL["boot"])
+
+
+def _torso_fb(c, top, hip, front):
+    rect(c, 20, top, 27, hip, PAL["tunic"])
+    rect(c, 20, top, 20, hip, PAL["tunic_l"])
+    rect(c, 27, top, 27, hip, PAL["tunic_d"])
+    rect(c, 20, hip - 2, 27, hip - 2, PAL["belt"])
+    if front:
+        rect(c, 23, hip - 2, 24, hip - 2, PAL["buckle"])
+
+
+def _arm_fb(c, shoulder_x, top, hand):
+    hx, hy = hand
+    line(c, shoulder_x, top + 1, hx, hy - 1, PAL["sleeve"], 2)
+    rect(c, hx, hy, hx + 1, hy + 1, PAL["skin"])
+
+
+def _sword_fb(c, hand, tip):
+    hx, hy = hand[0] + 0.5, hand[1] + 0.5
+    dx, dy = tip[0] - hx, tip[1] - hy
+    n = max(1.0, math.hypot(dx, dy))
+    ux, uy = dx / n, dy / n
+    line(c, hx - ux * 2, hy - uy * 2, hx, hy, PAL["grip"], 1)
+    line(c, hx + ux - uy * 1.5, hy + uy + ux * 1.5, hx + ux + uy * 1.5, hy + uy - ux * 1.5, PAL["guard"], 1)
+    line(c, hx + ux * 2, hy + uy * 2, tip[0], tip[1], PAL["blade"], 1)
+
+
+def _head_front(c, top, eyes):
+    hy = top - 1
+    rect(c, 20, hy - 6, 27, hy, PAL["skin"])
+    rect(c, 20, hy, 27, hy, PAL["skin_d"])
+    rect(c, 19, hy - 9, 28, hy - 6, PAL["hair"])
+    rect(c, 19, hy - 6, 19, hy - 3, PAL["hair"])
+    rect(c, 28, hy - 6, 28, hy - 3, PAL["hair"])
+    for x in (21, 24, 26):
+        put(c, x, hy - 5, PAL["hair"])                     # fringe
+    for x, y in ((20, hy - 10), (23, hy - 10), (26, hy - 10)):
+        put(c, x, y, PAL["hair"])                          # spikes
+    rect(c, 23, hy - 9, 24, hy - 9, PAL["hair_l"])
+    for x in (22, 25):
+        mf.eyes(c, x, hy - 4, eyes, PAL)
+    rect(c, 20, top, 27, top + 1, PAL["scarf"])            # scarf round the neck
+    rect(c, 25, top + 2, 26, top + 3, PAL["scarf_d"])      # knot ends in front
+
+
+def _head_back(c, top, phase, speed):
+    hy = top - 1
+    rect(c, 19, hy - 9, 28, hy, PAL["hair"])
+    rect(c, 21, hy - 8, 26, hy - 8, PAL["hair_l"])
+    put(c, 19, hy - 3, PAL["skin_d"])                      # ears
+    put(c, 28, hy - 3, PAL["skin_d"])
+    for x, y in ((20, hy - 10), (23, hy - 10), (26, hy - 10)):
+        put(c, x, y, PAL["hair"])
+    rect(c, 20, top, 27, top + 1, PAL["scarf"])
+    length = 4 + round(3 * speed)                         # tail hangs down the back and sways
+    for k in range(length):
+        x = 22 + round(math.sin(phase + k * 0.8) * (0.5 + speed))
+        rect(c, x, top + 2 + k, x + 1, top + 2 + k, PAL["scarf"] if k < length - 1 else PAL["scarf_d"])
+
+
+def fb_frame(view, bob=0, lifts=(0, 0), hands=None, tip=None, eyes="open", phase=0.0, speed=0.0,
+             flash=0.0, sword_in_front=True):
+    """One front ("down") or back ("up") frame. hands: ((x, y) sword hand, (x, y) other hand)."""
+    c = Canvas(mf.W, mf.H)
+    top, hip = 28 + bob, mf.HIP_Y + bob
+    front = view == "down"
+    sword_x = 18 if front else 29
+    other_x = 29 if front else 18
+    if hands is None:
+        hands = ((sword_x, top + 7), (other_x, top + 7))
+    if tip is None:
+        tip = (hands[0][0] + (-4 if front else 4), mf.SOLE - 3)
+    if not sword_in_front:
+        _sword_fb(c, hands[0], tip)
+    _legs_fb(c, bob, lifts)
+    _torso_fb(c, top, hip, front)
+    if front:
+        _head_front(c, top, eyes)
+    else:
+        _head_back(c, top, phase, speed)
+    _arm_fb(c, 20 if sword_x < 24 else 27, top, hands[0])
+    _arm_fb(c, 20 if other_x < 24 else 27, top, hands[1])
+    if sword_in_front:
+        _sword_fb(c, hands[0], tip)
+    if flash:
+        mf._flash(c, flash)
+    c.outline(mf.OUTLINE)
+    return c
+
+
+def idle_fb(view, i):
+    bob = [0, 0, 1, 0][i]
+    return fb_frame(view, bob=bob, eyes="closed" if i == 3 else "open", phase=i * 1.2)
+
+
+def run_fb(view, i):
+    (_, lf), (_, lb) = mf.RUN_FEET[i]
+    bob = mf.RUN_BOB[i]
+    top = 28 + bob
+    swing = 1 if lf > lb else -1                       # arms against the legs
+    front = view == "down"
+    sx, ox = (18, 29) if front else (29, 18)
+    hands = ((sx, top + 7 - swing), (ox, top + 7 + swing))
+    tip = (sx + (-4 if front else 4), mf.SOLE - 4 - swing)
+    return fb_frame(view, bob=bob, lifts=(lf, lb), hands=hands, tip=tip, phase=i * math.pi / 4, speed=1.0)
+
+
+def attack_down(i):
+    """Overhead cut towards the viewer: raise on the right, chop down across the body."""
+    return [
+        fb_frame("down", bob=1, hands=((17, 24), (29, 34)), tip=(15, 15), sword_in_front=False),
+        fb_frame("down", bob=0, hands=((21, 30), (29, 35)), tip=(25, 39)),
+        fb_frame("down", bob=1, hands=((24, 33), (28, 35)), tip=(30, 40)),
+        fb_frame("down", bob=1, hands=((26, 34), (28, 35)), tip=(33, 39)),
+        fb_frame("down", bob=0),
+    ][i]
+
+
+def attack_up(i):
+    """Cut away from the viewer: low on the right, sweep up over the head."""
+    return [
+        fb_frame("up", bob=1, hands=((29, 36), (18, 34)), tip=(34, 40), sword_in_front=False),
+        fb_frame("up", bob=0, hands=((27, 25), (18, 34)), tip=(28, 15), sword_in_front=False),
+        fb_frame("up", bob=0, hands=((24, 22), (19, 33)), tip=(22, 11), sword_in_front=False),
+        fb_frame("up", bob=1, hands=((21, 25), (19, 34)), tip=(14, 18), sword_in_front=False),
+        fb_frame("up", bob=0),
+    ][i]
+
+
+def hurt_fb(view, i):
+    return [
+        fb_frame(view, bob=1, eyes="wince", flash=0.75),
+        fb_frame(view, bob=1, eyes="wince"),
+        fb_frame(view, bob=0),
+    ][i]
+
+
 # (name, frames, fps, loop, extra)
 ANIMATIONS = [
     ("idle", [idle(i) for i in range(4)], 5, True, {"durations_ms": [240, 160, 240, 120]}),
@@ -240,6 +388,15 @@ ANIMATIONS = [
     ("spell", [spell(i) for i in range(6)], 12, False, {"durations_ms": SPELL_MS}),
     ("hurt", [hurt(i) for i in range(3)], 12, False, {"durations_ms": [90, 110, 120]}),
     ("death", [death(i) for i in range(5)], 8, False, {"durations_ms": [120, 140, 110, 100, 400]}),
+    # top-down directions: the animations above are the side view (left = mirrored)
+    ("idle_down", [idle_fb("down", i) for i in range(4)], 5, True, {"durations_ms": [240, 160, 240, 120]}),
+    ("run_down", [run_fb("down", i) for i in range(8)], 12, True, {}),
+    ("attack_down", [attack_down(i) for i in range(5)], 14, False, {"durations_ms": ATTACK_MS}),
+    ("hurt_down", [hurt_fb("down", i) for i in range(3)], 12, False, {"durations_ms": [90, 110, 120]}),
+    ("idle_up", [idle_fb("up", i) for i in range(4)], 5, True, {"durations_ms": [240, 160, 240, 120]}),
+    ("run_up", [run_fb("up", i) for i in range(8)], 12, True, {}),
+    ("attack_up", [attack_up(i) for i in range(5)], 14, False, {"durations_ms": ATTACK_MS}),
+    ("hurt_up", [hurt_fb("up", i) for i in range(3)], 12, False, {"durations_ms": [90, 110, 120]}),
 ]
 
 
