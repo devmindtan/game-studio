@@ -140,19 +140,17 @@ const CATS=[
   {id:'projectile',label:'Projectile'},
   {id:'aoe',label:'AOE'},
   {id:'buff',label:'Buff/Shield'},
-  {id:'equipment',label:'Vũ khí & Giáp'},
+  {id:'weapon',label:'Vũ khí'},
+  {id:'armor',label:'Giáp'},
   {id:'character',label:'Nhân vật'},
   {id:'base',label:'Vật phẩm/Môi trường'}
 ];
 
 function categoryOf(s){
   const n=s.name, aNames=(s.meta.animations||[]).map(a=>a.name);
-  if(/^(mage|swordsman|knight|hero|archer|rogue|npc|enemy|boss)$/.test(n) || /mage|swordsman/.test(n) && /(idle|run|walk|jump|attack|hurt|death)/.test(aNames.join(','))) {
-    // known characters in lab
-  }
   if(n==='mage' || n==='swordsman') return 'character';
-  if(/sword|axe|hammer|bow|staff|dagger|spear|mace|helmet|chestplate|armor|shield-item|greaves|boots|gauntlet/.test(n) || /^(iron-sword|greatsword|battle-axe|war-hammer|oak-bow|magic-staff|knight-helmet|steel-chestplate|round-shield|tower-shield)$/.test(n)) return 'equipment';
-  if(/shield$/.test(n) && !/magnetic/.test(n)) return 'equipment';
+  if(/^(iron-sword|greatsword|battle-axe|war-hammer|oak-bow|magic-staff)$/.test(n) || /sword|axe|hammer|bow|staff|dagger|spear|mace|wand/.test(n)) return 'weapon';
+  if(/helmet|hood|cap|chestplate|robe|tunic|armor|gloves|gauntlets|boots|greaves|shield$|cuirass|leggings|pauldron/.test(n) && !/magnetic/.test(n)) return 'armor';
   if(aNames.includes('fly')) return 'projectile';
   if(/magnetic-shield|haste|empower|heal|bloom|buff|rune|ward|barrier/.test(n)) return 'buff';
   if(/circle|zone|aura/.test(n)) return 'buff';
@@ -192,7 +190,7 @@ function renderList(){
   const list=$('list'); list.innerHTML='';
   const items=filtered();
   const groups={}; items.forEach(s=>{(groups[s._cat]=groups[s._cat]||[]).push(s);});
-  const order=['projectile','aoe','buff','equipment','character','base'];
+  const order=['weapon','armor','projectile','aoe','buff','character','base'];
   let any=false;
   order.forEach(cat=>{
     const arr=groups[cat]; if(!arr||!arr.length) return; any=true;

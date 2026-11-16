@@ -134,6 +134,130 @@
       }
     },
     {
+      "name": "assassin-armor",
+      "meta": {
+        "frames": 6,
+        "frame_size": [
+          32,
+          32
+        ],
+        "fps": 6.0,
+        "loop": true,
+        "anchor": [
+          16.0,
+          30.0
+        ],
+        "anchor_source": "explicit",
+        "animations": [
+          {
+            "name": "idle",
+            "start": 0,
+            "frames": 6,
+            "fps": 6.0,
+            "loop": true
+          }
+        ]
+      },
+      "strip": "sprites/assassin-armor/assassin-armor_strip.png",
+      "preview": "sprites/assassin-armor/preview.png",
+      "gifs": {
+        "idle": "sprites/assassin-armor/idle.gif"
+      }
+    },
+    {
+      "name": "assassin-boots",
+      "meta": {
+        "frames": 6,
+        "frame_size": [
+          28,
+          24
+        ],
+        "fps": 6.0,
+        "loop": true,
+        "anchor": [
+          14.0,
+          22.0
+        ],
+        "anchor_source": "explicit",
+        "animations": [
+          {
+            "name": "idle",
+            "start": 0,
+            "frames": 6,
+            "fps": 6.0,
+            "loop": true
+          }
+        ]
+      },
+      "strip": "sprites/assassin-boots/assassin-boots_strip.png",
+      "preview": "sprites/assassin-boots/preview.png",
+      "gifs": {
+        "idle": "sprites/assassin-boots/idle.gif"
+      }
+    },
+    {
+      "name": "assassin-gloves",
+      "meta": {
+        "frames": 6,
+        "frame_size": [
+          28,
+          24
+        ],
+        "fps": 6.0,
+        "loop": true,
+        "anchor": [
+          14.0,
+          22.0
+        ],
+        "anchor_source": "explicit",
+        "animations": [
+          {
+            "name": "idle",
+            "start": 0,
+            "frames": 6,
+            "fps": 6.0,
+            "loop": true
+          }
+        ]
+      },
+      "strip": "sprites/assassin-gloves/assassin-gloves_strip.png",
+      "preview": "sprites/assassin-gloves/preview.png",
+      "gifs": {
+        "idle": "sprites/assassin-gloves/idle.gif"
+      }
+    },
+    {
+      "name": "assassin-hood",
+      "meta": {
+        "frames": 6,
+        "frame_size": [
+          28,
+          24
+        ],
+        "fps": 6.0,
+        "loop": true,
+        "anchor": [
+          14.0,
+          22.0
+        ],
+        "anchor_source": "explicit",
+        "animations": [
+          {
+            "name": "idle",
+            "start": 0,
+            "frames": 6,
+            "fps": 6.0,
+            "loop": true
+          }
+        ]
+      },
+      "strip": "sprites/assassin-hood/assassin-hood_strip.png",
+      "preview": "sprites/assassin-hood/preview.png",
+      "gifs": {
+        "idle": "sprites/assassin-hood/idle.gif"
+      }
+    },
+    {
       "name": "battle-axe",
       "meta": {
         "frames": 6,
@@ -638,6 +762,68 @@
       }
     },
     {
+      "name": "knight-gauntlets",
+      "meta": {
+        "frames": 6,
+        "frame_size": [
+          28,
+          24
+        ],
+        "fps": 6.0,
+        "loop": true,
+        "anchor": [
+          14.0,
+          22.0
+        ],
+        "anchor_source": "explicit",
+        "animations": [
+          {
+            "name": "idle",
+            "start": 0,
+            "frames": 6,
+            "fps": 6.0,
+            "loop": true
+          }
+        ]
+      },
+      "strip": "sprites/knight-gauntlets/knight-gauntlets_strip.png",
+      "preview": "sprites/knight-gauntlets/preview.png",
+      "gifs": {
+        "idle": "sprites/knight-gauntlets/idle.gif"
+      }
+    },
+    {
+      "name": "knight-greaves",
+      "meta": {
+        "frames": 6,
+        "frame_size": [
+          28,
+          24
+        ],
+        "fps": 6.0,
+        "loop": true,
+        "anchor": [
+          14.0,
+          22.0
+        ],
+        "anchor_source": "explicit",
+        "animations": [
+          {
+            "name": "idle",
+            "start": 0,
+            "frames": 6,
+            "fps": 6.0,
+            "loop": true
+          }
+        ]
+      },
+      "strip": "sprites/knight-greaves/knight-greaves_strip.png",
+      "preview": "sprites/knight-greaves/preview.png",
+      "gifs": {
+        "idle": "sprites/knight-greaves/idle.gif"
+      }
+    },
+    {
       "name": "knight-helmet",
       "meta": {
         "frames": 6,
@@ -776,6 +962,130 @@
         "jump": "sprites/mage/jump.gif",
         "run": "sprites/mage/run.gif",
         "spell": "sprites/mage/spell.gif"
+      }
+    },
+    {
+      "name": "mage-boots",
+      "meta": {
+        "frames": 6,
+        "frame_size": [
+          28,
+          24
+        ],
+        "fps": 6.0,
+        "loop": true,
+        "anchor": [
+          14.0,
+          22.0
+        ],
+        "anchor_source": "explicit",
+        "animations": [
+          {
+            "name": "idle",
+            "start": 0,
+            "frames": 6,
+            "fps": 6.0,
+            "loop": true
+          }
+        ]
+      },
+      "strip": "sprites/mage-boots/mage-boots_strip.png",
+      "preview": "sprites/mage-boots/preview.png",
+      "gifs": {
+        "idle": "sprites/mage-boots/idle.gif"
+      }
+    },
+    {
+      "name": "mage-gloves",
+      "meta": {
+        "frames": 6,
+        "frame_size": [
+          28,
+          24
+        ],
+        "fps": 6.0,
+        "loop": true,
+        "anchor": [
+          14.0,
+          22.0
+        ],
+        "anchor_source": "explicit",
+        "animations": [
+          {
+            "name": "idle",
+            "start": 0,
+            "frames": 6,
+            "fps": 6.0,
+            "loop": true
+          }
+        ]
+      },
+      "strip": "sprites/mage-gloves/mage-gloves_strip.png",
+      "preview": "sprites/mage-gloves/preview.png",
+      "gifs": {
+        "idle": "sprites/mage-gloves/idle.gif"
+      }
+    },
+    {
+      "name": "mage-hood",
+      "meta": {
+        "frames": 6,
+        "frame_size": [
+          28,
+          24
+        ],
+        "fps": 6.0,
+        "loop": true,
+        "anchor": [
+          14.0,
+          22.0
+        ],
+        "anchor_source": "explicit",
+        "animations": [
+          {
+            "name": "idle",
+            "start": 0,
+            "frames": 6,
+            "fps": 6.0,
+            "loop": true
+          }
+        ]
+      },
+      "strip": "sprites/mage-hood/mage-hood_strip.png",
+      "preview": "sprites/mage-hood/preview.png",
+      "gifs": {
+        "idle": "sprites/mage-hood/idle.gif"
+      }
+    },
+    {
+      "name": "mage-robe",
+      "meta": {
+        "frames": 6,
+        "frame_size": [
+          32,
+          32
+        ],
+        "fps": 6.0,
+        "loop": true,
+        "anchor": [
+          16.0,
+          30.0
+        ],
+        "anchor_source": "explicit",
+        "animations": [
+          {
+            "name": "idle",
+            "start": 0,
+            "frames": 6,
+            "fps": 6.0,
+            "loop": true
+          }
+        ]
+      },
+      "strip": "sprites/mage-robe/mage-robe_strip.png",
+      "preview": "sprites/mage-robe/preview.png",
+      "gifs": {
+        "idle": "sprites/mage-robe/idle.gif"
       }
     },
     {
@@ -990,6 +1300,130 @@
       "strip": "sprites/raindrop/raindrop_strip.png",
       "preview": "sprites/raindrop/preview.png",
       "gifs": {}
+    },
+    {
+      "name": "ranger-boots",
+      "meta": {
+        "frames": 6,
+        "frame_size": [
+          28,
+          24
+        ],
+        "fps": 6.0,
+        "loop": true,
+        "anchor": [
+          14.0,
+          22.0
+        ],
+        "anchor_source": "explicit",
+        "animations": [
+          {
+            "name": "idle",
+            "start": 0,
+            "frames": 6,
+            "fps": 6.0,
+            "loop": true
+          }
+        ]
+      },
+      "strip": "sprites/ranger-boots/ranger-boots_strip.png",
+      "preview": "sprites/ranger-boots/preview.png",
+      "gifs": {
+        "idle": "sprites/ranger-boots/idle.gif"
+      }
+    },
+    {
+      "name": "ranger-cap",
+      "meta": {
+        "frames": 6,
+        "frame_size": [
+          28,
+          24
+        ],
+        "fps": 6.0,
+        "loop": true,
+        "anchor": [
+          14.0,
+          22.0
+        ],
+        "anchor_source": "explicit",
+        "animations": [
+          {
+            "name": "idle",
+            "start": 0,
+            "frames": 6,
+            "fps": 6.0,
+            "loop": true
+          }
+        ]
+      },
+      "strip": "sprites/ranger-cap/ranger-cap_strip.png",
+      "preview": "sprites/ranger-cap/preview.png",
+      "gifs": {
+        "idle": "sprites/ranger-cap/idle.gif"
+      }
+    },
+    {
+      "name": "ranger-gloves",
+      "meta": {
+        "frames": 6,
+        "frame_size": [
+          28,
+          24
+        ],
+        "fps": 6.0,
+        "loop": true,
+        "anchor": [
+          14.0,
+          22.0
+        ],
+        "anchor_source": "explicit",
+        "animations": [
+          {
+            "name": "idle",
+            "start": 0,
+            "frames": 6,
+            "fps": 6.0,
+            "loop": true
+          }
+        ]
+      },
+      "strip": "sprites/ranger-gloves/ranger-gloves_strip.png",
+      "preview": "sprites/ranger-gloves/preview.png",
+      "gifs": {
+        "idle": "sprites/ranger-gloves/idle.gif"
+      }
+    },
+    {
+      "name": "ranger-tunic",
+      "meta": {
+        "frames": 6,
+        "frame_size": [
+          32,
+          32
+        ],
+        "fps": 6.0,
+        "loop": true,
+        "anchor": [
+          16.0,
+          30.0
+        ],
+        "anchor_source": "explicit",
+        "animations": [
+          {
+            "name": "idle",
+            "start": 0,
+            "frames": 6,
+            "fps": 6.0,
+            "loop": true
+          }
+        ]
+      },
+      "strip": "sprites/ranger-tunic/ranger-tunic_strip.png",
+      "preview": "sprites/ranger-tunic/preview.png",
+      "gifs": {
+        "idle": "sprites/ranger-tunic/idle.gif"
+      }
     },
     {
       "name": "round-shield",
