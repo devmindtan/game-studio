@@ -277,6 +277,11 @@ def write_anim_meta(path, animations, anchor=None):
             "fps": float(anim.get("fps", 8)),
             "loop": bool(anim.get("loop", True)),
         })
+        if anim.get("durations_ms") is not None:
+            durations = anim["durations_ms"]
+            if len(durations) != len(frames) or any(float(value) <= 0 for value in durations):
+                raise ValueError(f"animation {anim.get('name')!r} has invalid durations_ms")
+            entries[-1]["durations_ms"] = [float(value) for value in durations]
         flat.extend(frames)
     if not flat:
         raise ValueError("no animations")
@@ -351,6 +356,12 @@ def _check_animations(animations, total_frames):
         expected += count
         if anim.get("fps", 0) <= 0:
             problems.append(f"animation {name!r} needs fps > 0")
+        if "durations_ms" in anim:
+            durations = anim["durations_ms"]
+            if not isinstance(durations, list) or len(durations) != count:
+                problems.append(f"animation {name!r} durations_ms must have one value per frame")
+            elif any(not isinstance(value, (int, float)) or value <= 0 for value in durations):
+                problems.append(f"animation {name!r} durations_ms values must be positive numbers")
     if expected > total_frames:
         problems.append(f"animations use {expected} frames, sheet has {total_frames}")
     return problems

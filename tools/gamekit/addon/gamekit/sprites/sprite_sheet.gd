@@ -2,7 +2,7 @@ class_name SpriteSheet
 extends RefCounted
 ## One pixel-art sprite as written by its gen.py: <name>_strip.png (every frame
 ## left to right) + <name>.json (frame_size, anchor, and either one animation or
-## an "animations" list of {name, start, frames, fps, loop}).
+## an "animations" list of {name, start, frames, fps, loop, durations_ms?}).
 ##
 ## Plays animations by name and draws them anchored, so every game and the
 ## sprite lab use the same rules (addons/gamekit/sprites).
@@ -92,6 +92,12 @@ func animation(anim_name: String) -> Dictionary:
 ## Seconds for one pass of the animation.
 func duration(anim_name: String) -> float:
 	var a := animation(anim_name)
+	var durations: Variant = a.get("durations_ms", [])
+	if durations is Array and durations.size() == int(a.get("frames", 1)) and not durations.is_empty():
+		var total_ms := 0.0
+		for value: Variant in durations:
+			total_ms += float(value)
+		return total_ms / 1000.0
 	return float(a.get("frames", 1)) / maxf(0.001, float(a.get("fps", 8)))
 
 
@@ -100,6 +106,21 @@ func duration(anim_name: String) -> float:
 func frame_index(anim_name: String, t: float) -> int:
 	var a := animation(anim_name)
 	var n := maxi(1, int(a.get("frames", 1)))
+	var durations: Variant = a.get("durations_ms", [])
+	if durations is Array and durations.size() == n and not durations.is_empty():
+		var total := 0.0
+		for value: Variant in durations:
+			total += maxf(0.001, float(value))
+		var elapsed := maxf(t, 0.0) * 1000.0
+		if bool(a.get("loop", true)):
+			elapsed = fposmod(elapsed, total)
+		else:
+			elapsed = minf(elapsed, total - 0.001)
+		for i in range(n):
+			elapsed -= maxf(0.001, float(durations[i]))
+			if elapsed < 0.0:
+				return int(a.get("start", 0)) + i
+		return int(a.get("start", 0)) + n - 1
 	var i := int(floor(maxf(t, 0.0) * float(a.get("fps", 8))))
 	i = posmod(i, n) if bool(a.get("loop", true)) else mini(i, n - 1)
 	return int(a.get("start", 0)) + i

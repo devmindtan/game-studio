@@ -12,6 +12,13 @@ const MULTI := {
 	],
 }
 const SINGLE := {"frames": 3, "frame_size": [8, 8], "fps": 6.0, "loop": true, "anchor": [3.5, 3.5]}
+const TIMED := {
+	"frames": 4, "frame_size": [16, 16], "anchor": [8.0, 15.0],
+	"animations": [
+		{"name": "windup", "start": 0, "frames": 4, "fps": 4.0, "loop": false,
+			"durations_ms": [100, 200, 50, 150]},
+	],
+}
 
 var failures: Array[String] = []
 
@@ -51,3 +58,15 @@ func test_first_of_picks_the_first_existing_name() -> void:
 func test_src_rect_follows_frame_size() -> void:
 	var s: SpriteSheet = SheetScript.from_meta("m", MULTI)
 	_check(s.src_rect(5) == Rect2(80, 0, 16, 16), "frame 5 at x=80, got %s" % s.src_rect(5))
+
+
+func test_per_frame_durations_keep_uneven_holds() -> void:
+	var s: SpriteSheet = SheetScript.from_meta("m", TIMED)
+	_check(s.frame_index("windup", 0.0) == 0, "timed animation starts at frame 0")
+	_check(s.frame_index("windup", 0.099) == 0, "first frame holds for 100 ms")
+	_check(s.frame_index("windup", 0.1) == 1, "second frame starts at 100 ms")
+	_check(s.frame_index("windup", 0.299) == 1, "second frame holds for 200 ms")
+	_check(s.frame_index("windup", 0.3) == 2, "third frame starts at 300 ms")
+	_check(s.frame_index("windup", 0.35) == 3, "fourth frame starts at 350 ms")
+	_check(s.frame_index("windup", 2.0) == 3, "one-shot holds the final timed frame")
+	_check(is_equal_approx(s.duration("windup"), 0.5), "timed animation lasts the sum of its frame holds")

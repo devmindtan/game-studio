@@ -62,6 +62,8 @@ Sprites (LPC)
 
 Sprite Lab (sprite-lab/: make + test sprites here, then promote into a game)
   art new <name> [--size N]         scaffold sprite-lab/sprites/<name>/gen.py
+  art rig new <name> [hero|hero-sword|knight] create an editable Pixelbolt pose source
+  art rig validate|inspect|motion|build <name> author, review, or import a rigged character
   art run <name>                    render + check metadata (frames, animations, anchor)
   art lab [<name>] [sheet|move]     open the lab: all animations / a movement test stage
   art shot <name> [sheet|move] [frames]  screenshot the lab (move = scripted demo) for review
@@ -95,7 +97,8 @@ cmd_doctor() {
   check "export templates" "test -d ${XDG_DATA_HOME:-$HOME/.local/share}/godot/export_templates/$ver" "echo $ver" "gamekit templates"
   check python3+PIL "python3 -c 'import PIL'" "python3 --version" "pip install pillow"
   check libresprite "command -v $LIBRESPRITE" "$LIBRESPRITE --version 2>/dev/null | head -1" "install LibreSprite 1.3 (~/.local/bin/libresprite)"
-  check node "command -v node" "node --version" "needed for lpc + smoke-web"
+  check node-20 "command -v node && node -e 'process.exit(Number(process.versions.node.split(\".\")[0]) >= 20 ? 0 : 1)'" "node --version" "install Node.js 20 or newer"
+  check pixelbolt "test -f $KIT/node_modules/pixelbolt/bin/pixelbolt.js" "node -p \"require('$KIT/node_modules/pixelbolt/package.json').version\"" "npm ci --prefix tools/gamekit"
   check chrome "command -v google-chrome || command -v chromium" "command -v google-chrome || command -v chromium" "needed for smoke-web"
   check zip "command -v zip" "echo zip" "apt install zip"
   check rsync "command -v rsync" "echo rsync" "apt install rsync"
@@ -387,6 +390,66 @@ print("                " + ", ".join("%s:%d@%sfps%s" % (a["name"], a["frames"], 
 ' "$d/$n.json" "$d/${n}_strip.png" "$n" || die "bad sprite-lab/sprites/$n/$n.json"
 }
 
+art_rig() {
+  local action="${1:-}"; shift || true
+  local n source pb
+  pb="$KIT/node_modules/pixelbolt/bin/pixelbolt.js"
+  [[ -f "$pb" ]] || die "Pixelbolt is missing; run npm ci --prefix tools/gamekit"
+  command -v node >/dev/null 2>&1 || die "Pixelbolt needs Node.js 20 or newer"
+  case "$action" in
+    new)
+      n="$(art_name "${1:-}")"
+      local template="${2:-hero-sword}" src="$LAB/sprites/$n"
+      [[ "$template" == "hero" || "$template" == "hero-sword" || "$template" == "knight" ]] || die "pose template must be hero, hero-sword, or knight"
+      [[ ! -f "$src/$n.poses.json" ]] || die "already exists: sprite-lab/sprites/$n/$n.poses.json"
+      GAMEKIT_PIPELINE="$KIT/pipeline" python3 "$KIT/pipeline/pixelbolt_bridge.py" scaffold \
+        --name "$n" --template "$template" --examples "$(dirname "$pb")/../examples" --out-dir "$src"
+      echo "Edit sprite-lab/sprites/$n/$n.poses.json, then run: gamekit art rig validate $n"
+      ;;
+    validate)
+      n="$(art_name "${1:-}")"; source="$LAB/sprites/$n/$n.poses.json"
+      [[ -f "$source" ]] || die "no pose source: $source (gamekit art rig new $n)"
+      local tmp; tmp="$(mktemp -d "${TMPDIR:-/tmp}/gamekit-pixelbolt-check.XXXXXX")"
+      trap "rm -rf '$tmp'" EXIT
+      node "$pb" compile "$source" --out "$tmp/$n.pixel.json" --metadata "$tmp/compile.json"
+      node "$pb" validate "$tmp/$n.pixel.json"
+      ;;
+    inspect|motion)
+      n="$(art_name "${1:-}")"; shift || true
+      source="$LAB/sprites/$n/$n.poses.json"
+      [[ -f "$source" ]] || die "no pose source: $source (gamekit art rig new $n)"
+      mkdir -p "$LAB/builds/inspections"
+      local out="$LAB/builds/inspections/$(date +%Y%m%d-%H%M%S)-$n-$action.png"
+      if [[ "$action" == "motion" ]]; then
+        local animation="${1:-walk}" speed="${2:-48}"
+        [[ "$speed" =~ ^[0-9]+([.][0-9]+)?$ ]] || die "speed must be a positive number in pixels per second"
+        [[ "$speed" != "0" && "$speed" != "0.0" ]] || die "speed must be greater than zero"
+        node "$pb" inspect "$source" --motion "$animation" --speed "$speed" --out "$out"
+      else
+        local animation="${1:-}"
+        local args=(--view onion --native --diagnostics --out "$out")
+        [[ -z "$animation" ]] || args+=(--animation "$animation")
+        node "$pb" inspect "$source" "${args[@]}"
+      fi
+      echo "$out"
+      ;;
+    build)
+      n="$(art_name "${1:-}")"; source="$LAB/sprites/$n/$n.poses.json"
+      [[ -f "$source" ]] || die "no pose source: $source (gamekit art rig new $n)"
+      local tmp; tmp="$(mktemp -d "${TMPDIR:-/tmp}/gamekit-pixelbolt.XXXXXX")"
+      trap "rm -rf '$tmp'" EXIT
+      node "$pb" compile "$source" --out "$tmp/$n.pixel.json" --metadata "$tmp/compile.json"
+      node "$pb" render "$tmp/$n.pixel.json" --out "$tmp/render" --gif-scale 4 >/dev/null
+      GAMEKIT_PIPELINE="$KIT/pipeline" python3 "$KIT/pipeline/pixelbolt_bridge.py" import \
+        --name "$n" --atlas "$tmp/render/$n.atlas.json" --sheet "$tmp/render/$n.png" \
+        --out-dir "$LAB/sprites/$n"
+      art_check_one "$n"
+      echo "   preview: sprite-lab/sprites/$n/preview.png"
+      ;;
+    *) die "usage: gamekit art rig new <name> [hero|hero-sword|knight] | validate <name> | inspect <name> [animation] | motion <name> <animation> [speed] | build <name>" ;;
+  esac
+}
+
 cmd_art() {
   ART_SUB="${1:-}"; shift || true
   local n
@@ -397,7 +460,7 @@ cmd_art() {
       if [[ "${1:-}" == "--size" ]]; then size="${2:-}"; fi
       [[ "$size" =~ ^[0-9]+$ ]] && (( size >= 8 && size <= 256 )) || die "--size must be 8..256"
       local src="$LAB/sprites/$n"
-      [[ -e "$src/gen.py" ]] && die "already exists: sprite-lab/sprites/$n/gen.py"
+      [[ -e "$src/gen.py" || -e "$src/$n.poses.json" ]] && die "already exists: sprite-lab/sprites/$n"
       mkdir -p "$src"
       sed -e "s/__NAME__/$n/g" -e "s/__SIZE__/$size/g" "$KIT/templates/sprite/gen.py" > "$src/gen.py"
       chmod +x "$src/gen.py"
@@ -406,6 +469,10 @@ cmd_art() {
       ;;
     run)
       n="$(art_name "${1:-}")"
+      if [[ -f "$LAB/sprites/$n/$n.poses.json" ]]; then
+        art_rig build "$n"
+        return
+      fi
       [[ -f "$LAB/sprites/$n/gen.py" ]] || die "no sprite-lab/sprites/$n/gen.py (gamekit art new $n)"
       say "render $n"
       (cd "$LAB/sprites/$n" && python3 gen.py) >/dev/null
@@ -415,7 +482,7 @@ cmd_art() {
     check)
       local any=0 d
       for d in "$LAB"/sprites/*/; do
-        [[ -f "$d/gen.py" ]] || continue
+        [[ -f "$d/gen.py" || -f "$d/$(basename "$d").poses.json" ]] || continue
         any=1; art_check_one "$(basename "$d")"
       done
       [[ $any == 1 ]] || echo "   (no sprites yet: gamekit art new <name>)"
@@ -423,7 +490,7 @@ cmd_art() {
     list)
       local d g
       for d in "$LAB"/sprites/*/; do
-        [[ -f "$d/gen.py" ]] || continue
+        [[ -f "$d/gen.py" || -f "$d/$(basename "$d").poses.json" ]] || continue
         n="$(basename "$d")"
         local where=""
         for g in "$WS"/games/*/; do
@@ -433,6 +500,7 @@ cmd_art() {
         printf '  %-14s %-44s %s\n' "$n" "$anims" "${where:+trong game:$where}"
       done
       ;;
+    rig) art_rig "$@" ;;
     lab)
       lab_ready
       local args=()
@@ -492,7 +560,7 @@ cmd_art() {
       lab_ready
       cmd_test "$LAB"
       ;;
-    *) die "usage: gamekit art new|run|lab|shot|check|list|promote|ase|open|test ... (gamekit help)" ;;
+    *) die "usage: gamekit art new|rig|run|lab|shot|check|list|promote|ase|open|test ... (gamekit help)" ;;
   esac
 }
 
