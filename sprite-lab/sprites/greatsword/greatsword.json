@@ -7,7 +7,7 @@
   "fps": 1.0,
   "loop": false,
   "anchor": [
-    6.0,
+    5.0,
     28.0
   ],
   "anchor_source": "explicit",
@@ -22,14 +22,14 @@
         "shape": "rect",
         "center": [
           16.5,
-          18.5
+          18.0
         ],
         "active": [
           0,
           0
         ],
         "half_w": 11.5,
-        "half_h": 11.5
+        "half_h": 12.0
       }
     }
   ]

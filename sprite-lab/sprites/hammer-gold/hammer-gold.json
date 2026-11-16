@@ -21,14 +21,14 @@
       "hitbox": {
         "shape": "rect",
         "center": [
-          16.5,
+          16.0,
           17.5
         ],
         "active": [
           0,
           0
         ],
-        "half_w": 8.5,
+        "half_w": 8.0,
         "half_h": 13.5
       }
     }

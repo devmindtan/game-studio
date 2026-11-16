@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Gậy phép gold (vật phẩm, magic staff)."""
+"""magic-staff gold (vật phẩm, magic-staff)."""
 import sys
 from pathlib import Path
 def _ws():
@@ -14,30 +14,33 @@ from sheet import export
 
 NAME="magic-staff-gold"; W,H=24,32; ANCHOR=(12.0,30.0)
 
-MAIN="#e0b84c"; DARK="#a67c1a"; LIGHT="#f2d98a"; EDGE="#fff3b0"
-TRIM="#f6e3a1"; TRIM_D="#8f6a1f"
-ORB="#45a8ff"; ORB_L="#9fd7ff"; ORB_D="#2a5fb8"; CORE="#ffffff"
+L="#f2d98a"; M="#e6c35c"; D="#a67c1a"; E="#fff6c8"
+HILT="#8a5a2e"; HILT_D="#563418"; GUARD="#8f6a1f"; POMMEL="#8f6a1f"; ORB="#ff7ac0"
 
-def staff(c,glint=False):
-    # thân gậy thẳng
-    c.rect(11,9,13,30,MAIN)
-    c.line(11,9,11,30,DARK)
-    c.line(13,9,13,30,LIGHT)
-    c.pixel(11,30,DARK); c.pixel(12,30,MAIN); c.pixel(13,30,LIGHT)
-    # vòng trang trí
-    c.line(10,20,14,20,TRIM); c.pixel(10,20,TRIM_D); c.pixel(14,20,TRIM_D)
-    c.line(10,26,14,26,TRIM)
-    # giá giữ ngọc
-    c.line(11,9,10,7,TRIM); c.line(13,9,14,7,TRIM)
-    c.line(10,7,11,6,TRIM_D); c.line(14,7,13,6,TRIM_D)
-    c.rect(10,8,14,9,TRIM)
-    # ngọc phép
-    c.ellipse(10,2,14,6,ORB_D)
-    c.ellipse(11,3,13,5,ORB)
-    c.pixel(11,3,ORB_L); c.pixel(12,4,CORE)
+def draw(c, glint=False):
+    # tham thang, gia do ngoc lon hon, vong trang tri
+    c.rect(11,9,12,30,M); c.line(11,9,11,30,D); c.line(12,9,12,30,L)
+    for y in (19,25):
+        c.line(10,y,13,y,GUARD); c.pixel(10,y,D); c.pixel(13,y,GUARD)
+    # gia giu ngoc
+    c.line(11,9,9,7,GUARD); c.line(12,9,14,7,GUARD)
+    c.line(9,7,11,5,HILT_D); c.line(14,7,12,5,HILT_D)
+    c.rect(9,7,14,8,GUARD)
+    # ngoc 4x4 + loi sang
+    c.ellipse(9,1,14,7,D)
+    c.ellipse(10,2,13,6,ORB)
+    c.ellipse(11,2,12,4,E)
+    c.pixel(10,3,L); c.pixel(13,3,L)
     if glint:
-        c.pixel(13,3,EDGE); c.pixel(9,4,ORB_L); c.pixel(13,14,EDGE)
+        c.pixel(12,2,E); c.pixel(11,10,E)
 
-def idle(i): c=Canvas(W,H); c.ellipse(9,29,15,31,"#00000033"); staff(c,glint=(i in (2,3))); return c
+def idle(i):
+    c = Canvas(W, H)
+    c.ellipse(9, 29, 15, 31, "#00000033")
+    draw(c, glint=(i in (2, 3)))
+    return c
+
 ANIMATIONS=[("idle",[idle(0)],1,False,{"hitbox":{"shape":"rect","center":[ANCHOR[0],ANCHOR[1]],"active":[0,0]}})]
-if __name__=="__main__": export(HERE,NAME,ANIMATIONS,anchor=ANCHOR); print("ok")
+if __name__=="__main__":
+    export(HERE, NAME, ANIMATIONS, anchor=ANCHOR)
+    print("ok")

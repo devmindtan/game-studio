@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Búa gold (vật phẩm, hammer)."""
+"""hammer gold (vật phẩm, hammer)."""
 import sys
 from pathlib import Path
 def _ws():
@@ -14,27 +14,32 @@ from sheet import export
 
 NAME="hammer-gold"; W,H=32,32; ANCHOR=(16.0,30.0)
 
-HEAD="#e6c35c"; HEAD_D="#a67c1a"; HEAD_L="#f2d98a"; EDGE="#fff6c8"
-HILT="#8a5a2e"; HILT_D="#563418"; BAND="#8f6a1f"
+L="#f2d98a"; M="#e6c35c"; D="#a67c1a"; E="#fff6c8"
+HILT="#8a5a2e"; HILT_D="#563418"; GUARD="#8f6a1f"; POMMEL="#8f6a1f"; ORB="#ff7ac0"
 
-def hammer(c,glint=False):
-    # cán thẳng, nối vào giữa đầu búa
-    c.rect(15,11,17,30,HILT)
-    c.line(15,11,15,30,HILT_D)
-    c.line(17,11,17,30,HEAD_L)
-    c.pixel(15,30,HILT_D); c.pixel(16,30,HILT); c.pixel(17,30,HEAD_L)
-    # đầu búa (khối ngang, cân đối)
-    c.rect(8,4,24,11,HEAD_D)
-    c.rect(9,5,23,10,HEAD)
-    c.rect(10,5,22,6,HEAD_L)
-    c.line(8,4,24,4,EDGE)
-    c.line(8,11,24,11,HEAD_D)
-    c.line(8,4,8,11,HEAD_D); c.line(24,4,24,11,HEAD_D)
-    # vòng siết cán
-    c.rect(14,10,18,11,BAND); c.pixel(14,10,BAND); c.pixel(18,10,BAND)
+def draw(c, glint=False):
+    # can thang giua dau
+    c.rect(15,11,16,30,HILT); c.line(15,11,15,30,HILT_D); c.line(16,11,16,30,M)
+    # dau búa khoi ngang, be vien
+    c.rect(8,4,23,11,D)
+    c.rect(9,5,22,10,M)
+    c.rect(10,5,21,6,L)
+    c.rect(8,5,10,10,D)      # mat
+    c.rect(21,5,23,10,D)
+    c.line(8,4,23,4,E)
+    # vong siet can
+    c.rect(14,10,17,12,GUARD); c.pixel(14,10,D); c.pixel(17,10,GUARD)
+    c.rect(14,29,17,30,GUARD)
     if glint:
-        c.pixel(11,5,EDGE); c.pixel(21,5,EDGE)
+        c.pixel(12,5,E); c.pixel(19,5,E)
 
-def idle(i): c=Canvas(W,H); c.ellipse(11,29,21,31,"#00000033"); hammer(c,glint=(i in (2,3))); return c
+def idle(i):
+    c = Canvas(W, H)
+    c.ellipse(7, 29, 25, 31, "#00000033")
+    draw(c, glint=(i in (2, 3)))
+    return c
+
 ANIMATIONS=[("idle",[idle(0)],1,False,{"hitbox":{"shape":"rect","center":[ANCHOR[0],ANCHOR[1]],"active":[0,0]}})]
-if __name__=="__main__": export(HERE,NAME,ANIMATIONS,anchor=ANCHOR); print("ok")
+if __name__=="__main__":
+    export(HERE, NAME, ANIMATIONS, anchor=ANCHOR)
+    print("ok")

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Cung wood (vật phẩm, bow)."""
+"""bow wood (vật phẩm, bow)."""
 import sys
 from pathlib import Path
 def _ws():
@@ -12,18 +12,31 @@ sys.path.insert(0,str(HERE.parents[1]/"lib"))
 from spritekit import Canvas
 from sheet import export
 
-NAME="bow-wood"; W,H=24,32; ANCHOR=(12.0,30.0)
+NAME="bow-wood"; W,H=24,32; ANCHOR=(10.0,30.0)
 
-MAIN="#b07c44"; DARK="#7a4f2a"; LIGHT="#d4a86a"; EDGE="#e8cfa0"
-STRING="#d8d8d8"; TRIM="#6b4410"
+L="#d4a86a"; M="#b07c44"; D="#7a4f2a"; E="#e8cfa0"
+HILT="#8a5a2e"; HILT_D="#563418"; GUARD="#6b4410"; POMMEL="#8a5a2e"; ORB="#7ad0a0"
 
-def bow(c,glint=False):
-    c.line(14,4,10,8,DARK,2); c.line(10,8,9,16,DARK,2); c.line(9,16,10,24,DARK,2); c.line(10,24,14,28,DARK,2)
-    c.line(14,4,11,8,MAIN,1); c.line(11,8,10,16,MAIN,1); c.line(10,16,11,24,MAIN,1); c.line(11,24,14,28,MAIN,1)
-    c.line(14,4,14,28,STRING,1)
-    c.rect(13,14,15,18,TRIM)
-    if glint: c.pixel(10,8,EDGE); c.pixel(10,24,EDGE)
+def draw(c, glint=False):
+    # cung recurve: hai canh cong, day doc o ben phai
+    pts = [(13,3),(10,5),(8,9),(8,14),(10,16),(8,22),(8,27),(10,30),(13,31)]
+    for i in range(len(pts)-1):
+        x1,y1 = pts[i]; x2,y2 = pts[i+1]
+        c.line(x1,y1,x2,y2,D,3)
+        c.line(x1,y1,x2,y2,M,1)
+    c.line(13,3,13,31,HILT_D)
+    c.rect(9,14,11,18,GUARD)
+    c.rect(10,15,11,17,HILT)
+    if glint:
+        c.pixel(8,10,E); c.pixel(8,26,E)
 
-def idle(i): c=Canvas(W,H); c.ellipse(9,29,16,31,"#00000033"); bow(c,glint=(i in (2,3))); return c
+def idle(i):
+    c = Canvas(W, H)
+    c.ellipse(7, 30, 15, 31, "#00000033")
+    draw(c, glint=(i in (2, 3)))
+    return c
+
 ANIMATIONS=[("idle",[idle(0)],1,False,{"hitbox":{"shape":"rect","center":[ANCHOR[0],ANCHOR[1]],"active":[0,0]}})]
-if __name__=="__main__": export(HERE,NAME,ANIMATIONS,anchor=ANCHOR); print("ok")
+if __name__=="__main__":
+    export(HERE, NAME, ANIMATIONS, anchor=ANCHOR)
+    print("ok")

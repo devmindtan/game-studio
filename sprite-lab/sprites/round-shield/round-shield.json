@@ -2,13 +2,13 @@
   "frames": 1,
   "frame_size": [
     32,
-    30
+    32
   ],
   "fps": 1.0,
   "loop": false,
   "anchor": [
     16.0,
-    28.0
+    29.0
   ],
   "anchor_source": "explicit",
   "animations": [
@@ -22,14 +22,14 @@
         "shape": "rect",
         "center": [
           16.5,
-          15.5
+          14.5
         ],
         "active": [
           0,
           0
         ],
-        "half_w": 10.5,
-        "half_h": 11.5
+        "half_w": 11.5,
+        "half_h": 10.5
       }
     }
   ]

@@ -1,99 +1,50 @@
 #!/usr/bin/env python3
-"""Generator cho sprite "tower-shield": khiên tháp lớn (vật phẩm/giáp).
-
-  idle    6 frame lặp: khiên tháp tựa đứng, bề mặt thép phản sáng.
-
-Neo (16, 30) đáy khiên (sprite 32x32).
-
-Chạy:  gamekit art run tower-shield
-"""
-
+"""Generator cho sprite "tower-shield" (legacy)."""
 import sys
 from pathlib import Path
+def _ws():
+    for p in Path(__file__).resolve().parents:
+        if (p/"tools/gamekit/pipeline/spritekit.py").exists(): return p
+    raise SystemExit("no workspace")
+HERE=Path(__file__).resolve().parent
+sys.path.insert(0,str(_ws()/"tools/gamekit/pipeline"))
+sys.path.insert(0,str(HERE.parents[1]/"lib"))
+from spritekit import Canvas
+from sheet import export
 
+NAME="tower-shield"; W,H=32,32; ANCHOR=(16.0,29.0)
 
-def _workspace() -> Path:
-    for parent in Path(__file__).resolve().parents:
-        if (parent / "tools/gamekit/pipeline/spritekit.py").exists():
-            return parent
-    raise SystemExit("Không tìm thấy tools/gamekit/pipeline — chạy trong workspace game-studio")
+L="#d8e4f0"; M="#b8c7d9"; D="#6b7f96"; E="#f2fbff"
+HILT="#8a5a2e"; HILT_D="#563418"; GUARD="#d9b44a"; POMMEL="#d9b44a"; ORB="#45a8ff"
 
-
-sys.path.insert(0, str(_workspace() / "tools/gamekit/pipeline"))
-
-from spritekit import Canvas, gif, preview, strip, write_anim_meta  # noqa: E402
-
-NAME = "tower-shield"
-W, H = 32, 32
-ANCHOR = (16.0, 30.0)
-HERE = Path(__file__).resolve().parent
-OUT = HERE
-
-STEEL = "#b8c7d9"
-STEEL_D = "#5f7187"
-EDGE = "#e8f4ff"
-DARK = "#3a4657"
-GOLD = "#d9b44a"
-BLUE = "#2f5f8a"
-
-
-def p(c, x, y, col):
-    c.pixel(x, y, col)
-
-
-def shield(c, glint=False):
-    # thân khiên tháp (trên thẳng, dưới bo/vát)
-    pts = [(8, 4), (24, 4), (25, 22), (16, 28), (7, 22)]
-    c.polygon(pts, STEEL_D)
-    inner = [(9, 5), (23, 5), (24, 22), (16, 27), (8, 22)]
-    c.polygon(inner, STEEL)
-    # viền
-    c.line(8, 4, 24, 4, EDGE)
-    c.line(8, 4, 7, 22, DARK)
-    c.line(24, 4, 25, 22, DARK)
-    c.line(7, 22, 16, 28, DARK)
-    c.line(25, 22, 16, 28, DARK)
-    # huy hiệu
-    c.polygon([(12, 8), (20, 8), (21, 18), (16, 22), (11, 18)], BLUE)
-    c.line(16, 9, 16, 20, GOLD)
-    c.line(13, 14, 19, 14, GOLD)
-    # gân gia cố
-    c.line(10, 6, 10, 22, STEEL_D)
-    c.line(22, 6, 22, 22, STEEL_D)
+def draw(c, glint=False):
+    # khiên hinh khi (top bang, duoi nhon), vien toi, hien thi kim loai
+    def hw(y):
+        if y <= 8: return 11
+        if y <= 20: return 11 - (y - 8) * 3 // 5
+        return max(0, 4 - (y - 20))
+    for y in range(4, 29):
+        w = hw(y)
+        if w <= 0: continue
+        c.line(16-w, y, 16+w, y, D)
+        c.line(16-w+1, y, 16+w-1, y, M if y > 5 else L)
+    # vien tren
+    c.line(5,4,27,4,E)
+    # hien thi: certain cross
+    c.line(16,8,16,24,GUARD)
+    c.line(9,14,23,14,GUARD)
+    c.rect(14,12,18,16,GUARD); c.rect(15,13,17,15,E)
+    c.pixel(16,13,POMMEL)
     if glint:
-        c.line(11, 6, 11, 12, EDGE)
-        p(c, 12, 7, "#ffffff")
-
+        c.pixel(10,10,E); c.pixel(22,10,E)
 
 def idle(i):
     c = Canvas(W, H)
-    c.ellipse(9, 29, 23, 31, "#00000033")
-    shield(c, glint=(i in (1, 2, 3)))
+    c.ellipse(6, 28, 26, 31, "#00000033")
+    draw(c, glint=(i in (2, 3)))
     return c
 
-
-ANIMATIONS=[("idle",[idle(0)],1,False)]
-
-
-def main() -> None:
-    flat = [f for _, frames, _, _ in ANIMATIONS for f in frames]
-    strip(flat).save(OUT / f"{NAME}_strip.png")
-    flat[0].save(OUT / f"{NAME}.png")
-    cols = max(len(frames) for _, frames, _, _ in ANIMATIONS)
-    sheet = Canvas(cols * W, len(ANIMATIONS) * H)
-    for row, (_, frames, _, _) in enumerate(ANIMATIONS):
-        sheet.paste(strip(frames), 0, row * H)
-    preview([sheet], HERE / "preview.png", scale=5)
-    for anim, frames, fps, _ in ANIMATIONS:
-        gif(frames, HERE / f"{anim}.gif", fps=fps, scale=5)
-    write_anim_meta(OUT / f"{NAME}.json",
-                    [{"name": n, "frames": f, "fps": fps, "loop": loop,
-                      "hitbox": {"shape": "rect", "center": [float(ANCHOR[0]), float(ANCHOR[1])], "active": [0, len(f)-1]}}
-                     for n, f, fps, loop in ANIMATIONS],
-                    anchor=ANCHOR)
-    print(f"strip:   {OUT / f'{NAME}_strip.png'}")
-    print(f"preview: {HERE / 'preview.png'}")
-
-
-if __name__ == "__main__":
-    main()
+ANIMATIONS=[("idle",[idle(0)],1,False,{"hitbox":{"shape":"rect","center":[ANCHOR[0],ANCHOR[1]],"active":[0,0]}})]
+if __name__=="__main__":
+    export(HERE, NAME, ANIMATIONS, anchor=ANCHOR)
+    print("ok")

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Gậy võ thuật (bo staff) wood (vật phẩm, staff - dùng cho class võ thuật)."""
+"""staff wood (vật phẩm, staff)."""
 import sys
 from pathlib import Path
 def _ws():
@@ -14,29 +14,26 @@ from sheet import export
 
 NAME="staff-wood"; W,H=24,32; ANCHOR=(12.0,30.0)
 
-MAIN="#b07c44"; DARK="#7a4f2a"; LIGHT="#d4a86a"; EDGE="#e8cfa0"
-GRIP="#6b4410"; GRIP_D="#4a2f18"
+L="#d4a86a"; M="#b07c44"; D="#7a4f2a"; E="#e8cfa0"
+HILT="#8a5a2e"; HILT_D="#563418"; GUARD="#6b4410"; POMMEL="#8a5a2e"; ORB="#7ad0a0"
 
-def staff(c,glint=False):
-    # thân gậy thẳng, cân đối (võ thuật/bo staff)
-    c.rect(11,2,13,30,MAIN)
-    c.line(11,2,11,30,DARK)
-    c.line(13,2,13,30,LIGHT)
-    # đầu gậy
-    c.pixel(11,2,EDGE); c.pixel(12,2,EDGE); c.pixel(13,2,LIGHT)
-    c.pixel(11,30,DARK); c.pixel(12,30,MAIN); c.pixel(13,30,LIGHT)
-    # quấn tay giữa
-    for y in range(14,19):
-        c.pixel(11,y,GRIP_D); c.pixel(12,y,GRIP); c.pixel(13,y,GRIP_D)
-    c.pixel(11,14,GRIP_D); c.pixel(13,18,GRIP_D)
-    # quấn gần hai đầu
-    for y in range(5,7):
-        c.pixel(11,y,GRIP_D); c.pixel(12,y,GRIP); c.pixel(13,y,GRIP_D)
-    for y in range(25,27):
-        c.pixel(11,y,GRIP_D); c.pixel(12,y,GRIP); c.pixel(13,y,GRIP_D)
+def draw(c, glint=False):
+    # bo staff: than thang, dau loe nhẹ, quan tay 3 doan
+    c.rect(11,2,12,30,M); c.line(11,2,11,30,D); c.line(12,2,12,30,L)
+    c.rect(10,2,13,3,E); c.rect(10,29,13,30,D)
+    for a,b in [(6,8),(14,17),(24,26)]:
+        for y in range(a,b+1):
+            c.pixel(11,y,HILT_D); c.pixel(12,y,HILT)
     if glint:
-        c.pixel(13,10,EDGE); c.pixel(13,22,EDGE)
+        c.pixel(12,11,E); c.pixel(12,20,E)
 
-def idle(i): c=Canvas(W,H); c.ellipse(9,29,15,31,"#00000033"); staff(c,glint=(i in (2,3))); return c
+def idle(i):
+    c = Canvas(W, H)
+    c.ellipse(9, 29, 15, 31, "#00000033")
+    draw(c, glint=(i in (2, 3)))
+    return c
+
 ANIMATIONS=[("idle",[idle(0)],1,False,{"hitbox":{"shape":"rect","center":[ANCHOR[0],ANCHOR[1]],"active":[0,0]}})]
-if __name__=="__main__": export(HERE,NAME,ANIMATIONS,anchor=ANCHOR); print("ok")
+if __name__=="__main__":
+    export(HERE, NAME, ANIMATIONS, anchor=ANCHOR)
+    print("ok")

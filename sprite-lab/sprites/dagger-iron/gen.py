@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Dao găm iron (vật phẩm, dagger)."""
+"""dagger iron (vật phẩm, dagger)."""
 import sys
 from pathlib import Path
 def _ws():
@@ -12,18 +12,53 @@ sys.path.insert(0,str(HERE.parents[1]/"lib"))
 from spritekit import Canvas
 from sheet import export
 
-NAME="dagger-iron"; W,H=20,20; ANCHOR=(10.0,18.0)
+NAME="dagger-iron"; W,H=20,20; ANCHOR=(2.0,18.0)
 
-MAIN="#b8c7d9"; DARK="#5f7187"; LIGHT="#d8e4f0"; EDGE="#e8f4ff"
-HILT="#8a5a2e"; HILT_D="#563418"; TRIM="#d9b44a"
+L="#d8e4f0"; M="#b8c7d9"; D="#6b7f96"; E="#f2fbff"
+HILT="#8a5a2e"; HILT_D="#563418"; GUARD="#d9b44a"; POMMEL="#d9b44a"; ORB="#45a8ff"
 
-def dagger(c,glint=False):
-    c.line(10,17,14,6,DARK,2); c.line(9,17,13,6,MAIN,1); c.line(9,16,13,7,LIGHT,1)
-    c.pixel(14,5,EDGE); c.pixel(14,6,MAIN)
-    c.line(7,16,12,15,TRIM); c.line(7,17,12,16,HILT_D)
-    c.line(9,17,8,18,HILT,2); c.pixel(8,18,TRIM)
-    if glint: c.pixel(13,7,EDGE); c.pixel(12,9,EDGE)
+def col(c, x, yc, lo, hi, colors):
+    for j, dy in enumerate(range(lo, hi + 1)):
+        y = yc + dy
+        if 0 <= x < W and 0 <= y < H:
+            c.pixel(x, y, colors[j])
 
-def idle(i): c=Canvas(W,H); c.ellipse(7,17,13,19,"#00000033"); dagger(c,glint=(i in (2,3))); return c
+def blade(c, bx, by, tx, lo, hi, colors, tips):
+    for x in range(bx, tx + 1):
+        yc = by - (x - bx)
+        dist = tx - x
+        tlo, thi, tcolors = lo, hi, colors
+        for d, lo2, hi2, cols2 in tips:
+            if d == dist:
+                tlo, thi, tcolors = lo2, hi2, cols2
+                break
+        col(c, x, yc, tlo, thi, tcolors)
+
+def draw(c, glint=False):
+    # dao gam ngan, luoi la, dau 2px
+    blade(c, 6, 15, 14, -1, 1, [L, M, D], [
+        (0, 0, 0, [L]),            # dinh nhon 1px
+        (1, -1, 0, [L, M]),        # 2px
+        (2, -1, 1, [L, M, D]),     # 3px -> than luoi
+    ])
+    for x in range(4, 9):
+        yc = 15 + (x - 6)
+        col(c, x, yc, 0, 1, [GUARD, HILT_D])
+    c.pixel(4, 13, GUARD); c.pixel(8, 17, GUARD)
+    for i in range(2):
+        x, yc = 5 - i, 16 + i
+        col(c, x, yc, 0, 1, [HILT, HILT_D])
+    c.rect(2, 17, 4, 19, POMMEL); c.pixel(2, 17, GUARD)
+    if glint:
+        c.pixel(10, 9, E); c.pixel(12, 7, E)
+
+def idle(i):
+    c = Canvas(W, H)
+    c.ellipse(2, 18, 7, 19, "#00000033")
+    draw(c, glint=(i in (2, 3)))
+    return c
+
 ANIMATIONS=[("idle",[idle(0)],1,False,{"hitbox":{"shape":"rect","center":[ANCHOR[0],ANCHOR[1]],"active":[0,0]}})]
-if __name__=="__main__": export(HERE,NAME,ANIMATIONS,anchor=ANCHOR); print("ok")
+if __name__=="__main__":
+    export(HERE, NAME, ANIMATIONS, anchor=ANCHOR)
+    print("ok")
