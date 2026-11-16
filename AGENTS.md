@@ -13,6 +13,7 @@ game-studio/
 ├── LESSONS.md                    lỗi đã gặp → chỗ đã chặn (đọc trước khi làm việc cùng loại)
 ├── .agents/skills/<tên>/SKILL.md skill dùng chung (bản gốc), ví dụ pixel-sprite
 ├── .claude/skills/<tên>          symlink → .agents/skills/<tên> (do `gamekit agents-link` tạo)
+├── sprite-lab/                   Sprite Lab: project Godot để làm + thử MỌI sprite (sheet, di chuyển), rồi promote vào game
 ├── templates/
 │   └── claude-code-game-studios/ framework gốc (49 agent, 74 skill), CHỈ ĐỌC. Mỗi game mới clone từ đây
 ├── games/
@@ -54,7 +55,7 @@ xuất kéo dài thì khuyên người dùng mở phiên mới ở đó.
 | "Thêm tính năng" (lớn, nhiều hệ thống) | `/quick-design` (thay đổi nhỏ) hoặc `/design-system` → `/create-stories` → `/dev-story` → `/story-done` |
 | "Game khó/dễ quá", "chỉnh tốc độ…" | sửa `assets/data/*.json` (không hardcode trong code) → `/balance-check` → `gamekit test` + `gamekit shot` |
 | "Thêm nhân vật", "sprite người/quái dạng người" | `gamekit lpc` (người dùng phối đồ, xuất **ZIP split animations**) → chép vào `games/<g>/assets/source/lpc/<tên>.zip` → `gamekit sprites <g>` → `gamekit preview <g> <tên>` → dùng `LpcCharacter` trong code |
-| Art khác (tile, cảnh, hiệu ứng, icon, sprite không LPC) | skill **`.agents/skills/pixel-sprite/SKILL.md`**: `gamekit art new <g> <tên> [--size N]` → sửa `gen.py` → `gamekit art run <g> <tên>` → xem `preview.png`/`anim.gif` → `gamekit shot <g>`; hướng nghệ thuật bằng `/art-bible`, `/asset-spec` |
+| Sprite / art pixel (nhân vật, quái, icon, hiệu ứng, tile; không phải LPC), thử animation, thử di chuyển | skill **`.agents/skills/pixel-sprite/SKILL.md`**, làm trong **Sprite Lab** (`sprite-lab/`, không bao giờ trong game): `gamekit art new <tên>` → sửa `gen.py` → `gamekit art run <tên>` → xem `preview.png` → `gamekit art shot <tên> sheet` + `… move` → `gamekit art test` → commit repo gốc → khi game cần: `gamekit art promote <tên> <g>`; hướng nghệ thuật bằng `/art-bible`, `/asset-spec` |
 | Menu, HUD, giao diện | `/ux-design` → `/team-ui`; bắt buộc chụp màn hình bằng `gamekit shot` |
 | Âm thanh | `/team-audio` (kit chưa có công cụ âm thanh) |
 | "Game bị lỗi…" | `/bug-report` → viết test hồi quy, **chạy cho thấy test fail trước** → sửa → `gamekit test` |
@@ -82,14 +83,15 @@ xuất kéo dài thì khuyên người dùng mở phiên mới ở đó.
   `games/<g>` hoặc `tools/gamekit`.
 - **Addon `games/<g>/addons/gamekit/` là bản sao.** Sửa ở `tools/gamekit/addon/` rồi chạy `gamekit install`.
 - **Git có ba tầng:** repo gốc `game-studio/` quản lý `AGENTS.md`, `LESSONS.md`, `CLAUDE.md`, `README.md`, `.agents/`,
-  `.claude/skills/` (symlink), `.aider.conf.yml` và `tools/gamekit`. Mỗi game là một repo riêng: remote `framework`
+  `.claude/skills/` (symlink), `.aider.conf.yml`, `sprite-lab/` và `tools/gamekit`. Mỗi game là một repo riêng: remote `framework`
   trỏ về upstream của framework, còn `origin` để dành cho repo riêng của game. `templates/` và
   `tools/lpc-generator/` là clone upstream. Commit theo mục "Quy tắc commit" bên dưới.
 - **README của game nói về game** (cách chơi, phím, cấu trúc, ai sở hữu thư mục nào). Tài liệu về công cụ
   nằm ở `tools/gamekit/README.md` và trong template, không chép vào game.
 - API Godot 4.7: tra `games/<g>/docs/engine-reference/godot/` trước khi dùng API mà mình không chắc.
 - **Shell là zsh.** Không dựa vào word splitting (`set -- $s`, `for x in $list` với chuỗi có dấu cách): gọi
-  từng lệnh riêng hoặc dùng mảng. Script trong `tools/gamekit` viết bằng bash (`#!/usr/bin/env bash`).
+  từng lệnh riêng hoặc dùng mảng. **Không gom nhiều đường dẫn vào một biến** (`L="a b"; git add $L` hỏng):
+  viết thẳng các đường dẫn vào lệnh. Script trong `tools/gamekit` viết bằng bash (`#!/usr/bin/env bash`).
 - **Sprite đặt theo điểm neo, không theo tâm canvas.** Sprite nào cũng có `<tên>.json` (do `gen.py` gọi
   `write_meta`) và game vẽ qua `SpriteAnchor`. Chi tiết trong skill `pixel-sprite`.
 
@@ -119,7 +121,7 @@ yêu cầu, nên không cần hỏi lại trước mỗi commit. Áp dụng cho 
 | File đã sửa | Repo | Ghi chú |
 |---|---|---|
 | `games/<g>/**` | repo của game đó (`git -C games/<g>`) | |
-| `AGENTS.md`, `LESSONS.md`, `CLAUDE.md`, `README.md`, `.gitignore`, `.aider.conf.yml`, `.agents/**`, `.claude/skills/**`, `tools/gamekit/**` | repo gốc `game-studio/` | |
+| `AGENTS.md`, `LESSONS.md`, `CLAUDE.md`, `README.md`, `.gitignore`, `.aider.conf.yml`, `.agents/**`, `.claude/skills/**`, `sprite-lab/**`, `tools/gamekit/**` | repo gốc `game-studio/` | |
 | `templates/**`, `tools/lpc-generator/**` | **không bao giờ** | clone upstream, chỉ đọc. Lỡ sửa thì `git checkout -- .` để hoàn tác |
 
 Thay đổi trải trên nhiều repo thì **mỗi repo một commit**. Ví dụ sửa gamekit:
@@ -134,7 +136,8 @@ Thay đổi trải trên nhiều repo thì **mỗi repo một commit**. Ví dụ
 | thứ người chơi nhìn thấy (hình, UI, cảm giác chơi) | thêm `gamekit shot <g> …` và **xem ảnh**; ảnh bằng chứng lưu vào `production/qa/evidence/<việc>/` và commit kèm |
 | `assets/data/*.json` | test như trên (hook commit của framework chặn JSON lỗi) |
 | sprite LPC | `gamekit sprites <g>` thành công (có credit) + `gamekit test <g>` |
-| sprite pixel art | `gamekit art run <g> <tên>` + **xem `preview.png`**; nếu đã dùng trong game thì `gamekit shot` |
+| sprite pixel art (lab) | `gamekit art run <tên>` + **xem** `preview.png`, ảnh `art shot … sheet` và `… move`; `gamekit art test` |
+| sprite đã promote vào game | `gamekit test <g>` + `gamekit shot <g>` và xem ảnh |
 | script trong `tools/gamekit` | `bash -n` (shell) / `python3 -m py_compile` (python); `gamekit install` + `gamekit test` trên ít nhất một game |
 | skill hoặc cấu hình agent | `gamekit agents-link` + `gamekit doctor` không còn mục `MISS` |
 | cấu hình export | `gamekit export <g> <preset>` cho preset bị đổi |
@@ -155,7 +158,7 @@ dùng bảo commit dở dang thì mới commit, và dùng type `wip`.
   xem có file nào vừa biến mất khỏi danh sách.
 - Commit kèm file `.uid` mà Godot sinh ra cạnh script/shader (quy tắc của framework); **không** commit `.godot/`,
   `builds/`, file tạm, log, `*.import` của file bị xóa, hay credential/khóa ký.
-- **Có** commit: `export_presets.cfg`, `assets/source/lpc/*.zip`, `assets/source/sprites/<tên>/gen.py`,
+- **Có** commit: `export_presets.cfg`, `assets/source/lpc/*.zip`, `sprite-lab/sprites/<tên>/` (gen.py, strip, json, preview),
   ảnh trong `production/qa/evidence/`.
 
 ### 4. Chia commit

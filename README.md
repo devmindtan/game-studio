@@ -9,6 +9,7 @@ Cursor, Aider…
 | `AGENTS.md` | **Workflow cho mọi agent** (bản gốc duy nhất). `CLAUDE.md` import nó |
 | `LESSONS.md` | Lỗi đã gặp và chỗ đã chặn chúng. Mỗi lần sai, agent sửa rule/công cụ và ghi thêm một dòng |
 | `.agents/skills/` | Skill dùng chung (ví dụ `pixel-sprite`). `.claude/skills/` chỉ chứa symlink trỏ về đây |
+| `sprite-lab/` | **Sprite Lab**: nơi làm và thử mọi sprite (xem cả animation, thử di chuyển) trước khi đưa vào game. Xem [README](sprite-lab/README.md) |
 | `templates/claude-code-game-studios/` | Bản gốc của framework để tạo game mới (không sửa trực tiếp) |
 | `tools/gamekit/` | Bộ công cụ: CLI `gamekit`, pipeline sprite LPC, pixel art, build/export. Xem [README](tools/gamekit/README.md) |
 | `tools/lpc-generator/` | Bộ tạo nhân vật LPC (web app) |
@@ -38,8 +39,9 @@ Ví dụ:
 
 - "Làm cho tôi game bắn thiên thạch": `gamekit new` rồi `/prototype`.
 - "Thêm nhân vật hiệp sĩ vào game": dùng bộ tạo LPC rồi `gamekit sprites`.
-- "Vẽ icon/hiệu ứng/quái pixel art": skill `pixel-sprite`, tức `gamekit art new <g> <tên>`, sửa `gen.py`,
-  rồi `gamekit art run <g> <tên>`. Agent viết code Python vẽ từng pixel và tự xem ảnh preview.
+- "Vẽ một nhân vật/quái/icon pixel art": skill `pixel-sprite`, làm trong Sprite Lab. Gồm `gamekit art new <tên>`,
+  sửa `gen.py`, `gamekit art run <tên>`, thử bằng `gamekit art shot <tên> sheet|move` (mọi animation + bản thử
+  di chuyển). Khi game cần mới `gamekit art promote <tên> <game>`.
 - "Game khó quá": chỉnh `assets/data/*.json`, rồi test và chụp màn hình.
 - "Xuất bản web để đưa lên itch.io": `gamekit export <g> Web` rồi `gamekit smoke-web`.
 

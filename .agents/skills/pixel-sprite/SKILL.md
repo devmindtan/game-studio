@@ -1,122 +1,90 @@
 ---
 name: pixel-sprite
 description: >
-  Thiết kế sprite pixel art cho game trong workspace này: nhân vật, kẻ địch,
-  icon, vật phẩm, hiệu ứng, animation và sprite sheet. Dùng khi người dùng nhờ
-  vẽ/sửa sprite, làm art không phải nhân vật LPC, tạo animation 2D, hoặc làm
-  việc với LibreSprite/.ase. English triggers: pixel art, sprite, spritesheet,
-  animation frames, LibreSprite, Aseprite, game art, tileset, icon.
+  Thiết kế, thử và đưa sprite pixel art vào game trong workspace này: nhân vật, kẻ địch, icon, vật phẩm,
+  hiệu ứng, animation, sprite sheet nhiều animation, bản thử di chuyển. Mọi sprite được làm và thử trong
+  Sprite Lab (sprite-lab/), không bao giờ làm thẳng trong game. Dùng khi người dùng nhờ vẽ/sửa/thử sprite,
+  làm art không phải nhân vật LPC, tạo animation 2D, hoặc làm việc với LibreSprite/.ase.
+  English triggers: pixel art, sprite, spritesheet, animation frames, sprite test, movement test,
+  LibreSprite, Aseprite, game art, tileset, icon.
 ---
 
 # Pixel sprite (game-studio)
 
-Agent tự thiết kế bằng generator + vòng lặp nhìn ảnh. Không điều khiển GUI.
-LibreSprite dùng để con người chỉnh tay và để chuyển `.ase` ↔ `.png`.
+Agent tự thiết kế bằng code (`gen.py` + `spritekit`) rồi lặp: nhìn ảnh, sửa. Không điều khiển GUI.
+**Mọi sprite được làm và thử trong Sprite Lab** (`sprite-lab/`, xem `sprite-lab/README.md`). Chỉ khi một game
+thật sự cần thì mới `promote` sang game đó.
 
-## Môi trường đã kiểm chứng
-
-- `libresprite` 1.3 ở `~/.local/bin/libresprite` (GPL-2.0, AppImage).
-- Pillow 10.2 có sẵn; **không có numpy**.
-- v1.3 **không có MCP/HTTP/`--set`/`tools.*`/`app.isHeadless`**. MCP server
-  (`data/scripts/mcp-server.js`) chỉ có trên master sau v1.3 — đừng cấu hình
-  MCP cho bản 1.3.
-- Script headless v1.3 chỉ vẽ được một frame; animation làm bằng Python.
-- Lỗi JS in `Error:` nhưng exit code vẫn 0 → luôn kiểm tra file output.
+> Bài học 2026-11-16 (`LESSONS.md`): một sheet pháp sư không liên quan đã bị tạo thẳng trong game đom đóm, và
+> trình xem thử bị nhét vào `main.gd` của game. Giờ `gamekit art new <game> …` bị từ chối.
 
 ## Lệnh
 
 ```sh
-gamekit art new <game> light-mote --size 24   # scaffold gen.py
-gamekit art run <game> light-mote             # render PNG + preview + GIF
-gamekit art ase <game> light-mote             # PNG -> .ase (cho người chỉnh)
-gamekit art open <game> light-mote            # mở .ase trong LibreSprite
+gamekit art new <tên> [--size N]       # sprite-lab/sprites/<tên>/gen.py (mẫu nhiều animation)
+gamekit art run <tên>                  # vẽ + kiểm tra metadata (frames, animation, neo)
+gamekit art shot <tên> sheet           # ảnh: mọi animation cạnh nhau, đường đất, neo, khung
+gamekit art shot <tên> move            # ảnh lưới 8 khoảnh khắc của bản thử di chuyển (demo)
+gamekit art lab [<tên>] [sheet|move]   # mở lab để người dùng tự điều khiển
+gamekit art test | check | list        # test của lab / kiểm mọi sprite / sprite nào đang ở game nào
+gamekit art promote <tên> <game>       # chép strip + json vào games/<g>/assets/sprites/custom/<tên>/
+gamekit art ase|open <tên>             # .ase để người chỉnh tay trong LibreSprite
 ```
 
-Trong thư mục game có thể bỏ `<game>`:
-`gamekit art run light-mote`.
+## Quy trình (đủ các bước mới được báo xong)
 
-## Cấu trúc file
+1. **Chốt spec**: kích thước (16/24/32/48/64; nhân vật cao thì chừa khoảng trống phía trên cho nhảy), palette
+   4–16 màu, hướng nhìn (mặc định quay phải), **điểm neo** (nhân vật đứng: giữa hai bàn chân trên mặt đất;
+   vật bay: tâm thân; đạn/giọt: đầu va chạm), danh sách animation với số frame/fps/loop. Mơ hồ thì chọn mặc
+   định và nói rõ. Tên animation dùng bộ chuẩn để lab và game hiểu: `idle`, `walk`/`run`/`fly`/`move`,
+   `jump`, `attack`, `spell`, `hurt`, `death`.
+2. **Vẽ silhouette trước** bằng ASCII map trong `gen.py` (`from_rows`, `outline`), rồi mới thêm chi tiết.
+3. **Render**: `gamekit art run <tên>`. Lệnh này dừng nếu thiếu `<tên>.json`, neo nằm ngoài khung, hoặc
+   animation không liền nhau. `gen.py` gọi `write_anim_meta(...)` (đã có sẵn trong mẫu); sprite một animation
+   có thể dùng `write_meta`.
+4. **Xem tĩnh**: mở `sprite-lab/sprites/<tên>/preview.png` bằng công cụ đọc ảnh của agent. Mỗi animation một
+   hàng. Nhiều agent không đọc được GIF động; `<animation>.gif` là cho người xem. Sửa, lặp 2–3 vòng.
+5. **Thử sheet**: `gamekit art shot <tên> sheet` rồi xem ảnh. Mọi animation chân/neo nằm trên đường đất,
+   khung không cắt mất hình (mũ khi nhảy, vũ khí khi vung).
+6. **Thử di chuyển**: `gamekit art shot <tên> move` rồi xem ảnh lưới. Đạt khi: lật hướng không làm sprite
+   xê dịch, đi/chạy có nhịp, nhảy có độ cao và bóng hợp lý, đòn đánh/phép/trúng đòn đọc được.
+7. **Test**: `gamekit art test` (unit `SpriteSheet`/`SpriteAnchor` + integration mọi sprite trong lab).
+8. **Commit** ở repo gốc (`sprite-lab/` thuộc repo gốc): `gen.py`, strip, json, png, preview, gif.
+9. **Đưa vào game** (chỉ khi game cần): `gamekit art promote <tên> <game>` → vẽ bằng `SpriteSheet` trong code
+   game → `gamekit test <g>` + `gamekit shot <g>` và **xem ảnh** → commit repo game.
 
-```text
-games/<g>/assets/source/sprites/<name>/   # .gdignore: không vào bản export
-  gen.py                                   # generator cần sửa
-  preview.png, anim.gif, <name>.ase        # để xem/chỉnh tay
-games/<g>/assets/sprites/custom/<name>/   # Godot import
-  <name>.png                               # frame chính
-  <name>_strip.png                         # dải animation (nếu nhiều frame)
-```
-
-`gen.py` tự tìm `tools/gamekit/pipeline/spritekit.py` bằng cách đi ngược lên
-workspace. Không copy helper vào từng game, không hard-code đường dẫn tuyệt đối.
-
-## Quy trình
-
-1. **Chốt spec**: kích thước (16/24/32/48/64), palette 4–16 màu, số frame, fps, **điểm neo (anchor)**,
-   hướng nhìn, anchor (chân giữa), nền trong suốt. Mơ hồ thì chọn mặc định và
-   nói rõ.
-2. **Vẽ silhouette trước** bằng ASCII map trong `gen.py`:
-
-   ```python
-   from spritekit import from_rows
-   rows = [
-       "....####....",
-       "..########..",
-       ".##########.",
-       "..########..",
-       "....####....",
-   ]
-   c = from_rows(rows, {"#": "#ffd34d"})
-   c.outline("#5a3300")
-   ```
-
-3. **Chạy và nhìn**: `gamekit art run <g> <name>`, rồi dùng công cụ đọc ảnh của agent (Read, read, view…)
-   mở `preview.png` (ảnh tĩnh, phóng to, có lưới). Nhiều agent không đọc được GIF động: xem các frame trong
-   `preview.png`, còn `anim.gif` là cho người xem. Sửa, lặp 2–3 vòng.
-4. **Metadata + điểm neo (bắt buộc)**: `gen.py` gọi
-   `write_meta(OUT / f"{NAME}.json", frames, fps=FPS, anchor=ANCHOR, loop=LOOP)`. `ANCHOR` là pixel nguồn sẽ
-   đặt lên vị trí của vật thể: tâm thân, chân, đầu giọt mưa… `None` = tâm phần có hình, chỉ đúng khi hình đối
-   xứng. Hình mà khung bao thay đổi theo frame (cánh vỗ, vung kiếm) **phải** đặt anchor rõ ràng.
-   `gamekit art run` dừng nếu thiếu `.json` hoặc anchor nằm ngoài khung. Game đọc frames/fps/anchor từ file
-   này, **không gõ tay vào config** (bài học 2026-11-16 trong `LESSONS.md`).
-
-   **Một sheet, nhiều animation** (idle/chạy/đánh/chết…): xếp các animation nối tiếp nhau trên dải ngang và
-   dùng `write_anim_meta(path, [{"name", "frames", "fps", "loop"}, …], anchor=ANCHOR)`. Mỗi animation có
-   `start` tự tính; game đọc `animations` trong `<tên>.json` rồi vẽ frame `start + i`. Không tách thành nhiều
-   sprite nếu người dùng muốn một sheet. Ví dụ: `games/dom-dom-dem-mua/assets/source/sprites/mage/gen.py`
-   (7 animation, 33 frame, xem trong game bằng `gamekit shot . "" 90 -- --mage-preview`).
-5. **Kiểm tra trong game**: thêm PNG vào `Sprite2D`/`AnimatedSprite2D` hoặc
-   `_draw`, chạy `gamekit test <g>` + `gamekit shot <g>` rồi xem ảnh.
-6. **Bàn giao**: PNG trong `assets/sprites/custom/`; `.ase` trong `assets/source/`
-   nếu người dùng muốn chỉnh tay.
+Không báo "xong" khi chưa xem `preview.png`, ảnh `sheet` và ảnh `move`.
 
 ## Quy tắc pixel art
 
 - Không anti-alias, không gradient mịn; dùng màu phẳng và banding.
 - 1 pixel = 1 đơn vị thiết kế; scale nguyên, nearest.
 - Silhouette phải đọc được ở 1x; outline tối 1px hoặc selective outline.
-- Animation: 4–8 frame cho idle/loop, 6–10 cho walk; đổi 1–2 pixel mỗi frame,
-  giữ chân/tâm cố định.
+- Animation: 4–8 frame cho idle/loop, 6–10 cho walk/run; đổi 1–2 pixel mỗi frame; neo cố định qua mọi frame.
 - Nền trong suốt (`RGBA`), không viền quanh cả canvas.
 
 ## Godot 4.7
 
-- Đặt sprite bằng điểm neo: `SpriteAnchor.dest_rect(point, frame_size, anchor, scale, flip_h)` (có trong game
-  dom-dom-dem-mua, `src/core/sprite_anchor.gd`). **Không** căn theo tâm canvas, **không** tự tính lại rect khi
-  lật bằng chiều rộng âm (Godot giữ vùng vẽ, chỉ lật texture). Kiểm vị trí bằng một chấm debug tại anchor
-  (game này có `--debug-anchors`).
+- Vẽ bằng addon dùng chung `addons/gamekit/sprites/`:
+  `SpriteSheet.load_dir(dir, name)` rồi `sheet.draw(self, anim, t, point, scale, flip_h)` trong `_draw()`.
+  Bên dưới là `SpriteAnchor.dest_rect`: **không** căn theo tâm canvas, **không** tự tính lại rect khi lật
+  bằng chiều rộng âm (Godot giữ vùng vẽ, chỉ lật texture).
+- Pixel art cần lọc Nearest: `rendering/textures/canvas_textures/default_texture_filter=0` (game do `gamekit
+  new` tạo và lab đã có). Thiếu nó, sprite bị nhòe khi phóng to.
+- Export: preset phải gói `assets/sprites/*.json` (template của gamekit đã có).
 
-- Pixel art cần lọc Nearest. Game do `gamekit new` tạo đã có sẵn
-  `rendering/textures/canvas_textures/default_texture_filter=0`; game cũ thì thêm dòng này vào `project.godot`
-  (hoặc đặt `texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST` trên node). Thiếu nó, sprite bị nhòe khi phóng to.
-- Bật `rendering/2d/snap/snap_2d_transforms_to_pixel` nếu sprite bị nửa pixel.
-- File PNG trong `assets/sprites/` được Godot tự import; không cần `.tres` cho
-  sprite đơn, dùng `AnimatedSprite2D` + `SpriteFrames` nếu có animation.
+## Môi trường đã kiểm chứng
+
+- `libresprite` 1.3 ở `~/.local/bin/libresprite` (GPL-2.0). Bản 1.3 **không có MCP/HTTP/`--set`**; script
+  headless chỉ vẽ được một frame, nên animation làm bằng Python. Lỗi JS in `Error:` nhưng exit code vẫn 0,
+  nên luôn kiểm tra file output.
+- Pillow 10.2 có sẵn; **không có numpy**.
 
 ## Không làm
 
+- Không tạo hay thử sprite trong thư mục game; không thêm cờ xem thử sprite vào code của game.
+- Không gõ số frame, fps, neo vào config của game: chúng nằm trong `<tên>.json` do `gen.py` sinh ra.
 - Không dùng dịch vụ ảnh trả phí, không gửi art lên mạng.
 - Không sửa `templates/` hay `tools/lpc-generator/` (clone upstream).
-- Không ghi đè sprite/credits hiện có khi chưa hỏi.
-- Không bỏ qua commit: theo "Quy tắc commit" trong `AGENTS.md` ở gốc workspace, commit `gen.py`, PNG và
-  `.ase` (nếu có) vào repo của game ngay khi sprite đạt.
-- Không báo "xong" khi chưa mở ảnh preview và ảnh chụp trong game.
+- Không ghi đè sprite đã promote khi chưa hỏi; sửa trong lab rồi promote lại.
+- Không bỏ qua commit (`AGENTS.md`, "Quy tắc commit"): lab ở repo gốc, bản promote ở repo game.
