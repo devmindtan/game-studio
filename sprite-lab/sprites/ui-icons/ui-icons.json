@@ -1,5 +1,5 @@
 {
-  "frames": 20,
+  "frames": 21,
   "frame_size": [
     16,
     16
@@ -148,6 +148,13 @@
     {
       "name": "earth_strike",
       "start": 19,
+      "frames": 1,
+      "fps": 1.0,
+      "loop": false
+    },
+    {
+      "name": "shield",
+      "start": 20,
       "frames": 1,
       "fps": 1.0,
       "loop": false

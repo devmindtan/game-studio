@@ -275,6 +275,21 @@ ICONS = {
         "..ddddddddd..",
         "....rrrrr....",
     ]),
+    # armour (giáp): a steel kite shield with a gold rim and a cross band
+    "shield": ({"o": "#c9a65a", "s": "#9fb3c8", "l": "#e8f0f6", "d": "#5f7186", "c": "#3f7fbf"}, [
+        "ooooooooooo",
+        "olllssssddo",
+        "olssscsssdo",
+        "olssscsssdo",
+        "occccccccco",
+        "olssscsssdo",
+        ".olsscssdo.",
+        ".osssscsdo.",
+        "..ossdsdo..",
+        "...ossdo...",
+        "....odo....",
+        ".....o.....",
+    ]),
 }
 
 
