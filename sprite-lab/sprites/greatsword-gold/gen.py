@@ -12,7 +12,7 @@ sys.path.insert(0,str(HERE.parents[1]/"lib"))
 from spritekit import Canvas
 from sheet import export
 
-NAME="greatsword-gold"; W,H=32,32; ANCHOR=(5.0,28.0)
+NAME="greatsword-gold"; W,H=32,32; ANCHOR=(6.0,29.0)
 
 L="#f2d98a"; M="#e6c35c"; D="#a67c1a"; E="#fff6c8"
 HILT="#8a5a2e"; HILT_D="#563418"; GUARD="#8f6a1f"; POMMEL="#8f6a1f"; ORB="#ff7ac0"
@@ -48,7 +48,7 @@ def draw(c, glint=False):
     for i in range(4):
         x, yc = 10 - i, 24 + i
         col(c, x, yc, 0, 1, [HILT, HILT_D])
-    c.rect(5, 27, 7, 29, POMMEL); c.pixel(5, 27, GUARD)
+    c.rect(6, 29, 7, 29, POMMEL); c.pixel(6, 29, GUARD)
     if glint:
         c.pixel(17, 17, E); c.pixel(20, 14, E); c.pixel(23, 11, E)
 

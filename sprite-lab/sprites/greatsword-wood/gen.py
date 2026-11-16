@@ -12,7 +12,7 @@ sys.path.insert(0,str(HERE.parents[1]/"lib"))
 from spritekit import Canvas
 from sheet import export
 
-NAME="greatsword-wood"; W,H=32,32; ANCHOR=(5.0,28.0)
+NAME="greatsword-wood"; W,H=32,32; ANCHOR=(6.0,29.0)
 
 L="#d4a86a"; M="#b07c44"; D="#7a4f2a"; E="#e8cfa0"
 HILT="#8a5a2e"; HILT_D="#563418"; GUARD="#6b4410"; POMMEL="#8a5a2e"; ORB="#7ad0a0"
@@ -48,7 +48,7 @@ def draw(c, glint=False):
     for i in range(4):
         x, yc = 10 - i, 24 + i
         col(c, x, yc, 0, 1, [HILT, HILT_D])
-    c.rect(5, 27, 7, 29, POMMEL); c.pixel(5, 27, GUARD)
+    c.rect(6, 29, 7, 29, POMMEL); c.pixel(6, 29, GUARD)
     if glint:
         c.pixel(17, 17, E); c.pixel(20, 14, E); c.pixel(23, 11, E)
 

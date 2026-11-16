@@ -12,23 +12,31 @@ sys.path.insert(0,str(HERE.parents[1]/"lib"))
 from spritekit import Canvas
 from sheet import export
 
-NAME="oak-bow"; W,H=24,32; ANCHOR=(10.0,30.0)
+NAME="oak-bow"; W,H=24,32; ANCHOR=(8.0,26.0)
 
 L="#d4a86a"; M="#b07c44"; D="#7a4f2a"; E="#e8cfa0"
 HILT="#8a5a2e"; HILT_D="#563418"; GUARD="#6b4410"; POMMEL="#8a5a2e"; ORB="#7ad0a0"
 
 def draw(c, glint=False):
-    # cung recurve: hai canh cong, day doc o ben phai
-    pts = [(13,3),(10,5),(8,9),(8,14),(10,16),(8,22),(8,27),(10,30),(13,31)]
-    for i in range(len(pts)-1):
-        x1,y1 = pts[i]; x2,y2 = pts[i+1]
-        c.line(x1,y1,x2,y2,D,3)
-        c.line(x1,y1,x2,y2,M,1)
-    c.line(13,3,13,31,HILT_D)
-    c.rect(9,14,11,18,GUARD)
-    c.rect(10,15,11,17,HILT)
+    # cung recurve gon: vai cong ro rang, day mong
+    STRING = "#d0d0d0"
+    upper = [(14,7),(11,8),(8,11),(7,14),(8,16)]
+    lower = [(8,19),(7,21),(8,24),(11,26),(14,27)]
+    for pts in (upper, lower):
+        for i in range(len(pts)-1):
+            x1,y1 = pts[i]; x2,y2 = pts[i+1]
+            c.line(x1,y1,x2,y2,HILT_D,2)
+            c.line(x1,y1,x2,y2,HILT,1)
+    # dau cung
+    c.rect(13,6,14,7,GUARD); c.rect(13,27,14,28,GUARD)
+    c.pixel(13,6,E); c.pixel(13,28,E)
+    # day cung
+    c.line(14,7,14,27,STRING)
+    # tay cam quan
+    c.rect(7,15,9,20,GUARD)
+    c.rect(8,16,9,19,HILT)
     if glint:
-        c.pixel(8,10,E); c.pixel(8,26,E)
+        c.pixel(8,11,E); c.pixel(8,24,E)
 
 def idle(i):
     c = Canvas(W, H)

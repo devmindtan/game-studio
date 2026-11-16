@@ -12,7 +12,7 @@ sys.path.insert(0,str(HERE.parents[1]/"lib"))
 from spritekit import Canvas
 from sheet import export
 
-NAME="dagger-iron"; W,H=20,20; ANCHOR=(2.0,18.0)
+NAME="dagger-iron"; W,H=20,20; ANCHOR=(3.0,19.0)
 
 L="#d8e4f0"; M="#b8c7d9"; D="#6b7f96"; E="#f2fbff"
 HILT="#8a5a2e"; HILT_D="#563418"; GUARD="#d9b44a"; POMMEL="#d9b44a"; ORB="#45a8ff"
@@ -48,7 +48,7 @@ def draw(c, glint=False):
     for i in range(2):
         x, yc = 5 - i, 16 + i
         col(c, x, yc, 0, 1, [HILT, HILT_D])
-    c.rect(2, 17, 4, 19, POMMEL); c.pixel(2, 17, GUARD)
+    c.rect(3, 19, 4, 19, POMMEL); c.pixel(3, 19, GUARD)
     if glint:
         c.pixel(10, 9, E); c.pixel(12, 7, E)
 
