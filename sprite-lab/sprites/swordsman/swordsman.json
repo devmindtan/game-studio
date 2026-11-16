@@ -1,0 +1,65 @@
+{
+  "frames": 37,
+  "frame_size": [
+    56,
+    56
+  ],
+  "fps": 8.0,
+  "loop": true,
+  "anchor": [
+    24.0,
+    54.0
+  ],
+  "anchor_source": "explicit",
+  "animations": [
+    {
+      "name": "idle",
+      "start": 0,
+      "frames": 6,
+      "fps": 8.0,
+      "loop": true
+    },
+    {
+      "name": "run",
+      "start": 6,
+      "frames": 8,
+      "fps": 12.0,
+      "loop": true
+    },
+    {
+      "name": "jump",
+      "start": 14,
+      "frames": 5,
+      "fps": 10.0,
+      "loop": false
+    },
+    {
+      "name": "attack",
+      "start": 19,
+      "frames": 5,
+      "fps": 14.0,
+      "loop": false
+    },
+    {
+      "name": "spell",
+      "start": 24,
+      "frames": 5,
+      "fps": 12.0,
+      "loop": false
+    },
+    {
+      "name": "hurt",
+      "start": 29,
+      "frames": 3,
+      "fps": 12.0,
+      "loop": false
+    },
+    {
+      "name": "death",
+      "start": 32,
+      "frames": 5,
+      "fps": 8.0,
+      "loop": false
+    }
+  ]
+}
