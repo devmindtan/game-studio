@@ -1,5 +1,5 @@
 {
-  "frames": 8,
+  "frames": 20,
   "frame_size": [
     16,
     16
@@ -64,6 +64,90 @@
     {
       "name": "boot",
       "start": 7,
+      "frames": 1,
+      "fps": 1.0,
+      "loop": false
+    },
+    {
+      "name": "blade_arc",
+      "start": 8,
+      "frames": 1,
+      "fps": 1.0,
+      "loop": false
+    },
+    {
+      "name": "back_slash",
+      "start": 9,
+      "frames": 1,
+      "fps": 1.0,
+      "loop": false
+    },
+    {
+      "name": "whirlwind",
+      "start": 10,
+      "frames": 1,
+      "fps": 1.0,
+      "loop": false
+    },
+    {
+      "name": "sharpen",
+      "start": 11,
+      "frames": 1,
+      "fps": 1.0,
+      "loop": false
+    },
+    {
+      "name": "haste",
+      "start": 12,
+      "frames": 1,
+      "fps": 1.0,
+      "loop": false
+    },
+    {
+      "name": "reach",
+      "start": 13,
+      "frames": 1,
+      "fps": 1.0,
+      "loop": false
+    },
+    {
+      "name": "vitality",
+      "start": 14,
+      "frames": 1,
+      "fps": 1.0,
+      "loop": false
+    },
+    {
+      "name": "swift",
+      "start": 15,
+      "frames": 1,
+      "fps": 1.0,
+      "loop": false
+    },
+    {
+      "name": "magnet",
+      "start": 16,
+      "frames": 1,
+      "fps": 1.0,
+      "loop": false
+    },
+    {
+      "name": "regen",
+      "start": 17,
+      "frames": 1,
+      "fps": 1.0,
+      "loop": false
+    },
+    {
+      "name": "frost_nova",
+      "start": 18,
+      "frames": 1,
+      "fps": 1.0,
+      "loop": false
+    },
+    {
+      "name": "earth_strike",
+      "start": 19,
       "frames": 1,
       "fps": 1.0,
       "loop": false
