@@ -1,11 +1,11 @@
 {
-  "frames": 6,
+  "frames": 1,
   "frame_size": [
     24,
     24
   ],
-  "fps": 6.0,
-  "loop": true,
+  "fps": 1.0,
+  "loop": false,
   "anchor": [
     12.0,
     22.0
@@ -15,9 +15,9 @@
     {
       "name": "idle",
       "start": 0,
-      "frames": 6,
-      "fps": 6.0,
-      "loop": true
+      "frames": 1,
+      "fps": 1.0,
+      "loop": false
     }
   ]
 }

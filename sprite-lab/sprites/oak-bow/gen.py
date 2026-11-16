@@ -68,7 +68,7 @@ def idle(i):
     return c
 
 
-ANIMATIONS = [("idle", [idle(i) for i in range(6)], 7, True)]
+ANIMATIONS=[("idle",[idle(0)],1,False)]
 
 
 def main() -> None:

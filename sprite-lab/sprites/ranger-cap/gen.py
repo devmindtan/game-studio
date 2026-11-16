@@ -24,7 +24,7 @@ def idle(i):
     c=Canvas(W,H); c.ellipse(8,21,20,23,"#00000033")
     cap(c, glint=(i==2))
     return c
-ANIMATIONS=[("idle",[idle(i) for i in range(6)],6,True)]
+ANIMATIONS=[("idle",[idle(0)],1,False)]
 def main():
     flat=[f for _,fr,_,_ in ANIMATIONS for f in fr]
     strip(flat).save(OUT/f"{NAME}_strip.png"); flat[0].save(OUT/f"{NAME}.png")

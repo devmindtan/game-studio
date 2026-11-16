@@ -136,13 +136,13 @@
     {
       "name": "assassin-armor",
       "meta": {
-        "frames": 6,
+        "frames": 1,
         "frame_size": [
           32,
           32
         ],
-        "fps": 6.0,
-        "loop": true,
+        "fps": 1.0,
+        "loop": false,
         "anchor": [
           16.0,
           30.0
@@ -152,9 +152,9 @@
           {
             "name": "idle",
             "start": 0,
-            "frames": 6,
-            "fps": 6.0,
-            "loop": true
+            "frames": 1,
+            "fps": 1.0,
+            "loop": false
           }
         ]
       },
@@ -167,13 +167,13 @@
     {
       "name": "assassin-boots",
       "meta": {
-        "frames": 6,
+        "frames": 1,
         "frame_size": [
           28,
           24
         ],
-        "fps": 6.0,
-        "loop": true,
+        "fps": 1.0,
+        "loop": false,
         "anchor": [
           14.0,
           22.0
@@ -183,9 +183,9 @@
           {
             "name": "idle",
             "start": 0,
-            "frames": 6,
-            "fps": 6.0,
-            "loop": true
+            "frames": 1,
+            "fps": 1.0,
+            "loop": false
           }
         ]
       },
@@ -198,13 +198,13 @@
     {
       "name": "assassin-gloves",
       "meta": {
-        "frames": 6,
+        "frames": 1,
         "frame_size": [
           28,
           24
         ],
-        "fps": 6.0,
-        "loop": true,
+        "fps": 1.0,
+        "loop": false,
         "anchor": [
           14.0,
           22.0
@@ -214,9 +214,9 @@
           {
             "name": "idle",
             "start": 0,
-            "frames": 6,
-            "fps": 6.0,
-            "loop": true
+            "frames": 1,
+            "fps": 1.0,
+            "loop": false
           }
         ]
       },
@@ -229,13 +229,13 @@
     {
       "name": "assassin-hood",
       "meta": {
-        "frames": 6,
+        "frames": 1,
         "frame_size": [
           28,
           24
         ],
-        "fps": 6.0,
-        "loop": true,
+        "fps": 1.0,
+        "loop": false,
         "anchor": [
           14.0,
           22.0
@@ -245,9 +245,9 @@
           {
             "name": "idle",
             "start": 0,
-            "frames": 6,
-            "fps": 6.0,
-            "loop": true
+            "frames": 1,
+            "fps": 1.0,
+            "loop": false
           }
         ]
       },
@@ -260,13 +260,13 @@
     {
       "name": "battle-axe",
       "meta": {
-        "frames": 6,
+        "frames": 1,
         "frame_size": [
           32,
           32
         ],
-        "fps": 6.0,
-        "loop": true,
+        "fps": 1.0,
+        "loop": false,
         "anchor": [
           14.0,
           30.0
@@ -276,9 +276,9 @@
           {
             "name": "idle",
             "start": 0,
-            "frames": 6,
-            "fps": 6.0,
-            "loop": true
+            "frames": 1,
+            "fps": 1.0,
+            "loop": false
           }
         ]
       },
@@ -515,13 +515,13 @@
     {
       "name": "greatsword",
       "meta": {
-        "frames": 6,
+        "frames": 1,
         "frame_size": [
           32,
           32
         ],
-        "fps": 5.0,
-        "loop": true,
+        "fps": 1.0,
+        "loop": false,
         "anchor": [
           16.0,
           30.0
@@ -531,9 +531,9 @@
           {
             "name": "idle",
             "start": 0,
-            "frames": 6,
-            "fps": 5.0,
-            "loop": true
+            "frames": 1,
+            "fps": 1.0,
+            "loop": false
           }
         ]
       },
@@ -733,13 +733,13 @@
     {
       "name": "iron-sword",
       "meta": {
-        "frames": 6,
+        "frames": 1,
         "frame_size": [
           24,
           24
         ],
-        "fps": 6.0,
-        "loop": true,
+        "fps": 1.0,
+        "loop": false,
         "anchor": [
           12.0,
           22.0
@@ -749,9 +749,9 @@
           {
             "name": "idle",
             "start": 0,
-            "frames": 6,
-            "fps": 6.0,
-            "loop": true
+            "frames": 1,
+            "fps": 1.0,
+            "loop": false
           }
         ]
       },
@@ -764,13 +764,13 @@
     {
       "name": "knight-gauntlets",
       "meta": {
-        "frames": 6,
+        "frames": 1,
         "frame_size": [
           28,
           24
         ],
-        "fps": 6.0,
-        "loop": true,
+        "fps": 1.0,
+        "loop": false,
         "anchor": [
           14.0,
           22.0
@@ -780,9 +780,9 @@
           {
             "name": "idle",
             "start": 0,
-            "frames": 6,
-            "fps": 6.0,
-            "loop": true
+            "frames": 1,
+            "fps": 1.0,
+            "loop": false
           }
         ]
       },
@@ -795,13 +795,13 @@
     {
       "name": "knight-greaves",
       "meta": {
-        "frames": 6,
+        "frames": 1,
         "frame_size": [
           28,
           24
         ],
-        "fps": 6.0,
-        "loop": true,
+        "fps": 1.0,
+        "loop": false,
         "anchor": [
           14.0,
           22.0
@@ -811,9 +811,9 @@
           {
             "name": "idle",
             "start": 0,
-            "frames": 6,
-            "fps": 6.0,
-            "loop": true
+            "frames": 1,
+            "fps": 1.0,
+            "loop": false
           }
         ]
       },
@@ -826,13 +826,13 @@
     {
       "name": "knight-helmet",
       "meta": {
-        "frames": 6,
+        "frames": 1,
         "frame_size": [
           32,
           28
         ],
-        "fps": 5.0,
-        "loop": true,
+        "fps": 1.0,
+        "loop": false,
         "anchor": [
           16.0,
           26.0
@@ -842,9 +842,9 @@
           {
             "name": "idle",
             "start": 0,
-            "frames": 6,
-            "fps": 5.0,
-            "loop": true
+            "frames": 1,
+            "fps": 1.0,
+            "loop": false
           }
         ]
       },
@@ -967,13 +967,13 @@
     {
       "name": "mage-boots",
       "meta": {
-        "frames": 6,
+        "frames": 1,
         "frame_size": [
           28,
           24
         ],
-        "fps": 6.0,
-        "loop": true,
+        "fps": 1.0,
+        "loop": false,
         "anchor": [
           14.0,
           22.0
@@ -983,9 +983,9 @@
           {
             "name": "idle",
             "start": 0,
-            "frames": 6,
-            "fps": 6.0,
-            "loop": true
+            "frames": 1,
+            "fps": 1.0,
+            "loop": false
           }
         ]
       },
@@ -998,13 +998,13 @@
     {
       "name": "mage-gloves",
       "meta": {
-        "frames": 6,
+        "frames": 1,
         "frame_size": [
           28,
           24
         ],
-        "fps": 6.0,
-        "loop": true,
+        "fps": 1.0,
+        "loop": false,
         "anchor": [
           14.0,
           22.0
@@ -1014,9 +1014,9 @@
           {
             "name": "idle",
             "start": 0,
-            "frames": 6,
-            "fps": 6.0,
-            "loop": true
+            "frames": 1,
+            "fps": 1.0,
+            "loop": false
           }
         ]
       },
@@ -1029,13 +1029,13 @@
     {
       "name": "mage-hood",
       "meta": {
-        "frames": 6,
+        "frames": 1,
         "frame_size": [
           28,
           24
         ],
-        "fps": 6.0,
-        "loop": true,
+        "fps": 1.0,
+        "loop": false,
         "anchor": [
           14.0,
           22.0
@@ -1045,9 +1045,9 @@
           {
             "name": "idle",
             "start": 0,
-            "frames": 6,
-            "fps": 6.0,
-            "loop": true
+            "frames": 1,
+            "fps": 1.0,
+            "loop": false
           }
         ]
       },
@@ -1060,13 +1060,13 @@
     {
       "name": "mage-robe",
       "meta": {
-        "frames": 6,
+        "frames": 1,
         "frame_size": [
           32,
           32
         ],
-        "fps": 6.0,
-        "loop": true,
+        "fps": 1.0,
+        "loop": false,
         "anchor": [
           16.0,
           30.0
@@ -1076,9 +1076,9 @@
           {
             "name": "idle",
             "start": 0,
-            "frames": 6,
-            "fps": 6.0,
-            "loop": true
+            "frames": 1,
+            "fps": 1.0,
+            "loop": false
           }
         ]
       },
@@ -1091,13 +1091,13 @@
     {
       "name": "magic-staff",
       "meta": {
-        "frames": 6,
+        "frames": 1,
         "frame_size": [
           24,
           32
         ],
-        "fps": 6.0,
-        "loop": true,
+        "fps": 1.0,
+        "loop": false,
         "anchor": [
           12.0,
           30.0
@@ -1107,9 +1107,9 @@
           {
             "name": "idle",
             "start": 0,
-            "frames": 6,
-            "fps": 6.0,
-            "loop": true
+            "frames": 1,
+            "fps": 1.0,
+            "loop": false
           }
         ]
       },
@@ -1253,13 +1253,13 @@
     {
       "name": "oak-bow",
       "meta": {
-        "frames": 6,
+        "frames": 1,
         "frame_size": [
           24,
           32
         ],
-        "fps": 7.0,
-        "loop": true,
+        "fps": 1.0,
+        "loop": false,
         "anchor": [
           12.0,
           30.0
@@ -1269,9 +1269,9 @@
           {
             "name": "idle",
             "start": 0,
-            "frames": 6,
-            "fps": 7.0,
-            "loop": true
+            "frames": 1,
+            "fps": 1.0,
+            "loop": false
           }
         ]
       },
@@ -1304,13 +1304,13 @@
     {
       "name": "ranger-boots",
       "meta": {
-        "frames": 6,
+        "frames": 1,
         "frame_size": [
           28,
           24
         ],
-        "fps": 6.0,
-        "loop": true,
+        "fps": 1.0,
+        "loop": false,
         "anchor": [
           14.0,
           22.0
@@ -1320,9 +1320,9 @@
           {
             "name": "idle",
             "start": 0,
-            "frames": 6,
-            "fps": 6.0,
-            "loop": true
+            "frames": 1,
+            "fps": 1.0,
+            "loop": false
           }
         ]
       },
@@ -1335,13 +1335,13 @@
     {
       "name": "ranger-cap",
       "meta": {
-        "frames": 6,
+        "frames": 1,
         "frame_size": [
           28,
           24
         ],
-        "fps": 6.0,
-        "loop": true,
+        "fps": 1.0,
+        "loop": false,
         "anchor": [
           14.0,
           22.0
@@ -1351,9 +1351,9 @@
           {
             "name": "idle",
             "start": 0,
-            "frames": 6,
-            "fps": 6.0,
-            "loop": true
+            "frames": 1,
+            "fps": 1.0,
+            "loop": false
           }
         ]
       },
@@ -1366,13 +1366,13 @@
     {
       "name": "ranger-gloves",
       "meta": {
-        "frames": 6,
+        "frames": 1,
         "frame_size": [
           28,
           24
         ],
-        "fps": 6.0,
-        "loop": true,
+        "fps": 1.0,
+        "loop": false,
         "anchor": [
           14.0,
           22.0
@@ -1382,9 +1382,9 @@
           {
             "name": "idle",
             "start": 0,
-            "frames": 6,
-            "fps": 6.0,
-            "loop": true
+            "frames": 1,
+            "fps": 1.0,
+            "loop": false
           }
         ]
       },
@@ -1397,13 +1397,13 @@
     {
       "name": "ranger-tunic",
       "meta": {
-        "frames": 6,
+        "frames": 1,
         "frame_size": [
           32,
           32
         ],
-        "fps": 6.0,
-        "loop": true,
+        "fps": 1.0,
+        "loop": false,
         "anchor": [
           16.0,
           30.0
@@ -1413,9 +1413,9 @@
           {
             "name": "idle",
             "start": 0,
-            "frames": 6,
-            "fps": 6.0,
-            "loop": true
+            "frames": 1,
+            "fps": 1.0,
+            "loop": false
           }
         ]
       },
@@ -1428,13 +1428,13 @@
     {
       "name": "round-shield",
       "meta": {
-        "frames": 6,
+        "frames": 1,
         "frame_size": [
           32,
           30
         ],
-        "fps": 5.0,
-        "loop": true,
+        "fps": 1.0,
+        "loop": false,
         "anchor": [
           16.0,
           28.0
@@ -1444,9 +1444,9 @@
           {
             "name": "idle",
             "start": 0,
-            "frames": 6,
-            "fps": 5.0,
-            "loop": true
+            "frames": 1,
+            "fps": 1.0,
+            "loop": false
           }
         ]
       },
@@ -1481,13 +1481,13 @@
     {
       "name": "steel-chestplate",
       "meta": {
-        "frames": 6,
+        "frames": 1,
         "frame_size": [
           32,
           28
         ],
-        "fps": 5.0,
-        "loop": true,
+        "fps": 1.0,
+        "loop": false,
         "anchor": [
           16.0,
           26.0
@@ -1497,9 +1497,9 @@
           {
             "name": "idle",
             "start": 0,
-            "frames": 6,
-            "fps": 5.0,
-            "loop": true
+            "frames": 1,
+            "fps": 1.0,
+            "loop": false
           }
         ]
       },
@@ -1671,13 +1671,13 @@
     {
       "name": "tower-shield",
       "meta": {
-        "frames": 6,
+        "frames": 1,
         "frame_size": [
           32,
           32
         ],
-        "fps": 5.0,
-        "loop": true,
+        "fps": 1.0,
+        "loop": false,
         "anchor": [
           16.0,
           30.0
@@ -1687,9 +1687,9 @@
           {
             "name": "idle",
             "start": 0,
-            "frames": 6,
-            "fps": 5.0,
-            "loop": true
+            "frames": 1,
+            "fps": 1.0,
+            "loop": false
           }
         ]
       },
@@ -1741,13 +1741,13 @@
     {
       "name": "war-hammer",
       "meta": {
-        "frames": 6,
+        "frames": 1,
         "frame_size": [
           32,
           32
         ],
-        "fps": 5.0,
-        "loop": true,
+        "fps": 1.0,
+        "loop": false,
         "anchor": [
           14.0,
           30.0
@@ -1757,9 +1757,9 @@
           {
             "name": "idle",
             "start": 0,
-            "frames": 6,
-            "fps": 5.0,
-            "loop": true
+            "frames": 1,
+            "fps": 1.0,
+            "loop": false
           }
         ]
       },
