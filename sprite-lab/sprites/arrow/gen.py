@@ -1,10 +1,13 @@
 #!/usr/bin/env python3
 """Generator cho sprite "arrow": mũi tên cơ bản của hệ cung.
 
-  fly     4 frame lặp: mũi tên bay thẳng, rung nhẹ;
-  impact  5 frame một lần: cắm vào mục tiêu và mảnh gỗ văng.
+  fly/fly_right  4 frame lặp: bay sang phải;
+  fly_left       4 frame lặp: bay sang trái;
+  fly_up         4 frame lặp: bay lên trên;
+  fly_down       4 frame lặp: bay xuống dưới;
+  impact         5 frame một lần: cắm vào mục tiêu và mảnh gỗ văng (hướng ngang).
 
-Bay sang phải. Neo (10, 4) tại đầu mũi tên (sprite 20x8).
+4 hướng bay cho game top-down. Neo tại tâm mũi tên (sprite vuông 20x20).
 
 Chạy:  gamekit art run arrow
 """
@@ -25,69 +28,110 @@ sys.path.insert(0, str(_workspace() / "tools/gamekit/pipeline"))
 from spritekit import Canvas, gif, preview, strip, write_anim_meta  # noqa: E402
 
 NAME = "arrow"
-W, H = 20, 8
-ANCHOR = (17.0, 4.0)  # tip
+S = 20
+CX, CY = 10, 10
+ANCHOR = (float(CX), float(CY))  # tâm sprite (ổn định cho mọi hướng)
 HERE = Path(__file__).resolve().parent
 OUT = HERE
 
 WOOD = "#8a5a2e"; WOOD_D = "#563418"; STEEL = "#c5d4e6"; TIP = "#e8f4ff"; FEATHER = "#d94a4a"; FEATHER_D = "#8a2f2f"
 
 
-def p(c, x, y, col): c.pixel(x, y, col)
+def p(c, x, y, col):
+    c.pixel(x, y, col)
 
 
-def draw_arrow(c, ox=0, oy=0):
-    y = 4 + oy
-    # shaft
-    c.line(2 + ox, y, 15 + ox, y, WOOD)
-    c.line(2 + ox, y, 14 + ox, y, WOOD_D)
-    # tip
-    c.line(15 + ox, y, 17 + ox, y, STEEL)
-    p(c, 18 + ox, y, TIP); p(c, 17 + ox, y - 1, STEEL); p(c, 17 + ox, y + 1, STEEL)
-    # fletching
-    c.line(2 + ox, y, 4 + ox, y - 2, FEATHER)
-    c.line(2 + ox, y, 4 + ox, y + 2, FEATHER_D)
-    p(c, 1 + ox, y - 1, FEATHER); p(c, 1 + ox, y + 1, FEATHER_D)
+def draw_arrow_dir(c, direction, wobble=0):
+    # direction: 'right','left','up','down'
+    if direction == "right":
+        y = CY + wobble
+        c.line(CX - 8, y, CX + 5, y, WOOD)
+        c.line(CX - 8, y, CX + 4, y, WOOD_D)
+        c.line(CX + 5, y, CX + 7, y, STEEL)
+        p(c, CX + 8, y, TIP); p(c, CX + 7, y - 1, STEEL); p(c, CX + 7, y + 1, STEEL)
+        c.line(CX - 8, y, CX - 6, y - 2, FEATHER); c.line(CX - 8, y, CX - 6, y + 2, FEATHER_D)
+        p(c, CX - 9, y - 1, FEATHER); p(c, CX - 9, y + 1, FEATHER_D)
+        return
+    if direction == "left":
+        y = CY + wobble
+        c.line(CX - 5, y, CX + 8, y, WOOD)
+        c.line(CX - 4, y, CX + 8, y, WOOD_D)
+        c.line(CX - 7, y, CX - 5, y, STEEL)
+        p(c, CX - 8, y, TIP); p(c, CX - 7, y - 1, STEEL); p(c, CX - 7, y + 1, STEEL)
+        c.line(CX + 8, y, CX + 6, y - 2, FEATHER); c.line(CX + 8, y, CX + 6, y + 2, FEATHER_D)
+        p(c, CX + 9, y - 1, FEATHER); p(c, CX + 9, y + 1, FEATHER_D)
+        return
+    if direction == "up":
+        x = CX + wobble
+        c.line(x, CY - 5, x, CY + 8, WOOD)
+        c.line(x, CY - 4, x, CY + 8, WOOD_D)
+        c.line(x, CY - 7, x, CY - 5, STEEL)
+        p(c, x, CY - 8, TIP); p(c, x - 1, CY - 7, STEEL); p(c, x + 1, CY - 7, STEEL)
+        c.line(x, CY + 8, x - 2, CY + 6, FEATHER); c.line(x, CY + 8, x + 2, CY + 6, FEATHER_D)
+        p(c, x - 1, CY + 9, FEATHER); p(c, x + 1, CY + 9, FEATHER_D)
+        return
+    if direction == "down":
+        x = CX + wobble
+        c.line(x, CY - 8, x, CY + 5, WOOD)
+        c.line(x, CY - 8, x, CY + 4, WOOD_D)
+        c.line(x, CY + 5, x, CY + 7, STEEL)
+        p(c, x, CY + 8, TIP); p(c, x - 1, CY + 7, STEEL); p(c, x + 1, CY + 7, STEEL)
+        c.line(x, CY - 8, x - 2, CY - 6, FEATHER); c.line(x, CY - 8, x + 2, CY - 6, FEATHER_D)
+        p(c, x - 1, CY - 9, FEATHER); p(c, x + 1, CY - 9, FEATHER_D)
+        return
 
 
-def fly(i):
-    c = Canvas(W, H)
-    oy = (0, -1, 0, 1)[i]
-    # speed streak
-    for x in (0, 2):
-        if (i + x) % 2 == 0: p(c, x, 4 + oy, WOOD_D)
-    draw_arrow(c, oy=oy)
+def fly(direction, i):
+    c = Canvas(S, S)
+    wobble = (0, -1, 0, 1)[i]
+    # speed streak behind
+    if direction == "right":
+        for dx in (0, 2):
+            if (i + dx) % 2 == 0: p(c, CX - 10 - dx, CY + wobble, WOOD_D)
+    elif direction == "left":
+        for dx in (0, 2):
+            if (i + dx) % 2 == 0: p(c, CX + 10 + dx, CY + wobble, WOOD_D)
+    elif direction == "up":
+        for dy in (0, 2):
+            if (i + dy) % 2 == 0: p(c, CX + wobble, CY + 10 + dy, WOOD_D)
+    else:  # down
+        for dy in (0, 2):
+            if (i + dy) % 2 == 0: p(c, CX + wobble, CY - 10 - dy, WOOD_D)
+    draw_arrow_dir(c, direction, wobble=wobble)
     return c
 
 
 def impact(i):
-    c = Canvas(W, H)
+    # impact ngang sang phải (tương thích), neo vẫn ở tâm
+    c = Canvas(S, S)
+    y = CY
     if i == 0:
-        draw_arrow(c)
-        p(c, 19, 4, TIP)
+        draw_arrow_dir(c, "right")
+        p(c, CX + 9, y, TIP)
         return c
     if i == 1:
-        # stuck, head buried
-        y = 4
-        c.line(2, y, 14, y, WOOD); c.line(2, y, 13, y, WOOD_D)
-        c.line(14, y, 16, y, STEEL)
-        c.line(2, y, 4, y - 2, FEATHER); c.line(2, y, 4, y + 2, FEATHER_D)
-        for dx, dy in ((17, 3), (17, 5), (18, 4)): p(c, dx, dy, STEEL)
+        c.line(CX - 8, y, CX + 4, y, WOOD); c.line(CX - 8, y, CX + 3, y, WOOD_D)
+        c.line(CX + 4, y, CX + 6, y, STEEL)
+        c.line(CX - 8, y, CX - 6, y - 2, FEATHER); c.line(CX - 8, y, CX - 6, y + 2, FEATHER_D)
+        for dx, dy in ((7, -1), (7, 1), (8, 0)): p(c, CX + dx, y + dy, STEEL)
         return c
-    # shaft wobble/settle + splinters
-    y = 4 + (1 if i == 2 else 0)
-    c.line(2, y, 14, y, WOOD); c.line(2, y, 13, y, WOOD_D)
-    c.line(14, y, 16, y + (1 if i < 4 else 0), STEEL)
-    c.line(2, y, 4, y - 2, FEATHER); c.line(2, y, 4, y + 2, FEATHER_D)
+    y = CY + (1 if i == 2 else 0)
+    c.line(CX - 8, y, CX + 4, y, WOOD); c.line(CX - 8, y, CX + 3, y, WOOD_D)
+    c.line(CX + 4, y, CX + 6, y + (1 if i < 4 else 0), STEEL)
+    c.line(CX - 8, y, CX - 6, y - 2, FEATHER); c.line(CX - 8, y, CX - 6, y + 2, FEATHER_D)
     if i == 2:
-        for dx, dy in ((17, 2), (18, 5)): p(c, dx, dy, WOOD_D)
+        for dx, dy in ((7, -2), (8, 1)): p(c, CX + dx, y + dy, WOOD_D)
     if i == 3:
-        p(c, 18, 3, WOOD_D)
+        p(c, CX + 8, y - 1, WOOD_D)
     return c
 
 
 ANIMATIONS = [
-    ("fly", [fly(i) for i in range(4)], 16, True),
+    ("fly", [fly("right", i) for i in range(4)], 16, True),
+    ("fly_right", [fly("right", i) for i in range(4)], 16, True),
+    ("fly_left", [fly("left", i) for i in range(4)], 16, True),
+    ("fly_up", [fly("up", i) for i in range(4)], 16, True),
+    ("fly_down", [fly("down", i) for i in range(4)], 16, True),
     ("impact", [impact(i) for i in range(5)], 14, False),
 ]
 
@@ -97,10 +141,10 @@ def main():
     strip(flat).save(OUT / f"{NAME}_strip.png")
     flat[0].save(OUT / f"{NAME}.png")
     cols = max(len(fr) for _, fr, _, _ in ANIMATIONS)
-    sheet = Canvas(cols * W, len(ANIMATIONS) * H)
-    for r, (_, fr, _, _) in enumerate(ANIMATIONS): sheet.paste(strip(fr), 0, r * H)
-    preview([sheet], HERE / "preview.png", scale=8)
-    for a, fr, fps, _ in ANIMATIONS: gif(fr, HERE / f"{a}.gif", fps=fps, scale=8)
+    sheet = Canvas(cols * S, len(ANIMATIONS) * S)
+    for r, (_, fr, _, _) in enumerate(ANIMATIONS): sheet.paste(strip(fr), 0, r * S)
+    preview([sheet], HERE / "preview.png", scale=6)
+    for a, fr, fps, _ in ANIMATIONS: gif(fr, HERE / f"{a}.gif", fps=fps, scale=6)
     write_anim_meta(OUT / f"{NAME}.json", [{"name": n, "frames": f, "fps": fps, "loop": lp} for n, f, fps, lp in ANIMATIONS], anchor=ANCHOR)
     print(OUT / "preview.png")
 

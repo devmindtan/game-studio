@@ -128,8 +128,31 @@ def impact(i):
     return c
 
 
+from PIL import Image
+
+
+def rot(c, deg):
+    nc = Canvas(c.width, c.height)
+    nc.img = c.img.rotate(deg, resample=Image.Resampling.NEAREST, expand=False)
+    return nc
+
+
+_SIDE = [fly(i) for i in range(6)]
+
+def dir_frames(base_frames, direction):
+    if direction == "right": return [f.copy() for f in base_frames]
+    if direction == "up": return [rot(f, 90) for f in base_frames]
+    if direction == "left": return [rot(f, 180) for f in base_frames]
+    if direction == "down": return [rot(f, 270) for f in base_frames]
+    raise ValueError(direction)
+
+
 ANIMATIONS = [
-    ("fly", [fly(i) for i in range(6)], 13, True),
+    ("fly", dir_frames(_SIDE, "right"), 13, True),
+    ("fly_right", dir_frames(_SIDE, "right"), 13, True),
+    ("fly_left", dir_frames(_SIDE, "left"), 13, True),
+    ("fly_up", dir_frames(_SIDE, "up"), 13, True),
+    ("fly_down", dir_frames(_SIDE, "down"), 13, True),
     ("impact", [impact(i) for i in range(6)], 14, False),
 ]
 

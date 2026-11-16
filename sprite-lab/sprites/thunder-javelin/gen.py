@@ -1,10 +1,13 @@
 #!/usr/bin/env python3
 """Generator cho sprite "thunder-javelin": giáo sét lao nhanh và giật nổ.
 
-  fly     6 frame lặp: mũi sét thẳng, tia điện tỏa hai bên, đuôi sáng;
-  impact  6 frame một lần: tia chớp nổ ra tứ phía rồi tắt dần.
+  fly/fly_right  6 frame lặp: bay sang phải;
+  fly_left       6 frame lặp: bay sang trái;
+  fly_up         6 frame lặp: bay lên trên;
+  fly_down       6 frame lặp: bay xuống dưới;
+  impact         6 frame một lần: tia chớp nổ ra tứ phía rồi tắt dần.
 
-Bay sang phải. Neo (14, 10) gần đầu giáo.
+4 hướng bay cho game top-down. Neo tâm (sprite vuông 28x28).
 
 Chạy:  gamekit art run thunder-javelin
 """
@@ -23,11 +26,14 @@ def _workspace() -> Path:
 sys.path.insert(0, str(_workspace() / "tools/gamekit/pipeline"))
 
 from spritekit import Canvas, gif, preview, strip, write_anim_meta  # noqa: E402
+from PIL import Image
 
 NAME = "thunder-javelin"
-W, H = 28, 20
+SW, SH = 28, 20
+S = 28
+OX, OY = (S - SW) // 2, (S - SH) // 2
 CX, CY = 14, 10
-ANCHOR = (float(CX), float(CY))
+ANCHOR = (14.0, 14.0)
 HERE = Path(__file__).resolve().parent
 OUT = HERE
 
@@ -49,7 +55,6 @@ def glow(c, x, y, r, col):
 
 
 def shaft(c, x, y, phase):
-    # thân giáo sét: đường sáng ngang hơi gấp khúc
     zig = ((0, 0), (0, -1), (0, 0), (0, 1), (0, 0), (0, -1))[phase]
     pts = [(x - 10, y + 1), (x - 6, y - 1), (x - 2, y + zig[1]), (x + 4, y), (x + 8, y)]
     for i in range(len(pts) - 1):
@@ -58,7 +63,6 @@ def shaft(c, x, y, phase):
     c.line(x - 4, y, x + 6, y, BOLT)
     c.rect(x + 5, y - 1, x + 7, y, CORE)
     p(c, x + 8, y, BOLT)
-    # tua điện hai bên, đổi theo pha
     branches = [
         ((-5, -3), (-3, -1)), ((-2, 3), (0, 1)), ((2, -3), (4, -1)),
         ((-7, 2), (-5, 1)), ((1, 3), (3, 2)),
@@ -74,18 +78,17 @@ def tail_sparks(c, x, y, phase):
             p(c, x + dx, y + dy, CORE if k == 0 else BOLT_MID)
 
 
-def fly(i):
-    c = Canvas(W, H)
+def fly_base(i):
+    c = Canvas(SW, SH)
     glow(c, CX, CY, 5, "#8ad8ff18")
     shaft(c, CX, CY, i)
     tail_sparks(c, CX, CY, i)
     return c
 
 
-def impact(i):
-    c = Canvas(W, H)
-    center = (CX, CY)
-    x, y = center
+def impact_base(i):
+    c = Canvas(SW, SH)
+    x, y = CX, CY
     if i == 0:
         glow(c, x, y, 4, "#ffffff55")
         c.ellipse(x - 2, y - 2, x + 2, y + 2, CORE)
@@ -124,9 +127,36 @@ def impact(i):
     return c
 
 
+def centered(base):
+    out = Canvas(S, S)
+    out.paste(base, OX, OY)
+    return out
+
+
+def rot(c, deg):
+    nc = Canvas(c.width, c.height)
+    nc.img = c.img.rotate(deg, resample=Image.Resampling.NEAREST, expand=False)
+    return nc
+
+
+_SIDE = [centered(fly_base(i)) for i in range(6)]
+
+def fly_dir(direction, i):
+    b = _SIDE[i]
+    if direction == "right": return b.copy()
+    if direction == "up": return rot(b, 90)
+    if direction == "left": return rot(b, 180)
+    if direction == "down": return rot(b, 270)
+    raise ValueError(direction)
+
+
 ANIMATIONS = [
-    ("fly", [fly(i) for i in range(6)], 16, True),
-    ("impact", [impact(i) for i in range(6)], 15, False),
+    ("fly", [fly_dir("right", i) for i in range(6)], 16, True),
+    ("fly_right", [fly_dir("right", i) for i in range(6)], 16, True),
+    ("fly_left", [fly_dir("left", i) for i in range(6)], 16, True),
+    ("fly_up", [fly_dir("up", i) for i in range(6)], 16, True),
+    ("fly_down", [fly_dir("down", i) for i in range(6)], 16, True),
+    ("impact", [centered(impact_base(i)) for i in range(6)], 15, False),
 ]
 
 
@@ -135,12 +165,12 @@ def main() -> None:
     strip(flat).save(OUT / f"{NAME}_strip.png")
     flat[0].save(OUT / f"{NAME}.png")
     cols = max(len(frames) for _, frames, _, _ in ANIMATIONS)
-    sheet = Canvas(cols * W, len(ANIMATIONS) * H)
+    sheet = Canvas(cols * S, len(ANIMATIONS) * S)
     for row, (_, frames, _, _) in enumerate(ANIMATIONS):
-        sheet.paste(strip(frames), 0, row * H)
-    preview([sheet], HERE / "preview.png", scale=6)
+        sheet.paste(strip(frames), 0, row * S)
+    preview([sheet], HERE / "preview.png", scale=5)
     for anim, frames, fps, _ in ANIMATIONS:
-        gif(frames, HERE / f"{anim}.gif", fps=fps, scale=6)
+        gif(frames, HERE / f"{anim}.gif", fps=fps, scale=5)
     write_anim_meta(OUT / f"{NAME}.json",
                     [{"name": n, "frames": f, "fps": fps, "loop": loop}
                      for n, f, fps, loop in ANIMATIONS],

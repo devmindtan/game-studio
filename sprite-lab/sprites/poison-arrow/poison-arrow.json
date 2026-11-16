@@ -1,14 +1,14 @@
 {
-  "frames": 10,
+  "frames": 26,
   "frame_size": [
     20,
-    8
+    20
   ],
   "fps": 14.0,
   "loop": true,
   "anchor": [
-    17.0,
-    4.0
+    10.0,
+    10.0
   ],
   "anchor_source": "explicit",
   "animations": [
@@ -20,8 +20,36 @@
       "loop": true
     },
     {
-      "name": "impact",
+      "name": "fly_right",
       "start": 4,
+      "frames": 4,
+      "fps": 14.0,
+      "loop": true
+    },
+    {
+      "name": "fly_left",
+      "start": 8,
+      "frames": 4,
+      "fps": 14.0,
+      "loop": true
+    },
+    {
+      "name": "fly_up",
+      "start": 12,
+      "frames": 4,
+      "fps": 14.0,
+      "loop": true
+    },
+    {
+      "name": "fly_down",
+      "start": 16,
+      "frames": 4,
+      "fps": 14.0,
+      "loop": true
+    },
+    {
+      "name": "impact",
+      "start": 20,
       "frames": 6,
       "fps": 12.0,
       "loop": false
