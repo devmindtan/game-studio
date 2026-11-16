@@ -141,8 +141,40 @@ def sign(v):
     return 1 if v > 0 else -1 if v < 0 else 0
 
 
+from PIL import Image
+
+
+def rot(c, deg):
+    """Rotate canvas by deg CCW (90/180/270), keeping size."""
+    nc = Canvas(c.width, c.height)
+    nc.img = c.img.rotate(deg, resample=Image.Resampling.NEAREST, expand=False)
+    return nc
+
+
+def fly_side_frames():
+    return [fly(i) for i in range(6)]
+
+
+def dir_frames(base_frames, direction):
+    if direction == "right":
+        return [f.copy() for f in base_frames]
+    if direction == "up":
+        return [rot(f, 90) for f in base_frames]
+    if direction == "left":
+        return [rot(f, 180) for f in base_frames]
+    if direction == "down":
+        return [rot(f, 270) for f in base_frames]
+    raise ValueError(direction)
+
+
+_SIDE = fly_side_frames()
+
 ANIMATIONS = [
-    ("fly", [fly(i) for i in range(6)], 14, True),
+    ("fly", dir_frames(_SIDE, "right"), 14, True),
+    ("fly_right", dir_frames(_SIDE, "right"), 14, True),
+    ("fly_left", dir_frames(_SIDE, "left"), 14, True),
+    ("fly_up", dir_frames(_SIDE, "up"), 14, True),
+    ("fly_down", dir_frames(_SIDE, "down"), 14, True),
     ("impact", [impact(i) for i in range(6)], 16, False),
 ]
 
@@ -155,9 +187,9 @@ def main() -> None:
     sheet = Canvas(cols * SIZE, len(ANIMATIONS) * SIZE)
     for row, (_, frames, _, _) in enumerate(ANIMATIONS):
         sheet.paste(strip(frames), 0, row * SIZE)
-    preview([sheet], HERE / "preview.png", scale=8)
+    preview([sheet], HERE / "preview.png", scale=6)
     for anim, frames, fps, _ in ANIMATIONS:
-        gif(frames, HERE / f"{anim}.gif", fps=fps, scale=8)
+        gif(frames, HERE / f"{anim}.gif", fps=fps, scale=6)
     write_anim_meta(OUT / f"{NAME}.json",
                     [{"name": n, "frames": f, "fps": fps, "loop": loop}
                      for n, f, fps, loop in ANIMATIONS],

@@ -1,5 +1,5 @@
 {
-  "frames": 12,
+  "frames": 36,
   "frame_size": [
     20,
     20
@@ -20,8 +20,36 @@
       "loop": true
     },
     {
-      "name": "impact",
+      "name": "fly_right",
       "start": 6,
+      "frames": 6,
+      "fps": 14.0,
+      "loop": true
+    },
+    {
+      "name": "fly_left",
+      "start": 12,
+      "frames": 6,
+      "fps": 14.0,
+      "loop": true
+    },
+    {
+      "name": "fly_up",
+      "start": 18,
+      "frames": 6,
+      "fps": 14.0,
+      "loop": true
+    },
+    {
+      "name": "fly_down",
+      "start": 24,
+      "frames": 6,
+      "fps": 14.0,
+      "loop": true
+    },
+    {
+      "name": "impact",
+      "start": 30,
       "frames": 6,
       "fps": 16.0,
       "loop": false
