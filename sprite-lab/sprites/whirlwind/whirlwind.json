@@ -1,0 +1,23 @@
+{
+  "frames": 8,
+  "frame_size": [
+    48,
+    48
+  ],
+  "fps": 14.0,
+  "loop": true,
+  "anchor": [
+    24.0,
+    24.0
+  ],
+  "anchor_source": "explicit",
+  "animations": [
+    {
+      "name": "spin",
+      "start": 0,
+      "frames": 8,
+      "fps": 14.0,
+      "loop": true
+    }
+  ]
+}

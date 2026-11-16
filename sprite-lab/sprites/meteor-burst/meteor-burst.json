@@ -1,0 +1,23 @@
+{
+  "frames": 9,
+  "frame_size": [
+    48,
+    40
+  ],
+  "fps": 13.0,
+  "loop": false,
+  "anchor": [
+    24.0,
+    28.0
+  ],
+  "anchor_source": "explicit",
+  "animations": [
+    {
+      "name": "blast",
+      "start": 0,
+      "frames": 9,
+      "fps": 13.0,
+      "loop": false
+    }
+  ]
+}
