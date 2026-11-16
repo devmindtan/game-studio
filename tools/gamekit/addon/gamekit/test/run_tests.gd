@@ -1,7 +1,8 @@
 extends SceneTree
 ## Minimal headless test runner (no gdUnit4 needed).
 ## Usage: gamekit test <game>   (or: godot --headless --path <game> -s res://addons/gamekit/test/run_tests.gd)
-## Runs every `test_*` method in every `*_test.gd` under res://tests (unit + integration),
+## Loads every script under res://src (a parse error fails the run), then
+## runs every `test_*` method in every `*_test.gd` under res://tests (unit + integration),
 ## prints PASS/FAIL per test and exits with code 1 on any failure.
 
 
@@ -10,6 +11,17 @@ func _init() -> void:
 	_collect("res://tests", files)
 	var passed := 0
 	var failed := 0
+	# Every game script must at least parse, even when no test touches it
+	# (lesson 2026-11-16: tests passed while the run scene had a parse error).
+	var sources: Array[String] = []
+	_collect_ext("res://src", ".gd", sources)
+	for path in sources:
+		var src: GDScript = load(path)
+		if src == null or not src.can_instantiate():
+			failed += 1
+			print("FAIL  %s — game script does not load (parse error?)" % path)
+		else:
+			passed += 1
 	for path in files:
 		var script: GDScript = load(path)
 		if script == null or not script.can_instantiate():
@@ -41,4 +53,15 @@ func _collect(dir_path: String, out: Array[String]) -> void:
 		_collect(dir_path.path_join(sub), out)
 	for f in dir.get_files():
 		if f.ends_with("_test.gd"):
+			out.append(dir_path.path_join(f))
+
+
+func _collect_ext(dir_path: String, ext: String, out: Array[String]) -> void:
+	var dir := DirAccess.open(dir_path)
+	if dir == null:
+		return
+	for sub in dir.get_directories():
+		_collect_ext(dir_path.path_join(sub), ext, out)
+	for f in dir.get_files():
+		if f.ends_with(ext):
 			out.append(dir_path.path_join(f))
