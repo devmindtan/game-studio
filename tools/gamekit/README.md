@@ -25,6 +25,19 @@ tools/gamekit/
     └── sprite/gen.py           mẫu generator cho `gamekit art new`
 ```
 
+## Cấu hình cho mọi AI agent
+
+`gamekit agents-link` (và `gamekit doctor`, qua `--check`) giữ một bản gốc duy nhất cho mỗi thứ:
+
+| Thứ | Bản gốc | Link cho từng agent |
+|---|---|---|
+| Hướng dẫn workspace | `AGENTS.md` | `CLAUDE.md` = `@AGENTS.md`; `GEMINI.md` → `AGENTS.md`; Aider: `.aider.conf.yml` |
+| Skill workspace | `.agents/skills/<tên>/` | `.claude/skills/<tên>` → `../../.agents/skills/<tên>` (OpenCode và Codex đọc `.agents/skills`) |
+| Hướng dẫn trong game | `games/<g>/AGENTS.md` (từ `templates/AGENTS.game.md`) | `GEMINI.md` → `AGENTS.md` |
+| Skill framework trong game | `games/<g>/.claude/skills/` | `.agents/skills` → `../.claude/skills` |
+
+`gamekit tidy` và `gamekit new` tự tạo phần của game.
+
 ## Tách game khỏi công cụ
 
 `gamekit new` clone template, sau đó tự chạy `gamekit tidy`. Lệnh này đưa các file thuộc về repo framework ra khỏi game
@@ -90,8 +103,8 @@ gamekit art open <game> light-mote            # mở .ase bằng LibreSprite
   - `assets/source/sprites/<tên>/` — `gen.py`, `preview.png`, `anim.gif`, `<tên>.ase`; Godot bỏ qua.
 - `gen.py` import helper `pipeline/spritekit.py` (ASCII map, outline, strip, grid, GIF, preview, `.ase`).
   Sửa `gen.py`, không sửa helper trong game.
-- Preview là ảnh phóng to nearest có lưới, để agent đọc bằng tool `read`. `anim.gif` để xem chuyển động.
-- `gamekit doctor` kiểm tra `libresprite`. Bản 1.3 không có MCP; xem `.opencode/skills/pixel-sprite/SKILL.md`
+- Preview là ảnh phóng to nearest có lưới, để agent đọc bằng công cụ đọc ảnh của nó. `anim.gif` để xem chuyển động.
+- `gamekit doctor` kiểm tra `libresprite`. Bản 1.3 không có MCP; xem `.agents/skills/pixel-sprite/SKILL.md`
   để biết giới hạn và quy trình đầy đủ.
 
 ## Xuất game

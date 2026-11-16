@@ -44,7 +44,8 @@ Project
   install <game>               (re)install the gamekit addon, presets, Makefile into a game
   tidy <game>                  move framework repo files out of a game (README, CHANGELOG, .github, ...)
   update-template              git pull the framework template (templates/claude-code-game-studios)
-  doctor                       check every tool the kit needs
+  doctor                       check every tool the kit needs (and the agent links)
+  agents-link [--check]        link AGENTS.md + .agents/skills for every agent (Claude, OpenCode, Codex, Gemini, …)
 
 Play and test
   run <game>                   play
@@ -98,6 +99,7 @@ cmd_doctor() {
   check "framework template" "test -f $TEMPLATE/CLAUDE.md" "git -C $TEMPLATE log --oneline -1" "git clone $UPSTREAM $TEMPLATE"
   check "lpc generator" "test -f $LPC_DIR/package.json" "git -C $LPC_DIR log --oneline -1" "git clone the generator into tools/lpc-generator"
   [[ -d "$LPC_DIR/node_modules" ]] || printf '  note  %-22s %s\n' "lpc node_modules" "not installed yet - the first 'gamekit lpc' runs npm ci"
+  cmd_agents_link --check || { ok=0; echo "        fix: gamekit agents-link"; }
   [[ $ok == 1 ]]
 }
 
@@ -152,11 +154,79 @@ cmd_tidy() {
       "$game/CLAUDE.md" > "$game/CLAUDE.md.tmp" && mv "$game/CLAUDE.md.tmp" "$game/CLAUDE.md"
     echo "   CLAUDE.md: added '## This game' (pointers + commit rule)"
   fi
+  agents_link_game 0 "$game"
   # origin pointed at the framework; keep it as 'framework' so 'origin' is free for the game's own remote.
   if [[ "$(git -C "$game" remote get-url origin 2>/dev/null)" == "$UPSTREAM" ]]; then
     git -C "$game" remote rename origin framework
     echo "   git remote origin -> framework (add your own: git remote add origin <url>)"
   fi
+}
+
+# --- agent config shared by every AI agent ------------------------------------
+# One source of truth per thing, links for each agent:
+#   instructions  AGENTS.md            <- CLAUDE.md (@AGENTS.md import), GEMINI.md (symlink)
+#   skills        .agents/skills/<n>/  <- .claude/skills/<n> (symlink); OpenCode/Codex read .agents/ directly
+# In a game: AGENTS.md (from template) points at the framework's CLAUDE.md, and
+# .agents/skills -> .claude/skills exposes the framework skills to non-Claude agents.
+AGENT_PROBLEMS=0
+_agent_fix() {  # _agent_fix <check-only 0|1> <message> <command...>
+  local check="$1" msg="$2"; shift 2
+  if [[ "$check" == 1 ]]; then printf '  MISS  %s\n' "$msg"; AGENT_PROBLEMS=$((AGENT_PROBLEMS + 1))
+  else "$@"; printf '   fixed %s\n' "$msg"; fi
+}
+_symlink_ok() { [[ -L "$1" && "$(readlink "$1")" == "$2" ]]; }
+
+agents_link_workspace() {
+  local check="$1" n
+  [[ -f "$WS/AGENTS.md" ]] || die "missing $WS/AGENTS.md (the shared instructions)"
+  grep -qx '@AGENTS.md' "$WS/CLAUDE.md" 2>/dev/null \
+    || _agent_fix "$check" "CLAUDE.md must import @AGENTS.md" \
+         sh -c "{ printf '@AGENTS.md\n\n'; cat '$WS/CLAUDE.md' 2>/dev/null; } > '$WS/CLAUDE.md.tmp' && mv '$WS/CLAUDE.md.tmp' '$WS/CLAUDE.md'"
+  _symlink_ok "$WS/GEMINI.md" AGENTS.md \
+    || _agent_fix "$check" "GEMINI.md -> AGENTS.md" ln -sfn AGENTS.md "$WS/GEMINI.md"
+  mkdir -p "$WS/.agents/skills"
+  for n in "$WS"/.agents/skills/*/; do
+    [[ -f "$n/SKILL.md" ]] || continue
+    n="$(basename "$n")"
+    local dest="$WS/.claude/skills/$n" target="../../.agents/skills/$n"
+    [[ -e "$dest" && ! -L "$dest" ]] && die ".claude/skills/$n is a real folder; move it to .agents/skills/$n"
+    _symlink_ok "$dest" "$target" \
+      || _agent_fix "$check" ".claude/skills/$n -> $target" sh -c "mkdir -p '$WS/.claude/skills' && ln -sfn '$target' '$dest'"
+  done
+  for n in "$WS"/.claude/skills/*; do        # links whose skill was removed
+    [[ -L "$n" && ! -e "$n" ]] && _agent_fix "$check" "stale link .claude/skills/$(basename "$n")" rm -f "$n"
+  done
+  return 0
+}
+
+agents_link_game() {
+  local check="$1" game="$2"
+  local title; title="$(sed -n 's/^config\/name="\(.*\)"/\1/p' "$game/project.godot")"
+  local tag; tag="games/$(basename "$game")"
+  [[ -f "$game/AGENTS.md" ]] \
+    || _agent_fix "$check" "$tag/AGENTS.md" \
+         sh -c "sed 's/__TITLE__/${title:-$(basename "$game")}/g' '$KIT/templates/AGENTS.game.md' > '$game/AGENTS.md'"
+  _symlink_ok "$game/GEMINI.md" AGENTS.md \
+    || _agent_fix "$check" "$tag/GEMINI.md -> AGENTS.md" ln -sfn AGENTS.md "$game/GEMINI.md"
+  if [[ -d "$game/.claude/skills" ]]; then
+    [[ -e "$game/.agents/skills" && ! -L "$game/.agents/skills" ]] && die "$tag/.agents/skills is a real folder"
+    _symlink_ok "$game/.agents/skills" ../.claude/skills \
+      || _agent_fix "$check" "$tag/.agents/skills -> ../.claude/skills" \
+           sh -c "mkdir -p '$game/.agents' && ln -sfn ../.claude/skills '$game/.agents/skills'"
+  fi
+  return 0
+}
+
+cmd_agents_link() {
+  local check=0; [[ "${1:-}" == "--check" ]] && check=1
+  [[ $check == 1 ]] || say "agent config (AGENTS.md + .agents/skills, linked for every agent)"
+  agents_link_workspace "$check"
+  local g; for g in "$WS"/games/*/; do [[ -f "$g/project.godot" ]] && agents_link_game "$check" "${g%/}"; done
+  if [[ $check == 1 ]]; then
+    [[ $AGENT_PROBLEMS == 0 ]] && echo "  ok    agent config (AGENTS.md, skills linked)"
+    return $(( AGENT_PROBLEMS > 0 ))
+  fi
+  echo "   skills: $(ls "$WS/.agents/skills" | tr '\n' ' ')"
 }
 
 cmd_new() {
@@ -204,7 +274,7 @@ EOF
     "$game/CLAUDE.md"
   godot_import "$game"
   echo
-  echo "Next:  cd games/$slug && claude    then  /start  (or describe the game: /prototype)"
+  echo "Next:  cd games/$slug and open your agent (claude, opencode, codex, …); start with /start or /prototype"
 }
 
 cmd_update_template() {
@@ -352,6 +422,7 @@ case "$sub" in
   new) cmd_new "$@" ;;
   install) cmd_install "$@" ;;
   tidy) cmd_tidy "$@" ;;
+  agents-link) cmd_agents_link "$@" ;;
   update-template) cmd_update_template ;;
   run) cmd_run "$@" ;;
   edit) cmd_edit "$@" ;;
