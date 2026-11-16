@@ -138,7 +138,9 @@ def main() -> None:
     for anim, frames, fps, _ in ANIMATIONS:
         gif(frames, HERE / f"{anim}.gif", fps=fps, scale=4)
     write_anim_meta(OUT / f"{NAME}.json",
-                    [{"name": n, "frames": f, "fps": fps, "loop": loop}
+                    [{"name": n, "frames": f, "fps": fps, "loop": loop,
+                      "hitbox": {"shape": "circle", "center": [float(ANCHOR[0]), float(ANCHOR[1])],
+                                 "active": [0, len(f)-1]}}
                      for n, f, fps, loop in ANIMATIONS],
                     anchor=ANCHOR)
     print(f"strip:   {OUT / f'{NAME}_strip.png'}")

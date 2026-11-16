@@ -30,7 +30,20 @@
         90.0,
         120.0,
         140.0
-      ]
+      ],
+      "hitbox": {
+        "shape": "circle",
+        "center": [
+          24.0,
+          44.0
+        ],
+        "active": [
+          1,
+          2
+        ],
+        "radius": 25.0,
+        "inner": 1.0
+      }
     },
     {
       "name": "hurt",

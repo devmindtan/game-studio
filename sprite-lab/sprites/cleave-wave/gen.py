@@ -142,10 +142,13 @@ def main() -> None:
     preview([sheet], HERE / "preview.png", scale=4)
     for anim, frames, fps, _ in ANIMATIONS:
         gif(frames, HERE / f"{anim}.gif", fps=fps, scale=4)
-    write_anim_meta(OUT / f"{NAME}.json",
-                    [{"name": n, "frames": f, "fps": fps, "loop": loop}
-                     for n, f, fps, loop in ANIMATIONS],
-                    anchor=ANCHOR)
+    dir_map = {"sweep":0.0,"sweep_right":0.0,"sweep_left":180.0,"sweep_up":-90.0,"sweep_down":90.0}
+    meta_anims = []
+    for n, f, fps, loop in ANIMATIONS:
+        meta_anims.append({"name": n, "frames": f, "fps": fps, "loop": loop,
+                           "hitbox": {"shape": "arc", "center": [float(ANCHOR[0]), float(ANCHOR[1])],
+                                      "active": [1, min(4, len(f)-1)], "dir_deg": dir_map.get(n, 0.0)}})
+    write_anim_meta(OUT / f"{NAME}.json", meta_anims, anchor=ANCHOR)
     print(f"strip:   {OUT / f'{NAME}_strip.png'}")
     print(f"preview: {HERE / 'preview.png'}")
 

@@ -17,35 +17,110 @@
       "start": 0,
       "frames": 7,
       "fps": 16.0,
-      "loop": false
+      "loop": false,
+      "hitbox": {
+        "shape": "arc",
+        "center": [
+          24.0,
+          24.0
+        ],
+        "active": [
+          1,
+          4
+        ],
+        "radius": 29.0,
+        "inner": 0.0,
+        "dir_deg": 0.0,
+        "half_angle_deg": 162.0
+      }
     },
     {
       "name": "sweep_right",
       "start": 7,
       "frames": 7,
       "fps": 16.0,
-      "loop": false
+      "loop": false,
+      "hitbox": {
+        "shape": "arc",
+        "center": [
+          24.0,
+          24.0
+        ],
+        "active": [
+          1,
+          4
+        ],
+        "radius": 29.0,
+        "inner": 0.0,
+        "dir_deg": 0.0,
+        "half_angle_deg": 162.0
+      }
     },
     {
       "name": "sweep_left",
       "start": 14,
       "frames": 7,
       "fps": 16.0,
-      "loop": false
+      "loop": false,
+      "hitbox": {
+        "shape": "arc",
+        "center": [
+          24.0,
+          24.0
+        ],
+        "active": [
+          1,
+          4
+        ],
+        "radius": 29.0,
+        "inner": 0.0,
+        "dir_deg": 180.0,
+        "half_angle_deg": 162.0
+      }
     },
     {
       "name": "sweep_up",
       "start": 21,
       "frames": 7,
       "fps": 16.0,
-      "loop": false
+      "loop": false,
+      "hitbox": {
+        "shape": "arc",
+        "center": [
+          24.0,
+          24.0
+        ],
+        "active": [
+          1,
+          4
+        ],
+        "radius": 29.0,
+        "inner": 0.0,
+        "dir_deg": -90.0,
+        "half_angle_deg": 162.0
+      }
     },
     {
       "name": "sweep_down",
       "start": 28,
       "frames": 7,
       "fps": 16.0,
-      "loop": false
+      "loop": false,
+      "hitbox": {
+        "shape": "arc",
+        "center": [
+          24.0,
+          24.0
+        ],
+        "active": [
+          1,
+          4
+        ],
+        "radius": 29.0,
+        "inner": 0.0,
+        "dir_deg": 90.0,
+        "half_angle_deg": 162.0
+      }
     }
   ]
 }

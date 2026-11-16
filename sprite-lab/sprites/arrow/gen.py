@@ -126,26 +126,32 @@ def impact(i):
     return c
 
 
+def _circle(active):
+    return {"shape": "circle", "center": [ANCHOR[0], ANCHOR[1]], "active": active}
+
+
 ANIMATIONS = [
-    ("fly", [fly("right", i) for i in range(4)], 16, True),
-    ("fly_right", [fly("right", i) for i in range(4)], 16, True),
-    ("fly_left", [fly("left", i) for i in range(4)], 16, True),
-    ("fly_up", [fly("up", i) for i in range(4)], 16, True),
-    ("fly_down", [fly("down", i) for i in range(4)], 16, True),
-    ("impact", [impact(i) for i in range(5)], 14, False),
+    {"name": "fly", "frames": [fly("right", i) for i in range(4)], "fps": 16, "loop": True, "hitbox": _circle([0, 3])},
+    {"name": "fly_right", "frames": [fly("right", i) for i in range(4)], "fps": 16, "loop": True, "hitbox": _circle([0, 3])},
+    {"name": "fly_left", "frames": [fly("left", i) for i in range(4)], "fps": 16, "loop": True, "hitbox": _circle([0, 3])},
+    {"name": "fly_up", "frames": [fly("up", i) for i in range(4)], "fps": 16, "loop": True, "hitbox": _circle([0, 3])},
+    {"name": "fly_down", "frames": [fly("down", i) for i in range(4)], "fps": 16, "loop": True, "hitbox": _circle([0, 3])},
+    {"name": "impact", "frames": [impact(i) for i in range(5)], "fps": 14, "loop": False, "hitbox": _circle([0, 1])},
 ]
 
 
 def main():
-    flat = [f for _, frames, _, _ in ANIMATIONS for f in frames]
+    flat = [f for a in ANIMATIONS for f in a["frames"]]
     strip(flat).save(OUT / f"{NAME}_strip.png")
     flat[0].save(OUT / f"{NAME}.png")
-    cols = max(len(fr) for _, fr, _, _ in ANIMATIONS)
+    cols = max(len(a["frames"]) for a in ANIMATIONS)
     sheet = Canvas(cols * S, len(ANIMATIONS) * S)
-    for r, (_, fr, _, _) in enumerate(ANIMATIONS): sheet.paste(strip(fr), 0, r * S)
+    for r, a in enumerate(ANIMATIONS):
+        sheet.paste(strip(a["frames"]), 0, r * S)
     preview([sheet], HERE / "preview.png", scale=6)
-    for a, fr, fps, _ in ANIMATIONS: gif(fr, HERE / f"{a}.gif", fps=fps, scale=6)
-    write_anim_meta(OUT / f"{NAME}.json", [{"name": n, "frames": f, "fps": fps, "loop": lp} for n, f, fps, lp in ANIMATIONS], anchor=ANCHOR)
+    for a in ANIMATIONS:
+        gif(a["frames"], HERE / f"{a['name']}.gif", fps=a["fps"], scale=6)
+    write_anim_meta(OUT / f"{NAME}.json", ANIMATIONS, anchor=ANCHOR)
     print(OUT / "preview.png")
 
 

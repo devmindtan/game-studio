@@ -17,7 +17,20 @@
       "start": 0,
       "frames": 8,
       "fps": 10.0,
-      "loop": false
+      "loop": false,
+      "hitbox": {
+        "shape": "circle",
+        "center": [
+          24.0,
+          28.0
+        ],
+        "active": [
+          0,
+          7
+        ],
+        "radius": 19.0,
+        "inner": 0.0
+      }
     }
   ]
 }

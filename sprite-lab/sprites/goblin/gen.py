@@ -137,7 +137,7 @@ def death(i):
 
 ANIMATIONS = [
     ("move", [move(i) for i in range(8)], 12, True, {}),
-    ("attack", [attack(i) for i in range(4)], 10, False, {"durations_ms": [260, 90, 120, 140]}),
+    ("attack", [attack(i) for i in range(4)], 10, False, {"durations_ms": [260, 90, 120, 140], "hitbox": {"shape": "circle", "center": [ANCHOR[0], ANCHOR[1]], "active": [1, 2]}}),
     ("hurt", [hurt(i) for i in range(2)], 12, False, {"durations_ms": [80, 120]}),
     ("death", [death(i) for i in range(5)], 8, False, {"durations_ms": [100, 120, 100, 100, 300]}),
 ]

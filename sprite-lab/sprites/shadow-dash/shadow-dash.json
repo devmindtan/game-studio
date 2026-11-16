@@ -17,35 +17,100 @@
       "start": 0,
       "frames": 7,
       "fps": 15.0,
-      "loop": false
+      "loop": false,
+      "hitbox": {
+        "shape": "circle",
+        "center": [
+          24.0,
+          24.0
+        ],
+        "active": [
+          0,
+          6
+        ],
+        "radius": 25.0,
+        "inner": 4.0
+      }
     },
     {
       "name": "dash_right",
       "start": 7,
       "frames": 7,
       "fps": 15.0,
-      "loop": false
+      "loop": false,
+      "hitbox": {
+        "shape": "circle",
+        "center": [
+          24.0,
+          24.0
+        ],
+        "active": [
+          0,
+          6
+        ],
+        "radius": 25.0,
+        "inner": 4.0
+      }
     },
     {
       "name": "dash_left",
       "start": 14,
       "frames": 7,
       "fps": 15.0,
-      "loop": false
+      "loop": false,
+      "hitbox": {
+        "shape": "circle",
+        "center": [
+          24.0,
+          24.0
+        ],
+        "active": [
+          0,
+          6
+        ],
+        "radius": 25.0,
+        "inner": 4.0
+      }
     },
     {
       "name": "dash_up",
       "start": 21,
       "frames": 7,
       "fps": 15.0,
-      "loop": false
+      "loop": false,
+      "hitbox": {
+        "shape": "circle",
+        "center": [
+          24.0,
+          24.0
+        ],
+        "active": [
+          0,
+          6
+        ],
+        "radius": 25.0,
+        "inner": 4.0
+      }
     },
     {
       "name": "dash_down",
       "start": 28,
       "frames": 7,
       "fps": 15.0,
-      "loop": false
+      "loop": false,
+      "hitbox": {
+        "shape": "circle",
+        "center": [
+          24.0,
+          24.0
+        ],
+        "active": [
+          0,
+          6
+        ],
+        "radius": 25.0,
+        "inner": 4.0
+      }
     }
   ]
 }

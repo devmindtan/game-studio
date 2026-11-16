@@ -263,8 +263,8 @@ ANIMATIONS = [
     ("run", [run(i) for i in range(8)], 12, True, {}),
     ("jump", [jump(i) for i in range(4)], 10, False, {"airborne": True,
                                                        "durations_ms": [80, 160, 160, 100]}),
-    ("attack", [attack(i) for i in range(5)], 14, False, {"durations_ms": ATTACK_MS}),
-    ("spell", [spell(i) for i in range(7)], 12, False, {"durations_ms": SPELL_MS}),
+    ("attack", [attack(i) for i in range(5)], 14, False, {"durations_ms": ATTACK_MS, "hitbox": {"shape": "circle", "center": [ANCHOR[0], ANCHOR[1]], "active": [1, 3]}}),
+    ("spell", [spell(i) for i in range(7)], 12, False, {"durations_ms": SPELL_MS, "hitbox": {"shape": "circle", "center": [ANCHOR[0], ANCHOR[1]], "active": [3, 4]}}),
     ("hurt", [hurt(i) for i in range(3)], 12, False, {"durations_ms": [90, 110, 120]}),
     ("death", [death(i) for i in range(5)], 8, False, {"durations_ms": [120, 140, 110, 100, 400]}),
 ]

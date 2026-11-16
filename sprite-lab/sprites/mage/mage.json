@@ -58,7 +58,20 @@
         70.0,
         90.0,
         150.0
-      ]
+      ],
+      "hitbox": {
+        "shape": "circle",
+        "center": [
+          24.0,
+          44.0
+        ],
+        "active": [
+          1,
+          3
+        ],
+        "radius": 32.0,
+        "inner": 0.0
+      }
     },
     {
       "name": "spell",
@@ -74,7 +87,20 @@
         80.0,
         120.0,
         140.0
-      ]
+      ],
+      "hitbox": {
+        "shape": "circle",
+        "center": [
+          24.0,
+          44.0
+        ],
+        "active": [
+          3,
+          4
+        ],
+        "radius": 31.0,
+        "inner": 1.0
+      }
     },
     {
       "name": "hurt",
