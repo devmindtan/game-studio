@@ -31,6 +31,27 @@ gamekit art promote <tên> <game>       # chép strip + json vào games/<g>/asse
 gamekit art ase|open <tên>             # .ase để người chỉnh tay trong LibreSprite
 ```
 
+### Nhân vật dùng pose rig (Pixelbolt)
+
+Khi thiết kế người/nhân vật có tay chân và cầm vũ khí, ưu tiên nguồn pose có khớp và attachment để giữ tỷ lệ
+cơ thể/vũ khí xuyên animation. Pixelbolt được gamekit ghim ở 0.17.0, chạy cục bộ, không cần dịch vụ ảnh:
+
+```sh
+gamekit art rig new <tên> [hero|hero-sword|knight]  # tạo <tên>.poses.json trong Sprite Lab
+gamekit art rig validate <tên>                       # kiểm tra nguồn pose
+gamekit art rig inspect <tên> [animation]            # xem onion-skin và diagnostics
+gamekit art rig motion <tên> <walk|run> [px/s]       # kiểm tra tiếp đất/trượt chân/quỹ đạo
+gamekit art rig build <tên>                          # render và nhập vào định dạng Sprite Lab
+gamekit art shot <tên> sheet && gamekit art shot <tên> move
+gamekit art test
+```
+
+Chốt brief cạnh nguồn: silhouette và khoảng âm, vai trò từng màu, mặt phẳng sáng, hướng nhìn, điểm neo, điểm
+tiếp đất, các pose contact/compression/passing/extension, anticipation/release/recovery, timing và chỗ gắn
+vũ khí. Xem ở 1x và khi phát animation; diagnostics chỉ báo chỗ cần xem, không tự xác nhận chất lượng.
+`Pixelbolt` export thời lượng frame riêng; metadata Sprite Lab giữ nguyên bằng `durations_ms`. `art run` tự
+chọn nguồn `.poses.json` nếu sprite có file đó; sprite dùng `gen.py` tiếp tục theo pipeline hiện tại.
+
 ## Quy trình (đủ các bước mới được báo xong)
 
 1. **Chốt spec**: kích thước (16/24/32/48/64; nhân vật cao thì chừa khoảng trống phía trên cho nhảy), palette

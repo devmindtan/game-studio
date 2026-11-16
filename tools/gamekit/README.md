@@ -92,6 +92,11 @@ trình đầy đủ ở [`sprite-lab/README.md`](../../sprite-lab/README.md) và
 
 ```bash
 gamekit art new <tên> [--size N]      # sprite-lab/sprites/<tên>/gen.py (mẫu nhiều animation)
+gamekit art rig new <tên> [hero|hero-sword|knight] # pose rig Pixelbolt có thể sửa
+gamekit art rig validate <tên>        # kiểm tra pose source
+gamekit art rig inspect <tên> [anim]  # onion skin + diagnostics
+gamekit art rig motion <tên> <anim> [px/s] # xem tiếp đất, trượt chân, loop, quỹ đạo
+gamekit art rig build <tên>            # xuất Pixelbolt thành strip/metadata Sprite Lab
 gamekit art run <tên>                 # vẽ + kiểm tra <tên>.json (frames, animation, điểm neo)
 gamekit art shot <tên> sheet|move     # ảnh để xem: mọi animation / 8 khoảnh khắc thử di chuyển
 gamekit art lab [<tên>] [sheet|move]  # mở lab (người dùng tự điều khiển)
@@ -101,6 +106,10 @@ gamekit art ase|open <tên>            # .ase cho LibreSprite
 ```
 
 - `gamekit art new <game> …` bị từ chối: sprite không được tạo trong game (bài học 2026-11-16).
+- Nhân vật dùng pose/bone và attachment có thể bắt đầu bằng `gamekit art rig new`; nguồn `<tên>.poses.json`
+  được Pixelbolt 0.17.0 compile và import lại thành strip Sprite Lab. Pixelbolt lưu thời lượng từng frame;
+  `SpriteSheet` giữ nguyên timing này qua `durations_ms`. Package cục bộ được ghim trong `tools/gamekit/package-lock.json`;
+  cài bằng `npm ci --prefix tools/gamekit` (Node.js 20+). `gen.py` vẫn phù hợp với sprite vẽ theo pixel/tọa độ.
 - Addon `addons/gamekit/sprites/`: `SpriteSheet` (đọc json, chọn frame theo animation và thời gian, vẽ)
   và `SpriteAnchor` (đặt theo điểm neo, kể cả khi lật). Dùng chung cho lab và mọi game.
 - `spritekit.py`: `from_rows`, `outline`, `strip`, `preview`, `gif`, `write_meta` / `write_anim_meta`

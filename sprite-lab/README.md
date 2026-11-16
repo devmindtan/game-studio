@@ -33,6 +33,27 @@ sprite-lab/
 
 Bước 9 chỉ làm khi game thật sự cần sprite đó. Thử nghiệm không bao giờ diễn ra trong game.
 
+### Nhân vật có tay chân và vũ khí: Pixelbolt pose rig
+
+Gamekit tích hợp Pixelbolt 0.17.0 cho nguồn nhân vật có khớp tương đối và attachment. Bản nguồn là
+`sprites/<tên>/<tên>.poses.json`; build compile bằng Pixelbolt rồi chuyển atlas sang định dạng strip của
+Sprite Lab. Timing frame không đều được giữ trong `durations_ms` và phát đúng trong `SpriteSheet`.
+
+```sh
+npm ci --prefix tools/gamekit                   # chỉ lần đầu, Node.js 20+
+gamekit art rig new swordsman hero-sword
+gamekit art rig validate swordsman
+gamekit art rig inspect swordsman attack
+gamekit art rig motion swordsman walk 48
+gamekit art run swordsman
+gamekit art shot swordsman sheet
+gamekit art shot swordsman move
+gamekit art test
+```
+
+Pixelbolt cung cấp cấu trúc và diagnostics; người thiết kế vẫn phải xem silhouette ở kích thước gốc, các pose
+chính, vũ khí qua các frame và playback thực tế. Sprite dùng `gen.py` vẫn hỗ trợ đầy đủ như trước.
+
 ## Trình thử (`gamekit art lab [<tên>] [sheet|move]`)
 
 - **sheet**: mọi animation cạnh nhau, mỗi cái lặp lại (animation một lần thì nghỉ 0,6 giây rồi chạy lại),
