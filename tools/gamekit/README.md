@@ -101,6 +101,9 @@ gamekit art open <game> light-mote            # mở .ase bằng LibreSprite
 - File sinh ra:
   - `assets/sprites/custom/<tên>/<tên>.png` và `<tên>_strip.png` — Godot import.
   - `assets/source/sprites/<tên>/` — `gen.py`, `preview.png`, `anim.gif`, `<tên>.ase`; Godot bỏ qua.
+- `gen.py` gọi `write_meta(...)` để ghi `assets/sprites/custom/<tên>/<tên>.json`: số frame, kích thước
+  frame, fps, loop và **điểm neo** (pixel nguồn đặt lên vị trí vật thể). `gamekit art run` dừng nếu thiếu
+  hoặc sai. Game đọc file này; đừng gõ lại các số đó vào config.
 - `gen.py` import helper `pipeline/spritekit.py` (ASCII map, outline, strip, grid, GIF, preview, `.ase`).
   Sửa `gen.py`, không sửa helper trong game.
 - Preview là ảnh phóng to nearest có lưới, để agent đọc bằng công cụ đọc ảnh của nó. `anim.gif` để xem chuyển động.

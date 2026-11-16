@@ -205,6 +205,73 @@ def gif(frames, path, fps=8, scale=1):
     return path
 
 
+# --- sprite metadata: frames, fps, anchor -------------------------------------
+# The game places a sprite by its ANCHOR (a point in source pixels), never by
+# the canvas centre: art is rarely centred on its canvas (lesson 2026-11-16,
+# LESSONS.md). Every sprite ships <name>.json next to <name>_strip.png.
+
+def content_bbox(frames):
+    """Union of the opaque area of every frame: (x0, y0, x1, y1), x1/y1 exclusive."""
+    boxes = [f.img.getchannel("A").getbbox() for f in frames]
+    boxes = [b for b in boxes if b]
+    if not boxes:
+        raise ValueError("every frame is empty")
+    return (min(b[0] for b in boxes), min(b[1] for b in boxes),
+            max(b[2] for b in boxes), max(b[3] for b in boxes))
+
+
+def content_centre(frames):
+    """Centre of the content over all frames, in source pixels."""
+    x0, y0, x1, y1 = content_bbox(frames)
+    return ((x0 + x1) / 2, (y0 + y1) / 2)
+
+
+def write_meta(path, frames, fps, anchor=None, loop=True):
+    """Write <name>.json beside the strip: what the game needs to draw it.
+
+    anchor: (x, y) in source pixels that lands on the object's position, e.g.
+    the body centre, the feet, the head of a raindrop. None = content centre
+    (right only for art that is symmetric around its middle).
+    """
+    import json
+
+    w, h = frames[0].width, frames[0].height
+    ax, ay = anchor if anchor is not None else content_centre(frames)
+    meta = {
+        "frames": len(frames),
+        "frame_size": [w, h],
+        "fps": fps,
+        "loop": loop,
+        "anchor": [ax, ay],
+        "anchor_source": "explicit" if anchor is not None else "content_centre",
+    }
+    check_meta(meta)
+    Path(path).parent.mkdir(parents=True, exist_ok=True)
+    Path(path).write_text(json.dumps(meta, indent=2) + "\n", encoding="utf-8")
+    return Path(path)
+
+
+def check_meta(meta, strip_size=None):
+    """Raise ValueError when metadata cannot be drawn correctly."""
+    problems = []
+    w, h = meta.get("frame_size", [0, 0])
+    n = meta.get("frames", 0)
+    ax, ay = meta.get("anchor", [-1, -1])
+    if n < 1:
+        problems.append("frames must be >= 1")
+    if not (0 <= ax <= w and 0 <= ay <= h):
+        problems.append(f"anchor ({ax}, {ay}) is outside the {w}x{h} frame")
+    if (ax * 2) % 1 or (ay * 2) % 1:
+        problems.append("anchor must be on a whole or half pixel (x.0 or x.5)")
+    if meta.get("fps", 0) <= 0:
+        problems.append("fps must be > 0")
+    if strip_size and tuple(strip_size) != (w * n, h):
+        problems.append(f"strip is {strip_size[0]}x{strip_size[1]}, meta says {n} x {w}x{h}")
+    if problems:
+        raise ValueError("; ".join(problems))
+    return meta
+
+
 LIBRESPRITE = os.environ.get("LIBRESPRITE", "libresprite")
 
 
@@ -273,4 +340,14 @@ if __name__ == "__main__":
         from_ase(d / "strip.ase", d / "back.png")
         assert Image.open(d / "back.png").size == Image.open(d / "strip.png").size
         assert len(base.palette()) == 1
+        # metadata: content-centre default, explicit anchor, and a bad anchor refused
+        m = write_meta(d / "m.json", frames, fps=8)
+        assert m.exists()
+        assert content_centre(frames) == (5.0, 2.5), content_centre(frames)
+        write_meta(d / "m2.json", frames, fps=8, anchor=(5.0, 4.5))
+        try:
+            write_meta(d / "bad.json", frames, fps=8, anchor=(40, 2))
+            raise AssertionError("anchor outside the frame was accepted")
+        except ValueError:
+            pass
     print("ok (temp files removed)")

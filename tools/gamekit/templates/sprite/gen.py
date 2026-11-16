@@ -6,6 +6,7 @@ Sửa file này rồi chạy:  gamekit art run <game> __NAME__
 File sinh ra:
   assets/sprites/custom/__NAME__/__NAME__.png        frame chính (Godot dùng)
   assets/sprites/custom/__NAME__/__NAME___strip.png  dải animation (nếu có nhiều frame)
+  assets/sprites/custom/__NAME__/__NAME__.json       số frame, fps, ĐIỂM NEO (game đặt sprite theo điểm này)
   assets/source/sprites/__NAME__/preview.png          ảnh phóng to để agent xem
   assets/source/sprites/__NAME__/anim.gif             xem animation
 """
@@ -23,10 +24,16 @@ def _workspace() -> Path:
 
 sys.path.insert(0, str(_workspace() / "tools/gamekit/pipeline"))
 
-from spritekit import Canvas, gif, preview, strip  # noqa: E402
+from spritekit import Canvas, gif, preview, strip, write_meta  # noqa: E402
 
 NAME = "__NAME__"
 SIZE = __SIZE__
+FPS = 8
+# Điểm neo (pixel nguồn) rơi đúng vào vị trí của vật thể trong game: tâm thân, chân,
+# đầu giọt mưa... None = tâm phần có hình (chỉ đúng khi hình đối xứng quanh giữa).
+# Đặt rõ khi hình lệch (ví dụ cánh vỗ làm khung bao nhảy): ANCHOR = (7.5, 8.5).
+ANCHOR = None
+LOOP = True
 
 HERE = Path(__file__).resolve().parent          # assets/source/sprites/<name>
 GAME = HERE.parents[3]                           # thư mục game
@@ -75,7 +82,8 @@ def main() -> None:
     strip(frames).save(OUT / f"{NAME}_strip.png")
     zoom = max(2, 256 // SIZE)
     preview(frames, HERE / "preview.png", scale=zoom)
-    gif(frames, HERE / "anim.gif", fps=8, scale=max(1, zoom // 2))
+    gif(frames, HERE / "anim.gif", fps=FPS, scale=max(1, zoom // 2))
+    write_meta(OUT / f"{NAME}.json", frames, fps=FPS, anchor=ANCHOR, loop=LOOP)
     print(f"sprite:  {OUT / f'{NAME}.png'}")
     print(f"strip:   {OUT / f'{NAME}_strip.png'}")
     print(f"preview: {HERE / 'preview.png'}")

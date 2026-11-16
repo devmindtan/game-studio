@@ -377,6 +377,18 @@ cmd_art() {
       (cd "$src" && python3 gen.py)
       local png="$ART_GAME/assets/sprites/custom/$ART_NAME/$ART_NAME.png"
       [[ -f "$png" ]] || die "generator wrote no ${png#"$WS"/}"
+      # Every sprite needs <name>.json (frames, fps, anchor) and it must match the strip.
+      local meta="${png%.png}.json" stripf="${png%.png}_strip.png"
+      [[ -f "$meta" ]] || die "generator wrote no ${meta#"$WS"/}: call write_meta(...) in gen.py (anchor!)"
+      GAMEKIT_PIPELINE="$KIT/pipeline" python3 -c '
+import json, os, sys
+sys.path.insert(0, os.environ["GAMEKIT_PIPELINE"])
+from PIL import Image
+from spritekit import check_meta
+m = json.load(open(sys.argv[1]))
+check_meta(m, Image.open(sys.argv[2]).size)
+print("   meta:    %d frame(s) %sx%s @ %s fps, anchor %s (%s)" % (m["frames"], *m["frame_size"], m["fps"], m["anchor"], m["anchor_source"]))
+' "$meta" "$stripf" || die "bad ${meta#"$WS"/}"
       echo "   sprite:  ${png#"$WS"/}"
       echo "   preview: ${src#"$WS"/}/preview.png"
       ;;
