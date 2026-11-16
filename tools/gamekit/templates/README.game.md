@@ -30,7 +30,7 @@ Mở AI agent (Claude Code, OpenCode, Codex…) **trong thư mục này** để 
 | `src/`, `assets/`, `tests/`, `design/`, `production/`, `project.godot`, `export_presets.cfg`, `README.md` | **game này** | sửa thoải mái |
 | `addons/gamekit/`, `Makefile` | gamekit (`../../tools/gamekit`) | bản sao, sửa ở tools/gamekit rồi `gamekit install` |
 | `.claude/`, `CLAUDE.md`, `project.yaml`, `docs/` | framework Claude Code Game Studios | cấu hình agent; cập nhật theo `UPGRADING.md` của template |
-| `AGENTS.md`, `GEMINI.md`, `.agents/skills` | gamekit (`gamekit agents-link`) | lối vào cho mọi agent; `.agents/skills` là symlink tới `.claude/skills` |
+| `AGENTS.md`, `.agents/skills` | gamekit (`gamekit agents-link`) | lối vào cho mọi agent; `.agents/skills` là symlink tới `.claude/skills` |
 | `LICENSES/` | giấy phép của mã bên thứ ba | không xóa |
 
 ## Credits

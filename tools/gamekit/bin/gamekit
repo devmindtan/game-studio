@@ -45,7 +45,7 @@ Project
   tidy <game>                  move framework repo files out of a game (README, CHANGELOG, .github, ...)
   update-template              git pull the framework template (templates/claude-code-game-studios)
   doctor                       check every tool the kit needs (and the agent links)
-  agents-link [--check]        link AGENTS.md + .agents/skills for every agent (Claude, OpenCode, Codex, Gemini, …)
+  agents-link [--check]        link AGENTS.md + .agents/skills for every agent (Claude, OpenCode, Codex, …)
 
 Play and test
   run <game>                   play
@@ -164,7 +164,7 @@ cmd_tidy() {
 
 # --- agent config shared by every AI agent ------------------------------------
 # One source of truth per thing, links for each agent:
-#   instructions  AGENTS.md            <- CLAUDE.md (@AGENTS.md import), GEMINI.md (symlink)
+#   instructions  AGENTS.md            <- CLAUDE.md (@AGENTS.md import)
 #   skills        .agents/skills/<n>/  <- .claude/skills/<n> (symlink); OpenCode/Codex read .agents/ directly
 # In a game: AGENTS.md (from template) points at the framework's CLAUDE.md, and
 # .agents/skills -> .claude/skills exposes the framework skills to non-Claude agents.
@@ -182,8 +182,6 @@ agents_link_workspace() {
   grep -qx '@AGENTS.md' "$WS/CLAUDE.md" 2>/dev/null \
     || _agent_fix "$check" "CLAUDE.md must import @AGENTS.md" \
          sh -c "{ printf '@AGENTS.md\n\n'; cat '$WS/CLAUDE.md' 2>/dev/null; } > '$WS/CLAUDE.md.tmp' && mv '$WS/CLAUDE.md.tmp' '$WS/CLAUDE.md'"
-  _symlink_ok "$WS/GEMINI.md" AGENTS.md \
-    || _agent_fix "$check" "GEMINI.md -> AGENTS.md" ln -sfn AGENTS.md "$WS/GEMINI.md"
   mkdir -p "$WS/.agents/skills"
   for n in "$WS"/.agents/skills/*/; do
     [[ -f "$n/SKILL.md" ]] || continue
@@ -206,8 +204,6 @@ agents_link_game() {
   [[ -f "$game/AGENTS.md" ]] \
     || _agent_fix "$check" "$tag/AGENTS.md" \
          sh -c "sed 's/__TITLE__/${title:-$(basename "$game")}/g' '$KIT/templates/AGENTS.game.md' > '$game/AGENTS.md'"
-  _symlink_ok "$game/GEMINI.md" AGENTS.md \
-    || _agent_fix "$check" "$tag/GEMINI.md -> AGENTS.md" ln -sfn AGENTS.md "$game/GEMINI.md"
   if [[ -d "$game/.claude/skills" ]]; then
     [[ -e "$game/.agents/skills" && ! -L "$game/.agents/skills" ]] && die "$tag/.agents/skills is a real folder"
     _symlink_ok "$game/.agents/skills" ../.claude/skills \

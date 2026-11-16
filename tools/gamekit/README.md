@@ -31,9 +31,9 @@ tools/gamekit/
 
 | Thứ | Bản gốc | Link cho từng agent |
 |---|---|---|
-| Hướng dẫn workspace | `AGENTS.md` | `CLAUDE.md` = `@AGENTS.md`; `GEMINI.md` → `AGENTS.md`; Aider: `.aider.conf.yml` |
+| Hướng dẫn workspace | `AGENTS.md` | `CLAUDE.md` = `@AGENTS.md`; Aider: `.aider.conf.yml` |
 | Skill workspace | `.agents/skills/<tên>/` | `.claude/skills/<tên>` → `../../.agents/skills/<tên>` (OpenCode và Codex đọc `.agents/skills`) |
-| Hướng dẫn trong game | `games/<g>/AGENTS.md` (từ `templates/AGENTS.game.md`) | `GEMINI.md` → `AGENTS.md` |
+| Hướng dẫn trong game | `games/<g>/AGENTS.md` (từ `templates/AGENTS.game.md`) | agent đọc trực tiếp |
 | Skill framework trong game | `games/<g>/.claude/skills/` | `.agents/skills` → `../.claude/skills` |
 
 `gamekit tidy` và `gamekit new` tự tạo phần của game.

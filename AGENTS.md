@@ -1,14 +1,14 @@
 # game-studio: workspace làm game
 
-> **Bản gốc duy nhất cho mọi AI agent** (Claude Code, OpenCode, Codex, Gemini CLI, Cursor, Aider…).
-> `CLAUDE.md` chỉ import file này; `GEMINI.md` là symlink tới nó. Muốn sửa workflow thì sửa **ở đây**.
+> **Bản gốc duy nhất cho mọi AI agent** (Claude Code, OpenCode, Codex, Cursor, Aider…).
+> `CLAUDE.md` chỉ import file này. Muốn sửa workflow thì sửa **ở đây**.
 
 Workspace gồm nhiều repo riêng. **Mỗi khi nhận yêu cầu, xác định loại yêu cầu theo bảng "Điều phối" bên dưới
 rồi dùng đúng công cụ ghi trong đó.** Mọi thao tác máy móc đi qua `gamekit` (đã có sẵn trên PATH).
 
 ```text
 game-studio/
-├── AGENTS.md                     workflow này (bản gốc); CLAUDE.md, GEMINI.md trỏ về đây
+├── AGENTS.md                     workflow này (bản gốc); CLAUDE.md trỏ về đây
 ├── README.md                     hướng dẫn cho người
 ├── .agents/skills/<tên>/SKILL.md skill dùng chung (bản gốc), ví dụ pixel-sprite
 ├── .claude/skills/<tên>          symlink → .agents/skills/<tên> (do `gamekit agents-link` tạo)
@@ -27,7 +27,6 @@ game-studio/
 |---|---|---|
 | Codex, OpenCode, Cursor | `AGENTS.md` | `.agents/skills/` (OpenCode đọc thêm `.claude/skills/`) |
 | Claude Code | `CLAUDE.md` → `@AGENTS.md` | `.claude/skills/` (symlink tới `.agents/skills/`) |
-| Gemini CLI | `GEMINI.md` (symlink tới `AGENTS.md`) | đọc `SKILL.md` theo đường dẫn ghi trong bảng điều phối |
 | Aider | `.aider.conf.yml` nạp `AGENTS.md` ở chế độ chỉ đọc | như trên |
 
 - **Thêm skill mới:** tạo `.agents/skills/<tên>/SKILL.md` (frontmatter có `name`, `description`), rồi chạy
@@ -81,7 +80,7 @@ xuất kéo dài thì khuyên người dùng mở phiên mới ở đó.
 - **Không sửa** `templates/` và `tools/lpc-generator/` (cả hai là clone upstream). Muốn tùy biến thì sửa ở
   `games/<g>` hoặc `tools/gamekit`.
 - **Addon `games/<g>/addons/gamekit/` là bản sao.** Sửa ở `tools/gamekit/addon/` rồi chạy `gamekit install`.
-- **Git có ba tầng:** repo gốc `game-studio/` quản lý `AGENTS.md`, `CLAUDE.md`, `GEMINI.md`, `README.md`, `.agents/`,
+- **Git có ba tầng:** repo gốc `game-studio/` quản lý `AGENTS.md`, `CLAUDE.md`, `README.md`, `.agents/`,
   `.claude/skills/` (symlink), `.aider.conf.yml` và `tools/gamekit`. Mỗi game là một repo riêng: remote `framework`
   trỏ về upstream của framework, còn `origin` để dành cho repo riêng của game. `templates/` và
   `tools/lpc-generator/` là clone upstream. Commit theo mục "Quy tắc commit" bên dưới.
@@ -100,7 +99,7 @@ yêu cầu, nên không cần hỏi lại trước mỗi commit. Áp dụng cho 
 | File đã sửa | Repo | Ghi chú |
 |---|---|---|
 | `games/<g>/**` | repo của game đó (`git -C games/<g>`) | |
-| `AGENTS.md`, `CLAUDE.md`, `GEMINI.md`, `README.md`, `.gitignore`, `.aider.conf.yml`, `.agents/**`, `.claude/skills/**`, `tools/gamekit/**` | repo gốc `game-studio/` | |
+| `AGENTS.md`, `CLAUDE.md`, `README.md`, `.gitignore`, `.aider.conf.yml`, `.agents/**`, `.claude/skills/**`, `tools/gamekit/**` | repo gốc `game-studio/` | |
 | `templates/**`, `tools/lpc-generator/**` | **không bao giờ** | clone upstream, chỉ đọc. Lỡ sửa thì `git checkout -- .` để hoàn tác |
 
 Thay đổi trải trên nhiều repo thì **mỗi repo một commit**. Ví dụ sửa gamekit:

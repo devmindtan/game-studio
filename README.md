@@ -1,12 +1,12 @@
 # game-studio
 
-Workspace làm game 2D bằng Godot 4.7, dùng được với mọi AI agent: Claude Code, OpenCode, Codex, Gemini CLI,
+Workspace làm game 2D bằng Godot 4.7, dùng được với mọi AI agent: Claude Code, OpenCode, Codex,
 Cursor, Aider…
 
 | Thư mục / file | Là gì |
 |---|---|
 | `games/<slug>/` | Mỗi game là một repo riêng: framework Claude Code Game Studios + Godot + addon gamekit |
-| `AGENTS.md` | **Workflow cho mọi agent** (bản gốc duy nhất). `CLAUDE.md` import nó, `GEMINI.md` là symlink tới nó |
+| `AGENTS.md` | **Workflow cho mọi agent** (bản gốc duy nhất). `CLAUDE.md` import nó |
 | `.agents/skills/` | Skill dùng chung (ví dụ `pixel-sprite`). `.claude/skills/` chỉ chứa symlink trỏ về đây |
 | `templates/claude-code-game-studios/` | Bản gốc của framework để tạo game mới (không sửa trực tiếp) |
 | `tools/gamekit/` | Bộ công cụ: CLI `gamekit`, pipeline sprite LPC, pixel art, build/export. Xem [README](tools/gamekit/README.md) |
@@ -47,6 +47,6 @@ Với Claude Code, hook và quy tắc của framework chỉ có hiệu lực khi
 
 ## Thêm skill hoặc sửa hướng dẫn cho agent
 
-- Hướng dẫn: sửa `AGENTS.md`. Không viết vào `CLAUDE.md` hay `GEMINI.md`.
+- Hướng dẫn: sửa `AGENTS.md`. Không viết vào `CLAUDE.md`.
 - Skill mới: tạo `.agents/skills/<tên>/SKILL.md`, rồi chạy `gamekit agents-link`.
 - Kiểm tra: `gamekit doctor` (hoặc `gamekit agents-link --check`).
