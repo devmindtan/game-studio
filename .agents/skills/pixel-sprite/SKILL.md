@@ -101,12 +101,20 @@ Không báo "xong" khi chưa xem `preview.png`, ảnh `sheet` và ảnh `move`.
   `SpriteHitbox.body(sheet, điểm_vẽ, tỉ_lệ, lật)`, cùng điểm và tỉ lệ với lúc vẽ; data game chỉ chứa hệ số
   (sát thương, `area`), **không** chứa bán kính/tầm đánh/tâm thân gõ tay.
 
-## Nhân vật cho game top-down (nhiều hướng)
+## Nhân vật: góc nhìn, đòn đánh, lớp (mặc giáp)
 
-- Game cho đi 8 hướng thì nhân vật cần ít nhất 3 góc: ngang (`idle`, `run`, `attack`…; trái = lật), mặt trước
-  (`<anim>_down`) và lưng (`<anim>_up`); đi chéo dùng góc ngang. Cùng tỉ lệ, cùng neo, cùng đường đất.
-- Thứ tự vẽ theo góc nhìn: góc lưng/trước, tay giơ cao hơn vai đi **cạnh** đầu và được vẽ trước đầu (đầu che vai),
-  không bao giờ cắt ngang mặt/tóc; vũ khí luôn nối liền với bàn tay (bài học 2026-11-16, `attack_up`).
+- **Góc nhìn theo quyết định của game**, ghi trong design của game. Bách Ải (2026-11-16): chỉ góc ngang, trái =
+  lật; nhân vật chỉ có `idle`, `run`, `hurt`, `death`. Game cần thêm góc thì dùng `<anim>_down` / `<anim>_up`,
+  cùng tỉ lệ, cùng neo, cùng đường đất. Ở góc trước/sau, tay giơ cao đi **cạnh** đầu, được vẽ trước đầu, không
+  cắt ngang mặt/tóc; vũ khí luôn nối liền với bàn tay (bài học `attack_up`).
+- **Đòn đánh không vẽ vào thân**: vệt chém, vụ nổ là sprite hiệu ứng riêng có hitbox. Vẽ cả hai thì game hiện hai
+  vệt.
+- **Nhân vật mặc được đồ thì vẽ theo lớp**: dựng bằng `minifig.draw_layers` và xuất bằng
+  `sheet.export_layered(...)`. Kết quả gồm `layers/<lớp>_strip.png` (không viền), `"layers"` và `"outline"` trong
+  json, `layers.png` để duyệt. `check_layers` (trong `art run`) bắt các lớp ghép lại + viền phải trùng từng pixel
+  với strip. Thứ tự lớp và ô trang bị: `minifig.LAYERS` (đầu: `hair`, ngực: `torso`/`arm_*`/`neck`, chân: `leg_*`,
+  giày: `boot_*`, tay: `hand_*`, vũ khí: `weapon*`, áo choàng: `cape_back`). Đồ mặc vẽ lại đúng các lớp của ô bằng
+  **cùng tư thế** của nhân vật; game ghép bằng `SpriteSheet.compose_layers({lớp: texture})` (viền sau khi ghép).
 - Xem **phóng to từng frame** của mỗi animation mới (preview cả sheet quá nhỏ để thấy lỗi tay/vũ khí).
 
 ## Quy tắc pixel art

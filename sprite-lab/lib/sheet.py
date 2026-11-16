@@ -13,7 +13,9 @@ from __future__ import annotations
 
 from pathlib import Path
 
-from spritekit import Canvas, gif, preview, strip, write_anim_meta
+import json
+
+from spritekit import Canvas, check_layers, gif, preview, strip, write_anim_meta
 
 
 def export(here: Path, name: str, animations, anchor, ground=False, preview_scale=None, gif_scale=None, body=None):
@@ -33,4 +35,53 @@ def export(here: Path, name: str, animations, anchor, ground=False, preview_scal
                     [{"name": n, "frames": f, "fps": fps, "loop": loop, **extra}
                      for n, f, fps, loop, extra in animations],
                     anchor=anchor, ground=ground, body=body)
+    return here / f"{name}_strip.png"
+
+
+def export_layered(here: Path, name: str, animations, anchor, outline, ground=False, body=None,
+                   preview_scale=None, gif_scale=None):
+    """Like export(), for a character drawn in layers (minifig.draw_layers).
+
+    animations: (name, [dict layer -> Canvas per frame], fps, loop, extra).
+    Writes the composed + outlined sprite exactly as export() does, plus
+    layers/<layer>_strip.png (no outline) for every layer used in any frame, and
+    adds "layers" (z order) and "outline" to <name>.json. check_layers verifies
+    that composing the layers gives the strip pixel for pixel; equipment replaces
+    layers and the game composes them the same way."""
+    import minifig as mf
+
+    def outlined(layers):
+        c = mf.compose(layers)
+        c.outline(outline)
+        return c
+
+    flat_anims = [(n, [outlined(f) for f in frames], fps, loop, extra) for n, frames, fps, loop, extra in animations]
+    export(here, name, flat_anims, anchor, ground=ground, preview_scale=preview_scale, gif_scale=gif_scale, body=body)
+    every = [f for _, frames, _, _, _ in animations for f in frames]
+    order = list(every[0].keys())
+    used = [k for k in order if any(f[k].img.getbbox() for f in every)]
+    layer_dir = here / "layers"
+    layer_dir.mkdir(exist_ok=True)
+    for old in layer_dir.glob("*_strip.png"):
+        if old.name[:-len("_strip.png")] not in used:
+            old.unlink()
+    for k in used:
+        strip([f[k] for f in every]).save(layer_dir / f"{k}_strip.png")
+    # review sheet: the first frame split into its layers (left to right, z order), then composed
+    first = every[0]
+    w0, h0 = first[used[0]].width, first[used[0]].height
+    exploded = Canvas((len(used) + 1) * (w0 + 4), h0)
+    for i, k in enumerate(used):
+        exploded.paste(first[k], i * (w0 + 4), 0)
+    exploded.paste(outlined(first), len(used) * (w0 + 4), 0)
+    preview([exploded], here / "layers.png", scale=preview_scale or 4, grid_lines=False)
+    meta_path = here / f"{name}.json"
+    meta = json.loads(meta_path.read_text(encoding="utf-8"))
+    meta["layers"] = used
+    meta["outline"] = outline
+    from PIL import Image
+    problems = check_layers(meta, Image.open(here / f"{name}_strip.png"), layer_dir)
+    if problems:
+        raise ValueError("; ".join(problems))
+    meta_path.write_text(json.dumps(meta, indent=2) + "\n", encoding="utf-8")
     return here / f"{name}_strip.png"

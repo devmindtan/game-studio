@@ -117,6 +117,8 @@ gamekit art ase|open <tên>            # .ase cho LibreSprite
   (`ground=True` + `check_ground`: nhân vật phải chạm đất ở mọi frame không `airborne`;
   `"hitbox"` của animation được `fit_hitbox` đo từ pixel, `check_hitbox` từ chối hitbox lệch; `body=` đo thân
   bằng `fit_body`, `check_body` kiểm tra; `gamekit test` nạp mọi script trong `src/` nên lỗi parse là FAIL)
+- Nhân vật theo lớp (mặc giáp): `sheet.export_layered` ghi `layers/<lớp>_strip.png`, `check_layers` kiểm tra ghép
+  lớp + viền trùng strip; `art promote` chép kèm `layers/`; trong game `SpriteSheet.compose_layers(overrides)`.
   (ghi `<tên>.json`), `check_meta`, `.ase` qua LibreSprite.
 - Export preset gói `assets/sprites/*.json` để game đọc được metadata.
 

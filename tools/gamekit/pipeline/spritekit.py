@@ -519,6 +519,43 @@ def check_body(meta, strip_img):
     return [p + " (regenerate with write_anim_meta(..., body=...))" for p in problems]
 
 
+def compose_layers(layer_imgs, frame_w, frame_h, outline_color):
+    """Stack layer strips (z order) and outline each frame like Canvas.outline.
+    The game does the same (SpriteSheet.compose) when equipment swaps layers."""
+    w, h = layer_imgs[0].size
+    stacked = Image.new("RGBA", (w, h), TRANSPARENT)
+    for img in layer_imgs:
+        stacked.alpha_composite(img.convert("RGBA"))
+    out = Image.new("RGBA", (w, h), TRANSPARENT)
+    for i in range(w // frame_w):
+        frame = Canvas(frame_w, frame_h)
+        frame.img = stacked.crop((i * frame_w, 0, (i + 1) * frame_w, frame_h))
+        frame.outline(outline_color)
+        out.paste(frame.img, (i * frame_w, 0))
+    return out
+
+
+def check_layers(meta, strip_img, layer_dir):
+    """Problems where the layer strips (layers/<layer>_strip.png) composed and
+    outlined differ from the sprite's strip (empty = they match pixel for pixel)."""
+    names = meta.get("layers")
+    if not names:
+        return []
+    imgs = []
+    for n in names:
+        p = Path(layer_dir) / f"{n}_strip.png"
+        if not p.exists():
+            return [f"layer {n}: missing {p}"]
+        imgs.append(Image.open(p).convert("RGBA"))
+    if any(i.size != strip_img.size for i in imgs):
+        return ["layer strips and the sprite strip differ in size"]
+    w, h = meta["frame_size"]
+    composed = compose_layers(imgs, w, h, meta.get("outline", "#1b1726"))
+    from PIL import ImageChops
+    diff = ImageChops.difference(composed, strip_img.convert("RGBA")).getbbox()
+    return [] if diff is None else [f"layers composed + outlined differ from the strip in {diff}"]
+
+
 def _check_animations(animations, total_frames):
     """Problems with the `animations` list of a sheet metadata (empty = fine)."""
     problems = []

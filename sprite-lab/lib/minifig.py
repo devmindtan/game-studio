@@ -13,6 +13,13 @@ A character is a dict of palette + part painters:
 Painters get (canvas, pose, geometry) and draw extra parts; "fx" runs after the
 outline, for glows / slashes / sparks that must not be outlined.
 
+Layers (for equipment): draw_layers() paints every part on its own transparent
+canvas, without outline, in LAYERS order; compose() + outline gives exactly what
+draw() returns. An equipment sprite (chest armour, boots, ...) replaces the layers
+of its slot, drawn with the same poses, and the game composes and outlines the
+result, so swapped parts always line up. Character keys: "behind" -> cape_back,
+"held_back" -> weapon_back, "head", "hair", "neck", "held" -> weapon, "front".
+
 Used by sprite-lab/sprites/swordsman/gen.py and sprite-lab/sprites/mage/gen.py.
 """
 from __future__ import annotations
@@ -119,20 +126,22 @@ def geometry(p):
 
 # --- body parts -----------------------------------------------------------------
 
-def leg(c, hip, foot, pal, back):
+def leg(c, hip, foot, pal, back, boot_c=None):
+    """Trouser leg on c, boot on boot_c (default: the same canvas)."""
     pants = pal["pants_d"] if back else pal["pants"]
     boot = pal["boot_d"] if back else pal["boot"]
     knee_y = min(foot[1] - 2, hip[1] + 2)
     line(c, hip[0], hip[1], foot[0], knee_y, pants, 2)
     line(c, foot[0], knee_y, foot[0], foot[1] - 1, pants, 2)
-    rect(c, foot[0] - 1, foot[1] - 1, foot[0] + 2, foot[1], boot)   # boot, toe forward
+    rect(boot_c or c, foot[0] - 1, foot[1] - 1, foot[0] + 2, foot[1], boot)   # boot, toe forward
 
 
-def arm(c, shoulder, hand, pal, back):
+def arm(c, shoulder, hand, pal, back, hand_c=None):
+    """Sleeve on c, hand on hand_c (default: the same canvas)."""
     sleeve = pal["sleeve_d"] if back else pal["sleeve"]
     line(c, shoulder[0], shoulder[1], hand[0], hand[1], sleeve, 2)
     skin = pal["skin_d"] if back else pal["skin"]
-    rect(c, hand[0], hand[1], hand[0] + 1, hand[1] + 1, skin)
+    rect(hand_c or c, hand[0], hand[1], hand[0] + 1, hand[1] + 1, skin)
 
 
 def tunic(c, g, pal):
@@ -189,43 +198,91 @@ def eyes(c, x, y, kind, pal):
 
 # --- the figure -------------------------------------------------------------------
 
-def draw(char, p) -> Canvas:
-    """One frame: the character in pose p, outlined, effects on top."""
+# Z order of the parts, back to front. Equipment slots map onto these:
+# head gear -> hair (+ head), chest -> torso + arm_back + arm_front (+ neck),
+# legs -> leg_back + leg_front, feet -> boot_back + boot_front,
+# hands -> hand_back + hand_front, weapon -> weapon_back + weapon, cape -> cape_back.
+LAYERS = ["cape_back", "leg_back", "boot_back", "arm_back", "hand_back", "weapon_back", "torso",
+          "leg_front", "boot_front", "neck", "head", "hair", "weapon", "arm_front", "hand_front", "front"]
+
+
+def draw_layers(char, p):
+    """Every part of the character in pose p on its own canvas (no outline, no fx),
+    as a dict in LAYERS order. compose() of it, outlined, is draw() without fx."""
     pal = char["pal"]
-    c = Canvas(W, H)
+    L = {name: Canvas(W, H) for name in LAYERS}
     g = geometry(p)
-    for name in ("behind",):
-        if char.get(name):
-            char[name](c, p, g)
-    if char.get("body", "tunic") == "tunic":
-        leg(c, g["hip"], g["foot_back"], pal, back=True)
+    tunic_body = char.get("body", "tunic") == "tunic"
+    if char.get("behind"):
+        char["behind"](L["cape_back"], p, g)
+    if tunic_body:
+        leg(L["leg_back"], g["hip"], g["foot_back"], pal, back=True, boot_c=L["boot_back"])
     else:  # robe: only boots show under the hem
         b = g["foot_back"]
-        rect(c, b[0] - 1, b[1] - 1, b[0] + 2, b[1], pal["boot_d"])
-    arm(c, g["sh_back"], g["hand_back"], pal, back=True)
+        rect(L["boot_back"], b[0] - 1, b[1] - 1, b[0] + 2, b[1], pal["boot_d"])
+    arm(L["arm_back"], g["sh_back"], g["hand_back"], pal, back=True, hand_c=L["hand_back"])
     if char.get("held_back"):
-        char["held_back"](c, p, g)
-    if char.get("body", "tunic") == "tunic":
-        tunic(c, g, pal)
-        leg(c, g["hip"], g["foot_front"], pal, back=False)
+        char["held_back"](L["weapon_back"], p, g)
+    if tunic_body:
+        tunic(L["torso"], g, pal)
+        leg(L["leg_front"], g["hip"], g["foot_front"], pal, back=False, boot_c=L["boot_front"])
     else:
-        f = g["foot_front"]
-        rect(c, f[0] - 1, f[1] - 1, f[0] + 2, f[1], pal["boot"])
-        robe(c, g, p, pal)
-    char["head"](c, p, g)
+        f = g["foot_front"]   # under the robe: on the back boot layer, below the torso
+        rect(L["boot_back"], f[0] - 1, f[1] - 1, f[0] + 2, f[1], pal["boot"])
+        robe(L["torso"], g, p, pal)
+    if char.get("neck"):
+        char["neck"](L["neck"], p, g)
+    char["head"](L["head"], p, g)
+    if char.get("hair"):
+        char["hair"](L["hair"], p, g)
     if char.get("held"):
-        char["held"](c, p, g)
-    arm(c, g["sh_front"], g["hand_front"], pal, back=False)
+        char["held"](L["weapon"], p, g)
+    arm(L["arm_front"], g["sh_front"], g["hand_front"], pal, back=False, hand_c=L["hand_front"])
     if char.get("front"):
-        char["front"](c, p, g)
+        char["front"](L["front"], p, g)
     if p["lie"]:
-        c = _lie(c, p["lie"])
+        L = _lie_layers(L, p["lie"])
     if p["flash"]:  # before the outline: the figure goes pale, its outline stays dark
-        _flash(c, p["flash"])
+        for c in L.values():
+            _flash(c, p["flash"])
+    return L
+
+
+def compose(layers) -> Canvas:
+    """Layers (dict in z order, or list of canvases) stacked into one canvas."""
+    out = Canvas(W, H)
+    for c in (layers.values() if isinstance(layers, dict) else layers):
+        out.img.alpha_composite(c.img)
+    return out
+
+
+def draw(char, p) -> Canvas:
+    """One frame: the character in pose p, outlined, effects on top."""
+    c = compose(draw_layers(char, p))
     c.outline(OUTLINE)
     if char.get("fx"):
-        char["fx"](c, p, g)
+        char["fx"](c, p, geometry(p))
     return c
+
+
+def _lie_layers(layers, amount):
+    """_lie for every layer with one shared shift (from the whole figure)."""
+    from PIL import Image
+    angle = 90 * amount
+    rotated = {k: c.img.rotate(angle, resample=Image.NEAREST, center=(ROOT_X, FLOOR - 1))
+               for k, c in layers.items()}
+    whole = Canvas(W, H)
+    for img in rotated.values():
+        whole.img.alpha_composite(img)
+    bb = whole.img.getchannel("A").getbbox()
+    shift = (FLOOR - 1) - bb[3] if bb else 0
+    out = {}
+    for k, img in rotated.items():
+        moved = Canvas(W, H)
+        moved.img.alpha_composite(img, (0, shift) if shift >= 0 else (0, 0),
+                                  (0, 0) if shift >= 0 else (0, -shift))
+        out[k] = moved
+    return out
 
 
 def _lie(c: Canvas, amount: float) -> Canvas:

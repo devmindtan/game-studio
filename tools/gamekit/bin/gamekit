@@ -384,13 +384,14 @@ art_check_one() {  # validate sprite-lab/sprites/<n>/<n>.json against its strip
 import json, os, sys
 sys.path.insert(0, os.environ["GAMEKIT_PIPELINE"])
 from PIL import Image
-from spritekit import check_meta, check_ground, check_hitbox, check_body
+from spritekit import check_meta, check_ground, check_hitbox, check_body, check_layers
 m = json.load(open(sys.argv[1]))
 check_meta(m, Image.open(sys.argv[2]).size)
 ground = check_ground(m, Image.open(sys.argv[2]).convert("RGBA"))
 if ground:
     sys.exit("ground: " + "; ".join(ground))
 hit = check_hitbox(m, Image.open(sys.argv[2]).convert("RGBA")) + check_body(m, Image.open(sys.argv[2]).convert("RGBA"))
+hit += check_layers(m, Image.open(sys.argv[2]).convert("RGBA"), os.path.join(os.path.dirname(sys.argv[1]), "layers"))
 if hit:
     sys.exit("hitbox: " + "; ".join(hit))
 anims = m.get("animations") or [{"name": "default", "frames": m["frames"], "fps": m["fps"], "loop": m.get("loop", True)}]
@@ -548,6 +549,12 @@ cmd_art() {
       local dest="$g/assets/sprites/custom/$n"
       mkdir -p "$dest"
       cp "$LAB/sprites/$n/${n}_strip.png" "$LAB/sprites/$n/$n.png" "$dest/" 2>/dev/null || cp "$LAB/sprites/$n/${n}_strip.png" "$dest/"
+      # layered characters (equipment): the layer strips go along, stale ones are removed
+      rm -rf "$dest/layers"
+      if [[ -d "$LAB/sprites/$n/layers" ]]; then
+        mkdir -p "$dest/layers"
+        cp "$LAB/sprites/$n/layers/"*_strip.png "$dest/layers/"
+      fi
       # The copy records where it came from; the source stays in the lab only.
       python3 -c 'import json,sys; m=json.load(open(sys.argv[1])); m["source"]="sprite-lab/sprites/"+sys.argv[3]; open(sys.argv[2],"w").write(json.dumps(m, indent=2)+"\n")' \
         "$LAB/sprites/$n/$n.json" "$dest/$n.json" "$n"

@@ -16,6 +16,7 @@ extends RefCounted
 const DEFAULT_ANIM := "default"
 
 var name := ""
+var dir := ""                  # folder it was loaded from (layers/ lives there)
 var texture: Texture2D
 var meta: Dictionary = {}
 var frame_size := Vector2.ZERO
@@ -36,6 +37,7 @@ static func load_dir(dir: String, sprite_name: String) -> SpriteSheet:
 		push_error("SpriteSheet: %s is not a JSON object" % json_path)
 		return null
 	var sheet := from_meta(sprite_name, parsed)
+	sheet.dir = dir
 	sheet.texture = load(strip_path)
 	return sheet
 
@@ -146,3 +148,93 @@ func draw_index(canvas: CanvasItem, index: int, point: Vector2, scale: float,
 	var dest := SpriteAnchor.dest_rect(point, frame_size, anchor, scale, flip_h)
 	dest.position = dest.position.round()
 	canvas.draw_texture_rect_region(texture, dest, src_rect(index), tint)
+
+
+# --- layers (equipment) -------------------------------------------------------
+# A character drawn in layers (sheet.export_layered in the Sprite Lab) has
+# "layers" (z order) and "outline" in its json and layers/<layer>_strip.png
+# without outline. compose_layers() stacks them, optionally swapping some (an
+# armour piece drawn with the same poses), and outlines each frame exactly like
+# spritekit (3x3 max of alpha), so the result matches <name>_strip.png when
+# nothing is swapped.
+
+
+## Layer names in z order (empty for a sprite that is not layered).
+func layer_names() -> PackedStringArray:
+	var out := PackedStringArray()
+	for n: Variant in meta.get("layers", []):
+		out.append(String(n))
+	return out
+
+
+## Rebuilds [member texture] from the layer strips. [param overrides] maps a
+## layer name to a Texture2D strip of the same size (equipment) or to null (hide
+## that layer). Example: sheet.compose_layers({"torso": chest_tex, "hair": null})
+func compose_layers(overrides := {}) -> void:
+	var names := layer_names()
+	if names.is_empty():
+		push_error("SpriteSheet %s has no layers" % name)
+		return
+	var stacked: Image = null
+	for n in names:
+		var tex: Texture2D = null
+		if overrides.has(n):
+			tex = overrides[n]
+		else:
+			tex = load(dir.path_join("layers").path_join(n + "_strip.png"))
+		if tex == null:
+			continue
+		var img := tex.get_image()
+		img.convert(Image.FORMAT_RGBA8)
+		if stacked == null:
+			stacked = Image.create_empty(img.get_width(), img.get_height(), false, Image.FORMAT_RGBA8)
+		stacked.blend_rect(img, Rect2i(Vector2i.ZERO, img.get_size()), Vector2i.ZERO)
+	if stacked == null:
+		return
+	var outline := Color.html(String(meta.get("outline", "#1b1726")))
+	texture = ImageTexture.create_from_image(outline_frames(stacked, int(frame_size.x), int(frame_size.y), outline))
+
+
+## 1 px outline around the opaque pixels of every [param fw] x [param fh] frame
+## of a strip (alpha of the border = max alpha of the 3x3 around it, inside the
+## same frame), with the strip drawn on top. Same result as spritekit's
+## Canvas.outline per frame.
+static func outline_frames(src: Image, fw: int, fh: int, color: Color) -> Image:
+	var w := src.get_width()
+	var h := src.get_height()
+	var data := src.get_data()
+	var out := PackedByteArray()
+	out.resize(data.size())
+	var cr := color.r8
+	var cg := color.g8
+	var cb := color.b8
+	for y in h:
+		for x in w:
+			var fx0 := (x / fw) * fw
+			var i := (y * w + x) * 4
+			var sa := data[i + 3]
+			var ba := 0
+			for dy in range(-1, 2):
+				var yy := y + dy
+				if yy < 0 or yy >= h:
+					continue
+				for dx in range(-1, 2):
+					var xx := x + dx
+					if xx < fx0 or xx >= fx0 + fw or xx >= w:
+						continue
+					ba = maxi(ba, data[(yy * w + xx) * 4 + 3])
+			if sa == 255 or ba == 0:
+				out[i] = data[i]
+				out[i + 1] = data[i + 1]
+				out[i + 2] = data[i + 2]
+				out[i + 3] = sa
+				continue
+			# src over border (PIL alpha_composite)
+			var sa_f := sa / 255.0
+			var ba_f := ba / 255.0
+			var oa := sa_f + ba_f * (1.0 - sa_f)
+			out[i] = roundi((data[i] * sa_f + cr * ba_f * (1.0 - sa_f)) / oa)
+			out[i + 1] = roundi((data[i + 1] * sa_f + cg * ba_f * (1.0 - sa_f)) / oa)
+			out[i + 2] = roundi((data[i + 2] * sa_f + cb * ba_f * (1.0 - sa_f)) / oa)
+			out[i + 3] = roundi(oa * 255.0)
+	return Image.create_from_data(w, h, false, Image.FORMAT_RGBA8, out)
