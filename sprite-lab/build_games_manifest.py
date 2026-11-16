@@ -7,7 +7,8 @@ user can look at it and judge what to apply. Nothing in a game is modified here.
 Per game:
   info        project.godot name/version, pitch (design/game-brief.md),
               decisions table (production/roadmap.md "Đã quyết")
-  screens     production/qa/evidence/**.png grouped by folder (newest first)
+  ui          production/ui/screens.json + the captured images (gamekit ui-shots),
+              with a staleness flag when game files are newer than the captures
   world       run_config.json (arena, spawn ring, xp curve, ui)
   stages      assets/data/waves/stage_*.json (+ per-monster spawn rate curves)
   heroes      classes.json + the class sprite (layers, body) as the game has it
@@ -16,6 +17,7 @@ Per game:
               follows PlayerStats (add per level, mul per level, floor 0.2)
   stat_ups    the stat upgrades with their per-level values
   sprites     every sprite folder the game ships (assets/sprites/custom)
+  effects     the effect sprites skill data really plays (no lab library here)
   review      design/review.json (the user's verdicts saved by the dashboard)
 
 Paths are relative to sprite-lab/ (the page lives there; the server is rooted
@@ -103,17 +105,27 @@ def sprite_info(root, name):
     return info
 
 
-def screens(root):
-    base = os.path.join(root, "production", "qa", "evidence")
-    groups = []
-    for folder in sorted(os.listdir(base)) if os.path.isdir(base) else []:
-        files = sorted(glob.glob(os.path.join(base, folder, "*.png")))
-        if not files:
-            continue
-        groups.append({"group": folder, "mtime": max(int(os.path.getmtime(f)) for f in files),
-                       "images": [{"name": os.path.basename(f), "url": rel(f)} for f in files]})
-    groups.sort(key=lambda g: -g["mtime"])
-    return groups
+def ui_set(root):
+    """The game's current screens: production/ui/screens.json captured by
+    `gamekit ui-shots` into production/ui/<name>.png. `stale` names the newest
+    game file changed after the oldest capture (the set may no longer match)."""
+    ui = os.path.join(root, "production", "ui")
+    spec = load(os.path.join(ui, "screens.json"))
+    shots = []
+    for sc in spec.get("screens", []):
+        img = os.path.join(ui, sc["name"] + ".png")
+        shots.append({"name": sc["name"], "title": sc.get("title", sc["name"]),
+                      "url": rel(img) if os.path.exists(img) else "",
+                      "mtime": int(os.path.getmtime(img)) if os.path.exists(img) else 0})
+    newest, newest_file = 0, ""
+    for pattern in ("src/**/*.gd", "src/**/*.tscn", "assets/data/**/*.json", "assets/sprites/**/*.png", "project.godot"):
+        for f in glob.glob(os.path.join(root, pattern), recursive=True):
+            m = os.path.getmtime(f)
+            if m > newest:
+                newest, newest_file = m, os.path.relpath(f, root)
+    oldest = min([s["mtime"] for s in shots if s["mtime"]] or [0])
+    stale = {"file": newest_file, "mtime": int(newest)} if shots and newest > oldest + 1 else None
+    return {"shots": shots, "stale": stale, "missing": [s["name"] for s in shots if not s["url"]]}
 
 
 def rate_at(w, t):
@@ -304,20 +316,16 @@ def check_skill(skill, cls, rules_doc, sprite_meta, scale):
     return grade(res, rules)
 
 
-def check_effect(meta, name, rules_doc, scale):
-    lim, rules = rules_doc.get("limits", {}), rules_doc.get("rules", [])
-    res, reach, flies = check_sprite(meta, lim, scale, 1.0, True)
-    loops = any(a.get("loop", True) for a in meta.get("animations", []) if a.get("name") in played_anims(meta))
-    if loops and res["snappy"][0] == "pass":
-        res["snappy"] = ["pass", "lặp: cần duration trong data khi đưa vào game"]
-    ok = (flies or lim["reach_min"] <= reach) and reach <= lim["reach_max"]
-    res["screen"] = ["pass" if ok else "fail", "tầm %.0f px ở cỡ 1" % reach + (" (đạn bay)" if flies else "")]
-    tags = [t for t in TAGS.get(name, {}).get("tags", []) if t.startswith("class-")]
-    res["class"] = ["pass", ", ".join(tags)] if tags else ["na", "chưa gắn tag class"]
-    if TAGS.get(name, {}).get("cat") == "status":   # buff/debuff marks: no damage, no reach
-        for k in ("hitbox", "screen", "snappy"):
-            res[k] = ["na", "hiệu ứng trạng thái, không gây sát thương"]
-    return grade(res, rules)
+def used_effects(skills, sprites):
+    """Effect sprites the game's data really plays (skill sprites and tiers)."""
+    by_name = {s["name"]: s for s in sprites}
+    out = []
+    for sk in skills:
+        for lv, t in enumerate(sk["tiers"], 1):
+            if t in by_name:
+                out.append({"sprite": by_name[t], "skill": sk["id"], "skill_name": sk["name"],
+                            "tier": lv if len(sk["tiers"]) > 1 else 0, "check": sk.get("check")})
+    return out
 
 
 def build_game(slug):
@@ -366,12 +374,6 @@ def build_game(slug):
     if rules_doc.get("rules"):
         for sk in skills:
             sk["check"] = check_skill(sk, classes.get(sk["class"], {}), rules_doc, meta_of, scale)
-    lab_checks = {}
-    if rules_doc.get("rules") and os.path.isdir(LAB):
-        for name in sorted(os.listdir(LAB)):
-            m = load(os.path.join(LAB, name, name + ".json"))
-            if m and TAGS.get(name, {}).get("cat") in ("strike", "projectile", "aoe", "status"):
-                lab_checks[name] = check_effect(m, name, rules_doc, scale)
 
     custom = os.path.join(root, "assets", "sprites", "custom")
     sprites = [s for s in (sprite_info(root, n) for n in sorted(os.listdir(custom)) if os.path.isdir(custom)) if s] \
@@ -380,11 +382,12 @@ def build_game(slug):
     info = project_info(os.path.join(root, "project.godot"))
     return {
         "slug": slug, "name": info.get("name") or slug, "version": info.get("version", ""),
-        "brief": brief_pitch(root), "decisions": decisions(root), "screens": screens(root),
+        "brief": brief_pitch(root), "decisions": decisions(root), "ui": ui_set(root),
         "world": cfg.get("world", {}), "xp": cfg.get("xp", {}), "pickups": cfg.get("pickups", {}),
         "stages": stages, "heroes": heroes, "monsters": mons, "skills": skills, "stat_ups": stat_ups,
         "sprites": sprites, "review": load(os.path.join(root, "design", "review.json")),
-        "rules": rules_doc, "rule_doc": rel(os.path.join(root, "design", "gameplay-rules.md")), "effect_checks": lab_checks,
+        "rules": rules_doc, "rule_doc": rel(os.path.join(root, "design", "gameplay-rules.md")),
+        "effects": used_effects(skills, sprites), "statuses": [],
     }
 
 

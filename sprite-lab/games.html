@@ -204,8 +204,8 @@ async function selectGame(g){
   renderTabs(); render();
 }
 function renderTabs(){
-  const n={overview:'',rules:(game.rules&&game.rules.rules||[]).length,ui:game.screens.reduce((a,s)=>a+s.images.length,0),map:game.stages.length,heroes:game.heroes.length,
-    monsters:game.monsters.length,skills:game.skills.length,effects:effectList().length};
+  const n={overview:'',rules:(game.rules&&game.rules.rules||[]).length,ui:game.ui.shots.length,map:game.stages.length,heroes:game.heroes.length,
+    monsters:game.monsters.length,skills:game.skills.length,effects:game.effects.length};
   const nav=$('tabs'); nav.innerHTML='';
   TABS.forEach(([id,label])=>{const b=el('button',{class:'tab'+(tab===id?' active':'')},label,n[id]!==''?el('span',{class:'n'},n[id]):null);
     b.onclick=()=>{tab=id; renderTabs(); render();}; nav.appendChild(b);});
@@ -213,7 +213,8 @@ function renderTabs(){
   nav.appendChild(el('div',{class:'tabFoot'},'Đã đánh giá: '+done+' mục'));
 }
 function render(){
-  history.replaceState(null,'','#'+game.slug+'/'+tab); painters=[];
+  const keep=decodeURIComponent(location.hash.slice(1)).split('/').slice(2).join('/');
+  history.replaceState(null,'','#'+game.slug+'/'+tab+(tab==='skills'&&keep?'/'+keep:'')); painters=[];
   const m=$('main'); m.innerHTML=''; ({overview,rules,ui,map,heroes,monsters,skills,effects})[tab](m);
 }
 
@@ -255,9 +256,6 @@ function rules(m){
       tb.appendChild(tr);});
     c.appendChild(tb); return c; };
   m.appendChild(mk('Kỹ năng trong game',game.skills.filter(s=>s.check).map(s=>[s.name,s.check,()=>{curSkillId=s.id;tab='skills';renderTabs();render();}])));
-  const lab=Object.entries(game.effect_checks||{});
-  const ok=lab.filter(([,c])=>c.ok).length;
-  m.appendChild(mk('Kho hiệu ứng Sprite Lab ('+ok+'/'+lab.length+' đạt luật bắt buộc)',lab.map(([n,c])=>[n,c,()=>{effQuery=n;effFilter='all';tab='effects';renderTabs();render();}])));
 }
 
 /* ---------- 1. overview ---------- */
@@ -266,8 +264,8 @@ function overview(m){
   m.appendChild(el('h2',{},game.name));
   m.appendChild(el('p',{class:'lead',html:md(b.pitch||'')}));
   const counters=el('div',{class:'grid g4',style:'margin-bottom:14px'});
-  [['ui','Ảnh giao diện',game.screens.reduce((a,s)=>a+s.images.length,0)],['map','Ải',game.stages.length],['heroes','Class',game.heroes.length],
-   ['monsters','Quái',game.monsters.length],['skills','Kỹ năng',game.skills.length],['effects','Hiệu ứng',effectList().length]]
+  [['ui','Màn hình',game.ui.shots.length],['map','Ải',game.stages.length],['heroes','Class',game.heroes.length],
+   ['monsters','Quái',game.monsters.length],['skills','Kỹ năng',game.skills.length],['effects','Hiệu ứng đang dùng',game.effects.length]]
    .forEach(([id,l,v])=>{const c=el('div',{class:'counter'},el('div',{class:'big'},v),el('div',{class:'lbl'},l)); c.onclick=()=>{tab=id;renderTabs();render();}; counters.appendChild(c);});
   m.appendChild(counters);
   const g2=el('div',{class:'grid g2'});
@@ -279,9 +277,9 @@ function overview(m){
   (game.decisions||[]).forEach(d=>t.appendChild(el('tr',{},el('td',{},d.topic),el('td',{html:md(d.decision)}))));
   dec.appendChild(t); g2.appendChild(dec);
   m.appendChild(g2);
-  if(game.screens.length){ const s=game.screens[0];
-    m.appendChild(el('h3',{style:'margin-top:16px'},'Ảnh mới nhất · '+s.group));
-    m.appendChild(shotGrid(s.images.slice(0,6),s.group)); }
+  if(game.ui.shots.length){
+    m.appendChild(el('h3',{style:'margin-top:16px'},'Giao diện hiện tại'));
+    m.appendChild(shotGrid(game.ui.shots.filter(x=>x.url).slice(0,4).map(x=>({url:x.url,name:x.title})),'Giao diện')); }
 }
 function shotGrid(images,group){const g=el('div',{class:'shots'});
   images.forEach(im=>{const f=el('figure',{},el('img',{src:im.url,loading:'lazy',alt:im.name}),el('figcaption',{},im.name));
@@ -290,14 +288,19 @@ function openLightbox(url,cap){const lb=$('lightbox'); lb.querySelector('img').s
 $('lightbox').onclick=()=>{$('lightbox').style.display='none';};
 document.addEventListener('keydown',e=>{ if(e.key==='Escape') $('lightbox').style.display='none'; });
 
-/* ---------- 2. UI screens ---------- */
+/* ---------- 2. UI screens (the current set, production/ui) ---------- */
 function ui(m){
   m.appendChild(el('h2',{},'Giao diện'));
-  m.appendChild(el('p',{class:'lead'},'Ảnh chụp từ game thật (production/qa/evidence), mới nhất ở trên. Bấm ảnh để phóng to. Đánh giá từng nhóm màn hình.'));
-  if(!game.screens.length){ m.appendChild(el('div',{class:'empty'},'Chưa có ảnh. Chụp bằng gamekit shot rồi lưu vào production/qa/evidence/<việc>/.')); return; }
-  game.screens.forEach(s=>{const c=el('div',{class:'card',style:'margin-bottom:12px'},
-    el('div',{class:'row'},el('h3',{style:'margin:0'},s.group),el('span',{class:'muted small'},s.images.length+' ảnh · '+new Date(s.mtime*1000).toLocaleString())));
-    c.appendChild(el('div',{style:'height:8px'})); c.appendChild(shotGrid(s.images,s.group)); c.appendChild(reviewBox('ui:'+s.group)); m.appendChild(c);});
+  m.appendChild(el('p',{class:'lead',html:'Bộ màn hình <b>hiện tại</b> của game, chụp bằng <code>gamekit ui-shots '+esc(game.slug)+'</code> theo <code>production/ui/screens.json</code>. Bấm ảnh để phóng to.'}));
+  const u=game.ui;
+  if(!u.shots.length){ m.appendChild(el('div',{class:'empty',html:'Game chưa có <code>production/ui/screens.json</code>.'})); return; }
+  if(u.stale) m.appendChild(el('div',{class:'card',style:'border-color:#a8902f;margin-bottom:12px',html:'⚠ Ảnh có thể đã cũ: <code>'+esc(u.stale.file)+'</code> đổi lúc '+new Date(u.stale.mtime*1000).toLocaleString()+', sau lần chụp. Chạy <code>gamekit ui-shots '+esc(game.slug)+'</code> để cập nhật.'}));
+  if(u.missing.length) m.appendChild(el('div',{class:'card err',style:'margin-bottom:12px'},'Chưa chụp: '+u.missing.join(', ')));
+  const grid=el('div',{class:'grid g2'});
+  u.shots.forEach(x=>{ const c=el('div',{class:'card'},el('div',{class:'row'},el('h3',{style:'margin:0'},x.title),el('span',{class:'muted small'},x.name+(x.mtime?' · '+new Date(x.mtime*1000).toLocaleString():''))));
+    if(x.url){ const im=el('img',{src:x.url,style:'width:100%;border-radius:6px;border:1px solid var(--border);margin-top:8px;cursor:zoom-in;display:block'}); im.onclick=()=>openLightbox(x.url,x.title); c.appendChild(im); }
+    c.appendChild(reviewBox('ui:'+x.name)); grid.appendChild(c); });
+  m.appendChild(grid);
 }
 
 /* ---------- 3. map & stages ---------- */
@@ -493,12 +496,14 @@ function skills(m){
   if(!game.skills.length){ m.appendChild(el('div',{class:'empty'},'Game chưa có kỹ năng.')); return; }
   const split=el('div',{class:'split'}); const list=el('div',{}); const pane=el('div',{});
   split.appendChild(list); split.appendChild(pane); m.appendChild(split);
+  const hb=decodeURIComponent(location.hash.slice(1)).split('/');
+  if(game.skills.some(x=>x.id===hb[2])) curSkillId=hb[2];
   if(!game.skills.some(s=>s.id===curSkillId)) curSkillId=game.skills[0].id;
   const show=()=>{ list.innerHTML='';
     game.skills.forEach(s=>{const r=review['skill:'+s.id];
       const it=el('div',{class:'listItem'+(s.id===curSkillId?' active':'')},el('div',{class:'t'},s.name+(s.start?' ★':'')+(s.check?(s.check.ok?(s.check.warn.length?' !':' ✓'):' ✗'):'')),
         el('div',{class:'s'},s.max_level+' cấp · '+s.tiers.length+' bậc sprite · '+s.class+(r&&r.status?' · '+({apply:'Dùng',maybe:'Cân nhắc',reject:'Không dùng'})[r.status]:'')));
-      it.onclick=()=>{curSkillId=s.id; painters=[]; show();}; list.appendChild(it);});
+      it.onclick=()=>{curSkillId=s.id; painters=[]; history.replaceState(null,'','#'+game.slug+'/skills/'+s.id); show();}; list.appendChild(it);});
     skillPane(pane,game.skills.find(s=>s.id===curSkillId)); };
   show();
   // stat upgrades
@@ -518,45 +523,102 @@ function skillPane(pane,s){
     el('span',{class:'pill'},'tối đa cấp '+s.max_level),el('span',{class:'pill'},'trọng số '+s.weight)));
   card.appendChild(el('p',{class:'muted',style:'margin:6px 0'},s.desc));
   card.appendChild(el('div',{style:'margin-bottom:8px'},checkView(s.check)));
-  let level=1, showHb=true, speed=1;
+  let level=1, showHb=true, speed=1, paused=false, clock=0, last=performance.now();
   const ctl=el('div',{class:'row'});
   const lvSel=el('select',{class:'ctrl'}); s.levels.forEach(l=>lvSel.appendChild(el('option',{value:l.level},'Cấp '+l.level)));
-  lvSel.onchange=()=>{level=Number(lvSel.value); t0=performance.now(); markRow();};
+  lvSel.onchange=()=>{level=Number(lvSel.value); clock=0; markRow();};
+  const playB=el('button',{class:'btn on'},'⏸ Dừng'); playB.onclick=()=>{paused=!paused; playB.textContent=paused?'▶ Phát':'⏸ Dừng'; playB.classList.toggle('on',!paused);};
+  const hitB=el('button',{class:'btn'},'🎯 Khoảnh khắc trúng');
   const hbBtn=el('button',{class:'btn on'},'Hitbox'); hbBtn.onclick=()=>{showHb=!showHb; hbBtn.classList.toggle('on',showHb);};
-  const spSel=el('select',{class:'ctrl'},el('option',{value:'0.5'},'0.5×'),el('option',{value:'1',selected:''},'1×'),el('option',{value:'2'},'2×'));
+  const spSel=el('select',{class:'ctrl'},el('option',{value:'0.25'},'0.25×'),el('option',{value:'0.5'},'0.5×'),el('option',{value:'1',selected:''},'1×'),el('option',{value:'2'},'2×'));
   spSel.onchange=()=>{speed=Number(spSel.value);};
-  ctl.appendChild(el('span',{class:'muted'},'Xem:')); ctl.appendChild(lvSel); ctl.appendChild(hbBtn); ctl.appendChild(spSel);
+  [el('span',{class:'muted'},'Xem:'),lvSel,playB,hitB,hbBtn,spSel].forEach(x=>ctl.appendChild(x));
   card.appendChild(ctl);
-  // demo scene: hero left, three monsters right; effect at the hero (melee / spin) or at the target (cast_range)
-  const W=720,H=300, gy=230, hx=200;
-  const sheets={}; const need=[...new Set([...s.tiers,...game.monsters.slice(0,3).map(x=>x.sprite&&x.sprite.name).filter(Boolean),game.heroes[0]&&game.heroes[0].sprite&&game.heroes[0].sprite.name].filter(Boolean))];
-  need.forEach(n=>{const info=anySprite(n); if(info) sheetOf(info).then(x=>{sheets[n]=x;});});
-  const cv=liveCanvas(W,H,(g,tt)=>{
-    const t=tt*speed; g.clearRect(0,0,W,H); g.fillStyle='#2f4a2c'; g.fillRect(0,0,W,H); g.fillStyle='#294226'; g.fillRect(0,gy,W,H-gy);
-    const lv=s.levels[level-1]||s.levels[0]; const fx=sheets[lv.sprite]; const hero=game.heroes[0]&&game.heroes[0].sprite&&sheets[game.heroes[0].sprite.name];
-    const sc=2*lv.size; const castT=0.35;
-    const reach=s.params.cast_range||0;
-    const mons=game.monsters.slice(0,3).map((mo,i)=>({mo,x:hx+(reach?reach:70)+i*70,y:gy}));
-    if(hero) hero.draw(g,'idle',t,hx,gy,2);
-    const bodyY=gy-26;
-    if(!fx){ g.fillStyle='#ffd36b'; g.fillText('sprite '+lv.sprite+' không có trong game hay lab',20,20); return; }
-    const anim=effectAnim(fx); const dur=fx.duration(anim); const period=castT+dur+0.8; const u=t%period; const et=u-castT;
-    const hb=hbAt(fx,anim); const [a0,a1]=hbTimes(fx,anim,hb);
-    const ex=reach?hx+reach:hx, ey=reach?gy-8:bodyY;
-    const active=et>=a0&&et<a1;
-    const hcx=ex+((hb&&hb.center?hb.center[0]:fx.anchor[0])-fx.anchor[0])*sc, hcy=ey+((hb&&hb.center?hb.center[1]:fx.anchor[1])-fx.anchor[1])*sc;
-    mons.forEach((mm,i)=>{const sh=mm.mo.sprite&&sheets[mm.mo.sprite.name]; if(!sh) return;
-      const fly=!mm.mo.sprite.meta.ground; const my=fly?gy-70:gy; const b=mm.mo.sprite.meta.body; const sc2=mm.mo.stats.scale||2;
-      const bx=mm.x+(b?(b.center[0]-sh.anchor[0])*sc2:0), by=my+(b?(b.center[1]-sh.anchor[1])*sc2:0);
-      const hit=hb&&active&&hitTest(hb,hcx,hcy,bx,by,sc,b?b.radius*sc2:10);
-      sh.draw(g,hit?'hurt':'move',t,mm.x,my,sc2,true);
-      if(hb&&et>=a0&&et<a0+0.7&&hitTest(hb,hcx,hcy,bx,by,sc,b?b.radius*sc2:10)){ const k=(et-a0)/0.7; g.save(); g.globalAlpha=k<.6?1:1-(k-.6)/.4;
-        g.font='bold 16px system-ui'; g.textAlign='center'; g.lineWidth=4; g.strokeStyle='#1a0d14'; g.strokeText(String(Math.round(lv.damage)),bx,by-30-k*30);
-        g.fillStyle='#ffee99'; g.fillText(String(Math.round(lv.damage)),bx,by-30-k*30); g.restore(); }});
-    if(et>=0&&et<dur){ fx.draw(g,anim,et,ex,ey,sc); if(showHb&&hb) drawHb(g,hb,hcx,hcy,sc,active); }
-    else if(u<castT){ g.strokeStyle='rgba(255,211,107,'+(0.9-u/castT*0.6)+')'; g.lineWidth=2; g.beginPath(); g.arc(hx,bodyY,10+u/castT*24,0,Math.PI*2); g.stroke(); }
-    g.fillStyle='#e9eef8'; g.font='12px system-ui'; g.textAlign='left';
-    g.fillText('Cấp '+lv.level+' · sprite '+lv.sprite+' · '+anim+(hb?' · hitbox '+hb.shape:' · không có hitbox')+' · '+(et<0?'ra chiêu':active?'TRÚNG':et<dur?'triển khai':'kết thúc'),10,18);
+  // Demo like the game: the real map tiles at game scale, one slime as a training
+  // dummy placed in reach, the effect placed the way run.gd places it (body centre,
+  // or cast_range towards the target), and the hit shown as in game: red flash,
+  // damage number, hp bar, death when its hp runs out.
+  const W=720,H=300;
+  let Z=2, VW=W/2, VH=H/2;         // zoom: 2x for small attacks, less for big ones so the whole area fits
+  let FEET={x:130,y:100};
+  const heroInfo=game.heroes[0]&&game.heroes[0].sprite;
+  const dummy=game.monsters.find(x=>x.id==='slime')||game.monsters[0];
+  const sheets={};
+  [...new Set([...s.tiers,heroInfo&&heroInfo.name,dummy&&dummy.sprite&&dummy.sprite.name].filter(Boolean))]
+    .forEach(n=>{const info=anySprite(n); if(info) sheetOf(info).then(x=>{sheets[n]=x;});});
+  const tmp=document.createElement('canvas');
+  function drawTint(sh,g,anim,t,x,y,sc,flip,col){ const [w,h]=sh.fs; tmp.width=w*sc; tmp.height=h*sc; const c=tmp.getContext('2d'); c.imageSmoothingEnabled=false;
+    const ax=(flip?w-sh.anchor[0]:sh.anchor[0])*sc;   // anchor x of the (mirrored) frame
+    c.clearRect(0,0,tmp.width,tmp.height); sh.drawIndex(c,sh.frame(anim,t),ax,sh.anchor[1]*sc,sc,flip);
+    c.globalCompositeOperation='source-atop'; c.fillStyle=col; c.fillRect(0,0,tmp.width,tmp.height); c.globalCompositeOperation='source-over';
+    g.drawImage(tmp,Math.round(x-(flip?w-sh.anchor[0]:sh.anchor[0])*sc),Math.round(y-sh.anchor[1]*sc)); }
+  function scene(lv){
+    const fx=sheets[lv.sprite], hero=heroInfo&&sheets[heroInfo.name], sl=dummy&&sheets[dummy.sprite.name];
+    if(!fx||!hero||!sl) return null;
+    const kind=fx.anims.some(a=>a.name.startsWith('slash_'))?'melee':fx.has('spin')?'orbit':s.params.cast_range?'cast':'self';
+    const anim0=kind==='melee'?'slash_right':effectAnim(fx), hbz=hbAt(fx,anim0);
+    const rz=hbz?(hbz.shape==='rect'?Math.max(hbz.half_w,hbz.half_h):hbz.radius)*2*lv.size:40;
+    Z=Math.max(1,Math.min(2,(H-24)/(2*rz+40))); VW=W/Z; VH=H/Z;
+    FEET={x:kind==='cast'?Math.max(40,VW/2-Number(s.params.cast_range||0)):VW*0.36,y:VH/2+24};
+    const hb0=hero.meta.body, hc={x:FEET.x+(hb0?(hb0.center[0]-hero.anchor[0])*2:0),y:FEET.y+(hb0?(hb0.center[1]-hero.anchor[1])*2:-26)};
+    const anim=kind==='melee'?'slash_right':effectAnim(fx), sc=2*lv.size, hb=hbAt(fx,anim);
+    const reach=hb?(hb.shape==='rect'?Math.max(hb.half_w,hb.half_h):hb.radius)*sc:40;
+    const cast=Number(s.params.cast_range||0);
+    const ssc=dummy.stats.scale||2, sb=sl.meta.body||{center:sl.anchor,radius:8};
+    // the dummy stands at the edge of the hit area (its body still overlaps it), not on the hero
+    const dist=kind==='cast'?cast:reach+sb.radius*ssc*0.4;
+    const fxAt=kind==='cast'?{x:hc.x+cast,y:hc.y}:hc;
+    const target={x:hc.x+dist,y:hc.y}, slFeet={x:target.x-(sb.center[0]-sl.anchor[0])*ssc,y:target.y-(sb.center[1]-sl.anchor[1])*ssc};
+    const lead=0.5, dur=kind==='orbit'?Number(s.params.duration||fx.duration(anim)):fx.duration(anim);
+    const [a0,a1]=hbTimes(fx,anim,hb);
+    const ticks=kind==='orbit'?Math.max(1,Number(s.params.ticks||1)):1;
+    const hcx=fxAt.x+((hb&&hb.center?hb.center[0]:fx.anchor[0])-fx.anchor[0])*sc, hcy=fxAt.y+((hb&&hb.center?hb.center[1]:fx.anchor[1])-fx.anchor[1])*sc;
+    const lands=hb&&hitTest(hb,hcx,hcy,target.x,target.y,sc,sb.radius*ssc);
+    const hits=lands?Array.from({length:ticks},(_,k)=>lead+(kind==='orbit'?k*dur/ticks:a0)):[];
+    return {fx,hero,sl,kind,anim,sc,hb,lead,dur,a0,a1,hits,fxAt,hcx,hcy,slFeet,target,ssc,sb,hc,period:lead+dur+1.6};
+  }
+  hitB.onclick=()=>{ const sc=scene(s.levels[level-1]||s.levels[0]); if(!sc||!sc.hits.length) return false;
+    clock=sc.hits[0]+0.04; paused=true; playB.textContent='▶ Phát'; playB.classList.remove('on'); return true; };
+  // #<game>/skills/<skill>/hit/<level> opens this demo frozen on the hit
+  const hashBits=decodeURIComponent(location.hash.slice(1)).split('/');
+  if(hashBits[2]===s.id&&hashBits[3]==='hit'){ if(hashBits[4]){ level=Number(hashBits[4])||1; lvSel.value=level; }
+    const tryHit=()=>{ if(!hitB.onclick()) setTimeout(tryHit,100); }; tryHit(); }
+  const cv=liveCanvas(W,H,(g)=>{
+    const now=performance.now(); if(!paused) clock+=(now-last)/1000*speed; last=now;
+    g.setTransform(1,0,0,1,0,0); g.clearRect(0,0,W,H);
+    const lv=s.levels[level-1]||s.levels[0]; const sc=scene(lv);
+    if(!sc){ g.fillStyle='#ffd36b'; g.font='13px system-ui'; g.fillText('Đang tải sprite…',12,20); return; }
+    g.imageSmoothingEnabled=false; g.setTransform(Z,0,0,Z,0,0);
+    drawGround(g,FEET.x,FEET.y,1,1e9,VW,VH);
+    if(Z<2){ g.setTransform(1,0,0,1,0,0); g.fillStyle='rgba(0,0,0,0)'; g.setTransform(Z,0,0,Z,0,0); }
+    const u=clock%sc.period, et=u-sc.lead, hp0=Number(dummy.stats.hp||10);
+    const done=sc.hits.filter(h=>h<=u), hp=Math.max(0,hp0-done.length*lv.damage), lastHit=done.length?done[done.length-1]:-9;
+    const killAt=hp<=0?done[Math.ceil(hp0/lv.damage)-1]:null;
+    // dummy: idle until hit, red flash on each hit, death when hp runs out
+    if(killAt==null||u-killAt<sc.sl.duration('death')){
+      const dead=killAt!=null, anim=dead?'death':(u-lastHit<0.12?'hurt':'move');
+      const at=dead?u-killAt:(anim==='hurt'?u-lastHit:u*0.6);
+      if(!dead&&u-lastHit<0.12) drawTint(sc.sl,g,anim,at,sc.slFeet.x,sc.slFeet.y,sc.ssc,true,'rgba(255,60,60,.55)');
+      else sc.sl.draw(g,anim,at,sc.slFeet.x,sc.slFeet.y,sc.ssc,true);
+      if(done.length&&!dead){ const r=sc.sb.radius*sc.ssc, w=Math.max(16,r*2), top={x:Math.round(sc.target.x-w/2),y:Math.round(sc.target.y-r-8)};
+        g.fillStyle='#1a0d14'; g.fillRect(top.x-1,top.y-1,w+2,5); g.fillStyle='#e6404d'; g.fillRect(top.x,top.y,Math.round(w*hp/hp0),3); }
+    }
+    sc.hero.draw(g,'idle',u,FEET.x,FEET.y,2,false);
+    if(u<sc.lead){ const k=u/sc.lead; g.strokeStyle='rgba(255,211,107,'+(0.9-k*0.6)+')'; g.lineWidth=2; g.beginPath(); g.arc(sc.hc.x,sc.hc.y,8+k*20,0,Math.PI*2); g.stroke(); }
+    if(et>=0&&et<sc.dur){ const at=sc.kind==='orbit'?et%sc.fx.duration(sc.anim):et; sc.fx.draw(g,sc.anim,at,sc.fxAt.x,sc.fxAt.y,sc.sc);
+      const active=sc.kind==='orbit'||(et>=sc.a0&&et<sc.a1);
+      if(showHb&&sc.hb) drawHb(g,sc.hb,sc.hcx,sc.hcy,sc.sc,active);
+      if(showHb){ g.strokeStyle='rgba(110,255,140,.8)'; g.lineWidth=1.5; g.beginPath(); g.arc(sc.target.x,sc.target.y,sc.sb.radius*sc.ssc,0,Math.PI*2); g.stroke(); } }
+    // damage numbers like the game: rise and fade over 0.7 s
+    done.forEach((h,i)=>{ const k=(u-h)/0.7; if(k<0||k>1) return; g.save(); g.globalAlpha=k<.6?1:1-(k-.6)/.4;
+      g.font='bold '+Math.round(18/Z)+'px system-ui'; g.textAlign='center'; g.lineWidth=5/Z;   // ~18 px on screen at any zoom g.strokeStyle='#1a0d14'; const y=sc.target.y-sc.sb.radius*sc.ssc-10-k*20+(i%2)*4;
+      g.strokeText(String(Math.round(lv.damage)),sc.target.x,y); g.fillStyle='#fff0a0'; g.fillText(String(Math.round(lv.damage)),sc.target.x,y); g.restore(); });
+    const hitNow=done.length&&u-lastHit<0.3;
+    g.setTransform(1,0,0,1,0,0);
+    g.font='12px system-ui'; g.textAlign='left'; g.fillStyle='#e9eef8';
+    g.fillText('×'+Z.toFixed(2).replace(/\.?0+$/,'')+' · Cấp '+lv.level+' · '+lv.sprite+' · '+({melee:'chém gần',orbit:'xoáy quanh người',cast:'bắn ra '+(s.params.cast_range||0)+' px',self:'quanh người'})[sc.kind]+' · sát thương '+lv.damage+' · slime '+hp0+' máu',10,18);
+    if(!sc.hits.length){ g.fillStyle='#ff8a8a'; g.fillText('Không trúng hình nhân ở vị trí này',10,36); }
+    if(hitNow){ g.font='bold 22px system-ui'; g.fillStyle='#ffd36b'; g.textAlign='center'; g.fillText(killAt!=null&&lastHit===killAt?'HẠ!':'TRÚNG!',W/2,40); }
   });
   cv.style.cssText='width:100%;height:auto'; card.appendChild(el('div',{class:'stage',style:'margin-top:8px;padding:0'},cv));
   // per level table
@@ -577,56 +639,38 @@ function skillPane(pane,s){
   pane.appendChild(card);
 }
 
-/* ---------- 7. effects (in game + lab library) ---------- */
-const EFFECT_CATS=['strike','projectile','aoe','status'];
-function effectList(){
-  if(!game) return [];
-  const skip=new Set(['ui-icons','exp-gem','gold-coin']);
-  game.heroes.forEach(h=>h.sprite&&skip.add(h.sprite.name)); game.monsters.forEach(mo=>mo.sprite&&skip.add(mo.sprite.name));
-  const used=new Map();
-  game.skills.forEach(s=>s.tiers.forEach(t=>used.set(t,s.name)));
-  const inGame=(game.sprites||[]).filter(s=>!skip.has(s.name)).map(s=>({info:s,used:true,by:used.get(s.name)||''}));
-  const names=new Set(inGame.map(e=>e.info.name));
-  const lab=labSprites.filter(s=>!names.has(s.name)&&EFFECT_CATS.includes(s.cat)).map(s=>({info:{name:s.name,meta:s.meta,strip:s.strip},used:false,by:'',cat:s.cat,tags:s.tags||[],check:(game.effect_checks||{})[s.name]}));
-  return inGame.concat(lab);}
-let effFilter='all',effQuery='',effHb=true;
+/* ---------- 7. effects actually used by the game ---------- */
+let effHb=true;
 function effects(m){
   m.appendChild(el('h2',{},'Hiệu ứng'));
-  m.appendChild(el('p',{class:'lead'},'Hiệu ứng game đang dùng (xanh) và kho hiệu ứng trong Sprite Lab chưa vào game (cam). Đánh giá "Dùng" cho hiệu ứng trong kho = muốn đưa vào game.'));
-  const bar=el('div',{class:'row',style:'margin-bottom:10px'});
-  const q=el('input',{class:'search',placeholder:'Tìm hiệu ứng / tag…',value:effQuery});
-  [['all','Tất cả'],['used','Đang dùng'],['lab','Chưa dùng (kho)'],['fit','Kho · đạt luật'],['reviewed','Đã đánh giá']].forEach(([v,l])=>{const c=el('button',{class:'chip'+(effFilter===v?' active':'')},l);
-    c.onclick=()=>{effFilter=v; render();}; bar.appendChild(c);});
-  bar.appendChild(q); const hbB=el('button',{class:'btn'+(effHb?' on':'')},'Hitbox'); hbB.onclick=()=>{effHb=!effHb; hbB.classList.toggle('on',effHb);}; bar.appendChild(hbB);
-  m.appendChild(bar);
-  const grid=el('div',{class:'grid g4'}); m.appendChild(grid);
-  const fill=()=>{ grid.innerHTML=''; painters=[];
-    const list=effectList().filter(e=>(effFilter==='all')||(effFilter==='used'&&e.used)||(effFilter==='lab'&&!e.used)||
-      (effFilter==='fit'&&!e.used&&e.check&&e.check.ok)||(effFilter==='reviewed'&&review['effect:'+e.info.name]&&review['effect:'+e.info.name].status))
-      .filter(e=>!effQuery||e.info.name.includes(effQuery)||(e.tags||[]).some(t=>t.includes(effQuery)));
-    if(!list.length) grid.appendChild(el('div',{class:'empty'},'Không có hiệu ứng phù hợp.'));
-    list.forEach(e=>{ const info=e.info; const card=el('div',{class:'card'});
+  m.appendChild(el('p',{class:'lead'},'Chỉ các hiệu ứng game đang thật sự dùng (sprite của kỹ năng trong data), nhóm theo kỹ năng và bậc.'));
+  const bar=el('div',{class:'row',style:'margin-bottom:10px'}); const hbB=el('button',{class:'btn'+(effHb?' on':'')},'Hitbox');
+  hbB.onclick=()=>{effHb=!effHb; hbB.classList.toggle('on',effHb);}; bar.appendChild(hbB); m.appendChild(bar);
+  const groups={}; game.effects.forEach(e=>{(groups[e.skill]=groups[e.skill]||[]).push(e);});
+  Object.values(groups).forEach(list=>{
+    const sec=el('div',{class:'card',style:'margin-bottom:12px'},el('div',{class:'row'},el('h3',{style:'margin:0'},'Kỹ năng: '+list[0].skill_name),list[0].check?checkView(list[0].check,true):null));
+    const grid=el('div',{class:'grid g4',style:'margin-top:10px'});
+    list.forEach(e=>{ const info=e.sprite; const card=el('div',{class:'card',style:'background:var(--panel2)'});
       let sheet=null, anim=null; sheetOf(info).then(x=>{sheet=x; anim=x?effectAnim(x):null;});
       const fs=info.meta.frame_size||[32,32]; const sc=Math.max(1,Math.floor(150/Math.max(fs[0],fs[1])));
-      const cv=liveCanvas(200,170,(g,t)=>{ g.clearRect(0,0,200,170); g.fillStyle='#232a1f'; g.fillRect(0,0,200,170);
+      const cv=liveCanvas(200,170,(g,t)=>{ g.clearRect(0,0,200,170); drawGround(g,100,85,1,1e9,200,170);
         if(!sheet) return; const ax=100-(fs[0]/2-sheet.anchor[0])*sc, ay=85-(fs[1]/2-sheet.anchor[1])*sc;
-        const tt=t%(sheet.duration(anim)+0.4); sheet.draw(g,anim,Math.min(tt,sheet.duration(anim)-0.001),ax,ay,sc);
+        const d=sheet.duration(anim), tt=t%(d+0.4); sheet.draw(g,anim,Math.min(tt,d-0.001),ax,ay,sc);
         const hb=hbAt(sheet,anim); if(effHb&&hb){ const [a0,a1]=hbTimes(sheet,anim,hb);
           drawHb(g,hb,ax+((hb.center?hb.center[0]:sheet.anchor[0])-sheet.anchor[0])*sc,ay+((hb.center?hb.center[1]:sheet.anchor[1])-sheet.anchor[1])*sc,sc,tt>=a0&&tt<a1);} });
-      card.appendChild(el('div',{class:'stage',style:'background:#232a1f'},cv));
-      card.appendChild(el('div',{class:'row',style:'margin-top:6px'},el('b',{},info.name),el('span',{class:'pill '+(e.used?'used':'lab')},e.used?'trong game':'kho lab')));
+      card.appendChild(el('div',{class:'stage'},cv));
+      card.appendChild(el('div',{class:'row',style:'margin-top:6px'},el('b',{},info.name),e.tier?el('span',{class:'pill'},'bậc '+['I','II','III','IV','V'][e.tier-1]+' · cấp '+e.tier):null));
       const anims=(info.meta.animations||[]).map(a=>a.name);
-      card.appendChild(el('div',{class:'small muted'},fs.join('×')+' · '+anims.length+' animation'+(e.by?' · dùng cho: '+e.by:'')+(e.cat?' · '+e.cat:'')));
+      card.appendChild(el('div',{class:'small muted'},fs.join('×')+' · '+anims.join(', ')));
       if(anims.length>1){ const ab=el('div',{class:'row',style:'margin-top:4px'});
-        anims.slice(0,6).forEach(n=>{const b=el('button',{class:'btn small'},n); b.onclick=()=>{anim=n; ab.querySelectorAll('.btn').forEach(x=>x.classList.toggle('on',x===b));}; ab.appendChild(b);});
+        anims.forEach(n=>{const b=el('button',{class:'btn small'},n); b.onclick=()=>{anim=n; ab.querySelectorAll('.btn').forEach(x=>x.classList.toggle('on',x===b));}; ab.appendChild(b);});
         card.appendChild(ab);}
-      const sk=e.used?game.skills.find(x=>x.tiers.includes(info.name)):null;
-      const ck=e.check||(sk&&sk.check);
-      if(ck) card.appendChild(el('div',{style:'margin-top:6px'},checkView(ck,true)));
       card.appendChild(reviewBox('effect:'+info.name)); grid.appendChild(card);});
-  };
-  q.oninput=()=>{effQuery=q.value.trim().toLowerCase(); fill();};
-  fill();
+    sec.appendChild(grid); m.appendChild(sec);
+  });
+  const st=el('div',{class:'card'},el('h3',{},'Trạng thái (buff / debuff)'));
+  st.appendChild(game.statuses&&game.statuses.length?el('div',{},'…'):el('div',{class:'empty',style:'padding:8px'},'Game chưa có hiệu ứng trạng thái. Khi có buff/debuff (bỏng, độc, choáng, tăng tốc…) chúng sẽ hiện ở đây.'));
+  m.appendChild(st);
 }
 
 init();

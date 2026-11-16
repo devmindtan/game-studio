@@ -91,13 +91,13 @@ trang tải), để xem và **đánh giá có áp dụng vào game không**:
 | Mục | Nội dung |
 |---|---|
 | Tổng quan | pitch, thể loại, câu hỏi thiết kế, bảng "Đã quyết" của roadmap, ảnh mới nhất |
-| Luật gameplay | luật trong `games/<g>/assets/data/gameplay_rules.json` + bảng chấm mọi kỹ năng và hiệu ứng trong kho |
-| Giao diện | ảnh chụp game (`production/qa/evidence/`) theo nhóm, bấm để phóng to |
+| Luật gameplay | luật trong `games/<g>/assets/data/gameplay_rules.json` + bảng chấm mọi kỹ năng của game |
+| Giao diện | bộ màn hình hiện tại `production/ui/` (chụp bằng `gamekit ui-shots <g>`), báo khi ảnh cũ hơn code |
 | Bản đồ & ải | bãi đấu vẽ đúng nền cỏ của game, vòng spawn, khung màn hình; biểu đồ đợt quái theo thời gian |
 | Nhân vật | animation, các lớp (bật/tắt từng lớp = chỗ đồ mặc thay vào), chỉ số kèm icon |
 | Quái vật | animation cùng tỉ lệ game, thân đo từ pixel, chỉ số, xuất hiện ở ải nào |
-| Kỹ năng | demo ra chiêu theo hitbox + nhịp frame, bảng giá trị từng cấp (như `PlayerStats`), nâng cấp chỉ số |
-| Hiệu ứng | hiệu ứng game đang dùng và kho Sprite Lab chưa dùng, chấm theo luật gameplay |
+| Kỹ năng | demo như trong game (nền bản đồ thật, slime làm hình nhân, chớp đỏ + số sát thương + thanh máu), nút "Khoảnh khắc trúng", bảng giá trị từng cấp, nâng cấp chỉ số; đường dẫn `games.html#<g>/skills/<kỹ năng>/hit/<cấp>` mở thẳng lúc trúng |
+| Hiệu ứng | chỉ hiệu ứng game đang dùng (nhóm theo kỹ năng, bậc); mục buff/debuff (trống khi game chưa có) |
 
 Mỗi mục có **Dùng / Cân nhắc / Không dùng + ghi chú**; bấm là lưu (`POST /api/review`) vào
 `games/<g>/design/review.json`. Agent đọc file đó khi làm game tiếp, và commit nó vào repo game.
