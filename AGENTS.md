@@ -159,6 +159,9 @@ dùng bảo commit dở dang thì mới commit, và dùng type `wip`.
   (`git add <paths>`). Chỉ dùng `git add -A` khi `status` cho thấy mọi thứ đều thuộc thay đổi này.
 - **Commit kèm đường dẫn:** `git commit -F - -- <các đường dẫn của thay đổi này>`. Với đường dẫn, Git chỉ
   commit đúng các file đó; thứ khác đang staged (một `git mv`/`git rm` từ trước) không lọt vào được.
+  **Ngoại lệ:** commit kèm đường dẫn lấy nội dung **trên đĩa**, nên không ghi được việc "thôi theo dõi"
+  (`git rm --cached` mà file vẫn còn): file sẽ bị commit lại. Trường hợp đó, xem stage chỉ còn đúng thay đổi
+  ấy rồi commit **không** kèm đường dẫn.
 - **Xem stage ở một lệnh riêng**, đọc xong mới commit: `git diff --cached --stat -M` không được nối `&&`
   với `git commit` (nối thì không kịp đọc). Một lệnh commit lỗi thì dừng, kiểm tra index rồi mới làm tiếp.
 - Sửa `.gitignore`: pattern chỉ dành cho thư mục gốc phải có `/` đầu (`/templates/`), rồi chạy `git status`
