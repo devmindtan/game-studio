@@ -55,7 +55,7 @@ xuất kéo dài thì khuyên người dùng mở phiên mới ở đó.
 | "Thêm tính năng" (lớn, nhiều hệ thống) | `/quick-design` (thay đổi nhỏ) hoặc `/design-system` → `/create-stories` → `/dev-story` → `/story-done` |
 | "Game khó/dễ quá", "chỉnh tốc độ…" | sửa `assets/data/*.json` (không hardcode trong code) → `/balance-check` → `gamekit test` + `gamekit shot` |
 | "Thêm nhân vật", "sprite người/quái dạng người" | `gamekit lpc` (người dùng phối đồ, xuất **ZIP split animations**) → chép vào `games/<g>/assets/source/lpc/<tên>.zip` → `gamekit sprites <g>` → `gamekit preview <g> <tên>` → dùng `LpcCharacter` trong code |
-| Sprite / art pixel (nhân vật, quái, icon, hiệu ứng, tile; không phải LPC), thử animation, thử di chuyển | skill **`.agents/skills/pixel-sprite/SKILL.md`**, làm trong **Sprite Lab** (`sprite-lab/`, không bao giờ trong game): `gamekit art new <tên>` → sửa `gen.py` → `gamekit art run <tên>` → xem `preview.png` → `gamekit art shot <tên> sheet` + `… move` → `gamekit art test` → commit repo gốc → khi game cần: `gamekit art promote <tên> <g>`; hướng nghệ thuật bằng `/art-bible`, `/asset-spec` |
+| Sprite / art pixel (nhân vật, quái, icon, hiệu ứng, tile; không phải LPC), thử animation, thử di chuyển | skill **`.agents/skills/pixel-sprite/SKILL.md`**, làm trong **Sprite Lab** (`sprite-lab/`, không bao giờ trong game). Nhân vật có tay chân/vũ khí: ưu tiên nguồn pose rig `gamekit art rig new` → validate/inspect/motion → `gamekit art run` → xem `preview.png` → `gamekit art shot <tên> sheet` + `… move` → `gamekit art test`; art không phù hợp rig: `gamekit art new` → sửa `gen.py` → cùng bước render/review/test; commit repo gốc → khi game cần: `gamekit art promote <tên> <g>`; hướng nghệ thuật bằng `/art-bible`, `/asset-spec` |
 | Menu, HUD, giao diện | `/ux-design` → `/team-ui`; bắt buộc chụp màn hình bằng `gamekit shot` |
 | Âm thanh | `/team-audio` (kit chưa có công cụ âm thanh) |
 | "Game bị lỗi…" | `/bug-report` → viết test hồi quy, **chạy cho thấy test fail trước** → sửa → `gamekit test` |
@@ -94,6 +94,13 @@ xuất kéo dài thì khuyên người dùng mở phiên mới ở đó.
   viết thẳng các đường dẫn vào lệnh. Script trong `tools/gamekit` viết bằng bash (`#!/usr/bin/env bash`).
 - **Sprite đặt theo điểm neo, không theo tâm canvas.** Sprite nào cũng có `<tên>.json` (do `gen.py` gọi
   `write_meta`) và game vẽ qua `SpriteAnchor`. Chi tiết trong skill `pixel-sprite`.
+
+## Điều tra code (graphify)
+
+- **Tối ưu đọc/điều hướng code trước** (ổn định, local, miễn phí): dùng `graphify` (CLI/skill) cho câu hỏi "ở đâu / gọi cái gì / liên kết thế nào", sau đó **chỉ đọc đúng file/line** được chỉ và xác minh trong source trước khi sửa.
+- **Duy trì index AST cục bộ** (không cần LLM, chạy qua `limited`): nếu khu vực làm việc chưa có `graphify-out/` hoặc code vừa thay đổi nhiều, chạy `limited graphify update <khu-vực>`. `<khu-vực>` ưu tiên phạm vi hẹp đang làm việc: `tools/gamekit`, `sprite-lab`, `.agents`, hoặc `games/<g>` (mỗi game là repo riêng; không index `templates/`, `tools/lpc-generator/`).
+- **Truy vấn**: `graphify explain "<symbol>" --graph <khu-vực>/graphify-out/graph.json`, `graphify path "A" "B" --graph <khu-vực>/graphify-out/graph.json` (hoặc dùng đường dẫn mặc định nếu đang ở đúng khu vực).
+- **Quy ước**: `graphify-out/` là artifact sinh ra, **không commit**. Thay đổi rộng hoặc codebase lạ: cập nhật/đọc graph trước rồi mới sửa.
 
 ## Sai một lần → sửa rule (bắt buộc, chỉ thị của người dùng từ 2026-11-16)
 

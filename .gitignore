@@ -2,6 +2,11 @@
 /games/
 /templates/
 /tools/lpc-generator/
+/tools/gamekit/node_modules/
+
+# Generated code graph (graphify update …)
+/graphify-out/
+**/graphify-out/
 
 # Editor / OS
 .vscode/settings.json
