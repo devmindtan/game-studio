@@ -1,0 +1,36 @@
+{
+  "frames": 1,
+  "frame_size": [
+    32,
+    32
+  ],
+  "fps": 1.0,
+  "loop": false,
+  "anchor": [
+    14.0,
+    30.0
+  ],
+  "anchor_source": "explicit",
+  "animations": [
+    {
+      "name": "idle",
+      "start": 0,
+      "frames": 1,
+      "fps": 1.0,
+      "loop": false,
+      "hitbox": {
+        "shape": "rect",
+        "center": [
+          18.5,
+          18.0
+        ],
+        "active": [
+          0,
+          0
+        ],
+        "half_w": 9.5,
+        "half_h": 13.0
+      }
+    }
+  ]
+}
