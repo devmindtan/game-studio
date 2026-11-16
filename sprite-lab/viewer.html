@@ -5,257 +5,285 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Sprite Lab Viewer</title>
 <style>
-:root{--bg:#0f1115;--panel:#171b23;--panel2:#1e2430;--panel3:#252c3a;--text:#e8edf7;--muted:#95a1b8;--accent:#7ef0ff;--accent2:#b06cff;--border:#2a3242;--good:#6ee06e}
-*{box-sizing:border-box} body{margin:0;font:13px/1.35 system-ui,-apple-system,Segoe UI,Roboto,sans-serif;background:var(--bg);color:var(--text)}
-header{padding:8px 12px;border-bottom:1px solid var(--border);display:flex;gap:8px;align-items:center;flex-wrap:wrap;position:sticky;top:0;background:#0f1115f2;backdrop-filter:blur(4px);z-index:5}
-header h1{font-size:15px;margin:0;font-weight:700} header .sub{color:var(--muted);font-size:12px}
-.wrap{display:grid;grid-template-columns:280px 1fr;min-height:calc(100vh - 46px)}
-aside{border-right:1px solid var(--border);padding:8px;overflow:auto}
-main{padding:10px;overflow:auto}
-input,select,button{font:inherit;color:var(--text);background:var(--panel2);border:1px solid var(--border);border-radius:6px;padding:5px 8px}
-button{cursor:pointer} button:hover{border-color:var(--accent)} button.primary{background:#1e4a58;border-color:#2d7d92}
-button.chip{border-radius:999px;padding:4px 9px;font-size:12px;background:var(--panel)}
-button.chip.active{background:#1e4a58;border-color:#2d7d92;color:#fff}
-button.animBtn{padding:4px 8px;font-size:12px;border-radius:6px}
-button.animBtn.active{background:#3a2a58;border-color:#7c5cc4;color:#fff}
-.search{width:100%;margin-bottom:6px;padding:6px 8px}
-.filters{display:flex;gap:4px;flex-wrap:wrap;margin-bottom:8px}
-.group{margin-bottom:6px}
-.groupHead{display:flex;align-items:center;gap:6px;padding:4px 6px;cursor:pointer;color:var(--muted);font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:.03em;border-radius:6px}
+:root{--bg:#0e1014;--panel:#161a22;--panel2:#1d2330;--panel3:#242c3b;--text:#e9eef8;--muted:#93a0b8;--accent:#7ef0ff;--accent2:#b06cff;--border:#283142;--good:#6ee06e;--warn:#ffd36b}
+*{box-sizing:border-box} html,body{height:100%} body{margin:0;font:13px/1.4 system-ui,-apple-system,Segoe UI,Roboto,sans-serif;background:var(--bg);color:var(--text)}
+button,input,select{font:inherit;color:var(--text)}
+header{height:44px;padding:0 12px;border-bottom:1px solid var(--border);display:flex;gap:10px;align-items:center;background:#0e1014f5;position:sticky;top:0;z-index:10}
+header h1{font-size:14px;margin:0;font-weight:700;letter-spacing:.02em} header .sub{color:var(--muted);font-size:12px}
+#status{margin-left:auto;font-size:12px}
+.layout{display:grid;grid-template-columns:270px 1fr;min-height:calc(100vh - 44px)}
+aside{border-right:1px solid var(--border);display:flex;flex-direction:column;min-height:0}
+.sideTop{padding:8px;border-bottom:1px solid var(--border);display:flex;flex-direction:column;gap:6px}
+.search{width:100%;background:var(--panel2);border:1px solid var(--border);border-radius:8px;padding:7px 9px}
+.filters{display:flex;gap:4px;flex-wrap:wrap}
+.chip{background:var(--panel);border:1px solid var(--border);border-radius:999px;padding:3px 8px;font-size:11px;cursor:pointer;color:var(--muted)}
+.chip:hover{color:var(--text);border-color:#3a4660} .chip.active{background:#173a46;border-color:#2b7d91;color:#dffaff}
+#list{overflow:auto;padding:6px;flex:1}
+.group{margin-bottom:4px}
+.groupHead{display:flex;align-items:center;gap:6px;padding:4px 6px;cursor:pointer;color:var(--muted);font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;border-radius:6px;user-select:none}
 .groupHead:hover{background:var(--panel);color:var(--text)}
-.groupHead .count{margin-left:auto;background:var(--panel3);border-radius:999px;padding:0 6px;font-size:11px;color:var(--muted)}
-.groupBody{display:flex;flex-direction:column;gap:3px;margin-top:2px}
+.groupHead .count{margin-left:auto;background:var(--panel3);color:var(--muted);border-radius:999px;padding:0 6px;font-size:10px;font-weight:600}
+.groupBody{display:flex;flex-direction:column;gap:2px;margin:2px 0 4px}
 .groupBody.collapsed{display:none}
-.item{padding:5px 7px;border:1px solid transparent;border-radius:6px;background:transparent;cursor:pointer;display:flex;flex-direction:column;gap:1px}
-.item:hover{background:var(--panel);border-color:var(--border)} .item.active{background:#182635;border-color:#2d7d92}
-.item .name{font-weight:600;font-size:13px} .item .meta{color:var(--muted);font-size:11px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.card{background:var(--panel);border:1px solid var(--border);border-radius:10px;padding:10px;margin-bottom:8px}
-.row{display:flex;gap:6px;flex-wrap:wrap;align-items:center}
-.titleRow{display:flex;gap:8px;align-items:baseline;flex-wrap:wrap}
-.title{font-size:17px;font-weight:700;margin:0} .muted{color:var(--muted)}
-.stage{display:flex;gap:12px;flex-wrap:wrap;align-items:flex-start}
-canvas{image-rendering:pixelated;image-rendering:crisp-edges;background:
-  linear-gradient(45deg,#191e29 25%,transparent 25%),linear-gradient(-45deg,#191e29 25%,transparent 25%),
-  linear-gradient(45deg,transparent 75%,#191e29 75%),linear-gradient(-45deg,transparent 75%,#191e29 75%);
-  background-size:12px 12px;background-position:0 0,0 6px,6px -6px,-6px 0px;border:1px solid var(--border);border-radius:6px}
-.previewBox img{image-rendering:pixelated;max-width:100%;border:1px solid var(--border);border-radius:6px;background:#151922}
-.pill{display:inline-block;padding:1px 7px;border-radius:999px;background:#223049;color:#b9d7ff;font-size:11px}
-.controls{margin-top:6px}
-label{color:var(--muted);font-size:12px}
+.item{padding:5px 7px;border:1px solid transparent;border-radius:7px;cursor:pointer}
+.item:hover{background:var(--panel);border-color:var(--border)} .item.active{background:#152636;border-color:#2b7d91}
+.item .row1{display:flex;gap:6px;align-items:center}
+.item .name{font-weight:600;font-size:13px;flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.item .tag{font-size:10px;color:var(--muted);background:var(--panel3);border-radius:4px;padding:0 5px}
+.item .meta{color:var(--muted);font-size:11px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:1px}
+main{padding:10px;overflow:auto}
+.card{background:var(--panel);border:1px solid var(--border);border-radius:10px}
+.empty{padding:24px;color:var(--muted)}
+.topbar{padding:8px 10px;border-bottom:1px solid var(--border);display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.title{font-size:16px;font-weight:700} .pill{font-size:11px;color:#cfe9ff;background:#1e3348;border:1px solid #2b4866;border-radius:999px;padding:1px 8px}
+.metaText{color:var(--muted);font-size:12px}
+.animBar{padding:8px 10px;border-bottom:1px solid var(--border);display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+.animBtn{background:var(--panel2);border:1px solid var(--border);border-radius:7px;padding:5px 9px;font-size:12px;cursor:pointer}
+.animBtn:hover{border-color:#43506a} .animBtn.active{background:#2f2550;border-color:#7658c8;color:#fff}
+.animBtn .sub{color:var(--muted);font-size:10px;margin-left:4px} .animBtn.active .sub{color:#d9ccff}
+.work{display:grid;grid-template-columns:auto 1fr;gap:10px;padding:10px}
+.player{display:flex;flex-direction:column;gap:6px;align-items:flex-start}
+canvas{image-rendering:pixelated;image-rendering:crisp-edges;border:1px solid var(--border);border-radius:8px;background:
+  linear-gradient(45deg,#191f2b 25%,transparent 25%),linear-gradient(-45deg,#191f2b 25%,transparent 25%),
+  linear-gradient(45deg,transparent 75%,#191f2b 75%),linear-gradient(-45deg,transparent 75%,#191f2b 75%);
+  background-size:12px 12px;background-position:0 0,0 6px,6px -6px,-6px 0px}
+.controls{display:flex;gap:4px;flex-wrap:wrap;align-items:center}
+.btn{background:var(--panel2);border:1px solid var(--border);border-radius:7px;padding:5px 9px;cursor:pointer;font-size:12px}
+.btn:hover{border-color:#43506a} .btn.primary{background:#1b4655;border-color:#2b7d91}
+select.ctrl{background:var(--panel2);border:1px solid var(--border);border-radius:7px;padding:5px 7px;font-size:12px}
+label.ctrlLbl{font-size:11px;color:var(--muted);display:flex;align-items:center;gap:4px}
+.scrubRow{display:flex;gap:6px;align-items:center;width:100%;max-width:420px}
+#scrub{flex:1;accent-color:var(--accent)}
+#frameInfo{font-size:12px;color:var(--muted);min-height:18px}
+.sidePane{display:flex;flex-direction:column;gap:8px;min-width:0}
+.panel{background:var(--panel2);border:1px solid var(--border);border-radius:8px}
+.panelHead{padding:6px 8px;font-size:11px;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:.04em;border-bottom:1px solid var(--border);display:flex;align-items:center}
+.panelBody{padding:8px}
+.previewBox img{image-rendering:pixelated;max-width:100%;border:1px solid var(--border);border-radius:6px;background:#121720;display:block}
 .gifRow{display:flex;gap:8px;flex-wrap:wrap}
-.gifRow figure{margin:0} .gifRow img{image-rendering:pixelated;border:1px solid var(--border);border-radius:6px;background:#151922;height:96px}
+.gifRow figure{margin:0} .gifRow img{image-rendering:pixelated;border:1px solid var(--border);border-radius:6px;background:#121720;height:88px}
 .gifRow figcaption{font-size:11px;color:var(--muted);margin-top:2px;text-align:center}
 .err{color:#ff9f9f} .ok{color:var(--good)}
-.small{font-size:11px}
-#frameInfo{min-height:18px}
-@media (max-width:900px){.wrap{grid-template-columns:1fr} aside{border-right:none;border-bottom:1px solid var(--border);max-height:38vh}}
+.toggle{margin-left:auto;font-size:11px;cursor:pointer;color:var(--accent);font-weight:600;text-transform:none;letter-spacing:0}
+@media (max-width:980px){.layout{grid-template-columns:1fr} aside{border-right:none;border-bottom:1px solid var(--border);max-height:36vh} .work{grid-template-columns:1fr}}
 </style>
 </head>
 <body>
 <header>
   <h1>Sprite Lab Viewer</h1>
-  <div class="sub">Test hiệu ứng: chọn sprite → bấm animation → Play/Step</div>
+  <div class="sub">Chọn sprite → bấm animation → Play/Step</div>
   <div id="status" class="sub"></div>
 </header>
-<div class="wrap">
+<div class="layout">
   <aside>
-    <input id="q" class="search" placeholder="Tìm theo tên..." />
-    <div class="filters" id="filters"></div>
+    <div class="sideTop">
+      <input id="q" class="search" placeholder="Tìm sprite…" />
+      <div class="filters" id="filters"></div>
+    </div>
     <div id="list"></div>
   </aside>
   <main>
-    <div id="empty" class="card muted">Đang tải… Mở bằng <code>./serve-viewer.sh</code> (hoặc <code>python3 -m http.server -d sprite-lab</code>).</div>
-    <div id="view" style="display:none">
-      <div class="card" style="padding:8px 10px">
-        <div class="titleRow">
-          <div class="title" id="vName"></div>
-          <span class="pill" id="vCat"></span>
-          <span class="muted small" id="vMeta"></span>
-        </div>
-        <div class="row" id="animBtns" style="margin-top:6px"></div>
+    <div id="empty" class="card empty">Đang tải danh sách… Hãy chạy <code>./serve-viewer.sh</code> trong <code>sprite-lab/</code> (mở server + trình duyệt).</div>
+    <div id="view" class="card" style="display:none">
+      <div class="topbar">
+        <div class="title" id="vName"></div>
+        <span class="pill" id="vCat"></span>
+        <span class="metaText" id="vMeta"></span>
       </div>
-      <div class="card" style="padding:8px 10px">
-        <div class="stage">
-          <div>
-            <canvas id="cv" width="128" height="128"></canvas>
-            <div class="controls row">
-              <button id="btnPlay" class="primary">Play</button>
-              <button id="btnPause">Pause</button>
-              <button id="btnStep">Step</button>
-              <button id="btnRestart">Restart</button>
-              <label>Scale <select id="scaleSel"><option>2</option><option>3</option><option selected>4</option><option>6</option><option>8</option></select></label>
-              <label>Tốc độ <select id="speedSel"><option value="0.5">0.5x</option><option value="1" selected>1x</option><option value="1.5">1.5x</option><option value="2">2x</option></select></label>
-            </div>
-            <div class="controls muted small" id="frameInfo"></div>
+      <div class="animBar" id="animBar"></div>
+      <div class="work">
+        <div class="player">
+          <canvas id="cv" width="128" height="128"></canvas>
+          <div class="scrubRow"><input id="scrub" type="range" min="0" max="0" value="0"><span id="scrubLabel" class="metaText"></span></div>
+          <div class="controls">
+            <button id="btnPlay" class="btn primary" title="Space">Play</button>
+            <button id="btnPause" class="btn" title="Space">Pause</button>
+            <button id="btnStep" class="btn" title="→">Step</button>
+            <button id="btnRestart" class="btn" title="R">Restart</button>
+            <label class="ctrlLbl">Scale <select id="scaleSel" class="ctrl"><option>2</option><option>3</option><option selected>4</option><option>6</option><option>8</option></select></label>
+            <label class="ctrlLbl">Tốc độ <select id="speedSel" class="ctrl"><option value="0.5">0.5×</option><option value="1" selected>1×</option><option value="1.5">1.5×</option><option value="2">2×</option></select></label>
+            <label class="ctrlLbl"><input type="checkbox" id="showAnchor" checked> Neo</label>
           </div>
-          <div class="previewBox">
-            <div class="muted small" style="margin-bottom:4px">Preview sheet</div>
-            <img id="previewImg" alt="preview" style="max-width:460px">
+          <div id="frameInfo"></div>
+        </div>
+        <div class="sidePane">
+          <div class="panel">
+            <div class="panelHead">GIF <span class="toggle" id="gifToggle"></span></div>
+            <div class="panelBody" id="gifWrap"><div id="gifRow" class="gifRow"></div></div>
+          </div>
+          <div class="panel">
+            <div class="panelHead">Preview sheet <span class="toggle" id="prevToggle"></span></div>
+            <div class="panelBody previewBox" id="prevWrap"><img id="previewImg" alt="preview"></div>
           </div>
         </div>
-      </div>
-      <div class="card" style="padding:8px 10px">
-        <div class="muted small" style="margin-bottom:4px">GIF</div>
-        <div id="gifRow" class="gifRow"></div>
       </div>
     </div>
   </main>
 </div>
 <script>
-let data = null, current = null, img = null;
-let anims = [], animIdx = 0, frameInAnim = 0, playing = true, acc = 0, lastT = 0, scale = 4, speed = 1;
-let activeFilter = 'all';
-const collapsed = {};
-const $ = id => document.getElementById(id);
-const cv = $('cv'), ctx = cv.getContext('2d');
+let data=null,current=null,img=null;
+let anims=[],animIdx=0,frameInAnim=0,playing=true,acc=0,lastT=0,scale=4,speed=1,showAnchor=true;
+let activeFilter='all';
+const collapsed={};
+const $=id=>document.getElementById(id);
+const cv=$('cv'),ctx=cv.getContext('2d');
 
-const CATS = [
-  {id:'all', label:'Tất cả'},
-  {id:'projectile', label:'Đạn/Projectile'},
-  {id:'aoe', label:'AOE'},
-  {id:'buff', label:'Buff/Shield/Vùng'},
-  {id:'base', label:'Cơ bản/NPC'}
+const CATS=[
+  {id:'all',label:'Tất cả'},
+  {id:'projectile',label:'Projectile'},
+  {id:'aoe',label:'AOE'},
+  {id:'buff',label:'Buff/Shield'},
+  {id:'base',label:'Nhân vật/Mẫu'}
 ];
 
 function categoryOf(s){
-  const n = s.name;
-  const aNames = (s.meta.animations||[]).map(a=>a.name);
+  const n=s.name, aNames=(s.meta.animations||[]).map(a=>a.name);
   if(aNames.includes('fly')) return 'projectile';
   if(/shield|haste|empower|heal|buff|rune|ward|barrier/.test(n)) return 'buff';
   if(/circle|zone|aura/.test(n)) return 'buff';
-  if(/cleave|slam|whirlwind|nova|burst|meteor|strike|spikes|geyser|column|pillar|wave|eruption|fall/.test(n)) return 'aoe';
   if(/bolt|shard|ball|orb|javelin|arrow|missile/.test(n)) return 'projectile';
+  if(/cleave|slam|whirlwind|nova|burst|meteor|strike|spikes|geyser|column|pillar|wave|eruption|fall|quake/.test(n)) return 'aoe';
   return 'base';
 }
-function catLabel(id){ const c=CATS.find(x=>x.id===id); return c?c.label:id; }
+function catLabel(id){const c=CATS.find(x=>x.id===id);return c?c.label:id;}
 
 async function init(){
   buildFilters();
   try{
-    const res = await fetch('sprites-manifest.json');
+    const res=await fetch('sprites-manifest.json');
     if(!res.ok) throw new Error('HTTP '+res.status);
-    data = await res.json();
-    data.sprites.forEach(s => s._cat = categoryOf(s));
-    $('status').innerHTML = '<span class="ok">'+data.sprites.length+' sprites</span>';
+    data=await res.json();
+    data.sprites.forEach(s=>s._cat=categoryOf(s));
+    $('status').innerHTML='<span class="ok">'+data.sprites.length+' sprites</span>';
     renderList();
   }catch(e){
-    $('status').innerHTML = '<span class="err">Cần chạy server</span>';
-    $('empty').innerHTML = '<span class="err">Lỗi: '+e.message+'</span><br><br>Chạy: <code>./serve-viewer.sh</code> trong <code>sprite-lab/</code> (hoặc <code>python3 -m http.server 8765</code> rồi mở <code>http://localhost:8765/viewer.html</code>).';
+    $('status').innerHTML='<span class="err">Cần server</span>';
+    $('empty').innerHTML='<span class="err">Không tải được manifest: '+e.message+'</span><br><br>Chạy <code>./serve-viewer.sh</code> trong <code>sprite-lab/</code> rồi mở trang trong trình duyệt.';
   }
 }
-
 function buildFilters(){
-  const wrap = $('filters'); wrap.innerHTML='';
+  const wrap=$('filters'); wrap.innerHTML='';
   CATS.forEach(c=>{
     const b=document.createElement('button'); b.className='chip'+(c.id===activeFilter?' active':''); b.textContent=c.label;
-    b.onclick=()=>{ activeFilter=c.id; buildFilters(); renderList(); };
+    b.onclick=()=>{activeFilter=c.id; buildFilters(); renderList();};
     wrap.appendChild(b);
   });
 }
-
 function filtered(){
-  const q = $('q').value.toLowerCase().trim();
-  return data.sprites.filter(s => (activeFilter==='all' || s._cat===activeFilter) && (!q || s.name.includes(q)));
+  const q=$('q').value.toLowerCase().trim();
+  return data.sprites.filter(s=>(activeFilter==='all'||s._cat===activeFilter)&&(!q||s.name.includes(q)));
 }
-
 function renderList(){
-  const list = $('list'); list.innerHTML='';
-  const items = filtered();
-  const groups = {};
-  items.forEach(s => { (groups[s._cat]=groups[s._cat]||[]).push(s); });
-  const order = ['projectile','aoe','buff','base'];
+  const list=$('list'); list.innerHTML='';
+  const items=filtered();
+  const groups={}; items.forEach(s=>{(groups[s._cat]=groups[s._cat]||[]).push(s);});
+  const order=['projectile','aoe','buff','base'];
+  let any=false;
   order.forEach(cat=>{
-    const arr = groups[cat]; if(!arr || !arr.length) return;
+    const arr=groups[cat]; if(!arr||!arr.length) return; any=true;
     const g=document.createElement('div'); g.className='group';
     const head=document.createElement('div'); head.className='groupHead';
-    const isCol = !!collapsed[cat];
-    head.innerHTML = '<span>'+ (isCol?'▸':'▾') +'</span><span>'+catLabel(cat)+'</span><span class="count">'+arr.length+'</span>';
-    head.onclick=()=>{ collapsed[cat]=!collapsed[cat]; renderList(); };
+    const isCol=!!collapsed[cat];
+    head.innerHTML='<span>'+ (isCol?'▸':'▾') +'</span><span>'+catLabel(cat)+'</span><span class="count">'+arr.length+'</span>';
+    head.onclick=()=>{collapsed[cat]=!collapsed[cat]; renderList();};
     const body=document.createElement('div'); body.className='groupBody'+(isCol?' collapsed':'');
     arr.forEach(s=>{
-      const d=document.createElement('div'); d.className='item'+(current && current.name===s.name ? ' active':'');
+      const d=document.createElement('div'); d.className='item'+(current&&current.name===s.name?' active':'');
       const a=(s.meta.animations||[]).map(x=>x.name).join(', ');
-      const fs=(s.meta.frame_size||[]).join('x');
-      d.innerHTML='<div class="name">'+s.name+'</div><div class="meta">'+fs+' · '+a+'</div>';
+      const fs=(s.meta.frame_size||[]).join('×');
+      d.innerHTML='<div class="row1"><div class="name">'+s.name+'</div><div class="tag">'+fs+'</div></div><div class="meta">'+a+'</div>';
       d.onclick=()=>selectSprite(s); body.appendChild(d);
     });
     g.appendChild(head); g.appendChild(body); list.appendChild(g);
   });
-  if(!items.length){ list.innerHTML='<div class="muted small" style="padding:6px">Không có sprite phù hợp.</div>'; }
+  if(!any) list.innerHTML='<div class="metaText" style="padding:8px">Không có sprite phù hợp.</div>';
 }
-
 function selectSprite(s){
-  current = s; renderList();
+  current=s; renderList();
   $('empty').style.display='none'; $('view').style.display='block';
-  $('vName').textContent = s.name;
-  $('vCat').textContent = catLabel(s._cat);
-  const fs = s.meta.frame_size||[0,0];
-  $('vMeta').textContent = fs[0]+'×'+fs[1]+' · neo ['+(s.meta.anchor||[]).join(', ')+'] · '+(s.meta.frame_count||'?')+'f';
-  $('previewImg').src = s.preview || '';
-  const gr = $('gifRow'); gr.innerHTML='';
-  Object.entries(s.gifs||{}).forEach(([name,src])=>{
-    const f=document.createElement('figure'); f.innerHTML='<img src="'+src+'"><figcaption>'+name+'</figcaption>'; gr.appendChild(f);
-  });
-  anims = (s.meta.animations && s.meta.animations.length) ? s.meta.animations : [{name:'default',start:0,frames:s.meta.frame_count||1,fps:8,loop:true}];
-  animIdx = 0; frameInAnim = 0; acc = 0; buildAnimBtns();
-  img = new Image();
-  img.onload = () => { resizeCanvas(); playing = true; };
-  img.src = s.strip;
+  $('vName').textContent=s.name;
+  $('vCat').textContent=catLabel(s._cat);
+  const fs=s.meta.frame_size||[0,0];
+  $('vMeta').textContent=fs[0]+'×'+fs[1]+' · neo ['+(s.meta.anchor||[]).join(', ')+'] · '+(s.meta.frame_count||'?')+'f';
+  $('previewImg').src=s.preview||'';
+  const gr=$('gifRow'); gr.innerHTML='';
+  const gifs=Object.entries(s.gifs||{});
+  if(!gifs.length){ gr.innerHTML='<span class="metaText">Không có GIF.</span>'; }
+  gifs.forEach(([name,src])=>{const f=document.createElement('figure'); f.innerHTML='<img src="'+src+'"><figcaption>'+name+'</figcaption>'; gr.appendChild(f);});
+  anims=(s.meta.animations&&s.meta.animations.length)?s.meta.animations:[{name:'default',start:0,frames:s.meta.frame_count||1,fps:8,loop:true}];
+  animIdx=0; frameInAnim=0; acc=0; buildAnimBtns();
+  img=new Image();
+  img.onload=()=>{resizeCanvas(); playing=true;};
+  img.src=s.strip;
 }
-
 function buildAnimBtns(){
-  const wrap = $('animBtns'); wrap.innerHTML='';
+  const wrap=$('animBar'); wrap.innerHTML='';
   anims.forEach((a,i)=>{
     const b=document.createElement('button'); b.className='animBtn'+(i===animIdx?' active':'');
-    b.textContent = a.name+' ('+a.frames+'f'+(a.loop===false?'·1x':'')+')';
-    b.onclick=()=>{ animIdx=i; frameInAnim=0; acc=0; playing=true; buildAnimBtns(); };
+    b.innerHTML=a.name+'<span class="sub">'+a.frames+'f · '+a.fps+'fps'+(a.loop===false?' · 1×':'')+'</span>';
+    b.onclick=()=>{animIdx=i; frameInAnim=0; acc=0; playing=true; buildAnimBtns(); updateScrub();};
     wrap.appendChild(b);
   });
+  updateScrub();
 }
-
+function currentAnim(){return anims[animIdx]||anims[0];}
 function resizeCanvas(){
-  if(!current) return; const fs = current.meta.frame_size||[32,32];
-  scale = parseInt($('scaleSel').value,10)||4;
-  cv.width = fs[0]*scale; cv.height = fs[1]*scale; ctx.imageSmoothingEnabled = false;
+  if(!current) return; const fs=current.meta.frame_size||[32,32];
+  scale=parseInt($('scaleSel').value,10)||4;
+  cv.width=fs[0]*scale; cv.height=fs[1]*scale; ctx.imageSmoothingEnabled=false;
 }
-function currentAnim(){ return anims[animIdx] || anims[0]; }
-
+function updateScrub(){
+  const a=currentAnim(); if(!a) return;
+  $('scrub').max=Math.max(0,a.frames-1); $('scrub').value=frameInAnim;
+  $('scrubLabel').textContent=(frameInAnim+1)+'/'+a.frames;
+}
 function draw(){
-  if(!current || !img || !img.complete) return;
-  const fs = current.meta.frame_size||[32,32];
-  const a = currentAnim();
-  const globalFrame = (a.start||0) + frameInAnim;
-  const sx = globalFrame * fs[0];
+  if(!current||!img||!img.complete) return;
+  const fs=current.meta.frame_size||[32,32];
+  const a=currentAnim(); if(!a) return;
+  const globalFrame=(a.start||0)+frameInAnim;
+  const sx=globalFrame*fs[0];
   ctx.clearRect(0,0,cv.width,cv.height);
-  ctx.drawImage(img, sx, 0, fs[0], fs[1], 0, 0, fs[0]*scale, fs[1]*scale);
-  $('frameInfo').textContent = a.name+' · '+(frameInAnim+1)+'/'+a.frames+' (g'+globalFrame+') · '+a.fps+'fps '+(a.loop===false?'1x':'loop')+(playing?' · ▶':' · ⏸');
+  ctx.drawImage(img,sx,0,fs[0],fs[1],0,0,fs[0]*scale,fs[1]*scale);
+  if(showAnchor && s.meta){
+    const anc=s.meta.anchor||[fs[0]/2,fs[1]/2];
+    const ax=Math.round(anc[0]*scale), ay=Math.round(anc[1]*scale);
+    ctx.strokeStyle='#ff4fd8'; ctx.lineWidth=Math.max(1,Math.floor(scale/2));
+    ctx.beginPath(); ctx.moveTo(ax-3*scale/2,ay); ctx.lineTo(ax+3*scale/2,ay); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(ax,ay-3*scale/2); ctx.lineTo(ax,ay+3*scale/2); ctx.stroke();
+  }
+  $('frameInfo').textContent=a.name+' · frame '+(frameInAnim+1)+'/'+a.frames+' (global '+globalFrame+') · '+a.fps+'fps · '+(a.loop===false?'one-shot':'loop')+' '+(playing?'▶':'⏸');
+  $('scrub').value=frameInAnim; $('scrubLabel').textContent=(frameInAnim+1)+'/'+a.frames;
 }
-
+const s={get meta(){return current?current.meta:null}};
 function tick(t){
   requestAnimationFrame(tick);
-  if(!current || !img || !img.complete) return;
-  const a = currentAnim(); if(!a) return;
+  if(!current||!img||!img.complete) return;
+  const a=currentAnim(); if(!a) return;
   if(playing){
-    if(!lastT) lastT = t;
-    const dt = (t - lastT)/1000; lastT = t;
-    acc += dt * speed;
-    const dur = 1 / Math.max(1, a.fps || 8);
-    while(acc >= dur){
-      acc -= dur;
-      if(frameInAnim < a.frames - 1) frameInAnim++;
-      else { if(a.loop === false){ playing = false; frameInAnim = a.frames - 1; } else { frameInAnim = 0; } }
-    }
-  } else { lastT = t; }
+    if(!lastT) lastT=t; const dt=(t-lastT)/1000; lastT=t; acc+=dt*speed;
+    const dur=1/Math.max(1,a.fps||8);
+    while(acc>=dur){ acc-=dur; if(frameInAnim<a.frames-1) frameInAnim++; else { if(a.loop===false){playing=false; frameInAnim=a.frames-1;} else {frameInAnim=0;} } }
+  } else { lastT=t; }
   draw();
 }
 
-$('q').addEventListener('input', renderList);
-$('scaleSel').addEventListener('change', resizeCanvas);
-$('speedSel').addEventListener('change', e => { speed = parseFloat(e.target.value)||1; });
-$('btnPlay').onclick = () => { playing = true; };
-$('btnPause').onclick = () => { playing = false; };
-$('btnStep').onclick = () => { playing = false; const a=currentAnim(); if(frameInAnim < a.frames-1) frameInAnim++; else if(a.loop!==false) frameInAnim=0; };
-$('btnRestart').onclick = () => { frameInAnim = 0; acc = 0; playing = true; };
+$('q').addEventListener('input',renderList);
+$('scaleSel').addEventListener('change',resizeCanvas);
+$('speedSel').addEventListener('change',e=>{speed=parseFloat(e.target.value)||1;});
+$('showAnchor').addEventListener('change',e=>{showAnchor=e.target.checked;});
+$('scrub').addEventListener('input',e=>{frameInAnim=parseInt(e.target.value,10)||0; playing=false; acc=0;});
+$('btnPlay').onclick=()=>{playing=true;};
+$('btnPause').onclick=()=>{playing=false;};
+$('btnStep').onclick=()=>{playing=false; const a=currentAnim(); if(frameInAnim<a.frames-1) frameInAnim++; else if(a.loop!==false) frameInAnim=0;};
+$('btnRestart').onclick=()=>{frameInAnim=0; acc=0; playing=true;};
+document.addEventListener('keydown',e=>{
+  if(e.target.tagName==='INPUT' && e.target.type!=='range' && e.target.type!=='checkbox') return;
+  if(e.code==='Space'){e.preventDefault(); playing=!playing;}
+  if(e.code==='ArrowRight'){e.preventDefault(); $('btnStep').onclick();}
+  if(e.code==='ArrowLeft'){e.preventDefault(); playing=false; frameInAnim=Math.max(0,frameInAnim-1);}
+  if(e.key==='r'||e.key==='R'){ $('btnRestart').onclick(); }
+});
 
 init();
 requestAnimationFrame(tick);
