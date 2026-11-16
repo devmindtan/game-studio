@@ -1,12 +1,17 @@
 #!/usr/bin/env python3
-"""Generator cho sprite "swordsman": kiếm sĩ nhìn nghiêng, quay phải, phong cách tối giản nhỏ gọn.
+"""Generator cho sprite "swordsman": kiếm sĩ nhìn nghiêng, quay phải (trái = lật), phong cách tối giản nhỏ gọn.
 
-Frame 48x48, nhân vật cao khoảng 26 px, neo (24, 44) giữa hai bàn chân trên mặt đất (ground=True: mọi
-frame không phải nhảy phải chạm đất, art run kiểm tra). Hình dựng từ tư thế bằng sprite-lab/lib/minifig.py.
-Dấu hiệu nhận diện: khăn quàng đỏ bay theo chuyển động (chuyển động phụ), kiếm bạc chuôi vàng.
+Frame 48x48, nhân vật cao khoảng 26 px, neo (24, 44) giữa hai bàn chân trên mặt đất (ground=True: art run
+kiểm tra mọi frame chạm đất). Hình dựng từ tư thế bằng sprite-lab/lib/minifig.py.
+Dấu hiệu nhận diện: khăn quàng đỏ bay theo chuyển động, kiếm bạc chuôi vàng.
 
-7 animation: idle 4, run 8, jump 4 (airborne), attack 5 (giữ frame không đều: lấy đà lâu, chém nhanh),
-spell 6 (giơ kiếm tụ sức rồi đâm), hurt 3, death 5.
+Bách Ải chỉ cần di chuyển hai hướng trái/phải; đòn đánh là sprite hiệu ứng riêng (sword-slash), nên nhân
+vật chỉ có: idle 4, run 8, hurt 3, death 5.
+
+Vẽ theo LỚP để mặc giáp sau này (minifig.LAYERS): cape_back (đuôi khăn), leg_*/boot_*, arm_*/hand_*,
+torso, neck (nút khăn), head (da, mắt), hair, weapon_back/weapon (kiếm). Mỗi lớp ghi ra
+layers/<lớp>_strip.png (không viền); swordsman_strip.png = các lớp ghép lại + viền, check_layers kiểm tra
+trùng từng pixel. Đồ mặc sau này vẽ lại đúng lớp của ô trang bị bằng cùng các tư thế ở đây.
 Chạy:  gamekit art run swordsman  ·  thử: gamekit art shot swordsman sheet|move
 """
 
@@ -26,12 +31,11 @@ HERE = Path(__file__).resolve().parent
 sys.path.insert(0, str(_workspace() / "tools/gamekit/pipeline"))
 sys.path.insert(0, str(HERE.parents[1] / "lib"))
 
-from spritekit import Canvas, gif, preview, strip, write_anim_meta  # noqa: E402
 import minifig as mf  # noqa: E402
 from minifig import line, pose, put, rect, run_pose  # noqa: E402
+from sheet import export_layered  # noqa: E402
 
 NAME = "swordsman"
-OUT = HERE
 ANCHOR = (float(mf.ROOT_X), float(mf.FLOOR))
 BLADE = 10          # blade length in px (body is ~26 px tall)
 
@@ -49,16 +53,24 @@ PAL = {
 }
 
 
-def head(c, p, g):
-    hx, hy = g["head"]
+def neck(c, p, g):
+    """Scarf knot round the neck, under the chin (chest slot)."""
     t = g["top"]
-    # scarf knot round the neck, under the chin
     rect(c, t[0] - 3, t[1], t[0] + 3, t[1] + 1, PAL["scarf"])
     put(c, t[0] + 2, t[1] + 1, PAL["scarf_d"])
-    # head block
+
+
+def head(c, p, g):
+    """Face block and eyes (skin layer)."""
+    hx, hy = g["head"]
     rect(c, hx - 3, hy - 6, hx + 4, hy, PAL["skin"])
     put(c, hx - 3, hy, PAL["skin_d"])
-    # hair: cap, back of the head, three spikes that follow the tilt
+    mf.eyes(c, hx + 2, hy - 4, p["eyes"], PAL)
+
+
+def hair(c, p, g):
+    """Cap, back of the head, three spikes that follow the tilt (head-gear slot)."""
+    hx, hy = g["head"]
     tilt = p["tilt"]
     rect(c, hx - 4, hy - 8, hx + 3, hy - 6, PAL["hair"])
     rect(c, hx - 4, hy - 6, hx - 2, hy - 2, PAL["hair"])
@@ -67,7 +79,6 @@ def head(c, p, g):
         put(c, hx + sx, hy + sy, PAL["hair"])
     put(c, hx, hy - 8, PAL["hair_l"])
     put(c, hx + 1, hy - 8, PAL["hair_l"])
-    mf.eyes(c, hx + 2, hy - 4, p["eyes"], PAL)
 
 
 def scarf_tail(c, p, g):
@@ -111,44 +122,15 @@ def _sword(c, p, g):
          PAL["blade_d"], 1)
 
 
-def fx(c, p, g):
-    """Effects after the outline: slash arc, charge sparkle, thrust flash."""
-    sx, sy = g["sh_front"]
-    if p["fx"] == "slash":
-        # arc from up-back to down-forward; t grows the visible part
-        a0, a1 = -110, -110 + 160 * p["fx_t"]
-        for r, col in ((13, (235, 250, 255, 230)), (12, (150, 220, 255, 150)), (11, (150, 220, 255, 70))):
-            for deg in range(int(a0), int(a1) + 1, 3):
-                rad = math.radians(deg)
-                put(c, sx + math.cos(rad) * r, sy + math.sin(rad) * r, col)
-    elif p["fx"] == "charge":
-        hx, hy = g["hand_front"]
-        a = math.radians(p["weapon"])
-        tipx, tipy = hx + math.cos(a) * BLADE, hy + math.sin(a) * BLADE
-        n = 2 + round(3 * p["fx_t"])
-        for k in range(n):
-            ang = k * 2 * math.pi / n + p["fx_t"] * 3
-            put(c, tipx + math.cos(ang) * 3, tipy + math.sin(ang) * 3, (255, 240, 150, 220))
-        put(c, tipx, tipy, (255, 255, 255, 255))
-    elif p["fx"] == "thrust":
-        hx, hy = g["hand_front"]
-        for k in range(4, 16):
-            alpha = 220 - k * 12
-            put(c, hx + 2 + k, hy, (255, 245, 180, max(40, alpha)))
-            if k % 3 == 0:
-                put(c, hx + 2 + k, hy - 1, (255, 255, 255, max(40, alpha)))
-                put(c, hx + 2 + k, hy + 1, (255, 255, 255, max(40, alpha)))
-
-
-CHAR = {"pal": PAL, "body": "tunic", "head": head, "behind": scarf_tail, "held_back": sword_behind,
-        "held": sword, "fx": fx}
+CHAR = {"pal": PAL, "body": "tunic", "head": head, "hair": hair, "neck": neck, "behind": scarf_tail,
+        "held_back": sword_behind, "held": sword}
 
 
 def frame(**kw):
-    return mf.draw(CHAR, pose(**kw))
+    return mf.draw_layers(CHAR, pose(**kw))
 
 
-# --- animations -------------------------------------------------------------------
+# --- animations: movement and state only (attacks are effect sprites) -------------
 
 def idle(i):
     bob = [0, 0, 1, 0][i]
@@ -157,53 +139,7 @@ def idle(i):
 
 
 def run(i):
-    p = run_pose(i, weapon=205 + 8 * math.sin(i * math.pi / 4))
-    return mf.draw(CHAR, p)
-
-
-def jump(i):
-    return [
-        frame(bob=2, feet=((-2, 0), (2, 0)), hands=((-3, 6), (3, 7)), weapon=60, tilt=-1),        # crouch
-        frame(bob=-1, feet=((-2, 3), (2, 5)), hands=((-4, 2), (3, 1)), weapon=-40, tilt=1,
-              speed=0.6, phase=1.0),                                                               # rise
-        frame(bob=0, feet=((-3, 2), (3, 1)), hands=((-4, 4), (4, 3)), weapon=10, speed=0.8,
-              phase=2.2),                                                                          # fall
-        frame(bob=2, feet=((-4, 0), (4, 0)), hands=((-3, 6), (4, 6)), weapon=70, tilt=-1),        # land
-    ][i]
-
-
-ATTACK_MS = [140, 50, 60, 90, 150]   # long wind-up, fast swing, hold the hit, settle
-# The slash trail is a separate effect sprite (sword-slash, with its hitbox), never drawn
-# into the body frames: drawn here too, the game showed two slashes (2026-11-16).
-
-
-def attack(i):
-    return [
-        frame(bob=1, lean=-1, feet=((-4, 0), (3, 0)), hands=((-3, 5), (-1, -3)), weapon=-120),
-        frame(bob=0, lean=2, feet=((-4, 0), (4, 0)), hands=((-2, 6), (5, 0)), weapon=-25),
-        frame(bob=1, lean=3, feet=((-4, 0), (5, 0)), hands=((-2, 6), (6, 4)), weapon=40),
-        frame(bob=1, lean=2, feet=((-4, 0), (5, 0)), hands=((-2, 7), (4, 6)), weapon=80),
-        frame(bob=0, lean=1, feet=((-3, 0), (3, 0)), hands=((-2, 7), (3, 5)), weapon=20),
-    ][i]
-
-
-SPELL_MS = [120, 120, 140, 60, 80, 160]
-
-
-def spell(i):
-    return [
-        frame(bob=1, lean=-1, hands=((-3, 4), (1, -5)), weapon=-90, fx="charge", fx_t=0.2,
-              head=(0, -1)),
-        frame(bob=1, lean=-1, hands=((-3, 4), (1, -6)), weapon=-90, fx="charge", fx_t=0.6,
-              head=(0, -1)),
-        frame(bob=2, lean=-2, feet=((-5, 0), (3, 0)), hands=((-4, 5), (-1, 1)), weapon=-10,
-              fx="charge", fx_t=1.0, eyes="closed"),
-        frame(bob=0, lean=3, feet=((-5, 0), (6, 0)), hands=((-3, 6), (7, 2)), weapon=0,
-              fx="thrust", speed=0.8, phase=2.0),
-        frame(bob=0, lean=3, feet=((-5, 0), (6, 0)), hands=((-3, 6), (7, 2)), weapon=0,
-              speed=0.5, phase=2.8),
-        frame(bob=0, lean=1, feet=((-3, 0), (3, 0)), hands=((-2, 7), (3, 5)), weapon=20),
-    ][i]
+    return mf.draw_layers(CHAR, run_pose(i, weapon=205 + 8 * math.sin(i * math.pi / 4)))
 
 
 def hurt(i):
@@ -230,200 +166,16 @@ def death(i):
     ][i]
 
 
-# --- front (facing down) and back (facing up) views ---------------------------------
-# Same proportions as the side view: head 8 px, torso 8 px wide from row 28 to the hip
-# (36), legs to the sole (42), outline on row 43, so the anchor (24, 44) and the floor
-# stay the same. Symmetric about x = 24. Front: the sword is in the hand on the
-# viewer's left (the hero's right hand); back: on the viewer's right.
-
-def _legs_fb(c, bob, lifts):
-    for (x0, lift), back in zip(((21, lifts[0]), (25, lifts[1])), (False, False)):
-        sole = mf.SOLE - lift
-        rect(c, x0, mf.HIP_Y + bob, x0 + 1, sole - 2, PAL["pants"])
-        rect(c, x0 - (1 if x0 < 24 else 0), sole - 1, x0 + 1 + (1 if x0 > 24 else 0), sole, PAL["boot"])
-
-
-def _torso_fb(c, top, hip, front):
-    rect(c, 20, top, 27, hip, PAL["tunic"])
-    rect(c, 20, top, 20, hip, PAL["tunic_l"])
-    rect(c, 27, top, 27, hip, PAL["tunic_d"])
-    rect(c, 20, hip - 2, 27, hip - 2, PAL["belt"])
-    if front:
-        rect(c, 23, hip - 2, 24, hip - 2, PAL["buckle"])
-
-
-def _arm_fb(c, shoulder_x, top, hand):
-    hx, hy = hand
-    line(c, shoulder_x, top + 1, hx, hy - 1, PAL["sleeve"], 2)
-    rect(c, hx, hy, hx + 1, hy + 1, PAL["skin"])
-
-
-def _sword_fb(c, hand, tip):
-    hx, hy = hand[0] + 0.5, hand[1] + 0.5
-    dx, dy = tip[0] - hx, tip[1] - hy
-    n = max(1.0, math.hypot(dx, dy))
-    ux, uy = dx / n, dy / n
-    line(c, hx - ux * 2, hy - uy * 2, hx, hy, PAL["grip"], 1)
-    line(c, hx + ux - uy * 1.5, hy + uy + ux * 1.5, hx + ux + uy * 1.5, hy + uy - ux * 1.5, PAL["guard"], 1)
-    line(c, hx + ux * 2, hy + uy * 2, tip[0], tip[1], PAL["blade"], 1)
-
-
-def _head_front(c, top, eyes):
-    hy = top - 1
-    rect(c, 20, hy - 6, 27, hy, PAL["skin"])
-    rect(c, 20, hy, 27, hy, PAL["skin_d"])
-    rect(c, 19, hy - 9, 28, hy - 6, PAL["hair"])
-    rect(c, 19, hy - 6, 19, hy - 3, PAL["hair"])
-    rect(c, 28, hy - 6, 28, hy - 3, PAL["hair"])
-    for x in (21, 24, 26):
-        put(c, x, hy - 5, PAL["hair"])                     # fringe
-    for x, y in ((20, hy - 10), (23, hy - 10), (26, hy - 10)):
-        put(c, x, y, PAL["hair"])                          # spikes
-    rect(c, 23, hy - 9, 24, hy - 9, PAL["hair_l"])
-    for x in (22, 25):
-        mf.eyes(c, x, hy - 4, eyes, PAL)
-    rect(c, 20, top, 27, top + 1, PAL["scarf"])            # scarf round the neck
-    rect(c, 25, top + 2, 26, top + 3, PAL["scarf_d"])      # knot ends in front
-
-
-def _head_back(c, top, phase, speed):
-    hy = top - 1
-    rect(c, 19, hy - 9, 28, hy, PAL["hair"])
-    rect(c, 21, hy - 8, 26, hy - 8, PAL["hair_l"])
-    put(c, 19, hy - 3, PAL["skin_d"])                      # ears
-    put(c, 28, hy - 3, PAL["skin_d"])
-    for x, y in ((20, hy - 10), (23, hy - 10), (26, hy - 10)):
-        put(c, x, y, PAL["hair"])
-    rect(c, 20, top, 27, top + 1, PAL["scarf"])
-    length = 4 + round(3 * speed)                         # tail hangs down the back and sways
-    for k in range(length):
-        x = 22 + round(math.sin(phase + k * 0.8) * (0.5 + speed))
-        rect(c, x, top + 2 + k, x + 1, top + 2 + k, PAL["scarf"] if k < length - 1 else PAL["scarf_d"])
-
-
-def fb_frame(view, bob=0, lifts=(0, 0), hands=None, tip=None, eyes="open", phase=0.0, speed=0.0,
-             flash=0.0, sword_in_front=True):
-    """One front ("down") or back ("up") frame. hands: ((x, y) sword hand, (x, y) other hand)."""
-    c = Canvas(mf.W, mf.H)
-    top, hip = 28 + bob, mf.HIP_Y + bob
-    front = view == "down"
-    sword_x = 18 if front else 29
-    other_x = 29 if front else 18
-    if hands is None:
-        hands = ((sword_x, top + 7), (other_x, top + 7))
-    if tip is None:
-        tip = (hands[0][0] + (-4 if front else 4), mf.SOLE - 3)
-    if not sword_in_front:
-        _sword_fb(c, hands[0], tip)
-    _legs_fb(c, bob, lifts)
-    _torso_fb(c, top, hip, front)
-    # an arm raised beside the head is drawn first so the head covers the shoulder
-    # (lesson 2026-11-16: drawn after, the sleeve crossed the hair in attack_up)
-    raised = hands[0][1] < top + 2
-    if raised:  # the shoulder of a raised arm sits at the outer edge of the torso
-        _arm_fb(c, 19 if sword_x < 24 else 28, top, hands[0])
-    if front:
-        _head_front(c, top, eyes)
-    else:
-        _head_back(c, top, phase, speed)
-    if not raised:
-        _arm_fb(c, 20 if sword_x < 24 else 27, top, hands[0])
-    _arm_fb(c, 20 if other_x < 24 else 27, top, hands[1])
-    if sword_in_front:
-        _sword_fb(c, hands[0], tip)
-    if flash:
-        mf._flash(c, flash)
-    c.outline(mf.OUTLINE)
-    return c
-
-
-def idle_fb(view, i):
-    bob = [0, 0, 1, 0][i]
-    return fb_frame(view, bob=bob, eyes="closed" if i == 3 else "open", phase=i * 1.2)
-
-
-def run_fb(view, i):
-    (_, lf), (_, lb) = mf.RUN_FEET[i]
-    bob = mf.RUN_BOB[i]
-    top = 28 + bob
-    swing = 1 if lf > lb else -1                       # arms against the legs
-    front = view == "down"
-    sx, ox = (18, 29) if front else (29, 18)
-    hands = ((sx, top + 7 - swing), (ox, top + 7 + swing))
-    tip = (sx + (-4 if front else 4), mf.SOLE - 4 - swing)
-    return fb_frame(view, bob=bob, lifts=(lf, lb), hands=hands, tip=tip, phase=i * math.pi / 4, speed=1.0)
-
-
-def attack_down(i):
-    """Overhead cut towards the viewer: raise on the right, chop down across the body."""
-    return [
-        fb_frame("down", bob=1, hands=((17, 24), (29, 34)), tip=(15, 15), sword_in_front=False),
-        fb_frame("down", bob=0, hands=((21, 30), (29, 35)), tip=(25, 39)),
-        fb_frame("down", bob=1, hands=((24, 33), (28, 35)), tip=(30, 40)),
-        fb_frame("down", bob=1, hands=((26, 34), (28, 35)), tip=(33, 39)),
-        fb_frame("down", bob=0),
-    ][i]
-
-
-def attack_up(i):
-    """Cut away from the viewer: low on the right, the arm rises beside the head
-    (never across it), the blade goes up over the head and cuts forward."""
-    return [
-        fb_frame("up", bob=1, hands=((29, 36), (18, 34)), tip=(34, 40)),
-        fb_frame("up", bob=0, hands=((30, 25), (18, 34)), tip=(32, 15)),
-        fb_frame("up", bob=0, hands=((30, 18), (19, 33)), tip=(29, 7)),
-        fb_frame("up", bob=1, hands=((29, 19), (19, 34)), tip=(22, 11)),
-        fb_frame("up", bob=0),
-    ][i]
-
-
-def hurt_fb(view, i):
-    return [
-        fb_frame(view, bob=1, eyes="wince", flash=0.75),
-        fb_frame(view, bob=1, eyes="wince"),
-        fb_frame(view, bob=0),
-    ][i]
-
-
-# (name, frames, fps, loop, extra)
+# (name, [layers per frame], fps, loop, extra)
 ANIMATIONS = [
     ("idle", [idle(i) for i in range(4)], 5, True, {"durations_ms": [240, 160, 240, 120]}),
     ("run", [run(i) for i in range(8)], 12, True, {}),
-    ("jump", [jump(i) for i in range(4)], 10, False, {"airborne": True,
-                                                       "durations_ms": [80, 160, 160, 100]}),
-    ("attack", [attack(i) for i in range(5)], 14, False, {"durations_ms": ATTACK_MS}),
-    ("spell", [spell(i) for i in range(6)], 12, False, {"durations_ms": SPELL_MS}),
     ("hurt", [hurt(i) for i in range(3)], 12, False, {"durations_ms": [90, 110, 120]}),
     ("death", [death(i) for i in range(5)], 8, False, {"durations_ms": [120, 140, 110, 100, 400]}),
-    # top-down directions: the animations above are the side view (left = mirrored)
-    ("idle_down", [idle_fb("down", i) for i in range(4)], 5, True, {"durations_ms": [240, 160, 240, 120]}),
-    ("run_down", [run_fb("down", i) for i in range(8)], 12, True, {}),
-    ("attack_down", [attack_down(i) for i in range(5)], 14, False, {"durations_ms": ATTACK_MS}),
-    ("hurt_down", [hurt_fb("down", i) for i in range(3)], 12, False, {"durations_ms": [90, 110, 120]}),
-    ("idle_up", [idle_fb("up", i) for i in range(4)], 5, True, {"durations_ms": [240, 160, 240, 120]}),
-    ("run_up", [run_fb("up", i) for i in range(8)], 12, True, {}),
-    ("attack_up", [attack_up(i) for i in range(5)], 14, False, {"durations_ms": ATTACK_MS}),
-    ("hurt_up", [hurt_fb("up", i) for i in range(3)], 12, False, {"durations_ms": [90, 110, 120]}),
 ]
 
 
-def main() -> None:
-    flat = [f for _, frames, _, _, _ in ANIMATIONS for f in frames]
-    strip(flat).save(OUT / f"{NAME}_strip.png")
-    flat[0].save(OUT / f"{NAME}.png")
-    cols = max(len(frames) for _, frames, _, _, _ in ANIMATIONS)
-    sheet = Canvas(cols * mf.W, len(ANIMATIONS) * mf.H)
-    for row, (_, frames, _, _, _) in enumerate(ANIMATIONS):
-        sheet.paste(strip(frames), 0, row * mf.H)
-    preview([sheet], HERE / "preview.png", scale=4, grid_lines=False)
-    for name, frames, fps, _, _ in ANIMATIONS:
-        gif(frames, HERE / f"{name}.gif", fps=fps, scale=4)
-    write_anim_meta(OUT / f"{NAME}.json",
-                    [{"name": n, "frames": f, "fps": fps, "loop": loop, **extra}
-                     for n, f, fps, loop, extra in ANIMATIONS],
-                    anchor=ANCHOR, ground=True, body="idle")
-    print(f"strip:   {OUT / f'{NAME}_strip.png'}")
-
-
 if __name__ == "__main__":
-    main()
+    export_layered(HERE, NAME, ANIMATIONS, anchor=ANCHOR, outline=mf.OUTLINE, ground=True, body="idle",
+                   preview_scale=4, gif_scale=4)
+    print(f"OK {NAME}")
