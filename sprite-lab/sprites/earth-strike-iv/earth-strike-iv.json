@@ -4,7 +4,7 @@
     72,
     72
   ],
-  "fps": 13.0,
+  "fps": 14.0,
   "loop": false,
   "anchor": [
     36.0,
@@ -16,20 +16,20 @@
       "name": "burst",
       "start": 0,
       "frames": 8,
-      "fps": 13.0,
+      "fps": 14.0,
       "loop": false,
       "hitbox": {
         "shape": "circle",
         "center": [
           36.0,
-          34.0
+          36.0
         ],
         "active": [
           2,
           6
         ],
-        "radius": 32.0,
-        "inner": 4.0
+        "radius": 37.0,
+        "inner": 0.0
       }
     }
   ]

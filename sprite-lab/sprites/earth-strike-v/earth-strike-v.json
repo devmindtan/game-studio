@@ -1,10 +1,10 @@
 {
-  "frames": 10,
+  "frames": 8,
   "frame_size": [
     88,
     88
   ],
-  "fps": 11.0,
+  "fps": 14.0,
   "loop": false,
   "anchor": [
     44.0,
@@ -15,20 +15,20 @@
     {
       "name": "burst",
       "start": 0,
-      "frames": 10,
-      "fps": 11.0,
+      "frames": 8,
+      "fps": 14.0,
       "loop": false,
       "hitbox": {
         "shape": "circle",
         "center": [
           44.0,
-          40.0
+          44.0
         ],
         "active": [
-          3,
-          8
+          2,
+          6
         ],
-        "radius": 44.0,
+        "radius": 47.0,
         "inner": 0.0
       }
     }
