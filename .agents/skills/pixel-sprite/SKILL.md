@@ -125,6 +125,14 @@ Không báo "xong" khi chưa xem `preview.png`, ảnh `sheet` và ảnh `move`.
   mặt, biểu tượng. Công thức (vòng lặp co giãn, lệch theo k²…) chỉ dùng để đặt vị trí và tạo chuyển động; dựng
   hình dáng bằng công thức cho ra bậc thang lởm chởm (bài học 2026-11-16: nón pháp sư "méo xẹo"). Cần biến thể
   (gió, nghiêng) thì vẽ thêm một bản đồ, đừng uốn bằng công thức.
+- **Skill phải khớp gameplay Bách Ải (bắt buộc trước khi vẽ)**: đọc `games/bach-ai/assets/data/classes.json`, `upgrades_<class>.json` và cách game nạp FX trong `src/run/run.gd` (`sheets` load theo **tên sprite**, `_add_fx(sprite, anim, ...)`). Checklist:
+  - **Tên sprite** phải đúng `skills.<id>.sprite` trong data. Game `sheets.get(name)` trả `null` và **bỏ qua lặng lẽ** nếu sai tên — không có lỗi để phát hiện.
+  - **Animation**: đòn định hướng có `slash_right/left/up/down` (game gọi qua `_slash_anim()`); AOE/cấp bậc dùng **một animation một lần** (`burst`/`spell`, `loop:false`) đặt **neo tại tâm người chơi**; skill duy trì như `whirlwind` dùng `spin`.
+  - **Hitbox** có sẵn, shape đúng hình thật, `active` nằm trong animation. Game scale sprite theo `area` rồi dùng `SpriteHitbox.of`, nên hitbox phải đo từ pixel chứ không gõ tay.
+  - **Neo**: AOE/đạn ở tâm hoặc đầu va chạm; nhân vật đứng `ground=True`.
+  - **Phân class theo roadmap**: băng/đất/phép thuật → Pháp sư hoặc Kiếm sĩ (`ground-slam`, `earth-spikes` là knight); tên/lõi chiêu phải khớp class đó, không vẽ skill "cho chung".
+  - **Bậc I–V là 5 sprite riêng** `<skill>-i..v` để data sau này map `level → sprite`. Hiện game **chưa có mapping đó** (upgrade chỉ nhân `skill_damage.*`): khi bàn giao phải nói rõ đây là **TODO phía game**, không tự sửa `src/` hay `assets/data/` của game.
+
 - **Chiêu thức nâng cấp I–V — chống "cùng một khuôn đổi màu"**: I–V là **nhịp tiến hóa**, KHÔNG phải bản thiết kế chung. Trước khi vẽ, phải chốt **DNA riêng của dòng chiêu** (từ nguyên tố/chất liệu) và ghi ngay vào docstring `gen.py` của cả 5 bậc, ví dụ:
   - **Băng/frost**: kết tinh, **đối xứng tròn**, cạnh sắc, phát sáng lạnh, tuyết.
   - **Đất/earth**: **đứt gãy, dịch chuyển khối, bất đối xứng, nặng**, tảng đá có mặt phẳng/đường vân, bụi, magma lộ ra — KHÔNG được là vòng tròn đối xứng kiểu băng.

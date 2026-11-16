@@ -182,7 +182,9 @@
       "nature",
       "earth",
       "upgrade",
-      "tier-I"
+      "tier-I",
+      "class-knight",
+      "auto-aoe"
     ]
   },
   "earth-strike-ii": {
@@ -191,7 +193,9 @@
       "nature",
       "earth",
       "upgrade",
-      "tier-II"
+      "tier-II",
+      "class-knight",
+      "auto-aoe"
     ]
   },
   "earth-strike-iii": {
@@ -200,7 +204,9 @@
       "nature",
       "earth",
       "upgrade",
-      "tier-III"
+      "tier-III",
+      "class-knight",
+      "auto-aoe"
     ]
   },
   "earth-strike-iv": {
@@ -209,7 +215,9 @@
       "nature",
       "earth",
       "upgrade",
-      "tier-IV"
+      "tier-IV",
+      "class-knight",
+      "auto-aoe"
     ]
   },
   "earth-strike-v": {
@@ -219,7 +227,9 @@
       "earth",
       "ultimate",
       "worldbreaker",
-      "tier-V"
+      "tier-V",
+      "class-knight",
+      "auto-aoe"
     ]
   },
   "earthquake-rift": {
@@ -262,7 +272,9 @@
       "magic",
       "ice",
       "upgrade",
-      "tier-I"
+      "tier-I",
+      "class-mage",
+      "auto-aoe"
     ]
   },
   "frost-nova-ii": {
@@ -271,7 +283,9 @@
       "magic",
       "ice",
       "upgrade",
-      "tier-II"
+      "tier-II",
+      "class-mage",
+      "auto-aoe"
     ]
   },
   "frost-nova-iii": {
@@ -280,7 +294,9 @@
       "magic",
       "ice",
       "upgrade",
-      "tier-III"
+      "tier-III",
+      "class-mage",
+      "auto-aoe"
     ]
   },
   "frost-nova-iv": {
@@ -289,7 +305,9 @@
       "magic",
       "ice",
       "upgrade",
-      "tier-IV"
+      "tier-IV",
+      "class-mage",
+      "auto-aoe"
     ]
   },
   "frost-nova-v": {
@@ -299,7 +317,9 @@
       "ice",
       "ultimate",
       "winter's-end",
-      "tier-V"
+      "tier-V",
+      "class-mage",
+      "auto-aoe"
     ]
   },
   "frost-shard": {
