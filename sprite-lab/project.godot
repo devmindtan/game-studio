@@ -1,0 +1,24 @@
+; Sprite Lab: where every pixel-art sprite of the workspace is made and tested
+; before `gamekit art promote` copies it into a game. Not a game; never exported.
+
+config_version=5
+
+[application]
+
+config/name="Sprite Lab"
+config/version="1.0.0"
+run/main_scene="res://lab/sprite_lab.tscn"
+config/features=PackedStringArray("4.7", "GL Compatibility")
+
+[display]
+
+window/size/viewport_width=1280
+window/size/viewport_height=720
+window/stretch/mode="canvas_items"
+window/stretch/aspect="keep"
+
+[rendering]
+
+textures/canvas_textures/default_texture_filter=0
+renderer/rendering_method="gl_compatibility"
+renderer/rendering_method.mobile="gl_compatibility"
