@@ -12,39 +12,54 @@ sys.path.insert(0,str(HERE.parents[1]/"lib"))
 from spritekit import Canvas
 from sheet import export
 
-NAME="greatsword-iron"; W,H=32,32; ANCHOR=(11.0,30.0)
+NAME="greatsword-iron"; W,H=32,32; ANCHOR=(6.0,28.0)
 
 BLADE="#b8c7d9"; BLADE_D="#6b7f96"; BLADE_L="#d8e4f0"; EDGE="#f2fbff"
 HILT="#8a5a2e"; HILT_D="#563418"; GUARD="#d9b44a"; POMMEL="#d9b44a"
 
-def blade_draw(c,glint=False):
-    # lưỡi thẳng, rộng, chéo lên-phải
-    for i in range(19):
-        x = 10 + i
-        y = 25 - i
-        c.pixel(x, y, BLADE_D)
-        c.pixel(x, y-1, BLADE)
-        c.pixel(x, y-2, BLADE)
-        c.pixel(x-1, y-2, BLADE_L)
-    # fuller
-    for i in range(4, 15):
-        x = 10 + i
-        y = 25 - i
-        c.pixel(x, y-1, BLADE_D)
-    # tip
-    c.pixel(28, 6, BLADE_L); c.pixel(29, 5, EDGE); c.pixel(28, 5, BLADE_L); c.pixel(29, 6, BLADE)
-    # guard rộng, nối đế lưỡi
-    c.line(7, 25, 13, 25, GUARD)
-    c.line(7, 26, 13, 26, HILT_D)
-    c.pixel(13, 24, GUARD)
-    # grip
-    c.line(10, 27, 10, 29, HILT)
-    c.line(9, 27, 9, 29, HILT_D)
-    # pommel
-    c.rect(9, 30, 11, 30, POMMEL)
-    if glint:
-        c.pixel(16, 18, EDGE); c.pixel(19, 15, EDGE); c.pixel(22, 12, EDGE)
+def col(c, x, yc, lo, hi, colors):
+    """Mot cot doc dien lien (tranh hien tuong caro)."""
+    for j, dy in enumerate(range(lo, hi + 1)):
+        y = yc + dy
+        if 0 <= x < W and 0 <= y < H:
+            c.pixel(x, y, colors[j])
 
-def idle(i): c=Canvas(W,H); c.ellipse(8,29,14,31,"#00000033"); blade_draw(c,glint=(i in (2,3))); return c
+def draw(c, glint=False):
+    bx, by = 11, 23          # chan luoi
+    tx = 27                    # cot dinh
+    # luoi: moi cot x co tam y = by-(x-bx), dien day dac
+    for x in range(bx, tx + 1):
+        yc = by - (x - bx)
+        if x >= tx - 1:
+            col(c, x, yc, 0, 0, [BLADE_L])         # dinh nhon
+        elif x == tx - 2:
+            col(c, x, yc, 0, 1, [BLADE_L, BLADE])
+        else:
+            col(c, x, yc, -2, 1, [BLADE_L, BLADE, BLADE, BLADE_D])
+    # guard vuong goc (cheo xuong-phai, slope +1)
+    gx, gy = 11, 23
+    for x in range(7, 15 + 1):
+        yc = gy + (x - gx)
+        col(c, x, yc, 0, 1, [GUARD, HILT_D])
+    # can: xuong-trai cung truc voi luoi (slope -1)
+    for i in range(4):
+        x = gx - 1 - i
+        yc = gy + 1 + i
+        col(c, x, yc, 0, 1, [HILT, HILT_D])
+    # chuom
+    px, py = 6, 28
+    c.rect(px - 1, py - 1, px + 1, py + 1, POMMEL)
+    c.pixel(px - 1, py - 1, GUARD)
+    if glint:
+        c.pixel(bx + 3, by - 3, EDGE); c.pixel(bx + 6, by - 6, EDGE)
+
+def idle(i):
+    c = Canvas(W, H)
+    c.ellipse(5, 27, 13, 31, "#00000033")
+    draw(c, glint=(i in (2, 3)))
+    return c
+
 ANIMATIONS=[("idle",[idle(0)],1,False,{"hitbox":{"shape":"rect","center":[ANCHOR[0],ANCHOR[1]],"active":[0,0]}})]
-if __name__=="__main__": export(HERE,NAME,ANIMATIONS,anchor=ANCHOR); print("ok")
+if __name__=="__main__":
+    export(HERE, NAME, ANIMATIONS, anchor=ANCHOR)
+    print("ok")

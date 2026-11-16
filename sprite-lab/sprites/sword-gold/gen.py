@@ -12,32 +12,54 @@ sys.path.insert(0,str(HERE.parents[1]/"lib"))
 from spritekit import Canvas
 from sheet import export
 
-NAME="sword-gold"; W,H=24,24; ANCHOR=(10.0,22.0)
+NAME="sword-gold"; W,H=24,24; ANCHOR=(5.0,21.0)
 
 BLADE="#e6c35c"; BLADE_D="#a67c1a"; BLADE_L="#f2d98a"; EDGE="#fff6c8"
 HILT="#8a5a2e"; HILT_D="#563418"; GUARD="#8f6a1f"; POMMEL="#8f6a1f"
 
-def sword(c,glint=False):
-    # lưỡi kiếm thẳng, chéo lên-phải
-    for i in range(13):
-        x = 10 + i
-        y = 18 - i
-        c.pixel(x, y, BLADE_D)      # viền tối (dưới-phải)
-        c.pixel(x, y-1, BLADE)      # thân
-        c.pixel(x-1, y-1, BLADE_L)  # viền sáng (trên-trái)
-    # tip
-    c.pixel(22, 5, BLADE_L); c.pixel(23, 4, EDGE); c.pixel(22, 4, BLADE_L); c.pixel(23, 5, BLADE)
-    # guard (ngang chéo nhẹ, nối liền đế lưỡi)
-    c.line(8, 18, 12, 18, GUARD)
-    c.pixel(8, 19, HILT_D); c.pixel(12, 17, GUARD)
-    # grip thẳng xuống
-    c.line(10, 19, 10, 21, HILT)
-    c.line(9, 19, 9, 21, HILT_D)
-    # pommel
-    c.pixel(9, 22, POMMEL); c.pixel(10, 22, POMMEL)
-    if glint:
-        c.pixel(14, 13, EDGE); c.pixel(17, 10, EDGE)
+def col(c, x, yc, lo, hi, colors):
+    """Mot cot doc dien lien (tranh hien tuong caro)."""
+    for j, dy in enumerate(range(lo, hi + 1)):
+        y = yc + dy
+        if 0 <= x < W and 0 <= y < H:
+            c.pixel(x, y, colors[j])
 
-def idle(i): c=Canvas(W,H); c.ellipse(7,21,14,23,"#00000033"); sword(c,glint=(i in (2,3))); return c
+def draw(c, glint=False):
+    bx, by = 9, 17          # chan luoi
+    tx = 20                    # cot dinh
+    # luoi: moi cot x co tam y = by-(x-bx), dien day dac
+    for x in range(bx, tx + 1):
+        yc = by - (x - bx)
+        if x >= tx - 1:
+            col(c, x, yc, 0, 0, [BLADE_L])         # dinh nhon
+        elif x == tx - 2:
+            col(c, x, yc, 0, 1, [BLADE_L, BLADE])
+        else:
+            col(c, x, yc, -1, 1, [BLADE_L, BLADE, BLADE_D])
+    # guard vuong goc (cheo xuong-phai, slope +1)
+    gx, gy = 9, 17
+    for x in range(6, 12 + 1):
+        yc = gy + (x - gx)
+        col(c, x, yc, 0, 1, [GUARD, HILT_D])
+    # can: xuong-trai cung truc voi luoi (slope -1)
+    for i in range(3):
+        x = gx - 1 - i
+        yc = gy + 1 + i
+        col(c, x, yc, 0, 1, [HILT, HILT_D])
+    # chuom
+    px, py = 5, 21
+    c.rect(px - 1, py - 1, px + 1, py + 1, POMMEL)
+    c.pixel(px - 1, py - 1, GUARD)
+    if glint:
+        c.pixel(bx + 3, by - 3, EDGE); c.pixel(bx + 6, by - 6, EDGE)
+
+def idle(i):
+    c = Canvas(W, H)
+    c.ellipse(4, 20, 10, 23, "#00000033")
+    draw(c, glint=(i in (2, 3)))
+    return c
+
 ANIMATIONS=[("idle",[idle(0)],1,False,{"hitbox":{"shape":"rect","center":[ANCHOR[0],ANCHOR[1]],"active":[0,0]}})]
-if __name__=="__main__": export(HERE,NAME,ANIMATIONS,anchor=ANCHOR); print("ok")
+if __name__=="__main__":
+    export(HERE, NAME, ANIMATIONS, anchor=ANCHOR)
+    print("ok")
