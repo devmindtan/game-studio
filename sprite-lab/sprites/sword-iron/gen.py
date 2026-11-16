@@ -12,36 +12,33 @@ sys.path.insert(0,str(HERE.parents[1]/"lib"))
 from spritekit import Canvas
 from sheet import export
 
-NAME="sword-iron"; W,H=24,24; ANCHOR=(12.0,22.0)
+NAME="sword-iron"; W,H=24,24; ANCHOR=(11.0,22.0)
 
 BLADE="#b8c7d9"; BLADE_D="#6b7f96"; BLADE_L="#d8e4f0"; EDGE="#f2fbff"
 HILT="#8a5a2e"; HILT_D="#563418"; GUARD="#d9b44a"; POMMEL="#d9b44a"
 
 def sword(c,glint=False):
-    # lưỡi kiếm thẳng, chéo lên-phải
-    # edge line
-    for i,(x,y) in enumerate([(16,5),(15,7),(14,9),(13,11),(12,13),(11,15),(10,17),(9,19)]):
-        c.pixel(x,y,BLADE_L)
-    # main blade
-    for i,(x,y) in enumerate([(15,6),(14,8),(13,10),(12,12),(11,14),(10,16),(9,18),(8,20)]):
-        c.pixel(x,y,BLADE)
-    # dark edge
-    for i,(x,y) in enumerate([(14,7),(13,9),(12,11),(11,13),(10,15),(9,17),(8,19)]):
-        c.pixel(x,y,BLADE_D)
+    # lưỡi kiếm thẳng, chéo lên-phải (đều, không méo)
+    # blade: 2 px wide along diagonal
+    for i in range(14):
+        x = 9 + i
+        y = 19 - i
+        c.pixel(x, y, BLADE_D)      # viền tối (dưới-phải)
+        c.pixel(x, y-1, BLADE)      # thân
+        if i >= 1:
+            c.pixel(x-1, y-1, BLADE_L)  # viền sáng (trên-trái)
     # tip
-    c.pixel(17,4,EDGE); c.pixel(16,4,BLADE_L); c.pixel(17,5,BLADE)
-    # fuller hint
-    c.pixel(13,12,BLADE_D); c.pixel(12,14,BLADE_D)
-    # guard
-    c.line(7,19,11,17,GUARD); c.pixel(7,19,GUARD); c.pixel(11,17,GUARD)
-    c.pixel(7,20,HILT_D)
+    c.pixel(22, 5, BLADE_L); c.pixel(23, 5, EDGE); c.pixel(22, 6, BLADE)
+    # guard (vuông góc với lưỡi, gọn)
+    c.line(7, 18, 10, 21, GUARD)
+    c.pixel(7, 18, GUARD); c.pixel(10, 21, GUARD)
     # grip
-    c.line(8,20,7,22,HILT); c.pixel(8,21,HILT_D)
+    c.line(8, 20, 7, 22, HILT); c.pixel(8, 21, HILT_D)
     # pommel
-    c.pixel(7,22,POMMEL)
+    c.pixel(6, 22, POMMEL); c.pixel(7, 22, POMMEL)
     if glint:
-        c.pixel(15,8,EDGE); c.pixel(14,10,EDGE)
+        c.pixel(14, 13, EDGE); c.pixel(16, 11, EDGE)
 
-def idle(i): c=Canvas(W,H); c.ellipse(7,21,14,23,"#00000033"); sword(c,glint=(i in (2,3))); return c
+def idle(i): c=Canvas(W,H); c.ellipse(7,21,15,23,"#00000033"); sword(c,glint=(i in (2,3))); return c
 ANIMATIONS=[("idle",[idle(0)],1,False,{"hitbox":{"shape":"rect","center":[ANCHOR[0],ANCHOR[1]],"active":[0,0]}})]
 if __name__=="__main__": export(HERE,NAME,ANIMATIONS,anchor=ANCHOR); print("ok")
