@@ -33,7 +33,7 @@ from sheet import export  # noqa: E402
 
 NAME = "sword-slash"
 SIZE = 48
-PIVOT = (24.0, 24.0)
+PIVOT = (20.0, 26.0)
 ANCHOR = PIVOT
 CORE = "#ffffff"
 EDGE = "#e8f0f6"   # swordsman blade

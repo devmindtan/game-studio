@@ -7,8 +7,8 @@
   "fps": 16.0,
   "loop": false,
   "anchor": [
-    24.0,
-    24.0
+    20.0,
+    26.0
   ],
   "anchor_source": "explicit",
   "animations": [
@@ -28,8 +28,8 @@
       "hitbox": {
         "shape": "arc",
         "center": [
-          24.0,
-          24.0
+          20.0,
+          26.0
         ],
         "active": [
           1,
@@ -57,17 +57,17 @@
       "hitbox": {
         "shape": "arc",
         "center": [
-          24.0,
-          24.0
+          20.0,
+          26.0
         ],
         "active": [
           1,
           2
         ],
-        "radius": 20.0,
-        "inner": 15.0,
+        "radius": 19.0,
+        "inner": 7.0,
         "dir_deg": 180.0,
-        "half_angle_deg": 68.0
+        "half_angle_deg": 92.0
       }
     },
     {
@@ -86,17 +86,17 @@
       "hitbox": {
         "shape": "arc",
         "center": [
-          24.0,
-          24.0
+          20.0,
+          26.0
         ],
         "active": [
           1,
           2
         ],
-        "radius": 20.0,
-        "inner": 15.0,
+        "radius": 25.0,
+        "inner": 11.0,
         "dir_deg": -90.0,
-        "half_angle_deg": 68.0
+        "half_angle_deg": 70.0
       }
     },
     {
@@ -115,17 +115,17 @@
       "hitbox": {
         "shape": "arc",
         "center": [
-          24.0,
-          24.0
+          20.0,
+          26.0
         ],
         "active": [
           1,
           2
         ],
-        "radius": 20.0,
-        "inner": 15.0,
+        "radius": 21.0,
+        "inner": 9.0,
         "dir_deg": 90.0,
-        "half_angle_deg": 68.0
+        "half_angle_deg": 86.0
       }
     }
   ]

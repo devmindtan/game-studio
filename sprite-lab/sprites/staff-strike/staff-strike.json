@@ -1,0 +1,120 @@
+{
+  "frames": 16,
+  "frame_size": [
+    32,
+    32
+  ],
+  "fps": 14.0,
+  "loop": false,
+  "anchor": [
+    16.0,
+    16.0
+  ],
+  "anchor_source": "explicit",
+  "animations": [
+    {
+      "name": "strike_right",
+      "start": 0,
+      "frames": 4,
+      "fps": 14.0,
+      "loop": false,
+      "durations_ms": [
+        60.0,
+        60.0,
+        60.0,
+        50.0
+      ],
+      "hitbox": {
+        "shape": "rect",
+        "center": [
+          25.5,
+          16.0
+        ],
+        "active": [
+          1,
+          2
+        ],
+        "half_w": 2.5,
+        "half_h": 7.0
+      }
+    },
+    {
+      "name": "strike_left",
+      "start": 4,
+      "frames": 4,
+      "fps": 14.0,
+      "loop": false,
+      "durations_ms": [
+        60.0,
+        60.0,
+        60.0,
+        50.0
+      ],
+      "hitbox": {
+        "shape": "rect",
+        "center": [
+          6.5,
+          16.0
+        ],
+        "active": [
+          1,
+          2
+        ],
+        "half_w": 2.5,
+        "half_h": 7.0
+      }
+    },
+    {
+      "name": "strike_up",
+      "start": 8,
+      "frames": 4,
+      "fps": 14.0,
+      "loop": false,
+      "durations_ms": [
+        60.0,
+        60.0,
+        60.0,
+        50.0
+      ],
+      "hitbox": {
+        "shape": "rect",
+        "center": [
+          16.0,
+          6.5
+        ],
+        "active": [
+          1,
+          2
+        ],
+        "half_w": 7.0,
+        "half_h": 2.5
+      }
+    },
+    {
+      "name": "strike_down",
+      "start": 12,
+      "frames": 4,
+      "fps": 14.0,
+      "loop": false,
+      "durations_ms": [
+        60.0,
+        60.0,
+        60.0,
+        50.0
+      ],
+      "hitbox": {
+        "shape": "rect",
+        "center": [
+          16.0,
+          25.5
+        ],
+        "active": [
+          1,
+          2
+        ],
+        "half_w": 7.0,
+        "half_h": 2.5
+      }
+    }
+  ]
+}

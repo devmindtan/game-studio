@@ -1,0 +1,120 @@
+{
+  "frames": 16,
+  "frame_size": [
+    32,
+    32
+  ],
+  "fps": 18.0,
+  "loop": false,
+  "anchor": [
+    16.0,
+    16.0
+  ],
+  "anchor_source": "explicit",
+  "animations": [
+    {
+      "name": "slash_right",
+      "start": 0,
+      "frames": 4,
+      "fps": 18.0,
+      "loop": false,
+      "durations_ms": [
+        40.0,
+        50.0,
+        50.0,
+        40.0
+      ],
+      "hitbox": {
+        "shape": "rect",
+        "center": [
+          25.0,
+          16.0
+        ],
+        "active": [
+          1,
+          2
+        ],
+        "half_w": 2.0,
+        "half_h": 8.0
+      }
+    },
+    {
+      "name": "slash_left",
+      "start": 4,
+      "frames": 4,
+      "fps": 18.0,
+      "loop": false,
+      "durations_ms": [
+        40.0,
+        50.0,
+        50.0,
+        40.0
+      ],
+      "hitbox": {
+        "shape": "rect",
+        "center": [
+          7.0,
+          16.0
+        ],
+        "active": [
+          1,
+          2
+        ],
+        "half_w": 2.0,
+        "half_h": 8.0
+      }
+    },
+    {
+      "name": "slash_up",
+      "start": 8,
+      "frames": 4,
+      "fps": 18.0,
+      "loop": false,
+      "durations_ms": [
+        40.0,
+        50.0,
+        50.0,
+        40.0
+      ],
+      "hitbox": {
+        "shape": "rect",
+        "center": [
+          16.0,
+          7.0
+        ],
+        "active": [
+          1,
+          2
+        ],
+        "half_w": 8.0,
+        "half_h": 2.0
+      }
+    },
+    {
+      "name": "slash_down",
+      "start": 12,
+      "frames": 4,
+      "fps": 18.0,
+      "loop": false,
+      "durations_ms": [
+        40.0,
+        50.0,
+        50.0,
+        40.0
+      ],
+      "hitbox": {
+        "shape": "rect",
+        "center": [
+          16.0,
+          25.0
+        ],
+        "active": [
+          1,
+          2
+        ],
+        "half_w": 8.0,
+        "half_h": 2.0
+      }
+    }
+  ]
+}
