@@ -1,5 +1,5 @@
 {
-  "frames": 21,
+  "frames": 22,
   "frame_size": [
     16,
     16
@@ -155,6 +155,13 @@
     {
       "name": "shield",
       "start": 20,
+      "frames": 1,
+      "fps": 1.0,
+      "loop": false
+    },
+    {
+      "name": "gear",
+      "start": 21,
       "frames": 1,
       "fps": 1.0,
       "loop": false

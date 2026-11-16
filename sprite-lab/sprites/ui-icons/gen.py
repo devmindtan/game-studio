@@ -290,6 +290,20 @@ ICONS = {
         "....odo....",
         ".....o.....",
     ]),
+    # settings: a steel gear with a hole
+    "gear": ({"g": "#9fb3c8", "l": "#e8f0f6", "d": "#5f7186"}, [
+        "....lll....",
+        ".ll.lgl.ll.",
+        ".lgggggggd.",
+        "..ggggggg..",
+        "lggg...gggd",
+        "lggg...gggd",
+        "lggg...gggd",
+        "..ggggggd..",
+        ".gggggggdd.",
+        ".dd.ddd.dd.",
+        "....ddd....",
+    ]),
 }
 
 
