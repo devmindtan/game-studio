@@ -3,7 +3,7 @@
 
   idle    1 frame: đại kiếm lớn, lưỡi thẳng, cân đối.
 
-Neo (12, 30) gần chuôi (sprite 32x32).
+Neo (11, 30) gần chuôi (sprite 32x32).
 
 Chạy:  gamekit art run greatsword
 """
@@ -28,37 +28,38 @@ from sheet import export  # noqa: E402
 
 NAME = "greatsword"
 W, H = 32, 32
-ANCHOR = (12.0, 30.0)
+ANCHOR = (11.0, 30.0)
 
 BLADE = "#b8c7d9"; BLADE_D = "#6b7f96"; BLADE_L = "#d8e4f0"; EDGE = "#f2fbff"
 HILT = "#8a5a2e"; HILT_D = "#563418"; GUARD = "#d9b44a"; POMMEL = "#d9b44a"
 
 
 def blade_draw(c, glint=False):
-    for i in range(20):
-        x = 9 + i
-        y = 26 - i
+    for i in range(19):
+        x = 10 + i
+        y = 25 - i
         c.pixel(x, y, BLADE_D)
         c.pixel(x, y - 1, BLADE)
         c.pixel(x, y - 2, BLADE)
         c.pixel(x - 1, y - 2, BLADE_L)
-    for i in range(3, 16):
-        x = 9 + i
-        y = 26 - i
+    for i in range(4, 15):
+        x = 10 + i
+        y = 25 - i
         c.pixel(x, y - 1, BLADE_D)
-    c.pixel(28, 6, BLADE_L); c.pixel(29, 6, EDGE); c.pixel(28, 7, BLADE); c.pixel(28, 5, BLADE_L)
-    c.line(6, 24, 11, 29, GUARD)
-    c.line(6, 25, 11, 30, HILT_D)
-    c.pixel(6, 24, GUARD); c.pixel(11, 29, GUARD)
-    c.line(9, 28, 7, 30, HILT); c.pixel(8, 29, HILT_D)
-    c.rect(6, 30, 8, 31, POMMEL)
+    c.pixel(28, 6, BLADE_L); c.pixel(29, 5, EDGE); c.pixel(28, 5, BLADE_L); c.pixel(29, 6, BLADE)
+    c.line(7, 25, 13, 25, GUARD)
+    c.line(7, 26, 13, 26, HILT_D)
+    c.pixel(13, 24, GUARD)
+    c.line(10, 27, 10, 29, HILT)
+    c.line(9, 27, 9, 29, HILT_D)
+    c.rect(9, 30, 11, 30, POMMEL)
     if glint:
         c.pixel(16, 18, EDGE); c.pixel(19, 15, EDGE); c.pixel(22, 12, EDGE)
 
 
 def idle(i):
     c = Canvas(W, H)
-    c.ellipse(8, 30, 18, 31, "#00000033")
+    c.ellipse(8, 29, 14, 31, "#00000033")
     blade_draw(c, glint=(i in (2, 3)))
     return c
 
