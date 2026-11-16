@@ -151,16 +151,18 @@ const CATS=[
   {id:'projectile',label:'Projectile'},
   {id:'aoe',label:'AOE'},
   {id:'buff',label:'Buff/Shield'},
+  {id:'status',label:'Trạng thái'},
   {id:'weapon',label:'Vũ khí'},
   {id:'armor',label:'Giáp'},
   {id:'character',label:'Nhân vật'},
   {id:'base',label:'Vật phẩm/Môi trường'}
 ];
-const ORDER=['character','weapon','armor','projectile','aoe','buff','base'];
+const ORDER=['character','weapon','armor','projectile','aoe','buff','status','base'];
 
 function categoryOf(s){
   const n=s.name, aNames=(s.meta.animations||[]).map(a=>a.name);
   if(n==='mage' || n==='swordsman' || s.meta.ground) return 'character';
+  if(/^status-/.test(n)) return 'status';
   if(/^(iron-sword|greatsword|battle-axe|war-hammer|oak-bow|magic-staff)$/.test(n) || /sword|axe|hammer|bow|staff|dagger|spear|mace|wand/.test(n)) return 'weapon';
   if(/helmet|hood|cap|chestplate|robe|tunic|armor|gloves|gauntlets|boots|greaves|shield$|cuirass|leggings|pauldron/.test(n) && !/magnetic/.test(n)) return 'armor';
   if(aNames.includes('fly')) return 'projectile';
