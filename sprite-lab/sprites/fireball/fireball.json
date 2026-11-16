@@ -19,17 +19,17 @@
       "fps": 14.0,
       "loop": true,
       "hitbox": {
-        "shape": "circle",
+        "shape": "rect",
         "center": [
-          10.0,
+          8.0,
           12.0
         ],
         "active": [
           0,
           5
         ],
-        "radius": 10.0,
-        "inner": 0.0
+        "half_w": 8.0,
+        "half_h": 5.0
       }
     },
     {
@@ -39,17 +39,17 @@
       "fps": 14.0,
       "loop": true,
       "hitbox": {
-        "shape": "circle",
+        "shape": "rect",
         "center": [
-          10.0,
+          8.0,
           12.0
         ],
         "active": [
           0,
           5
         ],
-        "radius": 10.0,
-        "inner": 0.0
+        "half_w": 8.0,
+        "half_h": 5.0
       }
     },
     {
@@ -59,17 +59,17 @@
       "fps": 14.0,
       "loop": true,
       "hitbox": {
-        "shape": "circle",
+        "shape": "rect",
         "center": [
-          10.0,
+          16.0,
           12.0
         ],
         "active": [
           0,
           5
         ],
-        "radius": 14.0,
-        "inner": 0.0
+        "half_w": 8.0,
+        "half_h": 5.0
       }
     },
     {
@@ -79,17 +79,17 @@
       "fps": 14.0,
       "loop": true,
       "hitbox": {
-        "shape": "circle",
+        "shape": "rect",
         "center": [
-          10.0,
-          12.0
+          12.0,
+          16.0
         ],
         "active": [
           0,
           5
         ],
-        "radius": 13.0,
-        "inner": 0.0
+        "half_w": 5.0,
+        "half_h": 8.0
       }
     },
     {
@@ -99,17 +99,17 @@
       "fps": 14.0,
       "loop": true,
       "hitbox": {
-        "shape": "circle",
+        "shape": "rect",
         "center": [
-          10.0,
-          12.0
+          12.0,
+          8.0
         ],
         "active": [
           0,
           5
         ],
-        "radius": 13.0,
-        "inner": 0.0
+        "half_w": 5.0,
+        "half_h": 8.0
       }
     },
     {
@@ -119,17 +119,17 @@
       "fps": 14.0,
       "loop": false,
       "hitbox": {
-        "shape": "circle",
+        "shape": "rect",
         "center": [
-          10.0,
-          12.0
+          11.0,
+          12.5
         ],
         "active": [
           0,
-          2
+          6
         ],
-        "radius": 10.0,
-        "inner": 0.0
+        "half_w": 11.0,
+        "half_h": 11.5
       }
     }
   ]

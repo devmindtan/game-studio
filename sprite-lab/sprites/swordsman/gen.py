@@ -168,10 +168,10 @@ def death(i):
 
 # (name, [layers per frame], fps, loop, extra)
 ANIMATIONS = [
-    ("idle", [idle(i) for i in range(4)], 5, True, {"durations_ms": [240, 160, 240, 120]}),
-    ("run", [run(i) for i in range(8)], 12, True, {}),
-    ("hurt", [hurt(i) for i in range(3)], 12, False, {"durations_ms": [90, 110, 120]}),
-    ("death", [death(i) for i in range(5)], 8, False, {"durations_ms": [120, 140, 110, 100, 400]}),
+    ("idle", [idle(i) for i in range(4)], 5, True, {"durations_ms": [240, 160, 240, 120], "hitbox": {"shape":"rect","center":[24.0,44.0],"active":[0,3]}}),
+    ("run", [run(i) for i in range(8)], 12, True, {"hitbox": {"shape":"rect","center":[24.0,44.0],"active":[0,7]}}),
+    ("hurt", [hurt(i) for i in range(3)], 12, False, {"durations_ms": [90, 110, 120], "hitbox": {"shape":"rect","center":[24.0,44.0],"active":[0,2]}}),
+    ("death", [death(i) for i in range(5)], 8, False, {"durations_ms": [120, 140, 110, 100, 400], "hitbox": {"shape":"rect","center":[24.0,44.0],"active":[0,4]}}),
 ]
 
 

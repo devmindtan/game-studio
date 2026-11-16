@@ -18,7 +18,7 @@ def _workspace() -> Path:
 
 sys.path.insert(0, str(_workspace() / "tools/gamekit/pipeline"))
 
-from spritekit import from_rows, gif, preview, strip, write_meta  # noqa: E402
+from spritekit import from_rows, gif, preview, strip, write_anim_meta  # noqa: E402
 
 NAME = "mote"
 FPS = 6
@@ -85,7 +85,9 @@ def main() -> None:
     strip(frames).save(OUT / f"{NAME}_strip.png")
     preview(frames, HERE / "preview.png", scale=24)
     gif(frames, HERE / "anim.gif", fps=6, scale=12)
-    write_meta(OUT / f"{NAME}.json", frames, fps=FPS, anchor=ANCHOR, loop=LOOP)
+    anim = {"name": "idle", "frames": frames, "fps": float(FPS), "loop": LOOP,
+            "hitbox": {"shape": "rect", "center": [ANCHOR[0] if ANCHOR else frames[0].width/2, ANCHOR[1] if ANCHOR else frames[0].height/2], "active": [0, len(frames)-1]}}
+    write_anim_meta(OUT / f"{NAME}.json", [anim], anchor=ANCHOR)
     print(f"strip: {OUT / f'{NAME}_strip.png'}")
 
 

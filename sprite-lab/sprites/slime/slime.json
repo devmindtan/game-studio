@@ -23,7 +23,20 @@
         100.0,
         140.0,
         120.0
-      ]
+      ],
+      "hitbox": {
+        "shape": "rect",
+        "center": [
+          11.5,
+          16.0
+        ],
+        "active": [
+          0,
+          3
+        ],
+        "half_w": 10.5,
+        "half_h": 7.0
+      }
     },
     {
       "name": "attack",
@@ -59,7 +72,20 @@
       "durations_ms": [
         80.0,
         120.0
-      ]
+      ],
+      "hitbox": {
+        "shape": "rect",
+        "center": [
+          11.5,
+          16.5
+        ],
+        "active": [
+          0,
+          1
+        ],
+        "half_w": 10.5,
+        "half_h": 6.5
+      }
     },
     {
       "name": "death",
@@ -72,7 +98,20 @@
         110.0,
         200.0,
         300.0
-      ]
+      ],
+      "hitbox": {
+        "shape": "rect",
+        "center": [
+          11.5,
+          17.5
+        ],
+        "active": [
+          0,
+          3
+        ],
+        "half_w": 11.5,
+        "half_h": 5.5
+      }
     }
   ],
   "ground": true,

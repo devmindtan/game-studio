@@ -92,12 +92,11 @@ def main():
     for r,(_,fr,_,_) in enumerate(ANIMATIONS): sheet.paste(strip(fr),0,r*S)
     preview([sheet],HERE/"preview.png",scale=4)
     for a,fr,fps,_ in ANIMATIONS: gif(fr,HERE/f"{a}.gif",fps=fps,scale=4)
-    dir_map = {"volley":0.0,"volley_right":0.0,"volley_left":180.0,"volley_up":-90.0,"volley_down":90.0}
     meta_anims = []
     for n,f,fps,lp in ANIMATIONS:
         meta_anims.append({"name":n,"frames":f,"fps":fps,"loop":lp,
-                           "hitbox":{"shape":"arc","center":[float(ANCHOR[0]),float(ANCHOR[1])],
-                                     "active":[1,len(f)-1],"dir_deg":dir_map.get(n,0.0)}})
+                           "hitbox":{"shape":"rect","center":[float(ANCHOR[0]),float(ANCHOR[1])],
+                                     "active":[1,len(f)-1]}})
     write_anim_meta(OUT/f"{NAME}.json", meta_anims, anchor=ANCHOR)
     print(OUT/"preview.png")
 

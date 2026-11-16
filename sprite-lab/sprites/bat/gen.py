@@ -109,12 +109,12 @@ def flash(c: Canvas, amount: float = 0.75) -> Canvas:
 
 
 ANIMATIONS = [
-    ("move", [frame("up", -1), frame("mid"), frame("down", 1), frame("mid")], 12, True, {}),
+    ("move", [frame("up", -1), frame("mid"), frame("down", 1), frame("mid")], 12, True, {"hitbox": {"shape":"rect","center":[12.0,12.0],"active":[0,3]}}),
     ("attack", [frame("up", -2), frame("folded", -1, -1), frame("folded", 0, 2)], 12, False,
      {"durations_ms": [140, 80, 120], "hitbox": {"shape": "circle", "center": [ANCHOR[0], ANCHOR[1]], "active": [1, 2]}}),
-    ("hurt", [flash(frame("mid")), frame("mid", 0, -1)], 12, False, {"durations_ms": [80, 120]}),
+    ("hurt", [flash(frame("mid")), frame("mid", 0, -1)], 12, False, {"durations_ms": [80, 120], "hitbox": {"shape":"rect","center":[12.0,12.0],"active":[0,1]}}),
     ("death", [flash(frame("folded")), frame("folded", 2), frame("folded", 5), frame("folded", 8)], 10, False,
-     {"durations_ms": [80, 90, 90, 260]}),
+     {"durations_ms": [80, 90, 90, 260], "hitbox": {"shape":"rect","center":[12.0,12.0],"active":[0,3]}}),
 ]
 
 

@@ -9,8 +9,8 @@ extends RefCounted
 ## ("active") and `gamekit art run` re-checks. Never type hit radii by hand
 ## (lesson 2026-11-16: a hand-tuned radius did not match the drawn sweep).
 ##
-## Shapes: "circle" (ring between inner and radius) and "arc" (that ring, cut
-## to dir_deg ± half_angle_deg).
+## Shapes: "circle" (ring between inner and radius), "arc" (that ring, cut
+## to dir_deg ± half_angle_deg), and "rect" (axis-aligned box, half_w x half_h).
 ##
 ## Example:
 ##   var hb := SpriteHitbox.of(slash, "slash_right", shoulder, 2.0)
@@ -20,8 +20,10 @@ extends RefCounted
 
 var shape := "circle"
 var center := Vector2.ZERO      # world
-var radius := 0.0               # world
-var inner := 0.0                # world
+var radius := 0.0               # world (circle/arc)
+var inner := 0.0                # world (circle/arc)
+var half_w := 0.0               # world (rect)
+var half_h := 0.0               # world (rect)
 var dir := Vector2.RIGHT
 var half_angle := PI            # radians
 var active_from := 0.0          # seconds into the animation
@@ -46,10 +48,14 @@ static func of(sheet: SpriteSheet, anim: String, point: Vector2, scale: float, f
 		local.x = -local.x
 		deg = 180.0 - deg
 	hb.center = point + local * scale
-	hb.radius = float(box.get("radius", 0.0)) * scale
-	hb.inner = float(box.get("inner", 0.0)) * scale
-	hb.dir = Vector2.from_angle(deg_to_rad(deg))
-	hb.half_angle = deg_to_rad(float(box.get("half_angle_deg", 180.0))) if hb.shape == "arc" else PI
+	if hb.shape == "rect":
+		hb.half_w = float(box.get("half_w", 0.0)) * scale
+		hb.half_h = float(box.get("half_h", 0.0)) * scale
+	else:
+		hb.radius = float(box.get("radius", 0.0)) * scale
+		hb.inner = float(box.get("inner", 0.0)) * scale
+		hb.dir = Vector2.from_angle(deg_to_rad(deg))
+		hb.half_angle = deg_to_rad(float(box.get("half_angle_deg", 180.0))) if hb.shape == "arc" else PI
 	var span: Array = box.get("active", [0, int(a.get("frames", 1)) - 1])
 	hb.active_from = frame_time(a, int(span[0]))
 	hb.active_to = frame_time(a, int(span[1]) + 1)
@@ -94,6 +100,9 @@ func is_active(t: float) -> bool:
 
 ## True when a circle at [param p] of radius [param extra] overlaps the area.
 func contains(p: Vector2, extra := 0.0) -> bool:
+	if shape == "rect":
+		var d := p - center
+		return absf(d.x) <= half_w + extra and absf(d.y) <= half_h + extra
 	var d := p - center
 	var dist := d.length()
 	if dist > radius + extra or dist < inner - extra:
@@ -106,7 +115,9 @@ func contains(p: Vector2, extra := 0.0) -> bool:
 
 ## Outline for debug overlays and the sprite lab.
 func draw(canvas: CanvasItem, color: Color, width := 1.0) -> void:
-	if shape == "arc":
+	if shape == "rect":
+		canvas.draw_rect(Rect2(center - Vector2(half_w, half_h), Vector2(half_w * 2.0, half_h * 2.0)), color, false, width)
+	elif shape == "arc":
 		var a0 := dir.angle() - half_angle
 		var a1 := dir.angle() + half_angle
 		canvas.draw_arc(center, radius, a0, a1, 24, color, width)

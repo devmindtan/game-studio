@@ -19,17 +19,17 @@
       "fps": 16.0,
       "loop": true,
       "hitbox": {
-        "shape": "circle",
+        "shape": "rect",
         "center": [
           10.0,
-          10.0
+          10.5
         ],
         "active": [
           0,
           3
         ],
-        "radius": 8.0,
-        "inner": 0.0
+        "half_w": 8.0,
+        "half_h": 7.5
       }
     },
     {
@@ -39,17 +39,17 @@
       "fps": 16.0,
       "loop": true,
       "hitbox": {
-        "shape": "circle",
+        "shape": "rect",
         "center": [
           10.0,
-          10.0
+          10.5
         ],
         "active": [
           0,
           3
         ],
-        "radius": 8.0,
-        "inner": 0.0
+        "half_w": 8.0,
+        "half_h": 7.5
       }
     },
     {
@@ -59,17 +59,17 @@
       "fps": 16.0,
       "loop": true,
       "hitbox": {
-        "shape": "circle",
+        "shape": "rect",
         "center": [
           10.0,
-          10.0
+          9.5
         ],
         "active": [
           0,
           3
         ],
-        "radius": 8.0,
-        "inner": 0.0
+        "half_w": 8.0,
+        "half_h": 7.5
       }
     },
     {
@@ -79,17 +79,17 @@
       "fps": 16.0,
       "loop": true,
       "hitbox": {
-        "shape": "circle",
+        "shape": "rect",
         "center": [
-          10.0,
+          10.5,
           10.0
         ],
         "active": [
           0,
           3
         ],
-        "radius": 8.0,
-        "inner": 0.0
+        "half_w": 7.5,
+        "half_h": 8.0
       }
     },
     {
@@ -99,17 +99,17 @@
       "fps": 16.0,
       "loop": true,
       "hitbox": {
-        "shape": "circle",
+        "shape": "rect",
         "center": [
-          10.0,
+          9.5,
           10.0
         ],
         "active": [
           0,
           3
         ],
-        "radius": 8.0,
-        "inner": 0.0
+        "half_w": 7.5,
+        "half_h": 8.0
       }
     },
     {
@@ -119,17 +119,17 @@
       "fps": 14.0,
       "loop": false,
       "hitbox": {
-        "shape": "circle",
+        "shape": "rect",
         "center": [
-          10.0,
-          10.0
+          11.5,
+          10.5
         ],
         "active": [
           0,
-          2
+          4
         ],
-        "radius": 9.0,
-        "inner": 0.0
+        "half_w": 8.5,
+        "half_h": 1.5
       }
     }
   ]

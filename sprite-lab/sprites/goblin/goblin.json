@@ -17,7 +17,20 @@
       "start": 0,
       "frames": 8,
       "fps": 12.0,
-      "loop": true
+      "loop": true,
+      "hitbox": {
+        "shape": "rect",
+        "center": [
+          27.5,
+          31.5
+        ],
+        "active": [
+          0,
+          7
+        ],
+        "half_w": 11.5,
+        "half_h": 12.5
+      }
     },
     {
       "name": "attack",
@@ -54,7 +67,20 @@
       "durations_ms": [
         80.0,
         120.0
-      ]
+      ],
+      "hitbox": {
+        "shape": "rect",
+        "center": [
+          22.0,
+          32.5
+        ],
+        "active": [
+          0,
+          1
+        ],
+        "half_w": 11.0,
+        "half_h": 11.5
+      }
     },
     {
       "name": "death",
@@ -68,7 +94,20 @@
         100.0,
         100.0,
         300.0
-      ]
+      ],
+      "hitbox": {
+        "shape": "rect",
+        "center": [
+          19.0,
+          32.5
+        ],
+        "active": [
+          0,
+          4
+        ],
+        "half_w": 15.0,
+        "half_h": 11.5
+      }
     }
   ],
   "ground": true,

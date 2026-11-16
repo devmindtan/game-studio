@@ -23,14 +23,40 @@
         160.0,
         240.0,
         120.0
-      ]
+      ],
+      "hitbox": {
+        "shape": "rect",
+        "center": [
+          27.5,
+          30.5
+        ],
+        "active": [
+          0,
+          3
+        ],
+        "half_w": 12.5,
+        "half_h": 13.5
+      }
     },
     {
       "name": "run",
       "start": 4,
       "frames": 8,
       "fps": 12.0,
-      "loop": true
+      "loop": true,
+      "hitbox": {
+        "shape": "rect",
+        "center": [
+          23.0,
+          30.0
+        ],
+        "active": [
+          0,
+          7
+        ],
+        "half_w": 11.0,
+        "half_h": 14.0
+      }
     },
     {
       "name": "hurt",
@@ -42,7 +68,20 @@
         90.0,
         110.0,
         120.0
-      ]
+      ],
+      "hitbox": {
+        "shape": "rect",
+        "center": [
+          25.5,
+          30.5
+        ],
+        "active": [
+          0,
+          2
+        ],
+        "half_w": 14.5,
+        "half_h": 13.5
+      }
     },
     {
       "name": "death",
@@ -56,7 +95,20 @@
         110.0,
         100.0,
         400.0
-      ]
+      ],
+      "hitbox": {
+        "shape": "rect",
+        "center": [
+          16.0,
+          31.0
+        ],
+        "active": [
+          0,
+          4
+        ],
+        "half_w": 15.0,
+        "half_h": 13.0
+      }
     }
   ],
   "ground": true,

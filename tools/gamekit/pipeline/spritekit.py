@@ -385,7 +385,7 @@ def check_ground(meta, strip_img):
 
 
 HITBOX_ALPHA = 96  # pixels fainter than this (glow, haze) never count as the hit area
-HITBOX_SHAPES = ("arc", "circle")
+HITBOX_SHAPES = ("arc", "circle", "rect")
 
 
 def _hit_pixels(frames, centre, alpha_min=HITBOX_ALPHA):
@@ -411,23 +411,61 @@ def _angle_diff(a, b):
     return (a - b + 180.0) % 360.0 - 180.0
 
 
+def _hit_aabb(frames, alpha_min=HITBOX_ALPHA):
+    """Axis-aligned bounding box of every solid pixel (alpha >= alpha_min).
+    Returns (x0, y0, x1, y1) in pixel coords covering pixel centres, or None."""
+    x0 = y0 = 10**9
+    x1 = y1 = -10**9
+    for f in frames:
+        img = f.img if hasattr(f, "img") else f
+        a = img.getchannel("A")
+        w, h = img.size
+        px = a.load()
+        for y in range(h):
+            for x in range(w):
+                if px[x, y] >= alpha_min:
+                    x0 = min(x0, x); y0 = min(y0, y)
+                    x1 = max(x1, x + 1); y1 = max(y1, y + 1)
+    if x1 < 0:
+        return None
+    return x0, y0, x1, y1
+
+
 def fit_hitbox(frames, spec):
     """Measure an effect's hit area from its pixels.
 
-    spec: {"shape": "arc"|"circle", "center": [x, y], "active": [first, last],
+    spec: {"shape": "arc"|"circle"|"rect", "center": [x, y], "active": [first, last],
            "dir_deg": d (arc only; 0 = right, 90 = down)}
     `center` is the pivot in source pixels (the hand for a sword swipe, the
     middle of a spin). Only frames first..last (the frames that deal damage)
     and pixels with alpha >= HITBOX_ALPHA are measured. Returns the spec plus
-    "radius" (outer), "inner" and, for arcs, "half_angle_deg", all from pixels,
-    so nobody types hit numbers by hand."""
+    measured bounds, all from pixels, so nobody types hit numbers by hand.
+
+    Shapes:
+      circle: radius (outer), inner (min distance from center)
+      arc:    circle + dir_deg, half_angle_deg
+      rect:   half_w, half_h (axis-aligned bounding box of solid pixels),
+              and center is set to the box centre (the spec's center is ignored
+              for measurement but kept for reference; we store measured center).
+    """
     import math
 
     shape = spec.get("shape")
     if shape not in HITBOX_SHAPES:
         raise ValueError(f"hitbox shape must be one of {HITBOX_SHAPES}, got {shape!r}")
     first, last = spec.get("active", [0, len(frames) - 1])
-    pts = _hit_pixels(frames[first:last + 1], spec["center"])
+    active_frames = frames[first:last + 1]
+    if shape == "rect":
+        bb = _hit_aabb(active_frames)
+        if bb is None:
+            raise ValueError("hitbox: the active frames have no solid pixels")
+        x0, y0, x1, y1 = bb
+        cx = (x0 + x1) / 2.0
+        cy = (y0 + y1) / 2.0
+        box = {"shape": "rect", "center": [float(cx), float(cy)], "active": [int(first), int(last)],
+               "half_w": float((x1 - x0) / 2.0), "half_h": float((y1 - y0) / 2.0)}
+        return box
+    pts = _hit_pixels(active_frames, spec["center"])
     if not pts:
         raise ValueError("hitbox: the active frames have no solid pixels")
     box = {"shape": shape, "center": [float(v) for v in spec["center"]], "active": [int(first), int(last)],
@@ -467,9 +505,14 @@ def check_hitbox(meta, strip_img):
         except ValueError as e:
             problems.append(f"{name}: {e}")
             continue
-        for key, tol in (("radius", 1.0), ("inner", 1.0), ("half_angle_deg", 3.0)):
+        for key, tol in (("radius", 1.0), ("inner", 1.0), ("half_angle_deg", 3.0), ("half_w", 1.0), ("half_h", 1.0)):
             if key in fit and abs(float(box.get(key, -999)) - fit[key]) > tol:
                 problems.append(f"{name}: hitbox {key} is {box.get(key)}, pixels say {fit[key]} "
+                                "(regenerate: pass the hitbox spec to write_anim_meta / export)")
+        if fit.get("shape") == "rect":
+            fc = fit.get("center", [0, 0]); bc = box.get("center", [-99, -99])
+            if abs(float(bc[0]) - fc[0]) > 1.0 or abs(float(bc[1]) - fc[1]) > 1.0:
+                problems.append(f"{name}: hitbox center is {bc}, pixels say {fc} "
                                 "(regenerate: pass the hitbox spec to write_anim_meta / export)")
     return problems
 

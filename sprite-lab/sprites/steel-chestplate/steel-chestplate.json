@@ -17,7 +17,20 @@
       "start": 0,
       "frames": 1,
       "fps": 1.0,
-      "loop": false
+      "loop": false,
+      "hitbox": {
+        "shape": "rect",
+        "center": [
+          16.5,
+          14.5
+        ],
+        "active": [
+          0,
+          0
+        ],
+        "half_w": 9.5,
+        "half_h": 10.5
+      }
     }
   ]
 }

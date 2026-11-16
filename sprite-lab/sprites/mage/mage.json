@@ -23,14 +23,40 @@
         160.0,
         240.0,
         120.0
-      ]
+      ],
+      "hitbox": {
+        "shape": "rect",
+        "center": [
+          26.0,
+          28.0
+        ],
+        "active": [
+          0,
+          3
+        ],
+        "half_w": 9.0,
+        "half_h": 16.0
+      }
     },
     {
       "name": "run",
       "start": 4,
       "frames": 8,
       "fps": 12.0,
-      "loop": true
+      "loop": true,
+      "hitbox": {
+        "shape": "rect",
+        "center": [
+          27.5,
+          28.0
+        ],
+        "active": [
+          0,
+          7
+        ],
+        "half_w": 13.5,
+        "half_h": 16.0
+      }
     },
     {
       "name": "jump",
@@ -44,7 +70,20 @@
         160.0,
         100.0
       ],
-      "airborne": true
+      "airborne": true,
+      "hitbox": {
+        "shape": "rect",
+        "center": [
+          28.5,
+          28.0
+        ],
+        "active": [
+          0,
+          3
+        ],
+        "half_w": 12.5,
+        "half_h": 16.0
+      }
     },
     {
       "name": "attack",
@@ -112,7 +151,20 @@
         90.0,
         110.0,
         120.0
-      ]
+      ],
+      "hitbox": {
+        "shape": "rect",
+        "center": [
+          26.0,
+          28.0
+        ],
+        "active": [
+          0,
+          2
+        ],
+        "half_w": 12.0,
+        "half_h": 16.0
+      }
     },
     {
       "name": "death",
@@ -126,7 +178,20 @@
         110.0,
         100.0,
         400.0
-      ]
+      ],
+      "hitbox": {
+        "shape": "rect",
+        "center": [
+          17.5,
+          29.0
+        ],
+        "active": [
+          0,
+          4
+        ],
+        "half_w": 17.5,
+        "half_h": 15.0
+      }
     }
   ],
   "ground": true

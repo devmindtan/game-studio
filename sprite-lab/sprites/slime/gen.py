@@ -118,13 +118,13 @@ def flash(c: Canvas, amount: float = 0.75) -> Canvas:
 
 ANIMATIONS = [
     ("move", [shape("normal"), shape("squash"), shape("stretch"), shape("normal")], 8, True,
-     {"durations_ms": [120, 100, 140, 120]}),
+     {"durations_ms": [120, 100, 140, 120], "hitbox": {"shape":"rect","center":[12.0,23.0],"active":[0,3]}}),
     ("attack", [shape("squash", -1), shape("squash", -2), shape("stretch", 2)], 10, False,
      {"durations_ms": [160, 120, 140], "hitbox": {"shape": "circle", "center": [ANCHOR[0], ANCHOR[1]], "active": [1, 2]}}),
     ("hurt", [flash(shape("squash", eyes="closed")), shape("normal", eyes="closed")], 12, False,
-     {"durations_ms": [80, 120]}),
+     {"durations_ms": [80, 120], "hitbox": {"shape":"rect","center":[12.0,23.0],"active":[0,1]}}),
     ("death", [shape("squash", eyes="closed"), shape("flat"), shape("puddle"),
-               shape("puddle").copy()], 8, False, {"durations_ms": [90, 110, 200, 300]}),
+               shape("puddle").copy()], 8, False, {"durations_ms": [90, 110, 200, 300], "hitbox": {"shape":"rect","center":[12.0,23.0],"active":[0,3]}}),
 ]
 
 

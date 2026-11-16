@@ -83,8 +83,8 @@ def main():
     for a,fr,fps,_ in ANIMATIONS: gif(fr,HERE/f"{a}.gif",fps=fps,scale=6)
     write_anim_meta(OUT / f"{NAME}.json",
                     [{"name":n,"frames":f,"fps":fps,"loop":lp,
-                      "hitbox": {"shape": "circle", "center": [float(ANCHOR[0]), float(ANCHOR[1])],
-                                 "active": [0, len(f)-1] if n.startswith("fly") else [0, min(2, len(f)-1)]}}
+                      "hitbox": {"shape": "rect", "center": [float(ANCHOR[0]), float(ANCHOR[1])],
+                                 "active": [0, len(f)-1] if n.startswith("fly") else [0, len(f)-1]}}
                      for n, f, fps, lp in ANIMATIONS],
                     anchor=ANCHOR)
     print(OUT/"preview.png")

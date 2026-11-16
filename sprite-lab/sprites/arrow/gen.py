@@ -126,17 +126,17 @@ def impact(i):
     return c
 
 
-def _circle(active):
-    return {"shape": "circle", "center": [ANCHOR[0], ANCHOR[1]], "active": active}
+def _rect(active):
+    return {"shape": "rect", "center": [ANCHOR[0], ANCHOR[1]], "active": active}
 
 
 ANIMATIONS = [
-    {"name": "fly", "frames": [fly("right", i) for i in range(4)], "fps": 16, "loop": True, "hitbox": _circle([0, 3])},
-    {"name": "fly_right", "frames": [fly("right", i) for i in range(4)], "fps": 16, "loop": True, "hitbox": _circle([0, 3])},
-    {"name": "fly_left", "frames": [fly("left", i) for i in range(4)], "fps": 16, "loop": True, "hitbox": _circle([0, 3])},
-    {"name": "fly_up", "frames": [fly("up", i) for i in range(4)], "fps": 16, "loop": True, "hitbox": _circle([0, 3])},
-    {"name": "fly_down", "frames": [fly("down", i) for i in range(4)], "fps": 16, "loop": True, "hitbox": _circle([0, 3])},
-    {"name": "impact", "frames": [impact(i) for i in range(5)], "fps": 14, "loop": False, "hitbox": _circle([0, 1])},
+    {"name": "fly", "frames": [fly("right", i) for i in range(4)], "fps": 16, "loop": True, "hitbox": _rect([0, 3])},
+    {"name": "fly_right", "frames": [fly("right", i) for i in range(4)], "fps": 16, "loop": True, "hitbox": _rect([0, 3])},
+    {"name": "fly_left", "frames": [fly("left", i) for i in range(4)], "fps": 16, "loop": True, "hitbox": _rect([0, 3])},
+    {"name": "fly_up", "frames": [fly("up", i) for i in range(4)], "fps": 16, "loop": True, "hitbox": _rect([0, 3])},
+    {"name": "fly_down", "frames": [fly("down", i) for i in range(4)], "fps": 16, "loop": True, "hitbox": _rect([0, 3])},
+    {"name": "impact", "frames": [impact(i) for i in range(5)], "fps": 14, "loop": False, "hitbox": _rect([0, 4])},
 ]
 
 

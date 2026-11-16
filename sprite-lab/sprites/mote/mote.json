@@ -4,11 +4,33 @@
     8,
     8
   ],
-  "fps": 6,
+  "fps": 6.0,
   "loop": true,
   "anchor": [
     3.5,
     3.5
   ],
-  "anchor_source": "content_centre"
+  "anchor_source": "content_centre",
+  "animations": [
+    {
+      "name": "idle",
+      "start": 0,
+      "frames": 4,
+      "fps": 6.0,
+      "loop": true,
+      "hitbox": {
+        "shape": "rect",
+        "center": [
+          3.5,
+          3.5
+        ],
+        "active": [
+          0,
+          3
+        ],
+        "half_w": 3.5,
+        "half_h": 3.5
+      }
+    }
+  ]
 }

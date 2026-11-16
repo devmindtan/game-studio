@@ -34,7 +34,7 @@ FRAMES = [
 def main() -> None:
     pal = dict(PAL, L=PAL["l"])
     frames = [from_rows(rows, pal) for rows in FRAMES]
-    export(HERE, "exp-gem", [("idle", frames, 8, True, {"durations_ms": [400, 80, 80, 80]})],
+    export(HERE, "exp-gem", [("idle", frames, 8, True, {"durations_ms": [400, 80, 80, 80], "hitbox": {"shape":"rect","center":[3.5,3.5],"active":[0,3]}})],
            anchor=(3.5, 3.5), preview_scale=16, gif_scale=8)
     print("ok")
 

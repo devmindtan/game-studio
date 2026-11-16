@@ -33,7 +33,7 @@ FRAMES = [
 
 def main() -> None:
     frames = [from_rows(rows, PAL) for rows in FRAMES]
-    export(HERE, "gold-coin", [("idle", frames, 8, True, {})], anchor=(4.0, 4.0), preview_scale=16, gif_scale=8)
+    export(HERE, "gold-coin", [("idle", frames, 8, True, {"hitbox":{"shape":"rect","center":[4.0,4.0],"active":[0,3]}})], anchor=(4.0, 4.0), preview_scale=16, gif_scale=8)
     print("ok")
 
 

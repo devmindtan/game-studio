@@ -89,11 +89,13 @@ Không báo "xong" khi chưa xem `preview.png`, ảnh `sheet` và ảnh `move`.
 - **Vẽ theo vũ khí**: đòn mặc định của một nhân vật có cỡ bằng tầm vũ khí của chính sprite đó (tay + lưỡi);
   sóng chém bay xa, vùng nổ lớn là nâng cấp, không phải đòn đầu.
 - **Neo = điểm xoay** của hiệu ứng (vai/tay với vệt chém, tâm với vòng xoáy), không phải tâm canvas tùy tiện.
-- **Mọi hiệu ứng gây sát thương có `hitbox`** trong animation: truyền spec
-  `{"shape": "arc"|"circle", "center": [x, y], "active": [frame_đầu, frame_cuối], "dir_deg": d}` vào
-  `export(...)`/`write_anim_meta`; bán kính, góc do `fit_hitbox` đo từ pixel (alpha ≥ 96, quầng mờ không tính).
-  `gamekit art run` từ chối hitbox lệch với pixel. Xem hitbox trên ảnh `gamekit art shot <tên> sheet`
-  (đỏ = frame gây sát thương).
+- **Mọi hiệu ứng liên quan đến chiến đấu phải có `hitbox` ngay khi thiết kế** (đòn đánh, projectile, vụ nổ,
+  AOE, vùng gây/nhận hiệu ứng…) để game dùng trực tiếp, không phải thiết kế lại: truyền spec
+  `{"shape": "rect"|"arc"|"circle", "center": [x, y], "active": [frame_đầu, frame_cuối], "dir_deg": d}` vào
+  `export(...)`/`write_anim_meta`. Chọn hình theo **hình dạng thực tế** của animation: `rect` cho tia/cột/vệt
+  thẳng kéo dài, `arc` cho quét/chém hình quạt, `circle` cho vùng tròn/nổ đều. Vùng đo từ pixel frame active
+  (alpha ≥ 96, quầng mờ không tính) bởi `fit_hitbox`; `gamekit art run` từ chối hitbox lệch với pixel. Xem
+  hitbox trên ảnh `gamekit art shot <tên> sheet` (đỏ = frame gây sát thương) và trên web viewer (bật "Hitbox").
 - **Thân (hurtbox) của nhân vật/quái** cũng đo từ pixel: `export(..., body="move")` hoặc
   `write_anim_meta(..., body="idle")` ghi `"body"` (tâm = trọng tâm pixel đặc, bán kính = hình tròn cùng diện tích);
   `art run` từ chối `body` lệch với pixel; ảnh `sheet` vẽ thân màu xanh lá.
