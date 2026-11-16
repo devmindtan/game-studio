@@ -15,14 +15,28 @@ from sheet import export
 NAME="magic-staff-wood"; W,H=24,32; ANCHOR=(12.0,30.0)
 
 MAIN="#b07c44"; DARK="#7a4f2a"; LIGHT="#d4a86a"; EDGE="#e8cfa0"
-ORB="#45a8ff"; ORB_L="#9fd7ff"; ORB_D="#2a5fb8"; TRIM="#6b4410"
+TRIM="#d9b44a"; TRIM_D="#8f6a1f"
+ORB="#45a8ff"; ORB_L="#9fd7ff"; ORB_D="#2a5fb8"; CORE="#ffffff"
 
 def staff(c,glint=False):
-    c.line(12,29,12,8,MAIN,2); c.line(11,29,11,9,DARK,1); c.line(13,29,13,9,LIGHT,1)
-    c.line(10,8,14,8,TRIM); c.line(10,7,10,9,TRIM); c.line(14,7,14,9,TRIM)
-    c.ellipse(10,2,14,6,ORB_D); c.ellipse(11,3,13,5,ORB); c.pixel(11,3,ORB_L); c.pixel(12,4,EDGE)
-    c.pixel(12,29,TRIM)
-    if glint: c.pixel(13,4,EDGE); c.pixel(9,4,ORB_L)
+    # thân gậy thẳng
+    c.rect(11,9,13,30,MAIN)
+    c.line(11,9,11,30,DARK)
+    c.line(13,9,13,30,LIGHT)
+    c.pixel(11,30,DARK); c.pixel(12,30,MAIN); c.pixel(13,30,LIGHT)
+    # vòng trang trí
+    c.line(10,20,14,20,TRIM); c.pixel(10,20,TRIM_D); c.pixel(14,20,TRIM_D)
+    c.line(10,26,14,26,TRIM)
+    # giá giữ ngọc
+    c.line(11,9,10,7,TRIM); c.line(13,9,14,7,TRIM)
+    c.line(10,7,11,6,TRIM_D); c.line(14,7,13,6,TRIM_D)
+    c.rect(10,8,14,9,TRIM)
+    # ngọc phép
+    c.ellipse(10,2,14,6,ORB_D)
+    c.ellipse(11,3,13,5,ORB)
+    c.pixel(11,3,ORB_L); c.pixel(12,4,CORE)
+    if glint:
+        c.pixel(13,3,EDGE); c.pixel(9,4,ORB_L); c.pixel(13,14,EDGE)
 
 def idle(i): c=Canvas(W,H); c.ellipse(9,29,15,31,"#00000033"); staff(c,glint=(i in (2,3))); return c
 ANIMATIONS=[("idle",[idle(0)],1,False,{"hitbox":{"shape":"rect","center":[ANCHOR[0],ANCHOR[1]],"active":[0,0]}})]

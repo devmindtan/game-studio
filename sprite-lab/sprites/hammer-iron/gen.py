@@ -12,18 +12,29 @@ sys.path.insert(0,str(HERE.parents[1]/"lib"))
 from spritekit import Canvas
 from sheet import export
 
-NAME="hammer-iron"; W,H=32,32; ANCHOR=(14.0,30.0)
+NAME="hammer-iron"; W,H=32,32; ANCHOR=(16.0,30.0)
 
-MAIN="#b8c7d9"; DARK="#5f7187"; LIGHT="#d8e4f0"; EDGE="#e8f4ff"
-HILT="#8a5a2e"; HILT_D="#563418"; TRIM="#d9b44a"
+HEAD="#b8c7d9"; HEAD_D="#5f7187"; HEAD_L="#d8e4f0"; EDGE="#f2fbff"
+HILT="#8a5a2e"; HILT_D="#563418"; BAND="#d9b44a"
 
 def hammer(c,glint=False):
-    c.line(13,29,18,9,HILT,2); c.line(13,29,18,9,HILT_D,1); c.line(14,28,19,10,"#d8e4f0",1)
-    c.rect(10,4,26,11,DARK); c.rect(11,5,25,10,MAIN); c.rect(12,6,24,7,LIGHT)
-    c.line(10,4,26,4,EDGE); c.line(10,11,26,11,DARK)
-    c.rect(17,9,19,11,TRIM); c.pixel(13,30,TRIM)
-    if glint: c.pixel(12,5,EDGE); c.pixel(24,5,EDGE)
+    # cán thẳng, nối vào giữa đầu búa
+    c.rect(15,11,17,30,HILT)
+    c.line(15,11,15,30,HILT_D)
+    c.line(17,11,17,30,HEAD_L)
+    c.pixel(15,30,HILT_D); c.pixel(16,30,HILT); c.pixel(17,30,HEAD_L)
+    # đầu búa (khối ngang, cân đối)
+    c.rect(8,4,24,11,HEAD_D)
+    c.rect(9,5,23,10,HEAD)
+    c.rect(10,5,22,6,HEAD_L)
+    c.line(8,4,24,4,EDGE)
+    c.line(8,11,24,11,HEAD_D)
+    c.line(8,4,8,11,HEAD_D); c.line(24,4,24,11,HEAD_D)
+    # vòng siết cán
+    c.rect(14,10,18,11,BAND); c.pixel(14,10,BAND); c.pixel(18,10,BAND)
+    if glint:
+        c.pixel(11,5,EDGE); c.pixel(21,5,EDGE)
 
-def idle(i): c=Canvas(W,H); c.ellipse(10,29,20,31,"#00000033"); hammer(c,glint=(i in (2,3))); return c
+def idle(i): c=Canvas(W,H); c.ellipse(11,29,21,31,"#00000033"); hammer(c,glint=(i in (2,3))); return c
 ANIMATIONS=[("idle",[idle(0)],1,False,{"hitbox":{"shape":"rect","center":[ANCHOR[0],ANCHOR[1]],"active":[0,0]}})]
 if __name__=="__main__": export(HERE,NAME,ANIMATIONS,anchor=ANCHOR); print("ok")

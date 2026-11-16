@@ -12,28 +12,42 @@ sys.path.insert(0,str(HERE.parents[1]/"lib"))
 from spritekit import Canvas
 from sheet import export
 
-NAME="greatsword-iron"; W,H=32,32; ANCHOR=(16.0,30.0)
+NAME="greatsword-iron"; W,H=32,32; ANCHOR=(14.0,30.0)
 
-MAIN="#b8c7d9"; DARK="#5f7187"; LIGHT="#d8e4f0"; EDGE="#e8f4ff"
-HILT="#8a5a2e"; HILT_D="#563418"; TRIM="#d9b44a"
+BLADE="#b8c7d9"; BLADE_D="#6b7f96"; BLADE_L="#d8e4f0"; EDGE="#f2fbff"
+HILT="#8a5a2e"; HILT_D="#563418"; GUARD="#d9b44a"; POMMEL="#d9b44a"
 
-def blade(c,glint=False):
-    c.polygon([(14,28),(10,27),(22,4),(25,5)],DARK)
-    c.polygon([(14,27),(11,26),(22,5),(24,6)],MAIN)
-    c.line(12,26,22,6,LIGHT); c.line(13,26,23,6,MAIN)
-    c.line(13,25,22,7,DARK)
-    c.pixel(23,4,EDGE); c.pixel(24,4,MAIN); c.pixel(23,5,MAIN)
-    c.line(8,25,18,22,TRIM); c.line(8,26,18,23,HILT_D)
-    c.pixel(8,25,TRIM); c.pixel(18,22,TRIM)
-    c.line(13,26,11,30,HILT,2); c.line(13,26,11,30,HILT_D,1)
-    c.pixel(11,30,TRIM); c.rect(10,29,12,30,TRIM)
+def blade_draw(c,glint=False):
+    # lưỡi thẳng, rộng, chéo lên-phải (không méo)
+    # light edge (left/top side of blade)
+    for j,y in enumerate(range(5,25)):
+        x = 22 - j
+        c.pixel(x,y,BLADE_L)
+    # center
+    for j,y in enumerate(range(5,26)):
+        x = 21 - j
+        c.pixel(x,y,BLADE)
+        c.pixel(x-1,y,BLADE)
+    # dark edge
+    for j,y in enumerate(range(6,26)):
+        x = 19 - j
+        c.pixel(x,y,BLADE_D)
+    # fuller (ranh giữa)
+    for j,y in enumerate(range(8,23)):
+        x = 20 - j
+        c.pixel(x,y,BLADE_D)
+    # tip
+    c.pixel(22,4,EDGE); c.pixel(21,4,BLADE_L); c.pixel(22,5,BLADE_L); c.pixel(21,5,BLADE)
+    # guard (ngang, rộng)
+    c.line(5,24,14,21,GUARD); c.line(5,25,14,22,HILT_D)
+    c.pixel(5,24,GUARD); c.pixel(14,21,GUARD)
+    # grip dài
+    c.line(10,23,8,30,HILT); c.pixel(10,24,HILT_D); c.pixel(9,26,HILT_D); c.pixel(8,28,HILT_D)
+    # pommel
+    c.rect(7,29,9,30,POMMEL)
     if glint:
-        for i in range(4):
-            y=20-i*3
-            if 6<=y<=25:
-                x=12+(26-y)*10//20
-                c.pixel(x,y,EDGE)
+        c.pixel(20,8,EDGE); c.pixel(18,12,EDGE); c.pixel(16,16,EDGE)
 
-def idle(i): c=Canvas(W,H); c.ellipse(9,29,20,31,"#00000033"); blade(c,glint=(i in (2,3))); return c
+def idle(i): c=Canvas(W,H); c.ellipse(7,29,16,31,"#00000033"); blade_draw(c,glint=(i in (2,3))); return c
 ANIMATIONS=[("idle",[idle(0)],1,False,{"hitbox":{"shape":"rect","center":[ANCHOR[0],ANCHOR[1]],"active":[0,0]}})]
 if __name__=="__main__": export(HERE,NAME,ANIMATIONS,anchor=ANCHOR); print("ok")

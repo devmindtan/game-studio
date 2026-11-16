@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 """Generator cho sprite "war-hammer": búa chiến (vật phẩm/trang bị).
 
-  idle    6 frame lặp: búa chiến tựa chéo, đầu búa ánh kim.
+  idle    1 frame: búa chiến, đầu vuông một bên và mỏ nhọn bên kia.
 
-Neo (14, 30) gần đuôi cán (sprite 32x32).
+Neo (16, 30) đáy cán (sprite 32x32).
 
 Chạy:  gamekit art run war-hammer
 """
@@ -19,79 +19,59 @@ def _workspace() -> Path:
     raise SystemExit("Không tìm thấy tools/gamekit/pipeline — chạy trong workspace game-studio")
 
 
+HERE = Path(__file__).resolve().parent
 sys.path.insert(0, str(_workspace() / "tools/gamekit/pipeline"))
+sys.path.insert(0, str(HERE.parents[1] / "lib"))
 
-from spritekit import Canvas, gif, preview, strip, write_anim_meta  # noqa: E402
+from spritekit import Canvas  # noqa: E402
+from sheet import export  # noqa: E402
 
 NAME = "war-hammer"
-SIZE = 32
-ANCHOR = (14.0, 30.0)
-HERE = Path(__file__).resolve().parent
-OUT = HERE
+W, H = 32, 32
+ANCHOR = (16.0, 30.0)
 
-STEEL = "#b8c7d9"
-STEEL_D = "#5f7187"
-EDGE = "#e8f4ff"
-WOOD = "#8a5a2e"
-WOOD_D = "#563418"
-GOLD = "#d9b44a"
-DARK = "#3a4657"
-
-
-def p(c, x, y, col):
-    c.pixel(x, y, col)
+HEAD = "#b8c7d9"; HEAD_D = "#5f7187"; HEAD_L = "#d8e4f0"; EDGE = "#f2fbff"
+HILT = "#8a5a2e"; HILT_D = "#563418"; BAND = "#d9b44a"; DARK = "#3a4657"
 
 
 def hammer(c, glint=False):
-    # cán
-    c.line(13, 29, 20, 8, WOOD, 2)
-    c.line(13, 29, 20, 8, WOOD_D, 1)
-    # đầu búa khối
-    c.rect(14, 4, 26, 11, STEEL_D)
-    c.rect(15, 5, 25, 10, STEEL)
-    c.line(15, 5, 25, 5, EDGE)
-    c.line(15, 5, 15, 10, EDGE)
-    # mặt đập
-    c.rect(14, 6, 15, 9, DARK)
-    # mỏ nhọn phía sau
-    c.polygon([(14, 6), (10, 8), (14, 10)], STEEL_D)
-    c.line(10, 8, 14, 7, EDGE)
-    # đai
-    c.rect(18, 7, 21, 11, GOLD)
-    c.line(19, 7, 19, 11, DARK)
-    p(c, 13, 30, GOLD)
+    # cán thẳng
+    c.rect(15, 11, 17, 30, HILT)
+    c.line(15, 11, 15, 30, HILT_D)
+    c.line(17, 11, 17, 30, HEAD_L)
+    c.pixel(15, 30, HILT_D); c.pixel(16, 30, HILT); c.pixel(17, 30, HEAD_L)
+    # đầu búa vuông (bên phải)
+    c.rect(17, 4, 25, 11, HEAD_D)
+    c.rect(18, 5, 24, 10, HEAD)
+    c.rect(19, 5, 23, 6, HEAD_L)
+    c.line(17, 4, 25, 4, EDGE); c.line(25, 4, 25, 11, HEAD_D); c.line(17, 11, 25, 11, HEAD_D)
+    c.rect(24, 6, 25, 9, DARK)  # mặt đập
+    # mỏ nhọn (bên trái)
+    c.pixel(14, 7, HEAD_D); c.pixel(13, 7, HEAD_D); c.pixel(12, 7, HEAD_D); c.pixel(11, 7, HEAD)
+    c.pixel(10, 8, HEAD); c.pixel(11, 8, HEAD_L)
+    c.pixel(14, 8, HEAD); c.pixel(13, 8, HEAD); c.pixel(12, 8, HEAD_L)
+    c.pixel(14, 9, HEAD_D); c.pixel(13, 9, HEAD_D); c.pixel(12, 9, HEAD); c.pixel(11, 9, HEAD)
+    c.pixel(10, 8, EDGE)
+    # vòng siết
+    c.rect(14, 10, 18, 11, BAND)
     if glint:
-        p(c, 16, 5, "#ffffff"); p(c, 22, 5, EDGE)
+        c.pixel(20, 5, EDGE); c.pixel(23, 5, EDGE)
 
 
 def idle(i):
-    c = Canvas(SIZE, SIZE)
-    c.ellipse(10, 29, 20, 31, "#00000033")
-    hammer(c, glint=(i == 2 or i == 3))
+    c = Canvas(W, H)
+    c.ellipse(11, 29, 21, 31, "#00000033")
+    hammer(c, glint=(i in (2, 3)))
     return c
 
 
-ANIMATIONS=[("idle",[idle(0)],1,False)]
+ANIMATIONS = [("idle", [idle(0)], 1, False,
+               {"hitbox": {"shape": "rect", "center": [ANCHOR[0], ANCHOR[1]], "active": [0, 0]}})]
 
 
 def main() -> None:
-    flat = [f for _, frames, _, _ in ANIMATIONS for f in frames]
-    strip(flat).save(OUT / f"{NAME}_strip.png")
-    flat[0].save(OUT / f"{NAME}.png")
-    cols = max(len(frames) for _, frames, _, _ in ANIMATIONS)
-    sheet = Canvas(cols * SIZE, len(ANIMATIONS) * SIZE)
-    for row, (_, frames, _, _) in enumerate(ANIMATIONS):
-        sheet.paste(strip(frames), 0, row * SIZE)
-    preview([sheet], HERE / "preview.png", scale=5)
-    for anim, frames, fps, _ in ANIMATIONS:
-        gif(frames, HERE / f"{anim}.gif", fps=fps, scale=5)
-    write_anim_meta(OUT / f"{NAME}.json",
-                    [{"name": n, "frames": f, "fps": fps, "loop": loop,
-                      "hitbox": {"shape": "rect", "center": [float(ANCHOR[0]), float(ANCHOR[1])], "active": [0, len(f)-1]}}
-                     for n, f, fps, loop in ANIMATIONS],
-                    anchor=ANCHOR)
-    print(f"strip:   {OUT / f'{NAME}_strip.png'}")
-    print(f"preview: {HERE / 'preview.png'}")
+    export(HERE, NAME, ANIMATIONS, anchor=ANCHOR)
+    print(f"ok")
 
 
 if __name__ == "__main__":

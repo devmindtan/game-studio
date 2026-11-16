@@ -7,7 +7,7 @@
   "fps": 1.0,
   "loop": false,
   "anchor": [
-    14.0,
+    16.0,
     30.0
   ],
   "anchor_source": "explicit",
@@ -21,7 +21,7 @@
       "hitbox": {
         "shape": "rect",
         "center": [
-          18.5,
+          16.5,
           17.5
         ],
         "active": [

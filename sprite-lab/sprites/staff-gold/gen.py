@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Gậy gold (vật phẩm, staff)."""
+"""Gậy võ thuật (bo staff) gold (vật phẩm, staff - dùng cho class võ thuật)."""
 import sys
 from pathlib import Path
 def _ws():
@@ -14,14 +14,28 @@ from sheet import export
 
 NAME="staff-gold"; W,H=24,32; ANCHOR=(12.0,30.0)
 
-MAIN="#e6c35c"; DARK="#a67c1a"; LIGHT="#f2d98a"; EDGE="#fff3b0"
-TRIM="#8f6a1f"
+MAIN="#e0b84c"; DARK="#a67c1a"; LIGHT="#f2d98a"; EDGE="#fff3b0"
+GRIP="#6b4410"; GRIP_D="#4a2f18"
 
 def staff(c,glint=False):
-    c.line(12,29,12,4,MAIN,2); c.line(11,29,11,5,DARK,1); c.line(13,29,13,5,LIGHT,1)
-    c.rect(10,3,14,5,TRIM); c.rect(11,2,13,3,TRIM)
-    c.pixel(12,29,TRIM)
-    if glint: c.pixel(13,8,EDGE); c.pixel(13,16,EDGE)
+    # thân gậy thẳng, cân đối (võ thuật/bo staff)
+    c.rect(11,2,13,30,MAIN)
+    c.line(11,2,11,30,DARK)
+    c.line(13,2,13,30,LIGHT)
+    # đầu gậy
+    c.pixel(11,2,EDGE); c.pixel(12,2,EDGE); c.pixel(13,2,LIGHT)
+    c.pixel(11,30,DARK); c.pixel(12,30,MAIN); c.pixel(13,30,LIGHT)
+    # quấn tay giữa
+    for y in range(14,19):
+        c.pixel(11,y,GRIP_D); c.pixel(12,y,GRIP); c.pixel(13,y,GRIP_D)
+    c.pixel(11,14,GRIP_D); c.pixel(13,18,GRIP_D)
+    # quấn gần hai đầu
+    for y in range(5,7):
+        c.pixel(11,y,GRIP_D); c.pixel(12,y,GRIP); c.pixel(13,y,GRIP_D)
+    for y in range(25,27):
+        c.pixel(11,y,GRIP_D); c.pixel(12,y,GRIP); c.pixel(13,y,GRIP_D)
+    if glint:
+        c.pixel(13,10,EDGE); c.pixel(13,22,EDGE)
 
 def idle(i): c=Canvas(W,H); c.ellipse(9,29,15,31,"#00000033"); staff(c,glint=(i in (2,3))); return c
 ANIMATIONS=[("idle",[idle(0)],1,False,{"hitbox":{"shape":"rect","center":[ANCHOR[0],ANCHOR[1]],"active":[0,0]}})]

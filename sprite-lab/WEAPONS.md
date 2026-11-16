@@ -12,8 +12,8 @@ Vũ khí được chia theo **loại (type)** và **chất liệu/cấp (tier/ma
 | `axe` | Rìu, chém nặng | 32x32 | — |
 | `hammer` | Búa, đập gây choáng | 32x32 | — |
 | `bow` | Cung, tấn công tầm xa | 24x32 | projectile `arrow` |
-| `magic-staff` | Gậy phép, dẫn phép thuật | 24x32 | `staff-strike`, projectile `arcane-bolt` |
-| `staff` | Gậy thường (quarterstaff) | 24x32 | `staff-strike` |
+| `magic-staff` | Gậy phép, dẫn phép thuật (đỉnh gắn ngọc) | 24x32 | `staff-strike`, projectile `arcane-bolt` |
+| `staff` | Gậy võ thuật (bo staff/quyền trượng, cán thẳng cân đối, quấn tay) | 24x32 | `staff-strike` |
 | `shield` | Khiên, phòng thủ/đỡ đòn | 32x32 | — |
 
 ## Quy ước đặt tên biến thể
