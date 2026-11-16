@@ -1,0 +1,30 @@
+{
+  "frames": 13,
+  "frame_size": [
+    24,
+    24
+  ],
+  "fps": 14.0,
+  "loop": true,
+  "anchor": [
+    10.0,
+    12.0
+  ],
+  "anchor_source": "explicit",
+  "animations": [
+    {
+      "name": "fly",
+      "start": 0,
+      "frames": 6,
+      "fps": 14.0,
+      "loop": true
+    },
+    {
+      "name": "impact",
+      "start": 6,
+      "frames": 7,
+      "fps": 14.0,
+      "loop": false
+    }
+  ]
+}
