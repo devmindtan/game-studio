@@ -129,8 +129,7 @@ Không báo "xong" khi chưa xem `preview.png`, ảnh `sheet` và ảnh `move`.
   `assets/data/gameplay_rules.json`: tự động, hitbox pixel, tầm trong màn hình, ra đòn nhanh, 4 hướng, mạnh theo
   cấp, khung nhỏ, đúng class, cân bằng DPS). Vẽ hiệu ứng cho game nào thì mở dashboard
   (`sprite-lab/serve-viewer.sh` → `games.html`, tab **Luật gameplay**, và demo ở tab **Kỹ năng**) và chỉ báo xong khi
-  kỹ năng **đạt luật bắt buộc**; `gamekit test <g>` fail nếu kỹ năng trong game vi phạm. Đánh giá của người dùng nằm ở
-  `games/<g>/design/review.json`: đọc trước khi đề xuất hay promote.
+  kỹ năng **đạt luật bắt buộc**; `gamekit test <g>` fail nếu kỹ năng trong game vi phạm.
 - **Skill phải khớp gameplay Bách Ải (bắt buộc trước khi vẽ)**: đọc `games/bach-ai/assets/data/classes.json`, `upgrades_<class>.json` và cách game nạp FX trong `src/run/run.gd` (`sheets` load theo **tên sprite**, `_add_fx(sprite, anim, ...)`). Checklist:
   - **Tên sprite** phải đúng `skills.<id>.sprite` trong data. Game `sheets.get(name)` trả `null` và **bỏ qua lặng lẽ** nếu sai tên — không có lỗi để phát hiện.
   - **Animation**: đòn định hướng có `slash_right/left/up/down` (game gọi qua `_slash_anim()`); AOE/cấp bậc dùng **một animation một lần** (`burst`/`spell`, `loop:false`) đặt **neo tại tâm người chơi**; skill duy trì như `whirlwind` dùng `spin`.

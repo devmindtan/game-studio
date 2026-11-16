@@ -9,27 +9,30 @@
 *{box-sizing:border-box} html,body{height:100%} body{margin:0;font:13px/1.45 system-ui,-apple-system,Segoe UI,Roboto,sans-serif;background:var(--bg);color:var(--text)}
 button,input,select,textarea{font:inherit;color:var(--text)}
 a{color:var(--accent)}
-header{height:48px;padding:0 14px;border-bottom:1px solid var(--border);display:flex;gap:12px;align-items:center;background:#0e1014f5;position:sticky;top:0;z-index:20}
+header{min-height:48px;flex-wrap:wrap;padding:6px 14px;border-bottom:1px solid var(--border);display:flex;gap:12px;align-items:center;background:#0e1014f5;position:sticky;top:0;z-index:20}
 header h1{font-size:14px;margin:0;font-weight:700}
 .navLink{color:var(--muted);text-decoration:none;padding:5px 12px;border-radius:7px;font-weight:600;font-size:12px;border:1px solid transparent}
 .navLink:hover{color:var(--text);background:var(--panel)} .navLink.active{background:#1e3348;border-color:#2b4866;color:#dffaff}
 select.ctrl{background:var(--panel2);border:1px solid var(--border);border-radius:7px;padding:5px 8px;font-size:12px}
 #gameSel{font-weight:700}
-#reviewStatus{margin-left:auto;font-size:12px;color:var(--muted)}
 .layout{display:grid;grid-template-columns:190px 1fr;min-height:calc(100vh - 48px)}
 nav#tabs{border-right:1px solid var(--border);padding:10px 8px;display:flex;flex-direction:column;gap:3px;position:sticky;top:48px;height:calc(100vh - 48px)}
 .tab{display:flex;align-items:center;gap:8px;padding:8px 10px;border-radius:8px;cursor:pointer;color:var(--muted);font-weight:600;border:1px solid transparent;background:none;text-align:left}
 .tab:hover{background:var(--panel);color:var(--text)} .tab.active{background:#2f2550;border-color:#7658c8;color:#fff}
 .tab .n{margin-left:auto;font-size:10px;background:var(--panel3);border-radius:999px;padding:0 6px;color:var(--muted)}
-.tabFoot{margin-top:auto;font-size:11px;color:var(--muted);padding:6px}
 main{padding:16px 18px;min-width:0}
 h2{font-size:18px;margin:0 0 4px} h3{font-size:14px;margin:0 0 8px}
 .lead{color:var(--muted);margin:0 0 14px;max-width:980px}
 .card{background:var(--panel);border:1px solid var(--border);border-radius:10px;padding:12px}
 .grid{display:grid;gap:12px}
-.g2{grid-template-columns:repeat(auto-fill,minmax(420px,1fr))}
-.g3{grid-template-columns:repeat(auto-fill,minmax(300px,1fr))}
-.g4{grid-template-columns:repeat(auto-fill,minmax(220px,1fr))}
+.g2{grid-template-columns:repeat(auto-fill,minmax(min(100%,420px),1fr))}
+.g3{grid-template-columns:repeat(auto-fill,minmax(min(100%,300px),1fr))}
+.g4{grid-template-columns:repeat(auto-fill,minmax(min(100%,150px),1fr))}
+.side2{display:grid;gap:12px;grid-template-columns:minmax(0,420px) minmax(0,1fr);margin-top:10px}
+.tableWrap{overflow-x:auto;max-width:100%}
+.stage canvas{max-width:100%;height:auto}
+main,.card,.grid>*{min-width:0}
+td{overflow-wrap:anywhere}
 .row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
 .muted{color:var(--muted)} .small{font-size:11px}
 .pill{font-size:11px;color:#cfe9ff;background:#1e3348;border:1px solid #2b4866;border-radius:999px;padding:1px 8px;white-space:nowrap}
@@ -54,13 +57,6 @@ canvas{image-rendering:pixelated;display:block}
 #lightbox{position:fixed;inset:0;background:#000d;display:none;align-items:center;justify-content:center;z-index:50;cursor:zoom-out}
 #lightbox img{max-width:94vw;max-height:90vh;image-rendering:auto;border-radius:6px}
 #lightbox .cap{position:fixed;bottom:12px;left:0;right:0;text-align:center;color:#ddd}
-.review{display:flex;gap:4px;align-items:center;flex-wrap:wrap;margin-top:8px;padding-top:8px;border-top:1px dashed var(--border)}
-.review .rb{background:var(--panel2);border:1px solid var(--border);border-radius:6px;padding:2px 8px;font-size:11px;cursor:pointer;color:var(--muted)}
-.review .rb.apply.on{background:#1d3a24;border-color:#3f9a55;color:#c9f5d0}
-.review .rb.maybe.on{background:#3a331a;border-color:#a8902f;color:#ffeeb0}
-.review .rb.reject.on{background:#3a1a22;border-color:#a83f55;color:#ffc9d3}
-.review input{flex:1;min-width:120px;background:var(--panel2);border:1px solid var(--border);border-radius:6px;padding:2px 7px;font-size:11px}
-.review .lbl{font-size:11px;color:var(--muted);margin-right:2px}
 .layers{display:flex;gap:6px;flex-wrap:wrap}
 .layer{display:flex;flex-direction:column;align-items:center;gap:2px;font-size:10px;color:var(--muted);cursor:pointer;padding:3px;border:1px solid var(--border);border-radius:6px;background:#121720}
 .layer.off{opacity:.35} .layer canvas{background:#1b2230}
@@ -79,7 +75,11 @@ canvas{image-rendering:pixelated;display:block}
 .verdict.ok{background:#1d3a24;color:#c9f5d0} .verdict.bad{background:#3a1a22;color:#ffc9d3}
 td.cell{text-align:center}
 .err{color:var(--bad)}
-@media (max-width:1000px){.layout{grid-template-columns:1fr} nav#tabs{position:static;height:auto;flex-direction:row;flex-wrap:wrap;border-right:none;border-bottom:1px solid var(--border)} .split{grid-template-columns:1fr} .g2{grid-template-columns:1fr}}
+@media (max-width:1100px){.side2{grid-template-columns:1fr}}
+@media (max-width:1000px){.layout{grid-template-columns:1fr;grid-template-rows:auto 1fr;align-content:start} .split{grid-template-columns:1fr}
+  nav#tabs{position:sticky;top:0;z-index:10;height:auto;flex-direction:row;flex-wrap:nowrap;overflow-x:auto;border-right:none;border-bottom:1px solid var(--border);background:var(--bg);padding:6px}
+  .tab{white-space:nowrap;padding:6px 10px} header{position:static}}
+@media (max-width:600px){main{padding:12px 10px} h2{font-size:16px} .counter .big{font-size:20px} .card{padding:10px} th,td{padding:5px 6px}}
 </style>
 </head>
 <body>
@@ -89,8 +89,7 @@ td.cell{text-align:center}
   <a class="navLink active" href="games.html">Game</a>
   <select id="gameSel" class="ctrl"></select>
   <span id="gameVer" class="pill"></span>
-  <span id="reviewStatus">Đánh giá được lưu vào <code>games/&lt;game&gt;/design/review.json</code></span>
-</header>
+  </header>
 <div class="layout">
   <nav id="tabs"></nav>
   <main id="main"><div class="empty">Đang tải… (chạy <code>sprite-lab/serve-viewer.sh</code>)</div></main>
@@ -99,9 +98,7 @@ td.cell{text-align:center}
 
 <script>
 /* Game dashboard: everything the game really has, read from games-manifest.json
-   (built from the game's own data files and sprites), so the user can look at it
-   and give a verdict per item: Dùng / Cân nhắc / Không dùng (+ note).
-   Verdicts are POSTed to /api/review and saved in games/<g>/design/review.json. */
+   (built from the game's own data files and sprites), to look at and discuss. */
 const $=id=>document.getElementById(id);
 function el(tag,attrs,...kids){const e=document.createElement(tag);
   for(const [k,v] of Object.entries(attrs||{})){ if(k==='class') e.className=v; else if(k==='html') e.innerHTML=v;
@@ -112,7 +109,7 @@ const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&g
 const md=s=>esc(s).replace(/\*\*(.+?)\*\*/g,'<b>$1</b>').replace(/`(.+?)`/g,'<code>$1</code>');
 const mmss=s=>String(Math.floor(s/60)).padStart(2,'0')+':'+String(Math.floor(s%60)).padStart(2,'0');
 
-let games=[],game=null,labSprites=[],tab='overview',review={};
+let games=[],game=null,labSprites=[],tab='overview';
 const TABS=[
   ['overview','Tổng quan'],['rules','Luật gameplay'],['ui','Giao diện'],['map','Bản đồ & ải'],['heroes','Nhân vật'],
   ['monsters','Quái vật'],['skills','Kỹ năng'],['effects','Hiệu ứng']];
@@ -162,28 +159,6 @@ function iconCanvas(name,sc){const c=el('canvas',{width:16*(sc||1),height:16*(sc
   if(iconSheet&&iconSheet.has(name)){const g=c.getContext('2d'); iconSheet.draw(g,name,0,8*(sc||1),8*(sc||1),sc||1);} return c;}
 function statRow(icon,label,value){return el('div',{class:'stat'},iconCanvas(icon,2),el('span',{class:'k'},label),el('span',{class:'v'},value));}
 
-/* ---------- review widget ---------- */
-let saveTimer=null;
-function reviewBox(key,label){
-  const r=review[key]||{}; const box=el('div',{class:'review'});
-  box.appendChild(el('span',{class:'lbl'},'Đánh giá'+(label?' · '+label:'')+':'));
-  const opts=[['apply','Dùng'],['maybe','Cân nhắc'],['reject','Không dùng']];
-  const btns=opts.map(([v,t])=>{const b=el('button',{class:'rb '+v+(r.status===v?' on':'')},t);
-    b.onclick=()=>{const cur=review[key]||{}; cur.status=cur.status===v?'':v; cur.at=new Date().toISOString(); review[key]=cur;
-      btns.forEach((x,i)=>x.classList.toggle('on',opts[i][0]===cur.status)); saveReview(); }; return b;});
-  btns.forEach(b=>box.appendChild(b));
-  const note=el('input',{placeholder:'ghi chú…',value:r.note||''});
-  note.oninput=()=>{const cur=review[key]||{}; cur.note=note.value; cur.at=new Date().toISOString(); review[key]=cur; saveReview();};
-  box.appendChild(note); return box;}
-function saveReview(){ clearTimeout(saveTimer); $('reviewStatus').textContent='Đang lưu…';
-  saveTimer=setTimeout(async()=>{
-    const clean={}; for(const [k,v] of Object.entries(review)) if(v&&(v.status||v.note)) clean[k]=v;
-    try{ const r=await fetch('/api/review?game='+encodeURIComponent(game.slug),{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(clean)});
-      $('reviewStatus').innerHTML=r.ok?'<span style="color:var(--good)">Đã lưu đánh giá '+new Date().toLocaleTimeString()+'</span>':'<span class="err">Lưu lỗi '+r.status+'</span>';
-    }catch(e){ $('reviewStatus').innerHTML='<span class="err">Không lưu được (server?)</span>'; }
-  },500);}
-function reviewCount(prefix){return Object.entries(review).filter(([k,v])=>k.startsWith(prefix)&&v.status).length;}
-
 /* ---------- boot ---------- */
 async function init(){
   try{
@@ -199,43 +174,38 @@ async function init(){
   if(first) selectGame(first); else $('main').innerHTML='<div class="empty">Chưa có game nào.</div>';
 }
 async function selectGame(g){
-  game=g; review=JSON.parse(JSON.stringify(g.review||{})); $('gameSel').value=g.slug; $('gameVer').textContent='v'+g.version;
+  game=g; $('gameSel').value=g.slug; $('gameVer').textContent='v'+g.version;
   const ic=gameSprite('ui-icons'); iconSheet=ic?await sheetOf(ic):null;
   renderTabs(); render();
 }
 function renderTabs(){
   const n={overview:'',rules:(game.rules&&game.rules.rules||[]).length,ui:game.ui.shots.length,map:game.stages.length,heroes:game.heroes.length,
-    monsters:game.monsters.length,skills:game.skills.length,effects:game.effects.length};
+    monsters:game.monsters.length,skills:game.skills.length,effects:(game.statuses||[]).length};
   const nav=$('tabs'); nav.innerHTML='';
   TABS.forEach(([id,label])=>{const b=el('button',{class:'tab'+(tab===id?' active':'')},label,n[id]!==''?el('span',{class:'n'},n[id]):null);
     b.onclick=()=>{tab=id; renderTabs(); render();}; nav.appendChild(b);});
-  const done=Object.values(review).filter(v=>v.status).length;
-  nav.appendChild(el('div',{class:'tabFoot'},'Đã đánh giá: '+done+' mục'));
 }
 function render(){
   const keep=decodeURIComponent(location.hash.slice(1)).split('/').slice(2).join('/');
   history.replaceState(null,'','#'+game.slug+'/'+tab+(tab==='skills'&&keep?'/'+keep:'')); painters=[];
   const m=$('main'); m.innerHTML=''; ({overview,rules,ui,map,heroes,monsters,skills,effects})[tab](m);
+  wrapTables(m);
 }
 
+function wrapTables(root){ root.querySelectorAll('table').forEach(t=>{ if(t.parentElement.classList.contains('tableWrap')) return;
+  const w=el('div',{class:'tableWrap'}); t.replaceWith(w); w.appendChild(t); }); }
 /* ---------- gameplay rules (assets/data/gameplay_rules.json) ---------- */
 function ruleList(){ return (game.rules&&game.rules.rules)||[]; }
 function ruleOf(id){ return ruleList().find(r=>r.id===id)||{id,title:id,severity:'should'}; }
 function chip(id,res,compact){ const r=ruleOf(id); const st=res[0]==='fail'?(r.severity==='must'?'fail':'warn'):res[0];
   const mark={pass:'✓',fail:'✗',warn:'!',na:'–'}[st];
   return el('span',{class:'chk '+st,title:r.title+': '+res[1]},compact?mark:mark+' '+r.title+(st==='fail'||st==='warn'?' ('+res[1]+')':'')); }
-function checkView(check,compact){ if(!check) return el('span',{class:'muted small'},'Game chưa có gameplay_rules.json');
-  if(compact){ const box=el('div',{});
-    box.appendChild(el('span',{class:'verdict '+(check.ok?'ok':'bad')},check.ok?'Đạt luật':'Không đạt'));
-    const notes=[...check.fail,...check.warn].map(f=>ruleOf(f).title+': '+check.results[f][1]);
-    if(notes.length) box.appendChild(el('div',{class:'small',style:'margin-top:3px;color:'+(check.ok?'var(--warn)':'var(--bad)')},notes.join(' · ')));
-    const row=el('div',{class:'checks'}); ruleList().forEach(r=>{const res=check.results[r.id]; if(res) row.appendChild(chip(r.id,res,true));});
-    box.appendChild(row); return box; }
-  const box=el('div',{});
-  box.appendChild(el('span',{class:'verdict '+(check.ok?'ok':'bad')},check.ok?'Đạt luật bắt buộc':'Vi phạm: '+check.fail.map(f=>ruleOf(f).title).join(', ')));
-  if(check.warn.length) box.appendChild(el('span',{class:'muted small',style:'margin-left:8px'},'Lưu ý: '+check.warn.map(f=>ruleOf(f).title).join(', ')));
-  const row=el('div',{class:'checks'}); ruleList().forEach(r=>{ const res=check.results[r.id]; if(res) row.appendChild(chip(r.id,res)); });
-  box.appendChild(row); return box; }
+function ruleLine(check){
+  if(!check) return el('div',{});
+  const bad=check.fail.map(f=>ruleOf(f).title+' ('+check.results[f][1]+')'), warn=check.warn.map(f=>ruleOf(f).title+' ('+check.results[f][1]+')');
+  return el('p',{class:'small',style:'margin:0 0 8px;color:'+(bad.length?'var(--bad)':warn.length?'var(--warn)':'var(--good)')},
+    bad.length?'Vi phạm luật: '+bad.join('; '):'Đạt luật gameplay'+(warn.length?' · lưu ý: '+warn.join('; '):''));
+}
 function rules(m){
   m.appendChild(el('h2',{},'Luật gameplay'));
   m.appendChild(el('p',{class:'lead',html:'Bách Ải là game 2D sinh tồn kiểu Vampire Survivors: chỉ di chuyển, đòn tự đánh, quái tràn theo đợt. Mọi kỹ năng và hiệu ứng phải qua các luật dưới đây. Luật <b>bắt buộc</b> sai thì <code>gamekit test</code> của game fail. Nguồn: <a href="'+(game.rule_doc||'#')+'" target="_blank">design/gameplay-rules.md</a> và <code>assets/data/gameplay_rules.json</code>.'}));
@@ -265,7 +235,7 @@ function overview(m){
   m.appendChild(el('p',{class:'lead',html:md(b.pitch||'')}));
   const counters=el('div',{class:'grid g4',style:'margin-bottom:14px'});
   [['ui','Màn hình',game.ui.shots.length],['map','Ải',game.stages.length],['heroes','Class',game.heroes.length],
-   ['monsters','Quái',game.monsters.length],['skills','Kỹ năng',game.skills.length],['effects','Hiệu ứng đang dùng',game.effects.length]]
+   ['monsters','Quái',game.monsters.length],['skills','Kỹ năng',game.skills.length],['effects','Hiệu ứng trạng thái',(game.statuses||[]).length]]
    .forEach(([id,l,v])=>{const c=el('div',{class:'counter'},el('div',{class:'big'},v),el('div',{class:'lbl'},l)); c.onclick=()=>{tab=id;renderTabs();render();}; counters.appendChild(c);});
   m.appendChild(counters);
   const g2=el('div',{class:'grid g2'});
@@ -299,7 +269,7 @@ function ui(m){
   const grid=el('div',{class:'grid g2'});
   u.shots.forEach(x=>{ const c=el('div',{class:'card'},el('div',{class:'row'},el('h3',{style:'margin:0'},x.title),el('span',{class:'muted small'},x.name+(x.mtime?' · '+new Date(x.mtime*1000).toLocaleString():''))));
     if(x.url){ const im=el('img',{src:x.url,style:'width:100%;border-radius:6px;border:1px solid var(--border);margin-top:8px;cursor:zoom-in;display:block'}); im.onclick=()=>openLightbox(x.url,x.title); c.appendChild(im); }
-    c.appendChild(reviewBox('ui:'+x.name)); grid.appendChild(c); });
+    grid.appendChild(c); });
   m.appendChild(grid);
 }
 
@@ -329,8 +299,8 @@ function map(m){
   game.stages.forEach(st=>{
     const card=el('div',{class:'card',style:'margin-bottom:14px'});
     card.appendChild(el('div',{class:'row'},el('h3',{style:'margin:0'},'Ải '+(st.number??'?')+' · '+(st.name||st.file)),
-      el('span',{class:'pill'},'trụ '+mmss(st.duration)),el('span',{class:'muted small'},st.file)));
-    const grid=el('div',{class:'grid',style:'grid-template-columns:minmax(300px,420px) 1fr;margin-top:10px'});
+      el('span',{class:'muted small'},'trụ '+mmss(st.duration))));
+    const grid=el('div',{class:'side2'});
     // whole arena
     const S=420, sc=S/(half*2+400); const arena=el('canvas',{width:S,height:S}); const g=arena.getContext('2d');
     drawGround(g,S/2,S/2,sc,half,S,S);
@@ -369,7 +339,7 @@ function map(m){
     st.waves.forEach(wv=>t.appendChild(el('tr',{},el('td',{},el('i',{class:'sw',style:'background:'+col(wv.monster)+';margin-right:6px'}),wv.monster),
       el('td',{},mmss(wv.t_from||0)),el('td',{},mmss(wv.t_to||0)),el('td',{class:'num'},wv.burst?'—':(wv.rate+' → '+(wv.rate_end??wv.rate))),el('td',{class:'num'},wv.burst||''))));
     right.appendChild(t);
-    grid.appendChild(right); card.appendChild(grid); card.appendChild(reviewBox('stage:'+(st.number??st.file)));
+    grid.appendChild(right); card.appendChild(grid);
     m.appendChild(card);
   });
 }
@@ -397,8 +367,8 @@ function heroes(m){
   m.appendChild(el('p',{class:'lead'},'Sprite đúng như game đang dùng (ghép từ các lớp). Bấm một lớp để tắt/bật: đây là chỗ đồ mặc (giáp, mũ, giày, vũ khí) sẽ thay vào.'));
   game.heroes.forEach(h=>{
     const card=el('div',{class:'card',style:'margin-bottom:12px'});
-    card.appendChild(el('div',{class:'row'},el('h3',{style:'margin:0'},h.name),el('span',{class:'pill'},h.id),el('span',{class:'muted small'},'sprite: '+(h.sprite?h.sprite.name:'—')+' · '+h.pool_size+' nâng cấp trong pool')));
-    const grid=el('div',{class:'grid',style:'grid-template-columns:minmax(280px,360px) 1fr;margin-top:10px'});
+    card.appendChild(el('div',{class:'row'},el('h3',{style:'margin:0'},h.name),el('span',{class:'muted small'},'sprite: '+(h.sprite?h.sprite.name:'—')+' · '+h.pool_size+' nâng cấp trong pool')));
+    const grid=el('div',{class:'side2'});
     const left=el('div',{}); const right=el('div',{});
     if(h.sprite){
       const info=h.sprite, enabled={}; (info.meta.layers||[]).forEach(n=>enabled[n]=true);
@@ -436,7 +406,7 @@ function heroes(m){
     right.appendChild(st);
     const sk=Object.keys(h.start_skills||{});
     right.appendChild(el('p',{},el('b',{},'Chiêu khởi đầu: '),sk.map(id=>(game.skills.find(s=>s.id===id)||{name:id}).name).join(', ')||'—'));
-    grid.appendChild(left); grid.appendChild(right); card.appendChild(grid); card.appendChild(reviewBox('hero:'+h.id));
+    grid.appendChild(left); grid.appendChild(right); card.appendChild(grid);
     m.appendChild(card);
   });
 }
@@ -449,7 +419,7 @@ function monsters(m){
   const grid=el('div',{class:'grid g3'});
   game.monsters.forEach(mo=>{
     const s=mo.stats, info=mo.sprite; const card=el('div',{class:'card'});
-    card.appendChild(el('div',{class:'row'},el('h3',{style:'margin:0'},mo.id),el('span',{class:'pill'},BEHAVIOUR[s.behaviour]||s.behaviour)));
+    card.appendChild(el('div',{class:'row'},el('h3',{style:'margin:0'},mo.id),el('span',{class:'muted small'},BEHAVIOUR[s.behaviour]||s.behaviour)));
     let sheet=null, anim='move', showBody=true;
     if(info) sheetOf(info).then(x=>{sheet=x;});
     const sc=(s.scale||2)*1.5;   // game scale for every monster, so sizes compare like in game
@@ -466,9 +436,9 @@ function monsters(m){
     card.appendChild(statRow('heart','Máu',s.hp)); card.appendChild(statRow('sword','Sát thương chạm',s.damage));
     card.appendChild(statRow('boot','Tốc độ',s.speed)); card.appendChild(statRow('gem','Kinh nghiệm rơi',s.xp));
     const extra=Object.entries(s).filter(([k])=>!['sprite','behaviour','hp','damage','speed','xp','scale'].includes(k));
-    if(extra.length) card.appendChild(el('div',{class:'row small muted',style:'margin-top:4px'},extra.map(([k,v])=>el('span',{class:'pill'},k+' '+v))));
+    if(extra.length) card.appendChild(el('div',{class:'small muted',style:'margin-top:4px'},extra.map(([k,v])=>k+' '+v).join(' · ')));
     card.appendChild(el('div',{class:'small muted',style:'margin-top:6px'},mo.appears.length?mo.appears.map(a=>'Ải '+a.stage+': từ '+mmss(a.from)+', ~'+a.expected+' con').join(' · '):'Chưa xuất hiện ở ải nào'));
-    card.appendChild(reviewBox('monster:'+mo.id)); grid.appendChild(card);
+    grid.appendChild(card);
   });
   m.appendChild(grid);
 }
@@ -500,29 +470,27 @@ function skills(m){
   if(game.skills.some(x=>x.id===hb[2])) curSkillId=hb[2];
   if(!game.skills.some(s=>s.id===curSkillId)) curSkillId=game.skills[0].id;
   const show=()=>{ list.innerHTML='';
-    game.skills.forEach(s=>{const r=review['skill:'+s.id];
-      const it=el('div',{class:'listItem'+(s.id===curSkillId?' active':'')},el('div',{class:'t'},s.name+(s.start?' ★':'')+(s.check?(s.check.ok?(s.check.warn.length?' !':' ✓'):' ✗'):'')),
-        el('div',{class:'s'},s.max_level+' cấp · '+s.tiers.length+' bậc sprite · '+s.class+(r&&r.status?' · '+({apply:'Dùng',maybe:'Cân nhắc',reject:'Không dùng'})[r.status]:'')));
+    game.skills.forEach(s=>{
+      const it=el('div',{class:'listItem'+(s.id===curSkillId?' active':'')},el('div',{class:'t'},s.name+(s.start?' ★':'')+''),
+        el('div',{class:'s'},s.max_level+' cấp'+(s.tiers.length>1?' · '+s.tiers.length+' bậc sprite':'')+(s.start?' · chiêu khởi đầu':'')));
       it.onclick=()=>{curSkillId=s.id; painters=[]; history.replaceState(null,'','#'+game.slug+'/skills/'+s.id); show();}; list.appendChild(it);});
-    skillPane(pane,game.skills.find(s=>s.id===curSkillId)); };
+    skillPane(pane,game.skills.find(s=>s.id===curSkillId)); wrapTables(pane); };
   show();
   // stat upgrades
   const su=el('div',{class:'card',style:'margin-top:14px'},el('h3',{},'Nâng cấp chỉ số (thẻ lên cấp)'));
   const t=el('table'); const maxL=Math.max(1,...game.stat_ups.map(u=>u.max_level));
-  t.appendChild(el('tr',{},el('th',{},'Thẻ'),el('th',{},'Mô tả'),...Array.from({length:maxL},(_,i)=>el('th',{class:'num'},'Cấp '+(i+1))),el('th',{},'Đánh giá')));
+  t.appendChild(el('tr',{},el('th',{},'Thẻ'),el('th',{},'Mô tả'),...Array.from({length:maxL},(_,i)=>el('th',{class:'num'},'Cấp '+(i+1)))));
   game.stat_ups.forEach(u=>{const cells=Array.from({length:maxL},(_,i)=>{const lv=u.levels[i]; if(!lv) return el('td',{});
       return el('td',{class:'num small'},Object.entries(lv).map(([k,v])=>k+(v.mul!=null?' ×'+v.mul:' +'+v.add)).join(', '));});
-    const rv=reviewBox('stat:'+u.id); rv.style.cssText='margin:0;padding:0;border:none';
-    t.appendChild(el('tr',{},el('td',{},el('b',{},u.name)),el('td',{class:'small muted'},u.desc),...cells,el('td',{},rv)));});
+    t.appendChild(el('tr',{},el('td',{},el('b',{},u.name)),el('td',{class:'small muted'},u.desc),...cells));});
   su.appendChild(t); m.appendChild(su);
 }
 function skillPane(pane,s){
   pane.innerHTML='';
   const card=el('div',{class:'card'});
-  card.appendChild(el('div',{class:'row'},el('h3',{style:'margin:0'},s.name),s.start?el('span',{class:'pill used'},'chiêu khởi đầu'):null,
-    el('span',{class:'pill'},'tối đa cấp '+s.max_level),el('span',{class:'pill'},'trọng số '+s.weight)));
+  card.appendChild(el('h3',{style:'margin:0'},s.name));
   card.appendChild(el('p',{class:'muted',style:'margin:6px 0'},s.desc));
-  card.appendChild(el('div',{style:'margin-bottom:8px'},checkView(s.check)));
+  card.appendChild(ruleLine(s.check));
   let level=1, showHb=true, speed=1, paused=false, clock=0, last=performance.now();
   const ctl=el('div',{class:'row'});
   const lvSel=el('select',{class:'ctrl'}); s.levels.forEach(l=>lvSel.appendChild(el('option',{value:l.level},'Cấp '+l.level)));
@@ -537,7 +505,7 @@ function skillPane(pane,s){
   // Demo like the game: the real map tiles at game scale, one slime as a training
   // dummy placed in reach, the effect placed the way run.gd places it (body centre,
   // or cast_range towards the target), and the hit shown as in game: red flash,
-  // damage number, hp bar, death when its hp runs out.
+  // damage number, hp bar; it never dies or fades, the loop simply repeats.
   const W=720,H=300;
   let Z=2, VW=W/2, VH=H/2;         // zoom: 2x for small attacks, less for big ones so the whole area fits
   let FEET={x:130,y:100};
@@ -569,13 +537,13 @@ function skillPane(pane,s){
     const dist=kind==='cast'?cast:reach+sb.radius*ssc*0.4;
     const fxAt=kind==='cast'?{x:hc.x+cast,y:hc.y}:hc;
     const target={x:hc.x+dist,y:hc.y}, slFeet={x:target.x-(sb.center[0]-sl.anchor[0])*ssc,y:target.y-(sb.center[1]-sl.anchor[1])*ssc};
-    const lead=0.5, dur=kind==='orbit'?Number(s.params.duration||fx.duration(anim)):fx.duration(anim);
+    const lead=0.3, dur=kind==='orbit'?Number(s.params.duration||fx.duration(anim)):fx.duration(anim);
     const [a0,a1]=hbTimes(fx,anim,hb);
     const ticks=kind==='orbit'?Math.max(1,Number(s.params.ticks||1)):1;
     const hcx=fxAt.x+((hb&&hb.center?hb.center[0]:fx.anchor[0])-fx.anchor[0])*sc, hcy=fxAt.y+((hb&&hb.center?hb.center[1]:fx.anchor[1])-fx.anchor[1])*sc;
     const lands=hb&&hitTest(hb,hcx,hcy,target.x,target.y,sc,sb.radius*ssc);
     const hits=lands?Array.from({length:ticks},(_,k)=>lead+(kind==='orbit'?k*dur/ticks:a0)):[];
-    return {fx,hero,sl,kind,anim,sc,hb,lead,dur,a0,a1,hits,fxAt,hcx,hcy,slFeet,target,ssc,sb,hc,period:lead+dur+1.6};
+    return {fx,hero,sl,kind,anim,sc,hb,lead,dur,a0,a1,hits,fxAt,hcx,hcy,slFeet,target,ssc,sb,hc,period:lead+dur+0.8};
   }
   hitB.onclick=()=>{ const sc=scene(s.levels[level-1]||s.levels[0]); if(!sc||!sc.hits.length) return false;
     clock=sc.hits[0]+0.04; paused=true; playB.textContent='▶ Phát'; playB.classList.remove('on'); return true; };
@@ -593,32 +561,30 @@ function skillPane(pane,s){
     if(Z<2){ g.setTransform(1,0,0,1,0,0); g.fillStyle='rgba(0,0,0,0)'; g.setTransform(Z,0,0,Z,0,0); }
     const u=clock%sc.period, et=u-sc.lead, hp0=Number(dummy.stats.hp||10);
     const done=sc.hits.filter(h=>h<=u), hp=Math.max(0,hp0-done.length*lv.damage), lastHit=done.length?done[done.length-1]:-9;
-    const killAt=hp<=0?done[Math.ceil(hp0/lv.damage)-1]:null;
-    // dummy: idle until hit, red flash on each hit, death when hp runs out
-    if(killAt==null||u-killAt<sc.sl.duration('death')){
-      const dead=killAt!=null, anim=dead?'death':(u-lastHit<0.12?'hurt':'move');
-      const at=dead?u-killAt:(anim==='hurt'?u-lastHit:u*0.6);
-      if(!dead&&u-lastHit<0.12) drawTint(sc.sl,g,anim,at,sc.slFeet.x,sc.slFeet.y,sc.ssc,true,'rgba(255,60,60,.55)');
-      else sc.sl.draw(g,anim,at,sc.slFeet.x,sc.slFeet.y,sc.ssc,true);
-      if(done.length&&!dead){ const r=sc.sb.radius*sc.ssc, w=Math.max(16,r*2), top={x:Math.round(sc.target.x-w/2),y:Math.round(sc.target.y-r-8)};
-        g.fillStyle='#1a0d14'; g.fillRect(top.x-1,top.y-1,w+2,5); g.fillStyle='#e6404d'; g.fillRect(top.x,top.y,Math.round(w*hp/hp0),3); }
-    }
+    const lethal=hp<=0;
+    // the dummy never dies or fades: red flash on each hit, hp bar from the first hit, full hp next loop
+    const flash=u-lastHit<0.12;
+    if(flash) drawTint(sc.sl,g,'hurt',u-lastHit,sc.slFeet.x,sc.slFeet.y,sc.ssc,true,'rgba(255,60,60,.55)');
+    else sc.sl.draw(g,'move',u*0.6,sc.slFeet.x,sc.slFeet.y,sc.ssc,true);
+    if(done.length){ const r=sc.sb.radius*sc.ssc, w=Math.max(16,r*2), top={x:Math.round(sc.target.x-w/2),y:Math.round(sc.target.y-r-8)};
+      g.fillStyle='#1a0d14'; g.fillRect(top.x-1,top.y-1,w+2,5); g.fillStyle='#e6404d'; g.fillRect(top.x,top.y,Math.round(w*hp/hp0),3); }
     sc.hero.draw(g,'idle',u,FEET.x,FEET.y,2,false);
-    if(u<sc.lead){ const k=u/sc.lead; g.strokeStyle='rgba(255,211,107,'+(0.9-k*0.6)+')'; g.lineWidth=2; g.beginPath(); g.arc(sc.hc.x,sc.hc.y,8+k*20,0,Math.PI*2); g.stroke(); }
     if(et>=0&&et<sc.dur){ const at=sc.kind==='orbit'?et%sc.fx.duration(sc.anim):et; sc.fx.draw(g,sc.anim,at,sc.fxAt.x,sc.fxAt.y,sc.sc);
       const active=sc.kind==='orbit'||(et>=sc.a0&&et<sc.a1);
-      if(showHb&&sc.hb) drawHb(g,sc.hb,sc.hcx,sc.hcy,sc.sc,active);
+      if(showHb&&sc.hb) drawHb(g,sc.hb,sc.hcx,sc.hcy,sc.sc,true);
       if(showHb){ g.strokeStyle='rgba(110,255,140,.8)'; g.lineWidth=1.5; g.beginPath(); g.arc(sc.target.x,sc.target.y,sc.sb.radius*sc.ssc,0,Math.PI*2); g.stroke(); } }
     // damage numbers like the game: rise and fade over 0.7 s
-    done.forEach((h,i)=>{ const k=(u-h)/0.7; if(k<0||k>1) return; g.save(); g.globalAlpha=k<.6?1:1-(k-.6)/.4;
-      g.font='bold '+Math.round(18/Z)+'px system-ui'; g.textAlign='center'; g.lineWidth=5/Z;   // ~18 px on screen at any zoom g.strokeStyle='#1a0d14'; const y=sc.target.y-sc.sb.radius*sc.ssc-10-k*20+(i%2)*4;
+    done.forEach((h,i)=>{ const k=(u-h)/0.7; if(k<0||k>1) return; g.save();
+      // ~18 px on screen at any zoom
+      g.font='bold '+Math.round(18/Z)+'px system-ui'; g.textAlign='center'; g.lineWidth=5/Z; g.strokeStyle='#1a0d14';
+      const y=sc.target.y-sc.sb.radius*sc.ssc-10-k*20+(i%2)*4;
       g.strokeText(String(Math.round(lv.damage)),sc.target.x,y); g.fillStyle='#fff0a0'; g.fillText(String(Math.round(lv.damage)),sc.target.x,y); g.restore(); });
     const hitNow=done.length&&u-lastHit<0.3;
     g.setTransform(1,0,0,1,0,0);
     g.font='12px system-ui'; g.textAlign='left'; g.fillStyle='#e9eef8';
     g.fillText('×'+Z.toFixed(2).replace(/\.?0+$/,'')+' · Cấp '+lv.level+' · '+lv.sprite+' · '+({melee:'chém gần',orbit:'xoáy quanh người',cast:'bắn ra '+(s.params.cast_range||0)+' px',self:'quanh người'})[sc.kind]+' · sát thương '+lv.damage+' · slime '+hp0+' máu',10,18);
     if(!sc.hits.length){ g.fillStyle='#ff8a8a'; g.fillText('Không trúng hình nhân ở vị trí này',10,36); }
-    if(hitNow){ g.font='bold 22px system-ui'; g.fillStyle='#ffd36b'; g.textAlign='center'; g.fillText(killAt!=null&&lastHit===killAt?'HẠ!':'TRÚNG!',W/2,40); }
+    if(hitNow){ g.font='bold 22px system-ui'; g.fillStyle='#ffd36b'; g.textAlign='center'; g.fillText(lethal?'HẠ!':'TRÚNG!',W/2,40); }
   });
   cv.style.cssText='width:100%;height:auto'; card.appendChild(el('div',{class:'stage',style:'margin-top:8px;padding:0'},cv));
   // per level table
@@ -634,43 +600,14 @@ function skillPane(pane,s){
     r.style.cursor='pointer'; r.onclick=()=>{lvSel.value=l.level; lvSel.onchange();}; rows.push(r); t.appendChild(r);});
   const markRow=()=>rows.forEach((r,i)=>r.style.background=i===level-1?'#2f2550':'');
   markRow(); card.appendChild(t);
-  card.appendChild(el('div',{class:'row small',style:'margin-top:8px'},Object.entries(s.params).filter(([k])=>k!=='tier_sprites').map(([k,v])=>el('span',{class:'pill'},k+': '+v))));
-  card.appendChild(reviewBox('skill:'+s.id));
   pane.appendChild(card);
 }
 
-/* ---------- 7. effects actually used by the game ---------- */
-let effHb=true;
+/* ---------- 7. effects: status effects on characters (buff / debuff) ---------- */
 function effects(m){
   m.appendChild(el('h2',{},'Hiệu ứng'));
-  m.appendChild(el('p',{class:'lead'},'Chỉ các hiệu ứng game đang thật sự dùng (sprite của kỹ năng trong data), nhóm theo kỹ năng và bậc.'));
-  const bar=el('div',{class:'row',style:'margin-bottom:10px'}); const hbB=el('button',{class:'btn'+(effHb?' on':'')},'Hitbox');
-  hbB.onclick=()=>{effHb=!effHb; hbB.classList.toggle('on',effHb);}; bar.appendChild(hbB); m.appendChild(bar);
-  const groups={}; game.effects.forEach(e=>{(groups[e.skill]=groups[e.skill]||[]).push(e);});
-  Object.values(groups).forEach(list=>{
-    const sec=el('div',{class:'card',style:'margin-bottom:12px'},el('div',{class:'row'},el('h3',{style:'margin:0'},'Kỹ năng: '+list[0].skill_name),list[0].check?checkView(list[0].check,true):null));
-    const grid=el('div',{class:'grid g4',style:'margin-top:10px'});
-    list.forEach(e=>{ const info=e.sprite; const card=el('div',{class:'card',style:'background:var(--panel2)'});
-      let sheet=null, anim=null; sheetOf(info).then(x=>{sheet=x; anim=x?effectAnim(x):null;});
-      const fs=info.meta.frame_size||[32,32]; const sc=Math.max(1,Math.floor(150/Math.max(fs[0],fs[1])));
-      const cv=liveCanvas(200,170,(g,t)=>{ g.clearRect(0,0,200,170); drawGround(g,100,85,1,1e9,200,170);
-        if(!sheet) return; const ax=100-(fs[0]/2-sheet.anchor[0])*sc, ay=85-(fs[1]/2-sheet.anchor[1])*sc;
-        const d=sheet.duration(anim), tt=t%(d+0.4); sheet.draw(g,anim,Math.min(tt,d-0.001),ax,ay,sc);
-        const hb=hbAt(sheet,anim); if(effHb&&hb){ const [a0,a1]=hbTimes(sheet,anim,hb);
-          drawHb(g,hb,ax+((hb.center?hb.center[0]:sheet.anchor[0])-sheet.anchor[0])*sc,ay+((hb.center?hb.center[1]:sheet.anchor[1])-sheet.anchor[1])*sc,sc,tt>=a0&&tt<a1);} });
-      card.appendChild(el('div',{class:'stage'},cv));
-      card.appendChild(el('div',{class:'row',style:'margin-top:6px'},el('b',{},info.name),e.tier?el('span',{class:'pill'},'bậc '+['I','II','III','IV','V'][e.tier-1]+' · cấp '+e.tier):null));
-      const anims=(info.meta.animations||[]).map(a=>a.name);
-      card.appendChild(el('div',{class:'small muted'},fs.join('×')+' · '+anims.join(', ')));
-      if(anims.length>1){ const ab=el('div',{class:'row',style:'margin-top:4px'});
-        anims.forEach(n=>{const b=el('button',{class:'btn small'},n); b.onclick=()=>{anim=n; ab.querySelectorAll('.btn').forEach(x=>x.classList.toggle('on',x===b));}; ab.appendChild(b);});
-        card.appendChild(ab);}
-      card.appendChild(reviewBox('effect:'+info.name)); grid.appendChild(card);});
-    sec.appendChild(grid); m.appendChild(sec);
-  });
-  const st=el('div',{class:'card'},el('h3',{},'Trạng thái (buff / debuff)'));
-  st.appendChild(game.statuses&&game.statuses.length?el('div',{},'…'):el('div',{class:'empty',style:'padding:8px'},'Game chưa có hiệu ứng trạng thái. Khi có buff/debuff (bỏng, độc, choáng, tăng tốc…) chúng sẽ hiện ở đây.'));
-  m.appendChild(st);
+  m.appendChild(el('p',{class:'lead'},'Hiệu ứng trạng thái hiện trực tiếp lên người (buff / debuff), ví dụ chảy máu, bỏng, độc, choáng, tăng tốc. Mỗi hiệu ứng vẽ cho mọi nhân vật và quái. Sprite của kỹ năng nằm ở tab Kỹ năng.'));
+  if(!(game.statuses||[]).length){ m.appendChild(el('div',{class:'card empty'},'Game chưa có hiệu ứng trạng thái.')); return; }
 }
 
 init();

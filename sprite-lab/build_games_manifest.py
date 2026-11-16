@@ -17,8 +17,7 @@ Per game:
               follows PlayerStats (add per level, mul per level, floor 0.2)
   stat_ups    the stat upgrades with their per-level values
   sprites     every sprite folder the game ships (assets/sprites/custom)
-  effects     the effect sprites skill data really plays (no lab library here)
-  review      design/review.json (the user's verdicts saved by the dashboard)
+  statuses    buff/debuff effects drawn on characters (empty until the game has them)
 
 Paths are relative to sprite-lab/ (the page lives there; the server is rooted
 at the workspace, see serve-viewer.sh). Image URLs carry ?v=<mtime>.
@@ -316,18 +315,6 @@ def check_skill(skill, cls, rules_doc, sprite_meta, scale):
     return grade(res, rules)
 
 
-def used_effects(skills, sprites):
-    """Effect sprites the game's data really plays (skill sprites and tiers)."""
-    by_name = {s["name"]: s for s in sprites}
-    out = []
-    for sk in skills:
-        for lv, t in enumerate(sk["tiers"], 1):
-            if t in by_name:
-                out.append({"sprite": by_name[t], "skill": sk["id"], "skill_name": sk["name"],
-                            "tier": lv if len(sk["tiers"]) > 1 else 0, "check": sk.get("check")})
-    return out
-
-
 def build_game(slug):
     root = os.path.join(GAMES, slug)
     data = os.path.join(root, "assets", "data")
@@ -385,9 +372,9 @@ def build_game(slug):
         "brief": brief_pitch(root), "decisions": decisions(root), "ui": ui_set(root),
         "world": cfg.get("world", {}), "xp": cfg.get("xp", {}), "pickups": cfg.get("pickups", {}),
         "stages": stages, "heroes": heroes, "monsters": mons, "skills": skills, "stat_ups": stat_ups,
-        "sprites": sprites, "review": load(os.path.join(root, "design", "review.json")),
+        "sprites": sprites,
         "rules": rules_doc, "rule_doc": rel(os.path.join(root, "design", "gameplay-rules.md")),
-        "effects": used_effects(skills, sprites), "statuses": [],
+        "statuses": [],   # buff/debuff effects drawn on characters: none in the game yet
     }
 
 

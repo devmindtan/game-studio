@@ -86,7 +86,7 @@ dải frame có thời lượng từng frame (bấm để nhảy tới), GIF và
 ### Game dashboard (`games.html`)
 
 Toàn bộ những gì một game đang có, đọc thẳng từ repo game (`build_games_manifest.py`, server dựng lại mỗi lần
-trang tải), để xem và **đánh giá có áp dụng vào game không**:
+trang tải), để xem và quyết định có áp dụng vào game không:
 
 | Mục | Nội dung |
 |---|---|
@@ -97,11 +97,10 @@ trang tải), để xem và **đánh giá có áp dụng vào game không**:
 | Nhân vật | animation, các lớp (bật/tắt từng lớp = chỗ đồ mặc thay vào), chỉ số kèm icon |
 | Quái vật | animation cùng tỉ lệ game, thân đo từ pixel, chỉ số, xuất hiện ở ải nào |
 | Kỹ năng | demo như trong game (nền bản đồ thật, slime làm hình nhân, chớp đỏ + số sát thương + thanh máu), nút "Khoảnh khắc trúng", bảng giá trị từng cấp, nâng cấp chỉ số; đường dẫn `games.html#<g>/skills/<kỹ năng>/hit/<cấp>` mở thẳng lúc trúng |
-| Hiệu ứng | chỉ hiệu ứng game đang dùng (nhóm theo kỹ năng, bậc); mục buff/debuff (trống khi game chưa có) |
+| Hiệu ứng | hiệu ứng trạng thái vẽ lên người (buff/debuff: chảy máu, bỏng, độc…, cho mọi nhân vật); trống khi game chưa có |
 
-Mỗi mục có **Dùng / Cân nhắc / Không dùng + ghi chú**; bấm là lưu (`POST /api/review`) vào
-`games/<g>/design/review.json`. Agent đọc file đó khi làm game tiếp, và commit nó vào repo game.
-Script dựng manifest **chỉ đọc** repo game; server chỉ ghi đúng file `design/review.json`.
+Trang chỉ để xem; đánh giá và quyết định trao đổi trực tiếp với agent. Script dựng manifest và server **chỉ đọc**
+repo game.
 
 ## Trình thử (`gamekit art lab [<tên>] [sheet|move]`)
 
