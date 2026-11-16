@@ -69,8 +69,9 @@ workspace. Không copy helper vào từng game, không hard-code đường dẫn
    c.outline("#5a3300")
    ```
 
-3. **Chạy và nhìn**: `gamekit art run <g> <name>`, rồi dùng tool `read` mở
-   `preview.png` và `anim.gif`. Sửa, lặp 2–3 vòng.
+3. **Chạy và nhìn**: `gamekit art run <g> <name>`, rồi dùng công cụ đọc ảnh của agent (Read, read, view…)
+   mở `preview.png` (ảnh tĩnh, phóng to, có lưới). Nhiều agent không đọc được GIF động: xem các frame trong
+   `preview.png`, còn `anim.gif` là cho người xem. Sửa, lặp 2–3 vòng.
 4. **Kiểm tra trong game**: thêm PNG vào `Sprite2D`/`AnimatedSprite2D` hoặc
    `_draw`, chạy `gamekit test <g>` + `gamekit shot <g>` rồi xem ảnh.
 5. **Bàn giao**: PNG trong `assets/sprites/custom/`; `.ase` trong `assets/source/`
@@ -87,8 +88,9 @@ workspace. Không copy helper vào từng game, không hard-code đường dẫn
 
 ## Godot 4.7
 
-- Pixel art cần lọc Nearest: `rendering/textures/canvas_textures/default_texture_filter=0`
-  trong Project Settings, hoặc `texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST`.
+- Pixel art cần lọc Nearest. Game do `gamekit new` tạo đã có sẵn
+  `rendering/textures/canvas_textures/default_texture_filter=0`; game cũ thì thêm dòng này vào `project.godot`
+  (hoặc đặt `texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST` trên node). Thiếu nó, sprite bị nhòe khi phóng to.
 - Bật `rendering/2d/snap/snap_2d_transforms_to_pixel` nếu sprite bị nửa pixel.
 - File PNG trong `assets/sprites/` được Godot tự import; không cần `.tres` cho
   sprite đơn, dùng `AnimatedSprite2D` + `SpriteFrames` nếu có animation.
@@ -98,5 +100,6 @@ workspace. Không copy helper vào từng game, không hard-code đường dẫn
 - Không dùng dịch vụ ảnh trả phí, không gửi art lên mạng.
 - Không sửa `templates/` hay `tools/lpc-generator/` (clone upstream).
 - Không ghi đè sprite/credits hiện có khi chưa hỏi.
-- Không commit nếu người dùng chưa yêu cầu.
+- Không bỏ qua commit: theo "Quy tắc commit" trong `AGENTS.md` ở gốc workspace, commit `gen.py`, PNG và
+  `.ase` (nếu có) vào repo của game ngay khi sprite đạt.
 - Không báo "xong" khi chưa mở ảnh preview và ảnh chụp trong game.

@@ -1,0 +1,3 @@
+# Aider: load the shared workspace instructions read-only (same file every agent uses).
+read:
+  - AGENTS.md
