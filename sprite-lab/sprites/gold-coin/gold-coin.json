@@ -1,0 +1,23 @@
+{
+  "frames": 4,
+  "frame_size": [
+    8,
+    8
+  ],
+  "fps": 8.0,
+  "loop": true,
+  "anchor": [
+    4.0,
+    4.0
+  ],
+  "anchor_source": "explicit",
+  "animations": [
+    {
+      "name": "idle",
+      "start": 0,
+      "frames": 4,
+      "fps": 8.0,
+      "loop": true
+    }
+  ]
+}
