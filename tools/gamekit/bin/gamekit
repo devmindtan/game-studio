@@ -54,6 +54,7 @@ Play and test
   test <game>                  import + unit/integration tests (exit 1 on failure)
   shot <game> [scene] [frames] [-- args]  fixed 60 fps, no vsync; frames = N or N,N,... (one run, one
                                image per frame) into <game>/builds/shots/, one path per line
+  ui-shots <game>              capture production/ui/screens.json into production/ui/*.png (current UI set)
 
 Sprites (LPC)
   lpc                          start the LPC character generator (http://localhost:5173)
@@ -329,6 +330,31 @@ cmd_shot() {
   done
   rm -rf "$tmp"
   [[ $n -gt 0 ]] || die "no frame captured"
+}
+
+# The game's current screens (production/ui/screens.json) captured into
+# production/ui/<name>.png, overwriting: this set is what the studio dashboard
+# shows as the game's UI (lesson 2026-11-17: old QA evidence of removed views was
+# shown as if it were the current UI).
+cmd_ui_shots() {
+  local g; g="$(resolve_game "${1:-}")"
+  local spec="$g/production/ui/screens.json"
+  [[ -f "$spec" ]] || die "no $spec (list of {name, title, scene, frames, args})"
+  say "ui-shots $(basename "$g")"
+  local lines; lines="$(python3 -c '
+import json, sys
+for s in json.load(open(sys.argv[1]))["screens"]:
+    print("\x1f".join([s["name"], s.get("scene", ""), str(s.get("frames", 120))] + list(s.get("args", []))))
+' "$spec")" || die "bad $spec"
+  local line name scene frames out
+  # \x1f, not a tab: tabs are IFS whitespace and an empty scene field would vanish
+  while IFS=$'\x1f' read -r -a line; do
+    name="${line[0]}"; scene="${line[1]}"; frames="${line[2]}"
+    out="$(cmd_shot "$g" "${scene:-}" "$frames" -- "${line[@]:3}" | tail -1)" || die "shot failed: $name"
+    [[ -f "$out" ]] || die "no image for $name"
+    mv "$out" "$g/production/ui/$name.png"
+    echo "   production/ui/$name.png"
+  done <<< "$lines"
 }
 
 cmd_lpc() {
@@ -625,6 +651,7 @@ case "$sub" in
   edit) cmd_edit "$@" ;;
   test) cmd_test "$@" ;;
   shot) cmd_shot "$@" ;;
+  ui-shots) cmd_ui_shots "$@" ;;
   lpc) cmd_lpc ;;
   sprites) cmd_sprites "$@" ;;
   sample-sprite) cmd_sample_sprite "$@" ;;

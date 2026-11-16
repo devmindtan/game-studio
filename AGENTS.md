@@ -74,6 +74,10 @@ xuất kéo dài thì khuyên người dùng mở phiên mới ở đó.
 - **Nhìn tận mắt rồi mới báo xong.** Thay đổi nào người chơi thấy được thì phải chạy game và xem ảnh
   (`gamekit shot`); ảnh dùng làm bằng chứng lưu ở `games/<g>/production/qa/evidence/`. Parse được code
   chưa có nghĩa là game chạy được.
+- **Giao diện hiện tại** của game là `production/ui/` (danh sách màn hình trong `production/ui/screens.json`):
+  đổi thứ người chơi thấy thì chạy `gamekit ui-shots <g>`, xem ảnh, commit `production/ui`. Dashboard (`games.html`)
+  chỉ hiện bộ này và báo khi nó cũ hơn code; ảnh trong `production/qa/evidence/` là bằng chứng lịch sử, không phải
+  giao diện hiện tại.
 - **Chụp nhanh:** cần nhiều ảnh thì **một** lệnh `gamekit shot <g> "" 300,320,340 -- …`, không gọi `shot` lặp lại
   trong vòng lặp (mỗi lần là một lần mở Godot và chạy lại từ đầu). Cảnh muộn trong game thì tua bằng cờ của game
   (ví dụ `--sim-steps=4`), không chụp ở frame 1500.
