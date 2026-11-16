@@ -3,3 +3,4 @@
 builds/
 addons/gamekit/
 *.import
+__pycache__/
