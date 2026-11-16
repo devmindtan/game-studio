@@ -121,21 +121,40 @@
     "radius": 10.5
   },
   "layers": [
-    "cape_back",
-    "leg_back",
-    "boot_back",
-    "arm_back",
-    "hand_back",
+    "chest_back",
+    "legs_back",
+    "arms_back",
     "weapon_back",
-    "torso",
-    "leg_front",
-    "boot_front",
-    "neck",
+    "chest",
+    "legs_front",
+    "body",
     "head",
-    "hair",
     "weapon",
-    "arm_front",
-    "hand_front"
+    "arms_front"
   ],
-  "outline": "#1b1726"
+  "outline": "#1b1726",
+  "slots": {
+    "body": [
+      "body"
+    ],
+    "head": [
+      "head"
+    ],
+    "chest": [
+      "chest_back",
+      "chest"
+    ],
+    "arms": [
+      "arms_back",
+      "arms_front"
+    ],
+    "legs": [
+      "legs_back",
+      "legs_front"
+    ],
+    "weapon": [
+      "weapon_back",
+      "weapon"
+    ]
+  }
 }

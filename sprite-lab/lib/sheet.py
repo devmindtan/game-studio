@@ -62,23 +62,29 @@ def export_layered(here: Path, name: str, animations, anchor, outline, ground=Fa
     used = [k for k in order if any(f[k].img.getbbox() for f in every)]
     layer_dir = here / "layers"
     layer_dir.mkdir(exist_ok=True)
-    for old in layer_dir.glob("*_strip.png"):
-        if old.name[:-len("_strip.png")] not in used:
+    for old in layer_dir.glob("*_strip.png*"):   # strips of layers no longer used, and their .import
+        if old.name.split("_strip.png")[0] not in used:
             old.unlink()
     for k in used:
         strip([f[k] for f in every]).save(layer_dir / f"{k}_strip.png")
-    # review sheet: the first frame split into its layers (left to right, z order), then composed
+
+    # review sheet: the first frame split by equipment slot (left to right), then composed
     first = every[0]
     w0, h0 = first[used[0]].width, first[used[0]].height
-    exploded = Canvas((len(used) + 1) * (w0 + 4), h0)
-    for i, k in enumerate(used):
-        exploded.paste(first[k], i * (w0 + 4), 0)
-    exploded.paste(outlined(first), len(used) * (w0 + 4), 0)
+    groups = [[k for k in parts if k in used] for parts in mf.SLOTS.values()]
+    groups = [g for g in groups if g]
+    exploded = Canvas((len(groups) + 1) * (w0 + 4), h0)
+    for i, parts in enumerate(groups):
+        exploded.paste(mf.compose([first[k] for k in parts]), i * (w0 + 4), 0)
+    exploded.paste(outlined(first), len(groups) * (w0 + 4), 0)
     preview([exploded], here / "layers.png", scale=preview_scale or 4, grid_lines=False)
     meta_path = here / f"{name}.json"
     meta = json.loads(meta_path.read_text(encoding="utf-8"))
     meta["layers"] = used
     meta["outline"] = outline
+    # equipment slots -> their layers (only layers this sprite uses)
+    meta["slots"] = {slot: [k for k in parts if k in used] for slot, parts in mf.SLOTS.items()
+                     if any(k in used for k in parts)}
     from PIL import Image
     problems = check_layers(meta, Image.open(here / f"{name}_strip.png"), layer_dir)
     if problems:

@@ -13,12 +13,14 @@ A character is a dict of palette + part painters:
 Painters get (canvas, pose, geometry) and draw extra parts; "fx" runs after the
 outline, for glows / slashes / sparks that must not be outlined.
 
-Layers (for equipment): draw_layers() paints every part on its own transparent
-canvas, without outline, in LAYERS order; compose() + outline gives exactly what
-draw() returns. An equipment sprite (chest armour, boots, ...) replaces the layers
-of its slot, drawn with the same poses, and the game composes and outlines the
-result, so swapped parts always line up. Character keys: "behind" -> cape_back,
-"held_back" -> weapon_back, "head", "hair", "neck", "held" -> weapon, "front".
+Layers (for equipment): draw_layers() paints the figure split by EQUIPMENT SLOT
+(SLOTS: body, head, chest, arms, legs, weapon), without outline, in LAYERS z order;
+compose() + outline gives exactly what draw() returns. A slot that wraps around
+the body has a back and a front part (the back arm is under the torso, the front
+arm over it), but it is one slot: an armour piece replaces all its parts, drawn
+with the same poses, and the game composes and outlines the result.
+Character keys: "head" -> body (face), "hair" -> head, "neck" + tunic/robe -> chest,
+"behind" -> chest_back, "held_back" -> weapon_back, "held" -> weapon, "front".
 
 Used by sprite-lab/sprites/swordsman/gen.py and sprite-lab/sprites/mage/gen.py.
 """
@@ -198,46 +200,51 @@ def eyes(c, x, y, kind, pal):
 
 # --- the figure -------------------------------------------------------------------
 
-# Z order of the parts, back to front. Equipment slots map onto these:
-# head gear -> hair (+ head), chest -> torso + arm_back + arm_front (+ neck),
-# legs -> leg_back + leg_front, feet -> boot_back + boot_front,
-# hands -> hand_back + hand_front, weapon -> weapon_back + weapon, cape -> cape_back.
-LAYERS = ["cape_back", "leg_back", "boot_back", "arm_back", "hand_back", "weapon_back", "torso",
-          "leg_front", "boot_front", "neck", "head", "hair", "weapon", "arm_front", "hand_front", "front"]
+# Z order, back to front. Equipment slots group these (see SLOTS).
+LAYERS = ["chest_back", "legs_back", "arms_back", "weapon_back", "chest", "legs_front",
+          "body", "head", "weapon", "arms_front", "front"]
+SLOTS = {
+    "body": ["body"],                         # the bare figure: face (eyes, skin)
+    "head": ["head"],                         # hair / helmet
+    "chest": ["chest_back", "chest"],         # cape or scarf tail behind; tunic, robe, collar
+    "arms": ["arms_back", "arms_front"],      # sleeves and hands (gloves, gauntlets)
+    "legs": ["legs_back", "legs_front"],      # trousers and boots (greaves)
+    "weapon": ["weapon_back", "weapon"],      # held behind the body / in front
+}
 
 
 def draw_layers(char, p):
-    """Every part of the character in pose p on its own canvas (no outline, no fx),
-    as a dict in LAYERS order. compose() of it, outlined, is draw() without fx."""
+    """The character in pose p split by equipment slot (no outline, no fx), as a
+    dict in LAYERS order. compose() of it, outlined, is draw() without fx."""
     pal = char["pal"]
     L = {name: Canvas(W, H) for name in LAYERS}
     g = geometry(p)
     tunic_body = char.get("body", "tunic") == "tunic"
     if char.get("behind"):
-        char["behind"](L["cape_back"], p, g)
+        char["behind"](L["chest_back"], p, g)
     if tunic_body:
-        leg(L["leg_back"], g["hip"], g["foot_back"], pal, back=True, boot_c=L["boot_back"])
+        leg(L["legs_back"], g["hip"], g["foot_back"], pal, back=True)
     else:  # robe: only boots show under the hem
         b = g["foot_back"]
-        rect(L["boot_back"], b[0] - 1, b[1] - 1, b[0] + 2, b[1], pal["boot_d"])
-    arm(L["arm_back"], g["sh_back"], g["hand_back"], pal, back=True, hand_c=L["hand_back"])
+        rect(L["legs_back"], b[0] - 1, b[1] - 1, b[0] + 2, b[1], pal["boot_d"])
+    arm(L["arms_back"], g["sh_back"], g["hand_back"], pal, back=True)
     if char.get("held_back"):
         char["held_back"](L["weapon_back"], p, g)
     if tunic_body:
-        tunic(L["torso"], g, pal)
-        leg(L["leg_front"], g["hip"], g["foot_front"], pal, back=False, boot_c=L["boot_front"])
+        tunic(L["chest"], g, pal)
+        leg(L["legs_front"], g["hip"], g["foot_front"], pal, back=False)
     else:
-        f = g["foot_front"]   # under the robe: on the back boot layer, below the torso
-        rect(L["boot_back"], f[0] - 1, f[1] - 1, f[0] + 2, f[1], pal["boot"])
-        robe(L["torso"], g, p, pal)
-    if char.get("neck"):
-        char["neck"](L["neck"], p, g)
-    char["head"](L["head"], p, g)
+        f = g["foot_front"]   # under the robe: with the back boot, below the chest
+        rect(L["legs_back"], f[0] - 1, f[1] - 1, f[0] + 2, f[1], pal["boot"])
+        robe(L["chest"], g, p, pal)
+    if char.get("neck"):     # collar / scarf knot: part of the chest slot, above the legs
+        char["neck"](L["chest"], p, g)
+    char["head"](L["body"], p, g)
     if char.get("hair"):
-        char["hair"](L["hair"], p, g)
+        char["hair"](L["head"], p, g)
     if char.get("held"):
         char["held"](L["weapon"], p, g)
-    arm(L["arm_front"], g["sh_front"], g["hand_front"], pal, back=False, hand_c=L["hand_front"])
+    arm(L["arms_front"], g["sh_front"], g["hand_front"], pal, back=False)
     if char.get("front"):
         char["front"](L["front"], p, g)
     if p["lie"]:

@@ -64,8 +64,9 @@ nháy trắng khi trúng đòn (giữ viền), ngã xoay về đất, và `keep_
 Nhân vật dùng `write_anim_meta(..., ground=True)`: `art run` kiểm tra mọi frame chạm đất.
 Hiệu ứng gây sát thương khai báo `"hitbox"` cho animation (xem skill `pixel-sprite`): `art run` đo và kiểm tra nó
 từ pixel, ảnh `art shot <tên> sheet` vẽ hitbox (đỏ = frame gây sát thương).
-Nhân vật mặc được đồ vẽ theo lớp (`minifig.draw_layers` + `sheet.export_layered`): xem `layers.png`, các lớp nằm
-trong `layers/`; `art run` kiểm tra ghép lớp trùng từng pixel với strip.
+Nhân vật mặc được đồ vẽ theo ô trang bị (`minifig.draw_layers` + `sheet.export_layered`): thân, giáp đầu, giáp
+ngực, giáp tay, giáp chân, vũ khí (`minifig.SLOTS`); xem `layers.png`, các lớp nằm trong `layers/`; `art run` kiểm
+tra ghép lớp trùng từng pixel với strip.
 
 ## Xem trên web (`./serve-viewer.sh`)
 

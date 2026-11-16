@@ -364,7 +364,7 @@ const STAT_ICON={max_hp:['heart','Máu tối đa'],damage:['sword','Sát thươn
   area:['star','Vùng đánh ×'],regen:['heart','Hồi máu /s'],armor:['skull','Giáp'],magnet:['gem','Hút vật phẩm ×']};
 function heroes(m){
   m.appendChild(el('h2',{},'Nhân vật'));
-  m.appendChild(el('p',{class:'lead'},'Sprite đúng như game đang dùng (ghép từ các lớp). Bấm một lớp để tắt/bật: đây là chỗ đồ mặc (giáp, mũ, giày, vũ khí) sẽ thay vào.'));
+  m.appendChild(el('p',{class:'lead'},'Sprite đúng như game đang dùng (ghép từ các lớp). Bấm một ô trang bị để tắt/bật: đồ mặc (giáp đầu, ngực, tay, chân, vũ khí) sẽ thay đúng ô đó.'));
   game.heroes.forEach(h=>{
     const card=el('div',{class:'card',style:'margin-bottom:12px'});
     card.appendChild(el('div',{class:'row'},el('h3',{style:'margin:0'},h.name),el('span',{class:'muted small'},'sprite: '+(h.sprite?h.sprite.name:'—')+' · '+h.pool_size+' nâng cấp trong pool')));
@@ -387,16 +387,18 @@ function heroes(m){
       const fl=el('button',{class:'btn'},'⇆ Lật'); fl.onclick=()=>{flip=!flip; fl.classList.toggle('on',flip);}; bar.appendChild(fl);
       left.appendChild(bar);
       if(info.meta.layers){
-        right.appendChild(el('h3',{},'Các lớp ('+info.meta.layers.length+') · ô trang bị'));
-        const SLOT={hair:'đầu',head:'đầu',torso:'ngực',arm_back:'ngực',arm_front:'ngực',neck:'ngực',leg_back:'chân',leg_front:'chân',
-          boot_back:'giày',boot_front:'giày',hand_back:'tay',hand_front:'tay',weapon:'vũ khí',weapon_back:'vũ khí',cape_back:'áo choàng'};
-        const lw=el('div',{class:'layers'});
+        // equipment slots: each one may have a back and a front part (around the body)
+        const slots=info.meta.slots||Object.fromEntries(info.meta.layers.map(n=>[n,[n]]));
+        const SLOT_NAME={body:'Thân',head:'Giáp đầu',chest:'Giáp ngực',arms:'Giáp tay',legs:'Giáp chân',weapon:'Vũ khí'};
+        right.appendChild(el('h3',{},'Ô trang bị'));
         const CROP=[8,10,32,36];   // the body area of the 48x48 frame
-        info.meta.layers.forEach(n=>{ const c=el('canvas',{width:64,height:72}); const box=el('div',{class:'layer'},c,el('span',{},n),el('span',{},SLOT[n]||''));
-          Promise.all([loadImg(info.strip),loadImg(info.layers[n])]).then(([whole,im])=>{ if(!im) return; const g=c.getContext('2d'); g.imageSmoothingEnabled=false;
+        const lw=el('div',{class:'layers'});
+        Object.entries(slots).forEach(([slot,parts])=>{ const c=el('canvas',{width:64,height:72});
+          const box=el('div',{class:'layer'},c,el('span',{},SLOT_NAME[slot]||slot));
+          Promise.all([loadImg(info.strip),...parts.map(n=>loadImg(info.layers[n]))]).then(([whole,...ims])=>{ const g=c.getContext('2d'); g.imageSmoothingEnabled=false;
             if(whole){ g.globalAlpha=.22; g.drawImage(whole,CROP[0],CROP[1],CROP[2],CROP[3],0,0,64,72); g.globalAlpha=1; }
-            g.drawImage(im,CROP[0],CROP[1],CROP[2],CROP[3],0,0,64,72);});
-          box.onclick=async()=>{enabled[n]=!enabled[n]; box.classList.toggle('off',!enabled[n]); await refresh();};
+            ims.forEach(im=>{ if(im) g.drawImage(im,CROP[0],CROP[1],CROP[2],CROP[3],0,0,64,72); });});
+          box.onclick=async()=>{ const on=!enabled[parts[0]]; parts.forEach(n=>enabled[n]=on); box.classList.toggle('off',!on); await refresh(); };
           lw.appendChild(box);});
         right.appendChild(lw);
       }

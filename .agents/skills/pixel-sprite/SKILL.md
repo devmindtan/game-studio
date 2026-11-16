@@ -114,8 +114,10 @@ Không báo "xong" khi chưa xem `preview.png`, ảnh `sheet` và ảnh `move`.
 - **Nhân vật mặc được đồ thì vẽ theo lớp**: dựng bằng `minifig.draw_layers` và xuất bằng
   `sheet.export_layered(...)`. Kết quả gồm `layers/<lớp>_strip.png` (không viền), `"layers"` và `"outline"` trong
   json, `layers.png` để duyệt. `check_layers` (trong `art run`) bắt các lớp ghép lại + viền phải trùng từng pixel
-  với strip. Thứ tự lớp và ô trang bị: `minifig.LAYERS` (đầu: `hair`, ngực: `torso`/`arm_*`/`neck`, chân: `leg_*`,
-  giày: `boot_*`, tay: `hand_*`, vũ khí: `weapon*`, áo choàng: `cape_back`). Đồ mặc vẽ lại đúng các lớp của ô bằng
+  với strip. Lớp **theo ô trang bị, không sâu hơn** (`minifig.SLOTS`, ghi vào json `"slots"`): `body` (mặt), `head`
+  (giáp đầu), `chest` (giáp ngực: `chest_back` + `chest`), `arms` (giáp tay: `arms_back` + `arms_front`), `legs`
+  (giáp chân: `legs_back` + `legs_front`), `weapon` (`weapon_back` + `weapon`). Phần sau/trước chỉ có khi ô đó ôm
+  quanh thân (tay sau nằm dưới áo, tay trước nằm trên); một món đồ thay mọi phần của ô. Đồ mặc vẽ lại đúng các lớp của ô bằng
   **cùng tư thế** của nhân vật; game ghép bằng `SpriteSheet.compose_layers({lớp: texture})` (viền sau khi ghép).
 - Xem **phóng to từng frame** của mỗi animation mới (preview cả sheet quá nhỏ để thấy lỗi tay/vũ khí).
 
