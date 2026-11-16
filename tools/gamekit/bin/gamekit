@@ -421,7 +421,7 @@ art_rig() {
       mkdir -p "$LAB/builds/inspections"
       local out="$LAB/builds/inspections/$(date +%Y%m%d-%H%M%S)-$n-$action.png"
       if [[ "$action" == "motion" ]]; then
-        local animation="${1:-walk}" speed="${2:-48}"
+        local animation="${1:-walk}" speed="${2:-24}"
         [[ "$speed" =~ ^[0-9]+([.][0-9]+)?$ ]] || die "speed must be a positive number in pixels per second"
         [[ "$speed" != "0" && "$speed" != "0.0" ]] || die "speed must be greater than zero"
         node "$pb" inspect "$source" --motion "$animation" --speed "$speed" --out "$out"

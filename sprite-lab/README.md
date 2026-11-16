@@ -44,7 +44,7 @@ npm ci --prefix tools/gamekit                   # chỉ lần đầu, Node.js 20
 gamekit art rig new swordsman hero-sword
 gamekit art rig validate swordsman
 gamekit art rig inspect swordsman attack
-gamekit art rig motion swordsman walk 48
+gamekit art rig motion swordsman walk 24
 gamekit art run swordsman
 gamekit art shot swordsman sheet
 gamekit art shot swordsman move
@@ -52,7 +52,8 @@ gamekit art test
 ```
 
 Pixelbolt cung cấp cấu trúc và diagnostics; người thiết kế vẫn phải xem silhouette ở kích thước gốc, các pose
-chính, vũ khí qua các frame và playback thực tế. Sprite dùng `gen.py` vẫn hỗ trợ đầy đủ như trước.
+chính, vũ khí qua các frame và playback thực tế. Hãy truyền tốc độ gameplay thật vào `motion`; mặc định 24
+px/s chỉ là tốc độ kiểm tra khởi đầu. Sprite dùng `gen.py` vẫn hỗ trợ đầy đủ như trước.
 
 ## Trình thử (`gamekit art lab [<tên>] [sheet|move]`)
 

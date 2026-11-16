@@ -95,7 +95,7 @@ gamekit art new <tên> [--size N]      # sprite-lab/sprites/<tên>/gen.py (mẫu
 gamekit art rig new <tên> [hero|hero-sword|knight] # pose rig Pixelbolt có thể sửa
 gamekit art rig validate <tên>        # kiểm tra pose source
 gamekit art rig inspect <tên> [anim]  # onion skin + diagnostics
-gamekit art rig motion <tên> <anim> [px/s] # xem tiếp đất, trượt chân, loop, quỹ đạo
+gamekit art rig motion <tên> <anim> [px/s] # xem tiếp đất, trượt chân, loop, quỹ đạo (mặc định 24)
 gamekit art rig build <tên>            # xuất Pixelbolt thành strip/metadata Sprite Lab
 gamekit art run <tên>                 # vẽ + kiểm tra <tên>.json (frames, animation, điểm neo)
 gamekit art shot <tên> sheet|move     # ảnh để xem: mọi animation / 8 khoảnh khắc thử di chuyển

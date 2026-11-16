@@ -49,6 +49,7 @@ gamekit art test
 Chốt brief cạnh nguồn: silhouette và khoảng âm, vai trò từng màu, mặt phẳng sáng, hướng nhìn, điểm neo, điểm
 tiếp đất, các pose contact/compression/passing/extension, anticipation/release/recovery, timing và chỗ gắn
 vũ khí. Xem ở 1x và khi phát animation; diagnostics chỉ báo chỗ cần xem, không tự xác nhận chất lượng.
+Với `motion`, dùng tốc độ nhân vật thật trong game; mặc định 24 px/s chỉ để kiểm tra ban đầu.
 `Pixelbolt` export thời lượng frame riêng; metadata Sprite Lab giữ nguyên bằng `durations_ms`. `art run` tự
 chọn nguồn `.poses.json` nếu sprite có file đó; sprite dùng `gen.py` tiếp tục theo pipeline hiện tại.
 
