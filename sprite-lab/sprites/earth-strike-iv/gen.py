@@ -1,5 +1,9 @@
 #!/usr/bin/env python3
-"""Seismic Vortex IV — sóng chấn động xoáy 2 chiều, lõi magma."""
+"""Landslide IV — sạt lở: đá lăn chéo xuống phải, vệt bụi, KHÔNG xoáy.
+
+DNA: ĐẤT — đứt gãy lệch trục, dịch chuyển khối, nặng, bụi, magma lộ ra.
+Không dùng cấu trúc đối xứng tròn/kết tinh của dòng băng.
+"""
 import math, sys
 from pathlib import Path
 
@@ -15,73 +19,64 @@ from sheet import export
 
 NAME=Path(__file__).parent.name
 SIZE=72; CX=CY=SIZE//2; ANCHOR=(float(CX),float(CY))
-TIER=4
 
-# palette đất/đá
-ROCK="#8a6a52"; ROCK_L="#c79a6a"; ROCK_D="#5a4335"
-CRACK="#2b2028"; DARK="#1e161c"; HOT="#d98a4a"; GLOW="#ffd08a"
-DUST="#c9a882"; SAND="#a9815c"; MAGMA="#ff6a2a"; MAGMA_D="#b8331a"
-ASH="#6b5a52"; SMOKE="#3a3038"
-FROST="#9fe8ff"  # for V only
+ROCK="#8a6a52"; ROCK_L="#c79a6a"; ROCK_D="#5a4335"; STRATA="#6e503c"
+CRACK="#2b2028"; SHADOW="#1e161c"; DUST="#c9a882"; SAND="#a9815c"
+MAGMA="#ff6a2a"; MAGMA_D="#b8331a"; GLOW="#ffd08a"; ASH="#6b5a52"
 
 def p(c,x,y,col):
     xi,yi=int(round(x)),int(round(y))
     if 0<=xi<SIZE and 0<=yi<SIZE: c.pixel(xi,yi,col)
 
 def poly(c,pts,col):
-    c.polygon([(int(round(x)),int(round(y))) for x,y in pts],col)
+    c.polygon([(int(round(a)),int(round(b))) for a,b in pts],col)
 
-def ring(c,r,col):
-    if r>0: c.ellipse(CX-r,CY-r,CX+r,CY+r,col,fill=False)
+def line(c,x1,y1,x2,y2,col,w=1):
+    c.line(int(round(x1)),int(round(y1)),int(round(x2)),int(round(y2)),col,w)
 
-def dot(c,a,r,col,size=1):
-    x=CX+math.cos(a)*r; y=CY+math.sin(a)*r
-    for dx in range(-size+1,size):
-        for dy in range(-size+1,size): p(c,x+dx,y+dy,col)
+def chip(c,x,y,s,hi=True):
+    poly(c,[(x,y-s),(x+s,y),(x,y+s),(x-s,y)],ROCK if hi else ROCK_D)
+    poly(c,[(x,y-s),(x+s,y),(x,y),(x-s,y)],ROCK_L if hi else SHADOW)
+    p(c,x,y,GLOW if hi else STRATA)
 
-def quake_spiral(c,phase,turn,r0,r1,thick,col_main,col_edge):
-    prev=None
-    steps=26
-    for s in range(steps):
-        u=s/(steps-1)
-        r=r0+(r1-r0)*u
-        a=phase+turn*u*2.5
-        x=CX+math.cos(a)*r; y=CY+math.sin(a)*r
-        w=max(1,round(thick*(1-u*0.7)))
-        if prev:
-            c.line(int(prev[0]),int(prev[1]),int(round(x)),int(round(y)),col_main,w)
-            c.line(int(prev[0]),int(prev[1]),int(round(x)),int(round(y)),col_edge,1)
-        for dx in range(-w+1,w): p(c,x+dx,y,col_edge)
-        prev=(x,y)
+def dust(c,x,y,r,col):
+    for k in range(6):
+        a=k*math.pi/3
+        p(c,x+math.cos(a)*r,y+math.sin(a)*r,col)
+
+# IV: sạt lở — đá lăn theo hướng chéo xuống phải, để lại vệt bụi, KHÔNG xoáy.
+BOULDERS=[(-18,-14,3),(-9,-11,2),(-2,-16,3),(7,-9,2),(-13,-4,2),(-4,-3,3),(5,-2,2),(13,-5,2)]
 
 def frame(i):
     c=Canvas(SIZE,SIZE)
     t=i/7.0
-    if i==0:
-        c.ellipse(CX-5,CY-5,CX+5,CY+5,CRACK)
-        c.ellipse(CX-3,CY-3,CX+3,CY+3,HOT)
-        p(c,CX,CY,GLOW)
-        return c
-    R=round(8+24*min(1,t*1.15))
-    for rr in range(4,R+4,5):
-        ring(c,rr,SMOKE if rr%10 else CRACK)
-    phase=i*0.33
-    for k in range(4):
-        quake_spiral(c,phase+k*math.pi/2,1,4,R,4,CRACK,ROCK)
-    for k in range(3):
-        quake_spiral(c,phase+0.5+k*2*math.pi/3,-1,3,round(R*0.78),3,ROCK_D,DUST)
-    quake_spiral(c,-phase*1.6,1,2,round(R*0.45),5,HOT,GLOW)
-    cr=max(2,round(6*(1-t*0.35)))
-    c.ellipse(CX-cr,CY-cr,CX+cr,CY+cr,CRACK)
-    c.ellipse(CX-cr+2,CY-cr+2,CX+cr-2,CY+cr-2,MAGMA_D)
-    c.ellipse(CX-2,CY-2,CX+2,CY+2,MAGMA)
-    p(c,CX,CY,GLOW if i<6 else MAGMA)
-    for k in range(16):
-        a=phase*1.4+k*2.0; r=round(R*(0.35+((k%7)/12)))
-        dot(c,a,r,DUST if k%3 else SAND)
-    if i>=5:
-        ring(c,R+2,ROCK_D)
-        for k in range(8): dot(c,phase+k*math.pi/4+0.6,R+2,DUST)
+    # đám bụi khởi phát ở góc trái
+    dx=CX-15; dy=CY-11
+    for rr in range(3,10,2):
+        for k in range(10):
+            a=k*math.pi/5+i*0.1
+            p(c,dx+math.cos(a)*(rr+k%3),dy+math.sin(a)*(rr*0.7+k%2),ASH if rr<7 else DUST)
+    # vệt quệt trên mặt đất
+    for s in range(6):
+        x=CX-16+s*6; y=CY-13+s*5
+        for w in range(3):
+            p(c, x, y+w, CRACK if w<2 else STRATA)
+        p(c,x+2,y+4,DUST)
+    # đá lăn dần theo hướng xuống-phải
+    for k,(ox,oy,sz) in enumerate(BOULDERS):
+        travel=min(1,t*(1.15-k*0.04))
+        x=CX+ox+travel*(14+k%3*3)
+        y=CY+oy+travel*(12+k%2*2)
+        # vệt mờ phía sau
+        for s in range(1,4):
+            p(c,x-s*2,y-s*2,ASH if s<3 else DUST)
+        chip(c,x,y,sz,hi=(k%2==0))
+    if i>=4:
+        for k in range(10):
+            a=k*0.63+i*0.3
+            p(c,CX+math.cos(a)*(14+k%5),CY+math.sin(a)*(12+k%4),DUST)
+    if i==7:
+        for k in range(6): p(c,CX-6+k*5,CY+3+k*3,ROCK_D)
     return c
 
 ANIM=[("burst",[frame(i) for i in range(8)],12,False,
