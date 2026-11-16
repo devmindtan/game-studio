@@ -1,0 +1,10 @@
+{
+  "name": "gamekit",
+  "private": true,
+  "engines": {
+    "node": ">=20"
+  },
+  "dependencies": {
+    "pixelbolt": "0.17.0"
+  }
+}
