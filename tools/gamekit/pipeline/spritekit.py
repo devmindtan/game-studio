@@ -262,12 +262,15 @@ if __name__ == "__main__":
         c = base.copy().outline("#7a4a00")
         c.pixel(3 + i, 2, "#ffffff")
         frames.append(c)
-    d = Path(tempfile.mkdtemp(prefix="spritekit-"))
-    strip(frames).save(d / "strip.png")
-    preview(frames, d / "preview.png", scale=6)
-    gif(frames, d / "anim.gif", fps=8, scale=4)
-    to_ase(d / "strip.png", d / "strip.ase")
-    from_ase(d / "strip.ase", d / "back.png")
-    assert Image.open(d / "back.png").size == Image.open(d / "strip.png").size
-    assert len(base.palette()) == 1
-    print("ok:", d)
+    # TemporaryDirectory removes everything on exit, also when an assert fails
+    # (machine rule: never leave temp output behind).
+    with tempfile.TemporaryDirectory(prefix="spritekit-") as tmp:
+        d = Path(tmp)
+        strip(frames).save(d / "strip.png")
+        preview(frames, d / "preview.png", scale=6)
+        gif(frames, d / "anim.gif", fps=8, scale=4)
+        to_ase(d / "strip.png", d / "strip.ase")
+        from_ase(d / "strip.ase", d / "back.png")
+        assert Image.open(d / "back.png").size == Image.open(d / "strip.png").size
+        assert len(base.palette()) == 1
+    print("ok (temp files removed)")
