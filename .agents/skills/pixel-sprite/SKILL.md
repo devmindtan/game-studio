@@ -63,7 +63,11 @@ chọn nguồn `.poses.json` nếu sprite có file đó; sprite dùng `gen.py` t
 2. **Vẽ silhouette trước** bằng ASCII map trong `gen.py` (`from_rows`, `outline`), rồi mới thêm chi tiết.
 3. **Render**: `gamekit art run <tên>`. Lệnh này dừng nếu thiếu `<tên>.json`, neo nằm ngoài khung, hoặc
    animation không liền nhau. `gen.py` gọi `write_anim_meta(...)` (đã có sẵn trong mẫu); sprite một animation
-   có thể dùng `write_meta`.
+   có thể dùng `write_meta`. **Nhân vật đứng trên đất** gọi `write_anim_meta(..., ground=True)`, đánh dấu
+   animation rời đất bằng `"airborne": True` (nhảy). Khi đó mọi frame còn lại phải có hàng pixel thấp nhất
+   (kể cả viền) nằm ngay trên điểm neo; lơ lửng hay lún đều bị `art run` từ chối (bài học 2026-11-16).
+   Nhân vật nhỏ kiểu tối giản dựng nhanh bằng `sprite-lab/lib/minifig.py` (tư thế bằng số, tỉ lệ giữ nguyên;
+   xem `sprites/swordsman/gen.py`, `sprites/mage/gen.py`).
 4. **Xem tĩnh**: mở `sprite-lab/sprites/<tên>/preview.png` bằng công cụ đọc ảnh của agent. Mỗi animation một
    hàng. Nhiều agent không đọc được GIF động; `<animation>.gif` là cho người xem. Sửa, lặp 2–3 vòng.
 5. **Thử sheet**: `gamekit art shot <tên> sheet` rồi xem ảnh. Mọi animation chân/neo nằm trên đường đất,

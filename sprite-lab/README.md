@@ -55,6 +55,14 @@ Pixelbolt cung cấp cấu trúc và diagnostics; người thiết kế vẫn ph
 chính, vũ khí qua các frame và playback thực tế. Hãy truyền tốc độ gameplay thật vào `motion`; mặc định 24
 px/s chỉ là tốc độ kiểm tra khởi đầu. Sprite dùng `gen.py` vẫn hỗ trợ đầy đủ như trước.
 
+### Nhân vật nhỏ gọn: `lib/minifig.py`
+
+Bộ dựng nhân vật nhìn ngang, tối giản (khung 48×48, cao ~26–30 px, neo (24, 44) trên đất): mỗi frame là
+một tư thế bằng số (`bob`, `lean`, `feet`, `hands`, `weapon`, `eyes`, `lie`, `flash`, `fx`…), nên tỉ lệ cơ thể
+không đổi giữa các animation. Có sẵn thân `tunic` (áo + quần) và `robe` (áo choàng), chu kỳ chạy 8 frame,
+nháy trắng khi trúng đòn (giữ viền), ngã xoay về đất, và `keep_above_floor` để vũ khí không xuyên đất.
+Nhân vật dùng `write_anim_meta(..., ground=True)`: `art run` kiểm tra mọi frame chạm đất.
+
 ## Trình thử (`gamekit art lab [<tên>] [sheet|move]`)
 
 - **sheet**: mọi animation cạnh nhau, mỗi cái lặp lại (animation một lần thì nghỉ 0,6 giây rồi chạy lại),

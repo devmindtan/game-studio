@@ -113,6 +113,7 @@ gamekit art ase|open <tên>            # .ase cho LibreSprite
 - Addon `addons/gamekit/sprites/`: `SpriteSheet` (đọc json, chọn frame theo animation và thời gian, vẽ)
   và `SpriteAnchor` (đặt theo điểm neo, kể cả khi lật). Dùng chung cho lab và mọi game.
 - `spritekit.py`: `from_rows`, `outline`, `strip`, `preview`, `gif`, `write_meta` / `write_anim_meta`
+  (`ground=True` + `check_ground`: nhân vật phải chạm đất ở mọi frame không `airborne`)
   (ghi `<tên>.json`), `check_meta`, `.ase` qua LibreSprite.
 - Export preset gói `assets/sprites/*.json` để game đọc được metadata.
 

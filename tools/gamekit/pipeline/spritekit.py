@@ -251,8 +251,13 @@ def write_meta(path, frames, fps, anchor=None, loop=True):
     return Path(path)
 
 
-def write_anim_meta(path, animations, anchor=None):
+def write_anim_meta(path, animations, anchor=None, ground=False):
     """Write <name>.json for one strip holding several named animations.
+
+    ground=True: a character standing on the floor; its anchor y is the floor
+    line, and every frame of every animation not marked {"airborne": True} must
+    touch it (lowest opaque pixel row == anchor y - 1). `check_ground` and
+    `gamekit art run` enforce it (lesson 2026-11-16: feet floated 8 px / sank 2 px).
 
     animations: list of {"name", "frames", "fps", "loop"} in strip order. The
     frames of each animation are laid out left to right, one animation after the
@@ -282,6 +287,8 @@ def write_anim_meta(path, animations, anchor=None):
             if len(durations) != len(frames) or any(float(value) <= 0 for value in durations):
                 raise ValueError(f"animation {anim.get('name')!r} has invalid durations_ms")
             entries[-1]["durations_ms"] = [float(value) for value in durations]
+        if anim.get("airborne"):
+            entries[-1]["airborne"] = True
         flat.extend(frames)
     if not flat:
         raise ValueError("no animations")
@@ -297,8 +304,15 @@ def write_anim_meta(path, animations, anchor=None):
         "anchor_source": "explicit" if anchor is not None else "content_centre",
         "animations": entries,
     }
+    if ground:
+        meta["ground"] = True
     Path(path).parent.mkdir(parents=True, exist_ok=True)
     check_meta(meta)
+    if ground:
+        sheet = strip(flat).img
+        problems = check_ground(meta, sheet)
+        if problems:
+            raise ValueError("; ".join(problems))
     Path(path).write_text(json.dumps(meta, indent=2) + "\n", encoding="utf-8")
     return Path(path)
 
@@ -325,6 +339,33 @@ def check_meta(meta, strip_size=None):
     if problems:
         raise ValueError("; ".join(problems))
     return meta
+
+
+def check_ground(meta, strip_img):
+    """Problems where a grounded sprite's frames do not touch the floor line.
+
+    Only for metadata with "ground": true. The floor is the anchor's y: the
+    lowest opaque row of each frame must be exactly anchor_y - 1, except in
+    animations marked "airborne" (jumps, knock-backs)."""
+    if not meta.get("ground"):
+        return []
+    w, h = meta["frame_size"]
+    floor = int(round(meta["anchor"][1]))
+    problems = []
+    for anim in meta.get("animations") or [{"name": "default", "start": 0, "frames": meta["frames"]}]:
+        if anim.get("airborne"):
+            continue
+        bad = []
+        for i in range(anim["frames"]):
+            idx = anim["start"] + i
+            bb = strip_img.crop((idx * w, 0, (idx + 1) * w, h)).getchannel("A").getbbox()
+            bottom = bb[3] if bb else None
+            if bottom != floor:
+                bad.append(f"{i}:{'empty' if bottom is None else bottom - floor:+}" if bottom else f"{i}:empty")
+        if bad:
+            problems.append(f"{anim['name']}: frames off the floor (frame:rows, + = sinks, - = floats) "
+                            + ", ".join(bad))
+    return problems
 
 
 def _check_animations(animations, total_frames):
