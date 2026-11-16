@@ -78,6 +78,12 @@ workspace. Không copy helper vào từng game, không hard-code đường dẫn
    xứng. Hình mà khung bao thay đổi theo frame (cánh vỗ, vung kiếm) **phải** đặt anchor rõ ràng.
    `gamekit art run` dừng nếu thiếu `.json` hoặc anchor nằm ngoài khung. Game đọc frames/fps/anchor từ file
    này, **không gõ tay vào config** (bài học 2026-11-16 trong `LESSONS.md`).
+
+   **Một sheet, nhiều animation** (idle/chạy/đánh/chết…): xếp các animation nối tiếp nhau trên dải ngang và
+   dùng `write_anim_meta(path, [{"name", "frames", "fps", "loop"}, …], anchor=ANCHOR)`. Mỗi animation có
+   `start` tự tính; game đọc `animations` trong `<tên>.json` rồi vẽ frame `start + i`. Không tách thành nhiều
+   sprite nếu người dùng muốn một sheet. Ví dụ: `games/dom-dom-dem-mua/assets/source/sprites/mage/gen.py`
+   (7 animation, 33 frame, xem trong game bằng `gamekit shot . "" 90 -- --mage-preview`).
 5. **Kiểm tra trong game**: thêm PNG vào `Sprite2D`/`AnimatedSprite2D` hoặc
    `_draw`, chạy `gamekit test <g>` + `gamekit shot <g>` rồi xem ảnh.
 6. **Bàn giao**: PNG trong `assets/sprites/custom/`; `.ase` trong `assets/source/`

@@ -387,7 +387,9 @@ from PIL import Image
 from spritekit import check_meta
 m = json.load(open(sys.argv[1]))
 check_meta(m, Image.open(sys.argv[2]).size)
-print("   meta:    %d frame(s) %sx%s @ %s fps, anchor %s (%s)" % (m["frames"], *m["frame_size"], m["fps"], m["anchor"], m["anchor_source"]))
+anims = m.get("animations") or []
+extra = ", %d animations: %s" % (len(anims), ", ".join(a["name"] for a in anims)) if anims else ""
+print("   meta:    %d frame(s) %sx%s @ %s fps, anchor %s (%s)%s" % (m["frames"], *m["frame_size"], m["fps"], m["anchor"], m["anchor_source"], extra))
 ' "$meta" "$stripf" || die "bad ${meta#"$WS"/}"
       echo "   sprite:  ${png#"$WS"/}"
       echo "   preview: ${src#"$WS"/}/preview.png"

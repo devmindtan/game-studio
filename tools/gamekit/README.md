@@ -106,6 +106,10 @@ gamekit art open <game> light-mote            # mở .ase bằng LibreSprite
   hoặc sai. Game đọc file này; đừng gõ lại các số đó vào config.
 - `gen.py` import helper `pipeline/spritekit.py` (ASCII map, outline, strip, grid, GIF, preview, `.ase`).
   Sửa `gen.py`, không sửa helper trong game.
+- Nhiều animation trong một sheet: các animation nối tiếp nhau trên dải ngang, `gen.py` gọi
+  `write_anim_meta(path, [{"name", "frames", "fps", "loop"}, …], anchor=…)`. Game đọc `animations` trong
+  `<tên>.json` và vẽ frame `start + i`. Ví dụ đầy đủ:
+  `games/dom-dom-dem-mua/assets/source/sprites/mage/gen.py` (7 animation).
 - Preview là ảnh phóng to nearest có lưới, để agent đọc bằng công cụ đọc ảnh của nó. `anim.gif` để xem chuyển động.
 - `gamekit doctor` kiểm tra `libresprite`. Bản 1.3 không có MCP; xem `.agents/skills/pixel-sprite/SKILL.md`
   để biết giới hạn và quy trình đầy đủ.

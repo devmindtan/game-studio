@@ -251,6 +251,53 @@ def write_meta(path, frames, fps, anchor=None, loop=True):
     return Path(path)
 
 
+def write_anim_meta(path, animations, anchor=None):
+    """Write <name>.json for one strip holding several named animations.
+
+    animations: list of {"name", "frames", "fps", "loop"} in strip order. The
+    frames of each animation are laid out left to right, one animation after the
+    previous one. The game plays `animations[i]` from its `start` for `frames`
+    frames, so the frame counts stay in this file and are never typed by hand.
+    """
+    import json
+
+    flat = []
+    entries = []
+    for anim in animations:
+        frames = anim.get("frames") or []
+        if not frames:
+            raise ValueError(f"animation {anim.get('name')!r} has no frames")
+        size = (frames[0].width, frames[0].height)
+        if any((f.width, f.height) != size for f in frames):
+            raise ValueError(f"animation {anim.get('name')!r} mixes frame sizes")
+        entries.append({
+            "name": str(anim.get("name", f"anim{len(entries)}")),
+            "start": len(flat),
+            "frames": len(frames),
+            "fps": float(anim.get("fps", 8)),
+            "loop": bool(anim.get("loop", True)),
+        })
+        flat.extend(frames)
+    if not flat:
+        raise ValueError("no animations")
+
+    w, h = flat[0].width, flat[0].height
+    ax, ay = anchor if anchor is not None else content_centre(flat)
+    meta = {
+        "frames": len(flat),
+        "frame_size": [w, h],
+        "fps": entries[0]["fps"],
+        "loop": entries[0]["loop"],
+        "anchor": [ax, ay],
+        "anchor_source": "explicit" if anchor is not None else "content_centre",
+        "animations": entries,
+    }
+    Path(path).parent.mkdir(parents=True, exist_ok=True)
+    check_meta(meta)
+    Path(path).write_text(json.dumps(meta, indent=2) + "\n", encoding="utf-8")
+    return Path(path)
+
+
 def check_meta(meta, strip_size=None):
     """Raise ValueError when metadata cannot be drawn correctly."""
     problems = []
@@ -265,11 +312,48 @@ def check_meta(meta, strip_size=None):
         problems.append("anchor must be on a whole or half pixel (x.0 or x.5)")
     if meta.get("fps", 0) <= 0:
         problems.append("fps must be > 0")
+    animations = meta.get("animations")
+    if animations is not None:
+        problems.extend(_check_animations(animations, n))
     if strip_size and tuple(strip_size) != (w * n, h):
         problems.append(f"strip is {strip_size[0]}x{strip_size[1]}, meta says {n} x {w}x{h}")
     if problems:
         raise ValueError("; ".join(problems))
     return meta
+
+
+def _check_animations(animations, total_frames):
+    """Problems with the `animations` list of a sheet metadata (empty = fine)."""
+    problems = []
+    if not isinstance(animations, list) or not animations:
+        return ["animations must be a non-empty list"]
+    names = set()
+    expected = 0
+    for i, anim in enumerate(animations):
+        if not isinstance(anim, dict):
+            problems.append(f"animation {i} is not an object")
+            continue
+        name = anim.get("name")
+        count = anim.get("frames", 0)
+        start = anim.get("start", -1)
+        if not isinstance(name, str) or not name:
+            problems.append(f"animation {i} has no name")
+        elif name in names:
+            problems.append(f"animation name {name!r} repeats")
+        else:
+            names.add(name)
+        if not isinstance(count, int) or count < 1:
+            problems.append(f"animation {name!r} needs frames >= 1")
+            continue
+        if start != expected:
+            problems.append(f"animation {name!r} starts at {start}, expected {expected} "
+                            "(animations must be contiguous from 0)")
+        expected += count
+        if anim.get("fps", 0) <= 0:
+            problems.append(f"animation {name!r} needs fps > 0")
+    if expected > total_frames:
+        problems.append(f"animations use {expected} frames, sheet has {total_frames}")
+    return problems
 
 
 LIBRESPRITE = os.environ.get("LIBRESPRITE", "libresprite")
@@ -348,6 +432,22 @@ if __name__ == "__main__":
         try:
             write_meta(d / "bad.json", frames, fps=8, anchor=(40, 2))
             raise AssertionError("anchor outside the frame was accepted")
+        except ValueError:
+            pass
+        # multi-animation sheet: contiguous starts, per-animation fps/loop, bad input refused
+        anims = [
+            {"name": "idle", "frames": frames[:2], "fps": 6, "loop": True},
+            {"name": "hit", "frames": frames[2:], "fps": 10, "loop": False},
+        ]
+        m3 = write_anim_meta(d / "m3.json", anims, anchor=(5.0, 4.5))
+        import json
+        meta3 = json.loads(m3.read_text())
+        assert [a["start"] for a in meta3["animations"]] == [0, 2], meta3
+        assert meta3["frames"] == 4
+        assert meta3["animations"][1]["loop"] is False
+        try:
+            write_anim_meta(d / "bad2.json", [{"name": "a", "frames": [], "fps": 6}])
+            raise AssertionError("animation without frames was accepted")
         except ValueError:
             pass
     print("ok (temp files removed)")
