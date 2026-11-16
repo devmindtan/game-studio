@@ -94,8 +94,12 @@ Không báo "xong" khi chưa xem `preview.png`, ảnh `sheet` và ảnh `move`.
   `export(...)`/`write_anim_meta`; bán kính, góc do `fit_hitbox` đo từ pixel (alpha ≥ 96, quầng mờ không tính).
   `gamekit art run` từ chối hitbox lệch với pixel. Xem hitbox trên ảnh `gamekit art shot <tên> sheet`
   (đỏ = frame gây sát thương).
-- Trong game: vùng trúng lấy bằng `SpriteHitbox.of(sheet, anim, điểm_vẽ, tỉ_lệ, lật)`, cùng điểm và tỉ lệ với
-  lúc vẽ; data game chỉ chứa hệ số (sát thương, `area`), **không** chứa bán kính/tầm đánh gõ tay.
+- **Thân (hurtbox) của nhân vật/quái** cũng đo từ pixel: `export(..., body="move")` hoặc
+  `write_anim_meta(..., body="idle")` ghi `"body"` (tâm = trọng tâm pixel đặc, bán kính = hình tròn cùng diện tích);
+  `art run` từ chối `body` lệch với pixel; ảnh `sheet` vẽ thân màu xanh lá.
+- Trong game: vùng trúng lấy bằng `SpriteHitbox.of(sheet, anim, điểm_vẽ, tỉ_lệ, lật)`, thân bằng
+  `SpriteHitbox.body(sheet, điểm_vẽ, tỉ_lệ, lật)`, cùng điểm và tỉ lệ với lúc vẽ; data game chỉ chứa hệ số
+  (sát thương, `area`), **không** chứa bán kính/tầm đánh/tâm thân gõ tay.
 
 ## Quy tắc pixel art
 

@@ -323,6 +323,9 @@ func _draw_sheet(font: Font) -> void:
 		if _anchors:
 			draw_rect(Rect2(point - Vector2(2, 2), Vector2(4, 4)), Color.MAGENTA)
 			# hit area from the json: bright on damage frames, faint otherwise
+			var body := SpriteHitbox.body(_sheet, point, _scale)
+			if body != null:
+				body.draw(self, Color(0.3, 1.0, 0.45, 0.8), 1.0)
 			var hb := SpriteHitbox.of(_sheet, anim, point, _scale)
 			if hb != null:
 				var on := hb.is_active(t)

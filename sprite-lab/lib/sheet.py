@@ -6,7 +6,8 @@
 Writes <name>_strip.png, <name>.png (first frame), preview.png (one row per
 animation, no grid), <animation>.gif and <name>.json (write_anim_meta, which
 also runs the ground check when ground=True). Extras per animation: any of
-"durations_ms", "airborne".
+"durations_ms", "airborne", "hitbox". body="<animation>" stores the body circle
+measured from that animation (spritekit.fit_body).
 """
 from __future__ import annotations
 
@@ -15,7 +16,7 @@ from pathlib import Path
 from spritekit import Canvas, gif, preview, strip, write_anim_meta
 
 
-def export(here: Path, name: str, animations, anchor, ground=False, preview_scale=None, gif_scale=None):
+def export(here: Path, name: str, animations, anchor, ground=False, preview_scale=None, gif_scale=None, body=None):
     flat = [f for _, frames, _, _, _ in animations for f in frames]
     w, h = flat[0].width, flat[0].height
     strip(flat).save(here / f"{name}_strip.png")
@@ -31,5 +32,5 @@ def export(here: Path, name: str, animations, anchor, ground=False, preview_scal
     write_anim_meta(here / f"{name}.json",
                     [{"name": n, "frames": f, "fps": fps, "loop": loop, **extra}
                      for n, f, fps, loop, extra in animations],
-                    anchor=anchor, ground=ground)
+                    anchor=anchor, ground=ground, body=body)
     return here / f"{name}_strip.png"

@@ -51,3 +51,13 @@ func test_active_window_follows_durations() -> void:
 func test_no_hitbox_returns_null() -> void:
 	var s := SpriteSheet.from_meta("n", {"frames": 1, "frame_size": [8, 8], "fps": 8.0})
 	_check(SpriteHitbox.of(s, "default", Vector2.ZERO, 1.0) == null, "sprite without hitbox -> null")
+
+
+func test_body_circle_follows_anchor_and_mirror() -> void:
+	var s := SpriteSheet.from_meta("b", {"frames": 1, "frame_size": [24, 24], "fps": 8.0, "anchor": [12.0, 23.0],
+		"body": {"anim": "default", "center": [14.0, 16.0], "radius": 7.5}})
+	var b := SpriteHitbox.body(s, Vector2(100, 100), 2.0)
+	_check(b.center.is_equal_approx(Vector2(104, 86)) and is_equal_approx(b.radius, 15.0),
+		"body at (104,86) r15, got %s r%s" % [b.center, b.radius])
+	var m := SpriteHitbox.body(s, Vector2(100, 100), 2.0, true)
+	_check(m.center.is_equal_approx(Vector2(96, 86)), "mirrored body at (96,86), got %s" % m.center)

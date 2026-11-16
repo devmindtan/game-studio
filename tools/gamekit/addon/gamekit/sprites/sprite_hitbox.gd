@@ -16,6 +16,7 @@ extends RefCounted
 ##   var hb := SpriteHitbox.of(slash, "slash_right", shoulder, 2.0)
 ##   if hb and hb.contains(enemy_center, enemy_radius): ...
 ##   hb.draw(self, Color.YELLOW)   # debug overlay
+##   var hurt := SpriteHitbox.body(slime, pos, 2.0)   # body circle for contact
 
 var shape := "circle"
 var center := Vector2.ZERO      # world
@@ -52,6 +53,25 @@ static func of(sheet: SpriteSheet, anim: String, point: Vector2, scale: float, f
 	var span: Array = box.get("active", [0, int(a.get("frames", 1)) - 1])
 	hb.active_from = frame_time(a, int(span[0]))
 	hb.active_to = frame_time(a, int(span[1]) + 1)
+	return hb
+
+
+## The sprite's body circle (its json "body", measured from pixels by
+## spritekit.fit_body) placed like the drawn sprite; null when it has none.
+## Use it for contact and for being hit instead of a hand-typed radius.
+static func body(sheet: SpriteSheet, point: Vector2, scale: float, flip_h := false) -> SpriteHitbox:
+	if sheet == null or not sheet.meta.get("body") is Dictionary:
+		return null
+	var b: Dictionary = sheet.meta["body"]
+	var c: Array = b.get("center", [sheet.anchor.x, sheet.anchor.y])
+	var local := Vector2(float(c[0]), float(c[1])) - sheet.anchor
+	if flip_h:
+		local.x = -local.x
+	var hb := SpriteHitbox.new()
+	hb.shape = "circle"
+	hb.center = point + local * scale
+	hb.radius = float(b.get("radius", 0.0)) * scale
+	hb.active_to = INF
 	return hb
 
 

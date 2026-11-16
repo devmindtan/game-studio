@@ -251,7 +251,7 @@ def write_meta(path, frames, fps, anchor=None, loop=True):
     return Path(path)
 
 
-def write_anim_meta(path, animations, anchor=None, ground=False):
+def write_anim_meta(path, animations, anchor=None, ground=False, body=None):
     """Write <name>.json for one strip holding several named animations.
 
     ground=True: a character standing on the floor; its anchor y is the floor
@@ -263,6 +263,10 @@ def write_anim_meta(path, animations, anchor=None, ground=False):
     frames of each animation are laid out left to right, one animation after the
     previous one. The game plays `animations[i]` from its `start` for `frames`
     frames, so the frame counts stay in this file and are never typed by hand.
+
+    body="<animation>": also measure the sprite's body circle (hurtbox) from the
+    solid pixels of that animation (fit_body) and store it as "body"; games use
+    it for contact and for being hit instead of a hand-typed radius.
     """
     import json
 
@@ -310,6 +314,11 @@ def write_anim_meta(path, animations, anchor=None, ground=False):
     }
     if ground:
         meta["ground"] = True
+    if body:
+        entry = next((e for e in entries if e["name"] == body), None)
+        if entry is None:
+            raise ValueError(f"body: no animation named {body!r}")
+        meta["body"] = fit_body(flat[entry["start"]:entry["start"] + entry["frames"]], body)
     Path(path).parent.mkdir(parents=True, exist_ok=True)
     check_meta(meta)
     if ground:
@@ -317,7 +326,7 @@ def write_anim_meta(path, animations, anchor=None, ground=False):
         problems = check_ground(meta, sheet)
         if problems:
             raise ValueError("; ".join(problems))
-    problems = check_hitbox(meta, strip(flat).img)
+    problems = check_hitbox(meta, strip(flat).img) + check_body(meta, strip(flat).img)
     if problems:
         raise ValueError("; ".join(problems))
     Path(path).write_text(json.dumps(meta, indent=2) + "\n", encoding="utf-8")
@@ -463,6 +472,51 @@ def check_hitbox(meta, strip_img):
                 problems.append(f"{name}: hitbox {key} is {box.get(key)}, pixels say {fit[key]} "
                                 "(regenerate: pass the hitbox spec to write_anim_meta / export)")
     return problems
+
+
+def fit_body(frames, anim_name):
+    """Body circle (hurtbox) of a sprite, measured from the solid pixels
+    (alpha >= HITBOX_ALPHA) of one animation, averaged over its frames:
+    centre = centroid of the solid pixels (a thin held sword or a scarf barely
+    moves it), radius = radius of the circle with the same area."""
+    import math
+
+    cxs, cys, rs = [], [], []
+    for f in frames:
+        img = f.img if hasattr(f, "img") else f
+        px = img.getchannel("A").load()
+        w, h = img.size
+        pts = [(x + 0.5, y + 0.5) for y in range(h) for x in range(w) if px[x, y] >= HITBOX_ALPHA]
+        if pts:
+            cxs.append(sum(p[0] for p in pts) / len(pts))
+            cys.append(sum(p[1] for p in pts) / len(pts))
+            rs.append(math.sqrt(len(pts) / math.pi))
+    if not rs:
+        raise ValueError(f"body: animation {anim_name!r} has no solid pixels")
+    half = lambda v: round(v * 2) / 2  # noqa: E731
+    n = len(rs)
+    return {"anim": anim_name, "center": [half(sum(cxs) / n), half(sum(cys) / n)], "radius": half(sum(rs) / n)}
+
+
+def check_body(meta, strip_img):
+    """Problems where "body" does not match the pixels of its animation."""
+    body = meta.get("body")
+    if not body:
+        return []
+    anim = next((a for a in meta.get("animations") or [] if a["name"] == body.get("anim")), None)
+    if anim is None:
+        return [f"body: no animation named {body.get('anim')!r}"]
+    w, h = meta["frame_size"]
+    frames = [strip_img.crop(((anim["start"] + i) * w, 0, (anim["start"] + i + 1) * w, h))
+              for i in range(anim["frames"])]
+    fit = fit_body(frames, anim["name"])
+    problems = []
+    if abs(float(body.get("radius", -99)) - fit["radius"]) > 1.0:
+        problems.append(f"body radius is {body.get('radius')}, pixels say {fit['radius']}")
+    c = body.get("center", [-99, -99])
+    if abs(float(c[0]) - fit["center"][0]) > 1.0 or abs(float(c[1]) - fit["center"][1]) > 1.0:
+        problems.append(f"body center is {c}, pixels say {fit['center']}")
+    return [p + " (regenerate with write_anim_meta(..., body=...))" for p in problems]
 
 
 def _check_animations(animations, total_frames):

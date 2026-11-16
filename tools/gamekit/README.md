@@ -115,7 +115,8 @@ gamekit art ase|open <tên>            # .ase cho LibreSprite
   và tỉ lệ với hình vẽ). Dùng chung cho lab và mọi game.
 - `spritekit.py`: `from_rows`, `outline`, `strip`, `preview`, `gif`, `write_meta` / `write_anim_meta`
   (`ground=True` + `check_ground`: nhân vật phải chạm đất ở mọi frame không `airborne`;
-  `"hitbox"` của animation được `fit_hitbox` đo từ pixel, `check_hitbox` từ chối hitbox lệch)
+  `"hitbox"` của animation được `fit_hitbox` đo từ pixel, `check_hitbox` từ chối hitbox lệch; `body=` đo thân
+  bằng `fit_body`, `check_body` kiểm tra; `gamekit test` nạp mọi script trong `src/` nên lỗi parse là FAIL)
   (ghi `<tên>.json`), `check_meta`, `.ase` qua LibreSprite.
 - Export preset gói `assets/sprites/*.json` để game đọc được metadata.
 
