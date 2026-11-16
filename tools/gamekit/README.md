@@ -22,7 +22,7 @@ tools/gamekit/
 │   ├── export.sh                   import → test → export → zip
 │   └── smoke_web.sh + web_smoke_cdp.mjs   mở bản Web trong Chrome headless, in console, chụp ảnh
 └── templates/                  project.godot, export_presets.cfg, Makefile cho game mới
-    └── sprite/gen.py           mẫu generator cho `gamekit art new`
+    └── sprite/gen.py           mẫu generator (nhiều animation) cho `gamekit art new`
 ```
 
 ## Cấu hình cho mọi AI agent
@@ -54,9 +54,8 @@ games/<slug>/
 ├── src/                       code game (core = luật chơi thuần, test được; game = scene)
 ├── assets/data/*.json         số liệu cân bằng
 ├── assets/source/lpc/         ← thả file ZIP/PNG xuất từ generator (Godot bỏ qua, không vào bản build)
-├── assets/source/sprites/     ← generator + preview + .ase của pixel art tự vẽ (Godot bỏ qua)
 ├── assets/sprites/characters/<tên>/   pipeline sinh ra: standard/*.png, <tên>_frames.tres, credits.csv
-├── assets/sprites/custom/<tên>/       PNG cho Godot do `gamekit art` sinh ra
+├── assets/sprites/custom/<tên>/       sprite đã promote từ Sprite Lab (strip + json)
 ├── assets/credits/            CREDITS.md + lpc_credits.csv (có trong bản build)
 ├── addons/gamekit/            bản sao addon (không sửa ở đây)
 ├── tests/unit, tests/integration
@@ -86,33 +85,27 @@ Tốc độ và chế độ lặp của từng animation nằm trong `addon/game
 `gamekit install <g>` rồi `gamekit sprites <g>`. Animation cỡ lớn (128/192px, thư mục `custom/`) hiện mới
 được chép sang, chưa chuyển thành SpriteFrames.
 
-## Pixel art tự vẽ (agent)
+## Pixel art: Sprite Lab
 
-Dùng cho tile, icon, hiệu ứng, quái, nhân vật không theo LPC. Agent viết generator Python (Pillow), render
-ra PNG, tự xem preview rồi sửa; LibreSprite chỉ dùng để người chỉnh tay và chuyển `.ase`.
+Mọi sprite pixel art được làm và thử trong `sprite-lab/` (project Godot riêng), không làm trong game. Quy
+trình đầy đủ ở [`sprite-lab/README.md`](../../sprite-lab/README.md) và skill `pixel-sprite`.
 
 ```bash
-gamekit art new <game> light-mote --size 24   # tạo assets/source/sprites/light-mote/gen.py
-gamekit art run <game> light-mote             # chạy gen.py -> PNG + preview.png + anim.gif
-gamekit art ase <game> light-mote             # PNG -> .ase trong assets/source/
-gamekit art open <game> light-mote            # mở .ase bằng LibreSprite
+gamekit art new <tên> [--size N]      # sprite-lab/sprites/<tên>/gen.py (mẫu nhiều animation)
+gamekit art run <tên>                 # vẽ + kiểm tra <tên>.json (frames, animation, điểm neo)
+gamekit art shot <tên> sheet|move     # ảnh để xem: mọi animation / 8 khoảnh khắc thử di chuyển
+gamekit art lab [<tên>] [sheet|move]  # mở lab (người dùng tự điều khiển)
+gamekit art test | check | list       # test lab / kiểm mọi sprite / sprite nào ở game nào
+gamekit art promote <tên> <game>      # chép strip + json (+ "source") vào game
+gamekit art ase|open <tên>            # .ase cho LibreSprite
 ```
 
-- File sinh ra:
-  - `assets/sprites/custom/<tên>/<tên>.png` và `<tên>_strip.png` — Godot import.
-  - `assets/source/sprites/<tên>/` — `gen.py`, `preview.png`, `anim.gif`, `<tên>.ase`; Godot bỏ qua.
-- `gen.py` gọi `write_meta(...)` để ghi `assets/sprites/custom/<tên>/<tên>.json`: số frame, kích thước
-  frame, fps, loop và **điểm neo** (pixel nguồn đặt lên vị trí vật thể). `gamekit art run` dừng nếu thiếu
-  hoặc sai. Game đọc file này; đừng gõ lại các số đó vào config.
-- `gen.py` import helper `pipeline/spritekit.py` (ASCII map, outline, strip, grid, GIF, preview, `.ase`).
-  Sửa `gen.py`, không sửa helper trong game.
-- Nhiều animation trong một sheet: các animation nối tiếp nhau trên dải ngang, `gen.py` gọi
-  `write_anim_meta(path, [{"name", "frames", "fps", "loop"}, …], anchor=…)`. Game đọc `animations` trong
-  `<tên>.json` và vẽ frame `start + i`. Ví dụ đầy đủ:
-  `games/dom-dom-dem-mua/assets/source/sprites/mage/gen.py` (7 animation).
-- Preview là ảnh phóng to nearest có lưới, để agent đọc bằng công cụ đọc ảnh của nó. `anim.gif` để xem chuyển động.
-- `gamekit doctor` kiểm tra `libresprite`. Bản 1.3 không có MCP; xem `.agents/skills/pixel-sprite/SKILL.md`
-  để biết giới hạn và quy trình đầy đủ.
+- `gamekit art new <game> …` bị từ chối: sprite không được tạo trong game (bài học 2026-11-16).
+- Addon `addons/gamekit/sprites/`: `SpriteSheet` (đọc json, chọn frame theo animation và thời gian, vẽ)
+  và `SpriteAnchor` (đặt theo điểm neo, kể cả khi lật). Dùng chung cho lab và mọi game.
+- `spritekit.py`: `from_rows`, `outline`, `strip`, `preview`, `gif`, `write_meta` / `write_anim_meta`
+  (ghi `<tên>.json`), `check_meta`, `.ase` qua LibreSprite.
+- Export preset gói `assets/sprites/*.json` để game đọc được metadata.
 
 ## Xuất game
 

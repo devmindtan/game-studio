@@ -9,6 +9,7 @@ KIT="$(cd "$(dirname "$(readlink -f "$0")")/.." && pwd)"
 WS="$(cd "$KIT/../.." && pwd)"                       # workspace root (game-studio/)
 TEMPLATE="$WS/templates/claude-code-game-studios"
 LPC_DIR="$WS/tools/lpc-generator"
+LAB="$WS/sprite-lab"
 UPSTREAM="https://github.com/Donchitos/Claude-Code-Game-Studios.git"
 GODOT="${GODOT:-godot}"
 LIBRESPRITE="${LIBRESPRITE:-libresprite}"
@@ -59,11 +60,14 @@ Sprites (LPC)
   sample-sprite <game>         compose a sample character offline (no browser)
   preview <game> [character]   character viewer
 
-Pixel art (agent)
-  art new <game> <name> [--size N]  scaffold assets/source/sprites/<name>/gen.py
-  art run <game> <name>             run the generator -> PNG + preview + GIF
-  art ase <game> <name>             PNG -> .ase for editing by hand
-  art open <game> <name>            convert and open the .ase in LibreSprite
+Sprite Lab (sprite-lab/: make + test sprites here, then promote into a game)
+  art new <name> [--size N]         scaffold sprite-lab/sprites/<name>/gen.py
+  art run <name>                    render + check metadata (frames, animations, anchor)
+  art lab [<name>] [sheet|move]     open the lab: all animations / a movement test stage
+  art shot <name> [sheet|move] [frames]  screenshot the lab (move = scripted demo) for review
+  art list | art check | art test   sprites + which games use them / validate all / lab tests
+  art promote <name> <game>         copy strip + json into games/<g>/assets/sprites/custom/<name>/
+  art ase|open <name>               .ase for editing by hand in LibreSprite
 
 Release
   templates                    install Godot export templates (once per Godot version)
@@ -337,81 +341,158 @@ cmd_preview() {
   "$GODOT" --path "$g" res://addons/gamekit/debug/character_viewer.tscn "${args[@]}"
 }
 
-# art <new|run|ase|open> [game] <name> [--size N]
-# The game may be omitted inside a game folder; then the first arg is <name>.
-art_target() {
-  local first="${1:-}" second="${2:-}"
-  if [[ -n "$first" ]] && { [[ -f "$first/project.godot" ]] || [[ -f "$WS/games/$first/project.godot" ]]; }; then
-    ART_GAME="$(resolve_game "$first")"; ART_NAME="$second"; ART_SHIFT=2
-  else
-    ART_GAME="$(resolve_game)"; ART_NAME="$first"; ART_SHIFT=1
-  fi
-  [[ -n "$ART_NAME" ]] || die "missing sprite name (gamekit art new <game> <name>)"
-  [[ "$ART_NAME" =~ ^[a-z0-9]+(-[a-z0-9]+)*$ ]] || die "sprite name must be lowercase-kebab (e.g. light-mote)"
+# --- Sprite Lab -------------------------------------------------------------------
+# Every sprite is made and tested in sprite-lab/ (its own Godot project), never
+# inside a game: `art new` refuses a game (lesson 2026-11-16, LESSONS.md).
+# A finished sprite goes into a game with `art promote <name> <game>`.
+
+lab_install() {
+  [[ -f "$LAB/project.godot" ]] || die "sprite lab missing: $LAB"
+  mkdir -p "$LAB/addons/gamekit" "$LAB/sprites" "$LAB/builds"
+  rsync -a --delete --exclude '*.uid' --exclude '*.import' "$KIT/addon/gamekit/" "$LAB/addons/gamekit/"
+  cp "$KIT/VERSION" "$LAB/addons/gamekit/VERSION"
 }
 
-cmd_art() {
-  local sub="${1:-}"; shift || true
-  case "$sub" in
-    new)
-      art_target "$@"; shift "$ART_SHIFT" || true
-      local size=32
-      if [[ "${1:-}" == "--size" ]]; then
-        size="${2:-}"; [[ -n "$size" ]] || die "--size needs a value"
-      fi
-      [[ "$size" =~ ^[0-9]+$ ]] && (( size >= 8 && size <= 256 )) || die "--size must be 8..256"
-      local src="$ART_GAME/assets/source/sprites/$ART_NAME"
-      [[ -e "$src/gen.py" ]] && die "already exists: ${src#"$WS"/}/gen.py"
-      mkdir -p "$src"
-      sed -e "s/__NAME__/$ART_NAME/g" -e "s/__SIZE__/$size/g" \
-        "$KIT/templates/sprite/gen.py" > "$src/gen.py"
-      chmod +x "$src/gen.py"
-      echo "   ${src#"$WS"/}/gen.py"
-      echo "Next:  gamekit art run $(basename "$ART_GAME") $ART_NAME"
-      ;;
-    run)
-      art_target "$@"
-      local src="$ART_GAME/assets/source/sprites/$ART_NAME"
-      [[ -f "$src/gen.py" ]] || die "no generator: ${src#"$WS"/}/gen.py (gamekit art new <game> $ART_NAME)"
-      say "render $ART_NAME"
-      (cd "$src" && python3 gen.py)
-      local png="$ART_GAME/assets/sprites/custom/$ART_NAME/$ART_NAME.png"
-      [[ -f "$png" ]] || die "generator wrote no ${png#"$WS"/}"
-      # Every sprite needs <name>.json (frames, fps, anchor) and it must match the strip.
-      local meta="${png%.png}.json" stripf="${png%.png}_strip.png"
-      [[ -f "$meta" ]] || die "generator wrote no ${meta#"$WS"/}: call write_meta(...) in gen.py (anchor!)"
-      GAMEKIT_PIPELINE="$KIT/pipeline" python3 -c '
+lab_ready() {  # addon present and current, project imported
+  if [[ ! -f "$LAB/addons/gamekit/VERSION" || "$(cat "$LAB/addons/gamekit/VERSION")" != "$VERSION" ]]; then
+    lab_install
+  fi
+  [[ -d "$LAB/.godot" ]] || godot_import "$LAB"
+}
+
+art_name() {
+  local n="${1:-}"
+  [[ -n "$n" ]] || die "missing sprite name (gamekit art list)"
+  if [[ -f "$WS/games/$n/project.godot" || -f "$n/project.godot" ]]; then
+    die "sprites are made in the Sprite Lab, not inside a game: gamekit art $ART_SUB <name>; then gamekit art promote <name> $n"
+  fi
+  [[ "$n" =~ ^[a-z0-9]+(-[a-z0-9]+)*$ ]] || die "sprite name must be lowercase-kebab (e.g. light-mote)"
+  echo "$n"
+}
+
+art_check_one() {  # validate sprite-lab/sprites/<n>/<n>.json against its strip
+  local n="$1" d="$LAB/sprites/$1"
+  [[ -f "$d/$n.json" ]] || die "no $n.json in sprite-lab/sprites/$n: gen.py must call write_meta / write_anim_meta"
+  [[ -f "$d/${n}_strip.png" ]] || die "no ${n}_strip.png in sprite-lab/sprites/$n"
+  GAMEKIT_PIPELINE="$KIT/pipeline" python3 -c '
 import json, os, sys
 sys.path.insert(0, os.environ["GAMEKIT_PIPELINE"])
 from PIL import Image
 from spritekit import check_meta
 m = json.load(open(sys.argv[1]))
 check_meta(m, Image.open(sys.argv[2]).size)
-anims = m.get("animations") or []
-extra = ", %d animations: %s" % (len(anims), ", ".join(a["name"] for a in anims)) if anims else ""
-print("   meta:    %d frame(s) %sx%s @ %s fps, anchor %s (%s)%s" % (m["frames"], *m["frame_size"], m["fps"], m["anchor"], m["anchor_source"], extra))
-' "$meta" "$stripf" || die "bad ${meta#"$WS"/}"
-      echo "   sprite:  ${png#"$WS"/}"
-      echo "   preview: ${src#"$WS"/}/preview.png"
+anims = m.get("animations") or [{"name": "default", "frames": m["frames"], "fps": m["fps"], "loop": m.get("loop", True)}]
+print("   %-12s %2d frame %sx%s  neo %s (%s)" % (sys.argv[3], m["frames"], *m["frame_size"], m["anchor"], m["anchor_source"]))
+print("                " + ", ".join("%s:%d@%sfps%s" % (a["name"], a["frames"], a["fps"], "" if a.get("loop", True) else " 1x") for a in anims))
+' "$d/$n.json" "$d/${n}_strip.png" "$n" || die "bad sprite-lab/sprites/$n/$n.json"
+}
+
+cmd_art() {
+  ART_SUB="${1:-}"; shift || true
+  local n
+  case "$ART_SUB" in
+    new)
+      n="$(art_name "${1:-}")"; shift
+      local size=32
+      if [[ "${1:-}" == "--size" ]]; then size="${2:-}"; fi
+      [[ "$size" =~ ^[0-9]+$ ]] && (( size >= 8 && size <= 256 )) || die "--size must be 8..256"
+      local src="$LAB/sprites/$n"
+      [[ -e "$src/gen.py" ]] && die "already exists: sprite-lab/sprites/$n/gen.py"
+      mkdir -p "$src"
+      sed -e "s/__NAME__/$n/g" -e "s/__SIZE__/$size/g" "$KIT/templates/sprite/gen.py" > "$src/gen.py"
+      chmod +x "$src/gen.py"
+      echo "   sprite-lab/sprites/$n/gen.py"
+      echo "Next:  gamekit art run $n   then   gamekit art lab $n"
+      ;;
+    run)
+      n="$(art_name "${1:-}")"
+      [[ -f "$LAB/sprites/$n/gen.py" ]] || die "no sprite-lab/sprites/$n/gen.py (gamekit art new $n)"
+      say "render $n"
+      (cd "$LAB/sprites/$n" && python3 gen.py) >/dev/null
+      art_check_one "$n"
+      echo "   preview: sprite-lab/sprites/$n/preview.png"
+      ;;
+    check)
+      local any=0 d
+      for d in "$LAB"/sprites/*/; do
+        [[ -f "$d/gen.py" ]] || continue
+        any=1; art_check_one "$(basename "$d")"
+      done
+      [[ $any == 1 ]] || echo "   (no sprites yet: gamekit art new <name>)"
+      ;;
+    list)
+      local d g
+      for d in "$LAB"/sprites/*/; do
+        [[ -f "$d/gen.py" ]] || continue
+        n="$(basename "$d")"
+        local where=""
+        for g in "$WS"/games/*/; do
+          [[ -f "$g/assets/sprites/custom/$n/$n.json" ]] && where+=" $(basename "$g")"
+        done
+        local anims; anims="$(python3 -c 'import json,sys; m=json.load(open(sys.argv[1])); print(",".join(a["name"] for a in m.get("animations") or [{"name":"default"}]))' "$d/$n.json" 2>/dev/null || echo "(chưa run)")"
+        printf '  %-14s %-44s %s\n' "$n" "$anims" "${where:+trong game:$where}"
+      done
+      ;;
+    lab)
+      lab_ready
+      local args=()
+      [[ -n "${1:-}" ]] && args+=("--sprite=$(art_name "$1")")
+      [[ -n "${2:-}" ]] && args+=("--mode=$2")
+      "$GODOT" --path "$LAB" res://lab/sprite_lab.tscn -- "${args[@]}"
+      ;;
+    shot)  # art shot <name> [sheet|move] [frames] [-- extra lab args]
+      n="$(art_name "${1:-}")"; shift
+      local mode="${1:-sheet}"; [[ $# -gt 0 ]] && shift
+      local frames="${1:-150}"; [[ $# -gt 0 && "$1" != "--" ]] && shift
+      [[ "${1:-}" == "--" ]] && shift
+      lab_ready
+      if [[ "$mode" != "move" ]]; then
+        cmd_shot "$LAB" res://lab/sprite_lab.tscn "$frames" -- --sprite="$n" --mode="$mode" "$@"
+        return
+      fi
+      # Movement is not one picture: the lab plays its scripted demo and grabs the
+      # moments it knows matter (walk, attack, run left, jump, spell, hurt…) into one
+      # grid image (--contact), so one look shows the sprite in motion.
+      mkdir -p "$LAB/builds/shots"
+      local out; out="$LAB/builds/shots/$(date +%Y%m%d-%H%M%S)-$n-move.png"
+      "${RUN[@]}" "$GODOT" --path "$LAB" --windowed --resolution 1280x720 --fixed-fps 60 \
+        res://lab/sprite_lab.tscn -- --sprite="$n" --contact="$out" "$@" 2>&1 | grep -E "ERROR" >&2 || true
+      [[ -f "$out" ]] || die "lab wrote no contact sheet"
+      echo "$out"
+      ;;
+    promote)  # art promote <name> <game>
+      n="$(art_name "${1:-}")"
+      local g; g="$(resolve_game "${2:-}")"
+      art_check_one "$n" >/dev/null
+      local dest="$g/assets/sprites/custom/$n"
+      mkdir -p "$dest"
+      cp "$LAB/sprites/$n/${n}_strip.png" "$LAB/sprites/$n/$n.png" "$dest/" 2>/dev/null || cp "$LAB/sprites/$n/${n}_strip.png" "$dest/"
+      # The copy records where it came from; the source stays in the lab only.
+      python3 -c 'import json,sys; m=json.load(open(sys.argv[1])); m["source"]="sprite-lab/sprites/"+sys.argv[3]; open(sys.argv[2],"w").write(json.dumps(m, indent=2)+"\n")' \
+        "$LAB/sprites/$n/$n.json" "$dest/$n.json" "$n"
+      echo "   ${dest#"$WS"/}/  (strip, json; source: sprite-lab/sprites/$n)"
+      echo "Next:  use it in the game, gamekit test $(basename "$g"), gamekit shot, then commit both repos"
       ;;
     ase)
-      art_target "$@"
-      local png="$ART_GAME/assets/sprites/custom/$ART_NAME/$ART_NAME.png"
-      local ase="$ART_GAME/assets/source/sprites/$ART_NAME/$ART_NAME.ase"
-      [[ -f "$png" ]] || die "missing ${png#"$WS"/} (gamekit art run ...)"
+      n="$(art_name "${1:-}")"
+      local png="$LAB/sprites/$n/${n}_strip.png" ase="$LAB/sprites/$n/$n.ase"
+      [[ -f "$png" ]] || die "missing sprite-lab/sprites/$n/${n}_strip.png (gamekit art run $n)"
       command -v "$LIBRESPRITE" >/dev/null 2>&1 || die "libresprite not found (gamekit doctor)"
-      say "ase $ART_NAME"
       GAMEKIT_PIPELINE="$KIT/pipeline" LIBRESPRITE="$LIBRESPRITE" python3 -c \
         'import os,sys; sys.path.insert(0,os.environ["GAMEKIT_PIPELINE"]); from spritekit import to_ase; to_ase(sys.argv[1],sys.argv[2])' \
         "$png" "$ase"
-      echo "   ${ase#"$WS"/}"
+      echo "   sprite-lab/sprites/$n/$n.ase"
       ;;
     open)
-      art_target "$@"
-      cmd_art ase "$ART_GAME" "$ART_NAME"
-      "$LIBRESPRITE" "$ART_GAME/assets/source/sprites/$ART_NAME/$ART_NAME.ase"
+      n="$(art_name "${1:-}")"
+      cmd_art ase "$n"
+      "$LIBRESPRITE" "$LAB/sprites/$n/$n.ase"
       ;;
-    *) die "usage: gamekit art new|run|ase|open <game> <name> [--size N]" ;;
+    test)
+      lab_ready
+      cmd_test "$LAB"
+      ;;
+    *) die "usage: gamekit art new|run|lab|shot|check|list|promote|ase|open|test ... (gamekit help)" ;;
   esac
 }
 

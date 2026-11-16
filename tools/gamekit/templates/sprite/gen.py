@@ -1,14 +1,20 @@
 #!/usr/bin/env python3
-"""Generator cho sprite "__NAME__".
+"""Generator cho sprite "__NAME__" (Sprite Lab).
 
-Sửa file này rồi chạy:  gamekit art run <game> __NAME__
+Sửa file này rồi:
+  gamekit art run __NAME__              vẽ lại + kiểm tra metadata
+  gamekit art lab __NAME__ [sheet|move] thử: mọi animation cạnh nhau / điều khiển di chuyển
+  gamekit art shot __NAME__ [sheet|move] chụp ảnh để agent tự xem
+  gamekit art promote __NAME__ <game>   khi đạt: chép strip + json vào game
 
-File sinh ra:
-  assets/sprites/custom/__NAME__/__NAME__.png        frame chính (Godot dùng)
-  assets/sprites/custom/__NAME__/__NAME___strip.png  dải animation (nếu có nhiều frame)
-  assets/sprites/custom/__NAME__/__NAME__.json       số frame, fps, ĐIỂM NEO (game đặt sprite theo điểm này)
-  assets/source/sprites/__NAME__/preview.png          ảnh phóng to để agent xem
-  assets/source/sprites/__NAME__/anim.gif             xem animation
+File sinh ra (cạnh gen.py, trong sprite-lab/sprites/__NAME__/):
+  __NAME___strip.png   mọi frame, trái sang phải (animation nối tiếp nhau)
+  __NAME__.json        frame_size, ĐIỂM NEO, danh sách animation {name, start, frames, fps, loop}
+  __NAME__.png         frame đầu (icon)
+  preview.png          mỗi animation một hàng, phóng to có lưới (để agent đọc)
+  <animation>.gif      xem chuyển động (cho người)
+
+Tên animation mà lab và game hiểu: idle, walk/run/fly/move, jump, attack, spell, hurt, death.
 """
 
 import sys
@@ -24,20 +30,17 @@ def _workspace() -> Path:
 
 sys.path.insert(0, str(_workspace() / "tools/gamekit/pipeline"))
 
-from spritekit import Canvas, gif, preview, strip, write_meta  # noqa: E402
+from spritekit import Canvas, gif, preview, strip, write_anim_meta  # noqa: E402
 
 NAME = "__NAME__"
 SIZE = __SIZE__
-FPS = 8
-# Điểm neo (pixel nguồn) rơi đúng vào vị trí của vật thể trong game: tâm thân, chân,
-# đầu giọt mưa... None = tâm phần có hình (chỉ đúng khi hình đối xứng quanh giữa).
-# Đặt rõ khi hình lệch (ví dụ cánh vỗ làm khung bao nhảy): ANCHOR = (7.5, 8.5).
+# Điểm neo (pixel nguồn) rơi đúng vào vị trí của vật thể trong game: giữa hai bàn chân (nhân vật
+# đứng trên đất), tâm thân (vật bay), đầu giọt mưa… None = tâm phần có hình (chỉ đúng khi hình
+# đối xứng và khung bao không đổi giữa các frame). Ví dụ nhân vật: ANCHOR = (SIZE / 2, SIZE - 2).
 ANCHOR = None
-LOOP = True
 
-HERE = Path(__file__).resolve().parent          # assets/source/sprites/<name>
-GAME = HERE.parents[3]                           # thư mục game
-OUT = GAME / "assets/sprites/custom" / NAME      # PNG cho Godot
+HERE = Path(__file__).resolve().parent  # sprite-lab/sprites/<name>
+OUT = HERE
 
 # Palette: giữ ít màu, đủ tối/sáng để đọc silhouette ở 1x.
 PALETTE = {
@@ -48,20 +51,11 @@ PALETTE = {
 }
 
 
-def frame(i: int) -> Canvas:
-    """Một frame. Thay bằng thiết kế thật của bạn.
-
-    Cách nhanh nhất là vẽ bằng ASCII map:
+def idle(i: int) -> Canvas:
+    """Một frame của "idle". Thay bằng thiết kế thật; vẽ nhanh nhất bằng ASCII map:
 
         from spritekit import from_rows
-        rows = [
-            "..oo..",
-            ".ommo.",
-            "ommmmo",
-            ".ommo.",
-            "..oo..",
-        ]
-        c = from_rows(rows, PALETTE)
+        c = from_rows(["..oo..", ".ommo.", "ommmmo", ".ommo.", "..oo.."], PALETTE)
 
     Ở đây là hình tròn giữ chỗ để `gamekit art run` có kết quả ngay.
     """
@@ -75,16 +69,27 @@ def frame(i: int) -> Canvas:
     return c
 
 
+# (tên, frames, fps, loop). Thêm animation bằng cách thêm dòng: ("walk", [walk(i) for i in range(6)], 10, True)
+ANIMATIONS = [
+    ("idle", [idle(i) for i in range(4)], 6, True),
+]
+
+
 def main() -> None:
-    frames = [frame(i) for i in range(4)]
-    OUT.mkdir(parents=True, exist_ok=True)
-    frames[0].save(OUT / f"{NAME}.png")
-    strip(frames).save(OUT / f"{NAME}_strip.png")
-    zoom = max(2, 256 // SIZE)
-    preview(frames, HERE / "preview.png", scale=zoom)
-    gif(frames, HERE / "anim.gif", fps=FPS, scale=max(1, zoom // 2))
-    write_meta(OUT / f"{NAME}.json", frames, fps=FPS, anchor=ANCHOR, loop=LOOP)
-    print(f"sprite:  {OUT / f'{NAME}.png'}")
+    flat = [f for _, frames, _, _ in ANIMATIONS for f in frames]
+    strip(flat).save(OUT / f"{NAME}_strip.png")
+    flat[0].save(OUT / f"{NAME}.png")
+    # Preview: mỗi animation một hàng.
+    cols = max(len(frames) for _, frames, _, _ in ANIMATIONS)
+    sheet = Canvas(cols * SIZE, len(ANIMATIONS) * SIZE)
+    for row, (_, frames, _, _) in enumerate(ANIMATIONS):
+        sheet.paste(strip(frames), 0, row * SIZE)
+    preview([sheet], HERE / "preview.png", scale=max(2, 256 // SIZE))
+    for anim, frames, fps, _ in ANIMATIONS:
+        gif(frames, HERE / f"{anim}.gif", fps=fps, scale=max(1, 128 // SIZE))
+    write_anim_meta(OUT / f"{NAME}.json",
+                    [{"name": n, "frames": f, "fps": fps, "loop": loop} for n, f, fps, loop in ANIMATIONS],
+                    anchor=ANCHOR)
     print(f"strip:   {OUT / f'{NAME}_strip.png'}")
     print(f"preview: {HERE / 'preview.png'}")
 
