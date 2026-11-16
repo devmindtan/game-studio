@@ -4,3 +4,4 @@ builds/
 addons/gamekit/
 *.import
 __pycache__/
+sprites-manifest.json

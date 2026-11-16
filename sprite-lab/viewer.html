@@ -164,7 +164,7 @@ function catLabel(id){const c=CATS.find(x=>x.id===id);return c?c.label:id;}
 async function init(){
   buildFilters();
   try{
-    const res=await fetch('sprites-manifest.json');
+    const res=await fetch('sprites-manifest.json',{cache:'no-store'});
     if(!res.ok) throw new Error('HTTP '+res.status);
     data=await res.json();
     data.sprites.forEach(s=>s._cat=categoryOf(s));
@@ -205,7 +205,7 @@ function renderList(){
       const d=document.createElement('div'); d.className='item'+(current&&current.name===s.name?' active':'');
       const a=(s.meta.animations||[]).map(x=>x.name).join(', ');
       const fs=(s.meta.frame_size||[]).join('×');
-      const thumb='sprites/'+s.name+'/'+s.name+'.png';
+      const thumb=s.thumb||('sprites/'+s.name+'/'+s.name+'.png');
       d.innerHTML='<img class="thumb" src="'+thumb+'" alt="" loading="lazy"><div class="info"><div class="row1"><div class="name">'+s.name+'</div><div class="tag">'+fs+'</div></div><div class="meta">'+a+'</div></div>';
       const im=d.querySelector('img.thumb');
       im.onerror=()=>{im.style.visibility='hidden';};

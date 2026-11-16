@@ -450,6 +450,8 @@ art_rig() {
         --name "$n" --atlas "$tmp/render/$n.atlas.json" --sheet "$tmp/render/$n.png" \
         --out-dir "$LAB/sprites/$n"
       art_check_one "$n"
+      # keep the web viewer's manifest current (image URLs carry ?v=<mtime>)
+      [[ -f "$LAB/build_manifest.py" ]] && python3 "$LAB/build_manifest.py" --quiet
       echo "   preview: sprite-lab/sprites/$n/preview.png"
       ;;
     *) die "usage: gamekit art rig new <name> [hero|hero-sword|knight] | validate <name> | inspect <name> [animation] | motion <name> <animation> [speed] | build <name>" ;;
@@ -483,6 +485,8 @@ cmd_art() {
       say "render $n"
       (cd "$LAB/sprites/$n" && python3 gen.py) >/dev/null
       art_check_one "$n"
+      # keep the web viewer's manifest current (image URLs carry ?v=<mtime>)
+      [[ -f "$LAB/build_manifest.py" ]] && python3 "$LAB/build_manifest.py" --quiet
       echo "   preview: sprite-lab/sprites/$n/preview.png"
       ;;
     check)
