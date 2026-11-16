@@ -1,0 +1,14 @@
+{
+  "frames": 4,
+  "frame_size": [
+    16,
+    16
+  ],
+  "fps": 12,
+  "loop": true,
+  "anchor": [
+    7.5,
+    8.5
+  ],
+  "anchor_source": "explicit"
+}

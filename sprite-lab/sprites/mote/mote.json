@@ -1,0 +1,14 @@
+{
+  "frames": 4,
+  "frame_size": [
+    8,
+    8
+  ],
+  "fps": 6,
+  "loop": true,
+  "anchor": [
+    3.5,
+    3.5
+  ],
+  "anchor_source": "content_centre"
+}
