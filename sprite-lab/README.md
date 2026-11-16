@@ -79,6 +79,21 @@ frame (bấm để nhảy tới), GIF và preview sheet. Phát đúng `durations
 - **Phím**: Space phát/dừng · ←/→ frame · ↑/↓ animation · 1–9 chọn animation · `[` `]` sprite trước/sau ·
   `+`/`-` tỉ lệ · B nền · R từ đầu · `/` tìm.
 
+### Tab Games — quản lý game và demo chiêu
+
+Nút **Games** trên thanh đầu chuyển sang bảng điều khiển: danh sách mọi game có `project.godot`
+(đọc từ `games/*/`), chọn game → danh sách chiêu từ `upgrades_<class>.json`, chọn chiêu → animation
+mô phỏng từ lúc ra chiêu đến lúc quái trúng đòn.
+
+- Demo **dựng từ data thật**, không vẽ tay: `build_games_manifest.py` quét `classes.json`,
+  `upgrades_<class>.json`, `monsters.json` và hitbox/frame timing trong `sprites/*/<tên>.json`.
+  Khi game thêm chiêu hoặc đổi `cast_range`, chỉ cần chạy lại script (serve script tự chạy lúc mở,
+  viewer tự cập nhật sau vài giây).
+- Sân khấu có 4 pha **Ra chiêu → Triển khai → Trúng đòn → Kết thúc**, thanh tua, phát lại, đổi tốc độ,
+  chọn bậc I–V và bật hitbox. Chỉ quái nằm trong hitbox (theo đúng `shape`/`radius`/`active` của bậc
+  đang chọn) mới hiện dấu trúng và số sát thương.
+- Script này **chỉ đọc** repo game; không tự promote sprite hay sửa `src/`/`assets/data/` của game.
+
 ## Trình thử (`gamekit art lab [<tên>] [sheet|move]`)
 
 - **sheet**: mọi animation cạnh nhau, mỗi cái lặp lại (animation một lần thì nghỉ 0,6 giây rồi chạy lại),

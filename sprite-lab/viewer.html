@@ -88,11 +88,51 @@ label.ctrlLbl{font-size:11px;color:var(--muted);display:flex;align-items:center;
 .gifRow figcaption{font-size:11px;color:var(--muted);margin-top:2px;text-align:center}
 .err{color:#ff9f9f} .ok{color:var(--good)}
 @media (max-width:980px){.layout{grid-template-columns:1fr} aside{border-right:none;border-bottom:1px solid var(--border);max-height:36vh} .work{grid-template-columns:1fr}}
+
+/* --- studio navigation + games / skill demo -------------------------------- */
+#nav{display:flex;gap:4px;margin-left:8px}
+.navBtn{background:transparent;border:1px solid transparent;border-radius:7px;padding:5px 12px;font-size:12px;font-weight:600;color:var(--muted);cursor:pointer}
+.navBtn:hover{color:var(--text);background:var(--panel)}
+.navBtn.active{background:#1e3348;border-color:#2b4866;color:#dffaff}
+.gamesLayout{display:grid;grid-template-columns:260px 1fr;height:calc(100vh - 44px);min-height:0}
+.gamesSide{border-right:1px solid var(--border);display:flex;flex-direction:column;min-height:0;overflow:hidden}
+.gamesSide .sideTop{padding:8px;border-bottom:1px solid var(--border)}
+#gameList{overflow-y:auto;padding:6px;flex:1;min-height:0}
+.gameItem{padding:8px;border:1px solid transparent;border-radius:8px;cursor:pointer;margin-bottom:4px}
+.gameItem:hover{background:var(--panel);border-color:var(--border)}
+.gameItem.active{background:#152636;border-color:#2b7d91}
+.gameItem .gn{font-weight:700;font-size:14px}
+.gameItem .gm{color:var(--muted);font-size:11px;margin-top:2px}
+.gamesMain{padding:10px;overflow:auto;min-height:0}
+.gamesWork{display:grid;grid-template-columns:250px 1fr;gap:12px;padding:10px}
+.skillList{display:flex;flex-direction:column;gap:4px}
+.skillItem{padding:8px;border:1px solid var(--border);border-radius:8px;cursor:pointer;background:var(--panel2)}
+.skillItem:hover{border-color:#43506a}
+.skillItem.active{background:#2f2550;border-color:#7658c8}
+.skillItem .sn{font-weight:700;font-size:13px}
+.skillItem .sm{color:var(--muted);font-size:11px;margin-top:2px}
+.demoHead{padding:8px 10px;border-bottom:1px solid var(--border)}
+.demoHead .dt{font-size:16px;font-weight:700}
+.demoHead .dd{color:var(--muted);font-size:12px;margin-top:3px;line-height:1.5}
+#demoStage{background:#232a1f;min-height:340px;padding:8px}
+#demoCv{max-width:100%;height:auto}
+.demoControls{padding:8px 10px;display:flex;gap:8px;align-items:center;flex-wrap:wrap;border-bottom:1px solid var(--border)}
+.timelineWrap{padding:8px 10px}
+.timelineWrap input[type=range]{width:100%;accent-color:#b06cff}
+.phases{display:flex;justify-content:space-between;font-size:10px;color:var(--muted);margin-top:3px}
+.phases span.on{color:#dffaff;font-weight:700}
+.demoInfo{padding:8px 10px;display:flex;gap:6px;flex-wrap:wrap}
+.demoInfo .pill{background:var(--panel3);border-color:var(--border);color:var(--muted)}
+@media (max-width:1100px){.gamesWork{grid-template-columns:1fr} .gamesLayout{grid-template-columns:1fr} .gamesSide{max-height:28vh;border-right:none;border-bottom:1px solid var(--border)}}
 </style>
 </head>
 <body>
 <header>
-  <h1>Sprite Lab Viewer</h1>
+  <h1>Studio</h1>
+  <nav id="nav">
+    <button class="navBtn active" data-view="lab">Sprite Lab</button>
+    <button class="navBtn" data-view="games">Games</button>
+  </nav>
   <div class="sub">Chọn sprite → chọn animation → xem / tua từng frame</div>
   <div id="status"><span id="live" title="Tự kiểm tra sprite mới mỗi 2 giây">● tự cập nhật</span><span id="count" class="sub"></span></div>
 </header>
@@ -161,6 +201,43 @@ label.ctrlLbl{font-size:11px;color:var(--muted);display:flex;align-items:center;
     </div>
   </main>
 </div>
+
+<div class="gamesLayout" id="gamesLayout" style="display:none">
+  <aside class="gamesSide">
+    <div class="sideTop"><input id="gq" class="search" placeholder="Tìm game…" /></div>
+    <div id="gameList"></div>
+  </aside>
+  <main class="gamesMain">
+    <div id="gameEmpty" class="card empty">Đang tải danh sách game…</div>
+    <div id="gameView" class="card" style="display:none">
+      <div class="topbar">
+        <div class="title" id="gName"></div>
+        <span class="pill" id="gVersion"></span>
+        <span class="metaText" id="gMeta"></span>
+      </div>
+      <div class="gamesWork">
+        <div class="skillList" id="skillList"></div>
+        <div class="demoPane">
+          <div class="demoHead"><div class="dt" id="demoName"></div><div class="dd" id="demoDesc"></div></div>
+          <div class="stage" id="demoStage"><canvas id="demoCv" width="720" height="340"></canvas></div>
+          <div class="demoControls">
+            <button id="demoPlay" class="btn primary">⏸ Dừng</button>
+            <button id="demoRestart" class="btn">↺ Lại từ đầu</button>
+            <label class="ctrlLbl">Tốc độ <select id="demoSpeed" class="ctrl"><option value="0.5">0.5×</option><option value="1" selected>1×</option><option value="2">2×</option></select></label>
+            <label class="ctrlLbl"><input type="checkbox" id="demoHitbox"> Hitbox</label>
+            <label class="ctrlLbl">Bậc <select id="demoTier" class="ctrl"></select></label>
+          </div>
+          <div class="timelineWrap">
+            <input type="range" id="demoScrub" min="0" max="1000" value="0" />
+            <div class="phases" id="demoPhases"><span data-p="0">Ra chiêu</span><span data-p="1">Triển khai</span><span data-p="2">Trúng đòn</span><span data-p="3">Kết thúc</span></div>
+          </div>
+          <div class="demoInfo" id="demoInfo"></div>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+
 <script>
 let data=null,current=null,img=null;
 let anims=[],animIdx=0,frameInAnim=0,playing=true,acc=0,lastT=0,scale=4,speed=1,showAnchor=true,showHitbox=false;
@@ -193,8 +270,8 @@ function categoryOf(s){
   if(/helmet|hood|cap|chestplate|robe|tunic|armor|gloves|gauntlets|boots|greaves|shield$|cuirass|leggings|pauldron/.test(n) && !/magnetic/.test(n)) return 'armor';
   if(aNames.includes('fly')) return 'projectile';
   if(/arrow-rain|scatter-volley|hunter-snare|smoke-bomb|shadow-slash|shadow-dash/.test(n)) return 'aoe';
-  if(/magnetic-shield|haste|empower|heal|bloom|buff|rune|ward|barrier/.test(n)) return 'buff';
-  if(/circle|zone|aura/.test(n)) return 'buff';
+  if(/magnetic-shield|haste|empower|heal|bloom|buff|rune|ward|barrier/.test(n)) return 'status';
+  if(/circle|zone|aura/.test(n)) return 'status';
   if(/cleave|slam|whirlwind|nova|burst|meteor|strike|spikes|geyser|column|pillar|wave|eruption|fall|quake|rain|volley|snare|trap|smoke|slash|dash/.test(n)) return 'aoe';
   if(/bolt|shard|fireball|orb|javelin|arrow|missile/.test(n)) return 'projectile';
   return 'base';
@@ -257,6 +334,7 @@ async function init(){
     $('empty').innerHTML='<span class="err">Không tải được manifest: '+e.message+'</span><br><br>Chạy <code>./serve-viewer.sh</code> trong <code>sprite-lab/</code> rồi mở trang trong trình duyệt.';
   }
   setInterval(poll,2000);
+  setInterval(pollGames,5000);
 }
 function setData(json){
   data=json; data.sprites.forEach(s=>{
@@ -430,6 +508,47 @@ function buildFilm(){
 function markFilm(){ [...$('film').querySelectorAll('canvas')].forEach((c,i)=>c.classList.toggle('cur',i===frameInAnim)); }
 function updatePlayBtn(){ $('btnPlay').textContent=playing?'⏸ Dừng':'▶ Phát'; }
 
+// Shared by the sprite viewer and the skill demo: draw a hitbox from the
+// sprite's measured numbers, centred at canvas point (cx,cy) at scale sc.
+// Mirrors SpriteHitbox.contains: (cx,cy) is the canvas centre of the hitbox,
+// hb numbers are unscaled, extra is a small target-body allowance in pixels.
+function hbHits(hb,cx,cy,px,py,sc,extra){
+  const dx=px-cx, dy=py-cy, d=Math.hypot(dx,dy);
+  if(hb.shape==='rect')
+    return Math.abs(dx)<=(hb.half_w||0)*sc+extra && Math.abs(dy)<=(hb.half_h||0)*sc+extra;
+  const r=(hb.radius||0)*sc, ir=(hb.inner||0)*sc;
+  if(d>r+extra || d<ir-extra) return false;
+  if(hb.shape!=='arc' || d<=extra) return true;
+  const dir=(hb.dir_deg||0)*Math.PI/180, ha=(hb.half_angle_deg||0)*Math.PI/180;
+  const a=Math.atan2(Math.sin(Math.atan2(dy,dx)-dir),Math.cos(Math.atan2(dy,dx)-dir));
+  return Math.abs(a)<=ha+Math.asin(Math.min(1,extra/Math.max(1,d)));
+}
+
+function drawHitboxShape(g,hb,cx,cy,sc){
+  const r=(hb.radius||0)*sc, ir=(hb.inner||0)*sc;
+  g.save();
+  g.lineWidth=Math.max(1,Math.floor(sc/4));
+  g.strokeStyle='rgba(255,80,80,.95)'; g.fillStyle='rgba(255,80,80,.18)';
+  if(hb.shape==='rect'){
+    const hw=(hb.half_w||0)*sc, hh=(hb.half_h||0)*sc;
+    g.fillRect(cx-hw,cy-hh,hw*2,hh*2); g.strokeRect(cx-hw,cy-hh,hw*2,hh*2);
+  }else if(hb.shape==='circle'){
+    if(r>0){ g.beginPath(); g.arc(cx,cy,r,0,Math.PI*2); g.fill(); g.stroke(); }
+    if(ir>0){ g.save(); g.globalCompositeOperation='destination-out'; g.beginPath(); g.arc(cx,cy,ir,0,Math.PI*2); g.fill(); g.restore();
+      g.beginPath(); g.arc(cx,cy,ir,0,Math.PI*2); g.strokeStyle='rgba(255,160,80,.9)'; g.stroke(); }
+  }else if(hb.shape==='arc'){
+    const dir=(hb.dir_deg||0)*Math.PI/180, ha=(hb.half_angle_deg||0)*Math.PI/180;
+    const a0=dir-ha, a1=dir+ha;
+    g.beginPath(); g.arc(cx,cy,r,a0,a1);
+    if(ir>0) g.arc(cx,cy,ir,a1,a0,true); else g.lineTo(cx,cy);
+    g.closePath(); g.fill(); g.stroke();
+    if(ir>0){ g.beginPath(); g.arc(cx,cy,ir,a0,a1); g.strokeStyle='rgba(255,160,80,.9)'; g.stroke(); }
+    g.beginPath(); g.moveTo(cx,cy); g.lineTo(cx+Math.cos(dir)*r,cy+Math.sin(dir)*r);
+    g.strokeStyle='rgba(255,255,255,.5)'; g.stroke();
+  }
+  g.restore();
+}
+
 function draw(){
   if(!current||!img||!img.complete) return;
   const fs=current.meta.frame_size||[32,32];
@@ -453,31 +572,7 @@ function draw(){
   if(showHitbox){
     const hb=a.hitbox;
     if(hb && hb.active && frameInAnim>=hb.active[0] && frameInAnim<=hb.active[1]){
-      const cx=(hb.center[0]||0)*scale, cy=(hb.center[1]||0)*scale;
-      const r=(hb.radius||0)*scale, ir=(hb.inner||0)*scale;
-      ctx.save();
-      ctx.lineWidth=Math.max(1,Math.floor(scale/4));
-      ctx.strokeStyle='rgba(255,80,80,.95)';
-      ctx.fillStyle='rgba(255,80,80,.18)';
-      if(hb.shape==='rect'){
-        const hw=(hb.half_w||0)*scale, hh=(hb.half_h||0)*scale;
-        ctx.fillRect(cx-hw, cy-hh, hw*2, hh*2);
-        ctx.strokeRect(cx-hw, cy-hh, hw*2, hh*2);
-      }else if(hb.shape==='circle'){
-        if(r>0){ ctx.beginPath(); ctx.arc(cx,cy,r,0,Math.PI*2); ctx.fill(); ctx.stroke(); }
-        if(ir>0){ ctx.save(); ctx.globalCompositeOperation='destination-out'; ctx.beginPath(); ctx.arc(cx,cy,ir,0,Math.PI*2); ctx.fill(); ctx.restore(); ctx.beginPath(); ctx.arc(cx,cy,ir,0,Math.PI*2); ctx.strokeStyle='rgba(255,160,80,.9)'; ctx.stroke(); }
-      }else if(hb.shape==='arc'){
-        const dir=(hb.dir_deg||0)*Math.PI/180, ha=(hb.half_angle_deg||0)*Math.PI/180;
-        const a0=dir-ha, a1=dir+ha;
-        ctx.beginPath();
-        ctx.arc(cx,cy,r,a0,a1);
-        if(ir>0) ctx.arc(cx,cy,ir,a1,a0,true); else ctx.lineTo(cx,cy);
-        ctx.closePath(); ctx.fill(); ctx.stroke();
-        if(ir>0){ ctx.beginPath(); ctx.arc(cx,cy,ir,a0,a1); ctx.strokeStyle='rgba(255,160,80,.9)'; ctx.stroke(); }
-        // direction line
-        ctx.beginPath(); ctx.moveTo(cx,cy); ctx.lineTo(cx+Math.cos(dir)*r, cy+Math.sin(dir)*r); ctx.strokeStyle='rgba(255,255,255,.5)'; ctx.stroke();
-      }
-      ctx.restore();
+      drawHitboxShape(ctx,hb,(hb.center[0]||0)*scale,(hb.center[1]||0)*scale,scale);
     }
   }
   $('frameInfo').innerHTML='<b>'+a.name+'</b> · frame '+(frameInAnim+1)+'/'+a.frames+' · '+Math.round(frameMs(a,frameInAnim))+' ms'+
@@ -486,6 +581,7 @@ function draw(){
 }
 function tick(t){
   requestAnimationFrame(tick);
+  if($('gamesLayout').style.display!=='none'){ tickDemo(t); return; }
   if(!current||!img||!img.complete) return;
   const a=currentAnim(); if(!a) return;
   if(playing){
@@ -548,6 +644,250 @@ document.addEventListener('keydown',e=>{
   else if(e.key==='r'||e.key==='R'){ $('btnRestart').onclick(); }
 });
 try{ const b=localStorage.getItem('viewerBg'); if(b&&BGS.includes(b)) setBg(b); }catch(e){}
+
+/* ================= games / skill demo =====================================
+   The demo is built from games-manifest.json (real game data) plus the sprite
+   strips already loaded by the sprite viewer. Nothing is hand-animated here:
+   frame timing and hitbox numbers come from the sprite metadata. */
+let gamesData=null,curGame=null,curSkill=null,demoImgs={},demoT=0,demoTotal=2.5;
+let demoPlaying=true,demoSpeed=1,demoHitbox=false,demoLast=0,demoReady=false,demoLoadedKey='';
+const demoCtx=$('demoCv').getContext('2d');
+const CAST_T=0.5, DEMO_SCALE=2;
+
+function spriteEntry(name){ return data? data.sprites.find(s=>s.name===name):null; }
+function loadDemoImg(name){
+  return new Promise(res=>{
+    const e=spriteEntry(name);
+    if(!e){ res(null); return; }
+    if(demoImgs[name] && demoImgs[name].src===e.strip){ res(demoImgs[name]); return; }
+    const im=new Image();
+    im.onload=()=>{ const v={img:im,meta:e.meta,src:e.strip}; demoImgs[name]=v; res(v); };
+    im.onerror=()=>res(null);
+    im.src=e.strip;
+  });
+}
+function animOf(v,name){
+  if(!v) return null;
+  const as=v.meta.animations||[];
+  return as.find(a=>a.name===name)||as[0]||{name:'default',start:0,frames:1,fps:8,loop:true};
+}
+function demoFrameMs(a,i){ return a.durations_ms? a.durations_ms[i] : 1000/Math.max(1,a.fps||8); }
+function animDuration(a){ let ms=0; const n=a.frames||1;
+  if(a.durations_ms) for(let i=0;i<n;i++) ms+=a.durations_ms[i]||0;
+  else ms=n*demoFrameMs(a,0); return ms/1000; }
+function hbTime(hb,frame){
+  if(hb.durations_ms) return hb.durations_ms.slice(0,frame).reduce((a,b)=>a+b,0)/1000;
+  return frame/(hb.fps||8);
+}
+function frameAt(a,t){
+  let ms=t*1000; const n=a.frames||1;
+  for(let i=0;i<n;i++){ const f=demoFrameMs(a,i); if(ms<f||i===n-1) return i; ms-=f; }
+  return 0;
+}
+function drawSprite(v,animName,t,x,y,sc,alpha){
+  if(!v||!v.img) return;
+  const a=animOf(v,animName), fs=v.meta.frame_size||[32,32];
+  let i=frameAt(a,t); if(a.loop===false) i=Math.min(i,a.frames-1);
+  const anc=v.meta.anchor||[fs[0]/2,fs[1]/2];
+  demoCtx.save(); if(alpha!=null) demoCtx.globalAlpha=alpha;
+  demoCtx.drawImage(v.img,((a.start||0)+i)*fs[0],0,fs[0],fs[1],
+    x-anc[0]*sc,y-anc[1]*sc,fs[0]*sc,fs[1]*sc);
+  demoCtx.restore();
+}
+
+function setView(v){
+  document.querySelector('.layout').style.display=(v==='lab'?'grid':'none');
+  $('gamesLayout').style.display=(v==='games'?'grid':'none');
+  document.querySelectorAll('.navBtn').forEach(b=>b.classList.toggle('active',b.dataset.view===v));
+  document.querySelector('header .sub').textContent=(v==='games')
+    ? 'Chọn game → chọn chiêu → xem từ lúc ra chiêu đến lúc quái trúng'
+    : 'Chọn sprite → chọn animation → xem / tua từng frame';
+  if(v==='games'){ loadGames(); if(curSkill) drawDemo(); }
+}
+document.querySelectorAll('.navBtn').forEach(b=>b.onclick=()=>setView(b.dataset.view));
+
+let lastGamesManifest='';
+async function loadGames(){
+  try{
+    const res=await fetch('games-manifest.json',{cache:'no-store'});
+    if(!res.ok) throw new Error('HTTP '+res.status);
+    const text=await res.text();
+    const first=!gamesData; lastGamesManifest=text;
+    gamesData=(JSON.parse(text).games)||[];
+    $('gameEmpty').style.display='none';
+    renderGameList();
+    if(!first){ if(curGame){ const fresh=gamesData.find(g=>g.slug===curGame.slug); if(fresh) selectGame(fresh); } return; }
+    const slug=decodeURIComponent(location.hash.slice(1)).split('/')[0];
+    const g=gamesData.find(x=>x.slug===slug)||gamesData.find(x=>x.skills.length);
+    if(g) selectGame(g);
+    else $('gameEmpty').textContent='Chưa có game nào có skill trong assets/data.';
+  }catch(e){
+    $('gameEmpty').innerHTML='<span class="err">Không tải được games-manifest.json: '+e.message+'</span><br>Chạy <code>./serve-viewer.sh</code> trong <code>sprite-lab/</code>.';
+  }
+}
+async function pollGames(){
+  try{
+    const r=await fetch('games-manifest.json',{cache:'no-store'});
+    const text=await r.text();
+    if(text!==lastGamesManifest){ lastGamesManifest=text; await loadGames(); }
+  }catch(e){}
+}
+function renderGameList(){
+  const box=$('gameList'); box.innerHTML='';
+  const q=$('gq').value.toLowerCase().trim();
+  let any=false;
+  (gamesData||[]).filter(g=>!q||g.name.toLowerCase().includes(q)||g.slug.includes(q)).forEach(g=>{
+    any=true; const d=document.createElement('div');
+    d.className='gameItem'+(curGame&&curGame.slug===g.slug?' active':'');
+    d.innerHTML='<div class="gn">'+g.name+'</div><div class="gm">'+g.skills.length+' chiêu · '+g.heroes.length+' class · v'+g.version+'</div>';
+    d.onclick=()=>selectGame(g); box.appendChild(d);
+  });
+  if(!any) box.innerHTML='<div class="metaText" style="padding:8px">Không có game phù hợp.</div>';
+}
+function selectGame(g){
+  curGame=g; renderGameList();
+  $('gameEmpty').style.display='none'; $('gameView').style.display='block';
+  $('gName').textContent=g.name; $('gVersion').textContent='v'+g.version;
+  $('gMeta').textContent=g.skills.length+' chiêu · '+g.heroes.length+' class · '+g.targets.length+' quái';
+  renderSkillList();
+  if(g.skills.length) selectSkill(g.skills[0]);
+  else { $('skillList').innerHTML='<div class="metaText">Game này chưa có skill trong upgrades_*.json.</div>'; demoReady=false; }
+}
+function renderSkillList(){
+  const box=$('skillList'); box.innerHTML='';
+  (curGame?curGame.skills:[]).forEach(s=>{
+    const d=document.createElement('div');
+    d.className='skillItem'+(curSkill&&curSkill.id===s.id?' active':'');
+    const kind={ 'cast-out':'bắn ra','melee':'cận chiến','orbit':'xoay quanh','projectile':'đạn bay' }[s.cast]||s.cast;
+    d.innerHTML='<div class="sn">'+s.name+'</div><div class="sm">'+kind+' · '+s.class+' · '+s.tiers.length+' bậc · '+s.damage+' dmg</div>';
+    d.onclick=()=>selectSkill(s); box.appendChild(d);
+  });
+}
+async function selectSkill(s){
+  curSkill=s; renderSkillList(); demoT=0; demoPlaying=true; demoLast=0;
+  $('demoName').textContent=s.name; $('demoDesc').textContent=s.desc||'';
+  const sel=$('demoTier'); sel.innerHTML='';
+  s.tiers.forEach((t,i)=>{ const o=document.createElement('option'); o.value=String(i);
+    o.textContent=['I','II','III','IV','V'][i]||String(i+1); sel.appendChild(o); });
+  const need=[...(curGame?curGame.heroes:[]).map(h=>h.sprite),...s.tiers,...(curGame?curGame.targets:[]).map(t=>t.sprite)];
+  const key=need.map(n=>(spriteEntry(n)||{}).strip||n).join('|');
+  demoReady=false;
+  await Promise.all([...new Set(need)].map(loadDemoImg));
+  demoLoadedKey=key;
+  updateDemoTiming(); updateDemoInfo();
+  demoReady=true; drawDemo();
+}
+function curTierIdx(){
+  if(!curSkill) return 0;
+  return Math.min(Math.max(0,parseInt($('demoTier').value||'0',10)),curSkill.tiers.length-1);
+}
+function curTierSprite(){ return curSkill?curSkill.tiers[curTierIdx()]:''; }
+function curTierHitbox(){
+  if(!curSkill) return {};
+  return (curSkill.tier_hitboxes&&curSkill.tier_hitboxes[curTierIdx()])||curSkill.hitbox||{};
+}
+function updateDemoTiming(){
+  if(!curSkill) return;
+  const v=demoImgs[curTierSprite()], a=v?animOf(v,curSkill.anim):null;
+  demoTotal=CAST_T+(a?animDuration(a):0.8)+0.7;
+}
+function updateDemoInfo(){
+  if(!curSkill) return;
+  const s=curSkill, hb=curTierHitbox(), v=demoImgs[curTierSprite()], a=v?animOf(v,s.anim):null;
+  $('demoInfo').innerHTML=[
+    'bậc '+['I','II','III','IV','V'][curTierIdx()],'cast_range '+s.cast_range,
+    'cooldown '+s.cooldown+'s','damage '+s.damage,
+    'hitbox '+(hb.shape||'—')+' r'+(hb.radius||hb.half_w||'—'),
+    'active '+(hb.active?hb.active.join('–'):'—'),
+    'frame '+(a?a.frames+' @ '+(a.fps||'durations'):'—')
+  ].map(x=>'<span class="pill">'+x+'</span>').join('');
+}
+
+function demoScene(){
+  const s=curSkill, hx=150, gy=250;
+  const reach=s.cast==='melee'?40:(s.cast_range||140);
+  const ex=s.cast==='orbit'?hx:hx+reach;
+  const ey=s.cast==='melee'?gy-40:gy-8;
+  const mons=(curGame?curGame.targets:[]).slice(0,3).map((t,i)=>({
+    t, x:Math.min(690,ex+30+i*75), y:t.sprite==='bat'?gy-90:gy }));
+  return {hx,gy,ex,ey,mons};
+}
+function drawDemo(){
+  if(!curSkill||!demoReady) return;
+  const g=demoCtx, s=curSkill, sc=DEMO_SCALE, W=g.canvas.width, H=g.canvas.height;
+  const {hx,gy,ex,ey,mons}=demoScene();
+  g.clearRect(0,0,W,H);
+  // ground
+  g.fillStyle='#2f4a2c'; g.fillRect(0,gy,W,H-gy);
+  g.strokeStyle='rgba(160,220,140,.35)'; g.beginPath(); g.moveTo(0,gy+.5); g.lineTo(W,gy+.5); g.stroke();
+  // cast marker: expanding ring while the caster winds up
+  if(demoT<CAST_T){
+    const u=demoT/CAST_T;
+    g.strokeStyle='rgba(255,211,107,'+(0.85-u*0.6)+')'; g.lineWidth=2;
+    g.beginPath(); g.arc(hx,gy-52,10+u*26,0,Math.PI*2); g.stroke();
+  }
+  // effect timing (frame data + hitbox of the currently selected tier)
+  const spr=curTierSprite();
+  const v=demoImgs[spr], a=v?animOf(v,s.anim):null;
+  const effT=Math.max(0,demoT-CAST_T);
+  const dur=a?animDuration(a):0.8;
+  const shown=effT>0 && effT<dur;
+  const hb=curTierHitbox();
+  let fx=ex, fy=ey;
+  if(s.cast==='projectile' && shown){ const u=Math.min(1,effT/0.6); fx=hx+(ex-hx)*u; }
+  const va=v&&v.meta, anc=(va&&va.anchor)||[0,0];
+  const hcx=fx+(((hb.center&&hb.center[0])||anc[0])-anc[0])*sc;
+  const hcy=fy+(((hb.center&&hb.center[1])||anc[1])-anc[1])*sc;
+  let active=false;
+  if(shown && hb.active){
+    const t0=hbTime(hb,hb.active[0]), t1=hbTime(hb,hb.active[1]+1);
+    active=effT>=t0 && effT<t1;
+  }
+  // monsters (flash + damage number on the hit frames)
+  mons.forEach((m,i)=>{
+    const mv=demoImgs[m.t.sprite]; let alpha=1;
+    if(demoT>dur+CAST_T+0.35) alpha=Math.max(0,1-(demoT-dur-CAST_T-0.35)/0.5);
+    const hit=active && hbHits(hb,hcx,hcy,m.x,m.y-14,sc,10);
+    drawSprite(mv,hit?'hurt':'move',hit?0.05:demoT*0.6,m.x,m.y,sc,alpha);
+    if(hit){
+      g.fillStyle='rgba(255,90,110,.9)';
+      g.beginPath(); g.arc(m.x,m.y-46,5,0,Math.PI*2); g.fill();
+      g.font='bold 15px system-ui'; g.textAlign='center';
+      g.fillStyle='#ffe08a'; g.fillText('-'+Math.round(s.damage),m.x,m.y-58);
+    }
+  });
+  // caster
+  const heroName=(curGame&&curGame.heroes[0]?curGame.heroes[0].sprite:'swordsman');
+  const hv=demoImgs[heroName];
+  const castAnim=(hv&&hv.meta.animations||[]).some(a=>a.name==='spell')?'spell':'idle';
+  drawSprite(hv,castAnim,demoT,hx,gy,sc);
+  // effect
+  if(shown) drawSprite(v,s.anim,effT,fx,fy,sc);
+  // hitbox overlay, in world placement: centre = anchor point + (hb.center - anchor)*scale
+  if(showHitboxCheckbox() && shown && hb.shape){
+    g.save(); g.globalAlpha=active?1:0.45; drawHitboxShape(g,hb,hcx,hcy,sc); g.restore();
+  }
+  // phase labels + scrub sync
+  const phase=demoT<CAST_T?0:!shown?3:active?2:1;
+  document.querySelectorAll('#demoPhases span').forEach((sp,i)=>sp.classList.toggle('on',i===phase));
+  if(document.activeElement!==$('demoScrub')) $('demoScrub').value=String(Math.min(1000,Math.round(demoT/demoTotal*1000)));
+  $('demoPlay').textContent=demoPlaying?'⏸ Dừng':'▶ Phát';
+}
+function showHitboxCheckbox(){ return $('demoHitbox').checked; }
+function tickDemo(t){
+  if(!curSkill||!demoReady){ demoLast=t; drawDemo(); return; }
+  if(!demoLast) demoLast=t;
+  const dt=(t-demoLast)/1000; demoLast=t;
+  if(demoPlaying){ demoT+=dt*demoSpeed; if(demoT>demoTotal) demoT=0; }
+  drawDemo();
+}
+$('demoPlay').onclick=()=>{ demoPlaying=!demoPlaying; if(demoPlaying&&demoT>=demoTotal) demoT=0; drawDemo(); };
+$('demoRestart').onclick=()=>{ demoT=0; demoPlaying=true; demoLast=0; drawDemo(); };
+$('demoSpeed').onchange=e=>{ demoSpeed=parseFloat(e.target.value)||1; e.target.blur(); };
+$('demoHitbox').onchange=e=>{ demoHitbox=e.target.checked; drawDemo(); };
+$('demoTier').onchange=()=>{ demoT=0; updateDemoTiming(); updateDemoInfo(); drawDemo(); };
+$('demoScrub').oninput=e=>{ demoT=(Number(e.target.value)/1000)*demoTotal; demoPlaying=false; drawDemo(); };
+$('gq').addEventListener('input',renderGameList);
 
 init();
 requestAnimationFrame(tick);

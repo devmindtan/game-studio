@@ -5,8 +5,9 @@ PORT="${1:-8765}"
 URL="http://localhost:${PORT}/viewer.html"
 echo "Sprite Lab Viewer: $URL"
 echo "Nhấn Ctrl+C để dừng."
-# regenerate manifest so new sprites appear (image URLs carry ?v=<mtime>)
+# regenerate both manifests so new sprites and game skills appear
 python3 build_manifest.py
+python3 build_games_manifest.py
 # open browser if possible
 if command -v xdg-open >/dev/null 2>&1; then (sleep 0.5; xdg-open "$URL" >/dev/null 2>&1 || true) &
 elif command -v open >/dev/null 2>&1; then (sleep 0.5; open "$URL" >/dev/null 2>&1 || true) & fi

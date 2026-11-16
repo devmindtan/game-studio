@@ -5,3 +5,4 @@ addons/gamekit/
 *.import
 __pycache__/
 sprites-manifest.json
+games-manifest.json
