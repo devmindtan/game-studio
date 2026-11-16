@@ -1,0 +1,132 @@
+{
+  "frames": 20,
+  "frame_size": [
+    48,
+    48
+  ],
+  "fps": 16.0,
+  "loop": false,
+  "anchor": [
+    24.0,
+    24.0
+  ],
+  "anchor_source": "explicit",
+  "animations": [
+    {
+      "name": "slash_right",
+      "start": 0,
+      "frames": 5,
+      "fps": 16.0,
+      "loop": false,
+      "durations_ms": [
+        50.0,
+        50.0,
+        70.0,
+        70.0,
+        60.0
+      ],
+      "hitbox": {
+        "shape": "arc",
+        "center": [
+          24.0,
+          24.0
+        ],
+        "active": [
+          1,
+          2
+        ],
+        "radius": 20.0,
+        "inner": 15.0,
+        "dir_deg": 0.0,
+        "half_angle_deg": 68.0
+      }
+    },
+    {
+      "name": "slash_left",
+      "start": 5,
+      "frames": 5,
+      "fps": 16.0,
+      "loop": false,
+      "durations_ms": [
+        50.0,
+        50.0,
+        70.0,
+        70.0,
+        60.0
+      ],
+      "hitbox": {
+        "shape": "arc",
+        "center": [
+          24.0,
+          24.0
+        ],
+        "active": [
+          1,
+          2
+        ],
+        "radius": 20.0,
+        "inner": 15.0,
+        "dir_deg": 180.0,
+        "half_angle_deg": 68.0
+      }
+    },
+    {
+      "name": "slash_up",
+      "start": 10,
+      "frames": 5,
+      "fps": 16.0,
+      "loop": false,
+      "durations_ms": [
+        50.0,
+        50.0,
+        70.0,
+        70.0,
+        60.0
+      ],
+      "hitbox": {
+        "shape": "arc",
+        "center": [
+          24.0,
+          24.0
+        ],
+        "active": [
+          1,
+          2
+        ],
+        "radius": 20.0,
+        "inner": 15.0,
+        "dir_deg": -90.0,
+        "half_angle_deg": 68.0
+      }
+    },
+    {
+      "name": "slash_down",
+      "start": 15,
+      "frames": 5,
+      "fps": 16.0,
+      "loop": false,
+      "durations_ms": [
+        50.0,
+        50.0,
+        70.0,
+        70.0,
+        60.0
+      ],
+      "hitbox": {
+        "shape": "arc",
+        "center": [
+          24.0,
+          24.0
+        ],
+        "active": [
+          1,
+          2
+        ],
+        "radius": 20.0,
+        "inner": 15.0,
+        "dir_deg": 90.0,
+        "half_angle_deg": 68.0
+      }
+    }
+  ]
+}
