@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Frost Nova cấp IV — AOE băng lan tròn, mạnh hơn cấp trước (tầm 30px, 20 mảnh)."""
+"""Blizzard Vortex IV — xoáy bão tuyết, chuyển động xoắn ốc."""
 import math, sys
 from pathlib import Path
 
@@ -18,86 +18,75 @@ SIZE=72; CX=CY=SIZE//2; ANCHOR=(float(CX),float(CY))
 TIER=4
 
 CORE="#ffffff"; ICE="#c8f6ff"; ICE_M="#6fe0ff"; ICE_D="#2a8fd6"; DEEP="#1b4f8a"
-FROST="#9fe8ff"; SNOW="#eaf9ff"
+NIGHT="#122a52"; FROST="#9fe8ff"; SNOW="#eaf9ff"; SHADOW="#0e1c38"
 
 def p(c,x,y,col):
-    if 0<=x<SIZE and 0<=y<SIZE: c.pixel(x,y,col)
+    xi,yi=int(round(x)),int(round(y))
+    if 0<=xi<SIZE and 0<=yi<SIZE: c.pixel(xi,yi,col)
+
+def poly(c,pts,col):
+    c.polygon([(int(round(x)),int(round(y))) for x,y in pts],col)
 
 def ring(c,r,col):
     if r>0: c.ellipse(CX-r,CY-r,CX+r,CY+r,col,fill=False)
 
-def shard(c,x,y,a,col,long=False):
-    dx=1 if math.cos(a)>=0 else -1
-    dy=1 if math.sin(a)>=0 else -1
-    p(c,x,y,col); p(c,x+dx,y,col); p(c,x,y+dy,col)
-    if long:
-        p(c,x+dx*2,y,col); p(c,x,y+dy*2,col)
+def dot(c,a,r,col,size=1):
+    x=CX+math.cos(a)*r; y=CY+math.sin(a)*r
+    for dx in range(-size+1,size):
+        for dy in range(-size+1,size):
+            p(c,x+dx,y+dy,col)
+
+def spiral(c,phase,turn,r0,r1,thick,col_main,col_edge):
+    prev=None
+    steps=26
+    for s in range(steps):
+        u=s/(steps-1)
+        r=r0+(r1-r0)*u
+        a=phase+turn*u*2.6
+        x=CX+math.cos(a)*r; y=CY+math.sin(a)*r
+        w=max(1,round(thick*(1-u*0.72)))
+        if prev:
+            c.line(int(prev[0]),int(prev[1]),int(round(x)),int(round(y)),col_main,w)
+            c.line(int(prev[0]),int(prev[1]),int(round(x)),int(round(y)),col_edge,1)
+        for dx in range(-w+1,w):
+            p(c,x+dx,y,w if False else col_edge)
+        prev=(x,y)
 
 def frame(i):
     c=Canvas(SIZE,SIZE)
-    # tiến độ nổ 0..1 qua 8 frame
     t=i/7.0
-    R=30
-    nsh=20
-    rings=3
-
     if i==0:
-        c.ellipse(CX-3,CY-3,CX+3,CY+3,ICE_M)
-        c.ellipse(CX-2,CY-2,CX+2,CY+2,CORE)
-        for k in range(nsh//2):
-            a=math.radians(k*360/(nsh//2))
-            p(c,round(CX+math.cos(a)*5),round(CY+math.sin(a)*5),ICE)
+        c.ellipse(CX-5,CY-5,CX+5,CY+5,ICE_D)
+        c.ellipse(CX-3,CY-3,CX+3,CY+3,CORE)
+        for k in range(4): dot(c,k*math.pi/2,7,ICE)
         return c
-
-    r0=max(2,round(R*0.30*t))
-    r1=max(3,round(R*(0.45+0.55*t)))
-    # vong trong / ngoai
-    ring(c,r0,ICE_M)
-    ring(c,r1,ICE_D if i<6 else DEEP)
-    if rings>=2 and i>=2: ring(c,max(2,round(r1*0.72)),ICE)
-    if rings>=3 and i>=4: ring(c,max(2,round(r1*0.55)),ICE_M)
-
-    # tam lõi
-    cr=max(1,round(4*(1-t*0.6)))
-    c.ellipse(CX-cr,CY-cr,CX+cr,CY+cr,ICE if i<5 else ICE_M)
-    c.pixel(CX,CY,CORE if i<6 else ICE)
-
-    # mảnh băng bay ra
-    for k in range(nsh):
-        a=math.radians(k*360/nsh + (7 if i%2 else 0))
-        rad=round(r1+(k%3)*2)
-        shard(c,round(CX+math.cos(a)*rad),round(CY+math.sin(a)*rad),a,
-              ICE if k%3 else FROST, long=(TIER>=3 and k%2==0))
-
-    # cap cao: mat bang đóng băng + tia băng dài + tuyết
-    if TIER>=2:
-        for k in range(20):
-            a=math.radians(k*360/20 + (i*3))
-            x=round(CX+math.cos(a)*r1*0.6); y=round(CY+math.sin(a)*r1*0.6)
-            p(c,x,y,ICE)
-    if TIER>=3:
-        for k in range(nsh//2):
-            a=math.radians(k*720/nsh + 15)
-            rad=round(r1*0.85)
-            x=round(CX+math.cos(a)*rad); y=round(CY+math.sin(a)*rad)
-            p(c,x,y,DEEP); p(c,x+1,y,ICE_D)
-    if TIER>=4:
-        for k in range(10):
-            a=math.radians(k*137+i*19); rad=round(r1*(0.5+((k%5)/10)))
-            p(c,round(CX+math.cos(a)*rad),round(CY+math.sin(a)*rad),SNOW)
-    if TIER>=5:
-        ring(c,max(1,round(r1*0.35)),CORE if i<6 else ICE)
+    R=round(7+23*min(1,t*1.15))
+    # dia xoay nen
+    for rr in range(4,R+4,5):
+        ring(c,rr,NIGHT if rr%10 else SHADOW)
+    phase=i*0.34
+    # 4 nhanh xoay cung chieu kim dong ho, 3 nhanh nguoc lai
+    for k in range(4):
+        spiral(c,phase+k*math.pi/2,1,4,R,4,ICE_D,ICE_M)
+    for k in range(3):
+        spiral(c,phase+0.5+k*2*math.pi/3,-1,3,round(R*0.78),3,DEEP,FROST)
+    # mat trong xoay nhanh hon
+    spiral(c,-phase*1.6,1,2,round(R*0.45),5,ICE,CORE)
+    # con mat ba nhanh
+    cr=max(2,round(6*(1-t*0.35)))
+    c.ellipse(CX-cr,CY-cr,CX+cr,CY+cr,DEEP)
+    c.ellipse(CX-cr+2,CY-cr+2,CX+cr-2,CY+cr-2,ICE_M)
+    c.ellipse(CX-2,CY-2,CX+2,CY+2,ICE)
+    p(c,CX,CY,CORE if i<6 else FROST)
+    # hat tuyet kéo theo huong xoay
+    for k in range(18):
+        a=phase*1.5+k*1.9; r=round(R*(0.35+((k%7)/12)))
+        dot(c,a,r,SNOW if k%3 else FROST)
+    if i>=5:
+        ring(c,R+2,ICE_D)
         for k in range(8):
-            a=math.radians(k*45+i*5)
-            rad=round(r1*1.12)
-            p(c,round(CX+math.cos(a)*rad),round(CY+math.sin(a)*rad),CORE)
-    if i==7:
-        # tàn: vài mảnh rơi
-        for k in range(6):
-            a=math.radians(k*60+12)
-            p(c,round(CX+math.cos(a)*(R-2)),round(CY+math.sin(a)*(R-2)),DEEP)
+            dot(c,phase+k*math.pi/4+0.6,R+2,FROST)
     return c
-
 ANIM=[("burst",[frame(i) for i in range(8)],12,False,
        {"hitbox":{"shape":"circle","center":[float(CX),float(CY)],"active":[2,6]}})]
 if __name__=="__main__":

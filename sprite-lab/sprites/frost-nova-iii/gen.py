@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Frost Nova cấp III — AOE băng lan tròn, mạnh hơn cấp trước (tầm 26px, 16 mảnh)."""
+"""Glacial Spires III — cọc băng mọc lên, mặt đất nứt nẻ."""
 import math, sys
 from pathlib import Path
 
@@ -18,86 +18,84 @@ SIZE=64; CX=CY=SIZE//2; ANCHOR=(float(CX),float(CY))
 TIER=3
 
 CORE="#ffffff"; ICE="#c8f6ff"; ICE_M="#6fe0ff"; ICE_D="#2a8fd6"; DEEP="#1b4f8a"
-FROST="#9fe8ff"; SNOW="#eaf9ff"
+NIGHT="#122a52"; FROST="#9fe8ff"; SNOW="#eaf9ff"; SHADOW="#0e1c38"
 
 def p(c,x,y,col):
-    if 0<=x<SIZE and 0<=y<SIZE: c.pixel(x,y,col)
+    xi,yi=int(round(x)),int(round(y))
+    if 0<=xi<SIZE and 0<=yi<SIZE: c.pixel(xi,yi,col)
+
+def poly(c,pts,col):
+    c.polygon([(int(round(x)),int(round(y))) for x,y in pts],col)
 
 def ring(c,r,col):
     if r>0: c.ellipse(CX-r,CY-r,CX+r,CY+r,col,fill=False)
 
-def shard(c,x,y,a,col,long=False):
-    dx=1 if math.cos(a)>=0 else -1
-    dy=1 if math.sin(a)>=0 else -1
-    p(c,x,y,col); p(c,x+dx,y,col); p(c,x,y+dy,col)
-    if long:
-        p(c,x+dx*2,y,col); p(c,x,y+dy*2,col)
+def dot(c,a,r,col,size=1):
+    x=CX+math.cos(a)*r; y=CY+math.sin(a)*r
+    for dx in range(-size+1,size):
+        for dy in range(-size+1,size):
+            p(c,x+dx,y+dy,col)
+
+def gem(c,a,dist,h,size):
+    # tinh thể đứng: đáy có bóng, thân khối lăng trụ, mặt sáng/trối rõ
+    ux,uy=math.cos(a),math.sin(a); vx,vy=-uy,ux
+    bx=CX+ux*dist; by=CY+uy*dist
+    tip=(bx+uy*h*0.15, by-ux*h*0.15-h)
+    base_l=(bx+vx*size,by+vy*size)
+    base_r=(bx-vx*size,by-vy*size)
+    mid_l=(bx+vx*size*0.55-uy*h*0.05, by+vy*size*0.55-ux*h*0.05-h*0.55)
+    mid_r=(bx-vx*size*0.55-uy*h*0.05, by-vy*size*0.55-ux*h*0.05-h*0.55)
+    poly(c,[(base_l[0]+2,base_l[1]+3),(base_r[0]+2,base_r[1]+3),
+            (mid_r[0]+2,mid_r[1]+2),(mid_l[0]+2,mid_l[1]+2)],SHADOW)
+    poly(c,[base_l,base_r,mid_r,mid_l],ICE_D)
+    poly(c,[mid_l,mid_r,tip],ICE)
+    poly(c,[mid_r,tip,(bx+ux*size*0.2,by+uy*size*0.2-h*0.6)],DEEP)
+    c.line(int(mid_l[0]),int(mid_l[1]),int(tip[0]),int(tip[1]),ICE_M)
+    c.line(int(base_l[0]),int(base_l[1]),int(mid_l[0]),int(mid_l[1]),FROST)
+    p(c,tip[0],tip[1],CORE)
+    # mat truoc: vach sang
+    c.line(int(base_l[0]),int(base_l[1]),int(mid_l[0]),int(mid_l[1]),CORE)
+
+def crack(c,a,reach):
+    x,y=CX,CY
+    for s in range(1,5):
+        rr=reach*s/4
+        wob=math.sin(s*2.3+a*7)*2
+        nx=CX+math.cos(a+wob*0.01)*rr
+        ny=CY+math.sin(a+wob*0.01)*rr
+        c.line(int(round(x)),int(round(y)),int(round(nx)),int(round(ny)),NIGHT,max(1,4-s))
+        if s>2: c.line(int(round(x)),int(round(y)),int(round(nx)),int(round(ny)),ICE_D)
+        x,y=nx,ny
 
 def frame(i):
     c=Canvas(SIZE,SIZE)
-    # tiến độ nổ 0..1 qua 8 frame
     t=i/7.0
-    R=26
-    nsh=16
-    rings=3
-
+    reach=round(6+20*min(1,t*1.2))
+    for k in range(8):
+        crack(c,k*math.pi/4+0.08,reach)
     if i==0:
-        c.ellipse(CX-3,CY-3,CX+3,CY+3,ICE_M)
-        c.ellipse(CX-2,CY-2,CX+2,CY+2,CORE)
-        for k in range(nsh//2):
-            a=math.radians(k*360/(nsh//2))
-            p(c,round(CX+math.cos(a)*5),round(CY+math.sin(a)*5),ICE)
+        c.ellipse(CX-4,CY-4,CX+4,CY+4,ICE_M)
+        p(c,CX,CY,CORE)
         return c
-
-    r0=max(2,round(R*0.30*t))
-    r1=max(3,round(R*(0.45+0.55*t)))
-    # vong trong / ngoai
-    ring(c,r0,ICE_M)
-    ring(c,r1,ICE_D if i<6 else DEEP)
-    if rings>=2 and i>=2: ring(c,max(2,round(r1*0.72)),ICE)
-    if rings>=3 and i>=4: ring(c,max(2,round(r1*0.55)),ICE_M)
-
-    # tam lõi
-    cr=max(1,round(4*(1-t*0.6)))
-    c.ellipse(CX-cr,CY-cr,CX+cr,CY+cr,ICE if i<5 else ICE_M)
-    c.pixel(CX,CY,CORE if i<6 else ICE)
-
-    # mảnh băng bay ra
-    for k in range(nsh):
-        a=math.radians(k*360/nsh + (7 if i%2 else 0))
-        rad=round(r1+(k%3)*2)
-        shard(c,round(CX+math.cos(a)*rad),round(CY+math.sin(a)*rad),a,
-              ICE if k%3 else FROST, long=(TIER>=3 and k%2==0))
-
-    # cap cao: mat bang đóng băng + tia băng dài + tuyết
-    if TIER>=2:
-        for k in range(16):
-            a=math.radians(k*360/16 + (i*3))
-            x=round(CX+math.cos(a)*r1*0.6); y=round(CY+math.sin(a)*r1*0.6)
-            p(c,x,y,ICE)
-    if TIER>=3:
-        for k in range(nsh//2):
-            a=math.radians(k*720/nsh + 15)
-            rad=round(r1*0.85)
-            x=round(CX+math.cos(a)*rad); y=round(CY+math.sin(a)*rad)
-            p(c,x,y,DEEP); p(c,x+1,y,ICE_D)
-    if TIER>=4:
-        for k in range(6):
-            a=math.radians(k*137+i*19); rad=round(r1*(0.5+((k%5)/10)))
-            p(c,round(CX+math.cos(a)*rad),round(CY+math.sin(a)*rad),SNOW)
-    if TIER>=5:
-        ring(c,max(1,round(r1*0.35)),CORE if i<6 else ICE)
+    h=round(4+16*min(1,t*1.15))
+    size=max(2,round(2+2*min(1,t*1.5)))
+    dist=round(5+9*min(1,t*1.2))
+    # 8 tinh the lon theo vong, 8 tinh the nho xen ke
+    for k in range(8):
+        gem(c,k*math.pi/4,dist,h,size)
+    if i>=4:
         for k in range(8):
-            a=math.radians(k*45+i*5)
-            rad=round(r1*1.12)
-            p(c,round(CX+math.cos(a)*rad),round(CY+math.sin(a)*rad),CORE)
+            gem(c,k*math.pi/4+math.pi/8,dist+3,round(h*0.6),max(1,size-1))
+    cr=max(1,round(4*(1-t*0.7)))
+    c.ellipse(CX-cr,CY-cr,CX+cr,CY+cr,DEEP)
+    c.ellipse(CX-cr+1,CY-cr+1,CX+cr-1,CY+cr-1,ICE)
+    p(c,CX,CY,CORE)
+    for k in range(10):
+        dot(c,k*2.1+i*0.4,reach-2+k%4,SNOW)
     if i==7:
-        # tàn: vài mảnh rơi
-        for k in range(6):
-            a=math.radians(k*60+12)
-            p(c,round(CX+math.cos(a)*(R-2)),round(CY+math.sin(a)*(R-2)),DEEP)
+        for k in range(8):
+            dot(c,k*math.pi/4,round(reach*0.65),DEEP)
     return c
-
 ANIM=[("burst",[frame(i) for i in range(8)],13,False,
        {"hitbox":{"shape":"circle","center":[float(CX),float(CY)],"active":[2,6]}})]
 if __name__=="__main__":

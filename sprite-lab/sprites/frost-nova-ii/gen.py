@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Frost Nova cấp II — AOE băng lan tròn, mạnh hơn cấp trước (tầm 22px, 12 mảnh)."""
+"""Frost Bloom II — hoa băng nở từ mặt đất, cánh hoa đa góc."""
 import math, sys
 from pathlib import Path
 
@@ -18,87 +18,73 @@ SIZE=56; CX=CY=SIZE//2; ANCHOR=(float(CX),float(CY))
 TIER=2
 
 CORE="#ffffff"; ICE="#c8f6ff"; ICE_M="#6fe0ff"; ICE_D="#2a8fd6"; DEEP="#1b4f8a"
-FROST="#9fe8ff"; SNOW="#eaf9ff"
+NIGHT="#122a52"; FROST="#9fe8ff"; SNOW="#eaf9ff"; SHADOW="#0e1c38"
 
 def p(c,x,y,col):
-    if 0<=x<SIZE and 0<=y<SIZE: c.pixel(x,y,col)
+    xi,yi=int(round(x)),int(round(y))
+    if 0<=xi<SIZE and 0<=yi<SIZE: c.pixel(xi,yi,col)
+
+def poly(c,pts,col):
+    c.polygon([(int(round(x)),int(round(y))) for x,y in pts],col)
 
 def ring(c,r,col):
     if r>0: c.ellipse(CX-r,CY-r,CX+r,CY+r,col,fill=False)
 
-def shard(c,x,y,a,col,long=False):
-    dx=1 if math.cos(a)>=0 else -1
-    dy=1 if math.sin(a)>=0 else -1
-    p(c,x,y,col); p(c,x+dx,y,col); p(c,x,y+dy,col)
-    if long:
-        p(c,x+dx*2,y,col); p(c,x,y+dy*2,col)
+def dot(c,a,r,col,size=1):
+    x=CX+math.cos(a)*r; y=CY+math.sin(a)*r
+    for dx in range(-size+1,size):
+        for dy in range(-size+1,size):
+            p(c,x+dx,y+dy,col)
+
+def petal(c,a,length,width,col_mid,col_edge,col_core):
+    # canh hoa: thân hẹt, đầu nhọn, có gờ sáng
+    ux,uy=math.cos(a),math.sin(a)
+    vx,vy=-uy,ux
+    base=5
+    tip=(CX+ux*length,CY+uy*length)
+    l=(CX+ux*(base+length*0.45)+vx*width,CY+uy*(base+length*0.45)+vy*width)
+    r=(CX+ux*(base+length*0.45)-vx*width,CY+uy*(base+length*0.45)-vy*width)
+    poly(c,[l,tip,r],col_mid)
+    c.line(int(l[0]),int(l[1]),int(tip[0]),int(tip[1]),col_core)
+    c.line(int(tip[0]),int(tip[1]),int(r[0]),int(r[1]),col_edge)
+    # gân giữa
+    c.line(CX+int(ux*base),CY+int(uy*base),int(tip[0]),int(tip[1]),col_core)
 
 def frame(i):
     c=Canvas(SIZE,SIZE)
-    # tiến độ nổ 0..1 qua 8 frame
     t=i/7.0
-    R=22
-    nsh=12
-    rings=2
-
     if i==0:
-        c.ellipse(CX-3,CY-3,CX+3,CY+3,ICE_M)
+        c.ellipse(CX-4,CY-4,CX+4,CY+4,ICE_D)
         c.ellipse(CX-2,CY-2,CX+2,CY+2,CORE)
-        for k in range(nsh//2):
-            a=math.radians(k*360/(nsh//2))
-            p(c,round(CX+math.cos(a)*5),round(CY+math.sin(a)*5),ICE)
         return c
-
-    r0=max(2,round(R*0.30*t))
-    r1=max(3,round(R*(0.45+0.55*t)))
-    # vong trong / ngoai
-    ring(c,r0,ICE_M)
-    ring(c,r1,ICE_D if i<6 else DEEP)
-    if rings>=2 and i>=2: ring(c,max(2,round(r1*0.72)),ICE)
-    if rings>=3 and i>=4: ring(c,max(2,round(r1*0.55)),ICE_M)
-
-    # tam lõi
-    cr=max(1,round(3*(1-t*0.6)))
-    c.ellipse(CX-cr,CY-cr,CX+cr,CY+cr,ICE if i<5 else ICE_M)
-    c.pixel(CX,CY,CORE if i<6 else ICE)
-
-    # mảnh băng bay ra
-    for k in range(nsh):
-        a=math.radians(k*360/nsh + (7 if i%2 else 0))
-        rad=round(r1+(k%3)*2)
-        shard(c,round(CX+math.cos(a)*rad),round(CY+math.sin(a)*rad),a,
-              ICE if k%3 else FROST, long=(TIER>=3 and k%2==0))
-
-    # cap cao: mat bang đóng băng + tia băng dài + tuyết
-    if TIER>=2:
-        for k in range(12):
-            a=math.radians(k*360/12 + (i*3))
-            x=round(CX+math.cos(a)*r1*0.6); y=round(CY+math.sin(a)*r1*0.6)
-            p(c,x,y,ICE)
-    if TIER>=3:
-        for k in range(nsh//2):
-            a=math.radians(k*720/nsh + 15)
-            rad=round(r1*0.85)
-            x=round(CX+math.cos(a)*rad); y=round(CY+math.sin(a)*rad)
-            p(c,x,y,DEEP); p(c,x+1,y,ICE_D)
-    if TIER>=4:
-        for k in range(0):
-            a=math.radians(k*137+i*19); rad=round(r1*(0.5+((k%5)/10)))
-            p(c,round(CX+math.cos(a)*rad),round(CY+math.sin(a)*rad),SNOW)
-    if TIER>=5:
-        ring(c,max(1,round(r1*0.35)),CORE if i<6 else ICE)
+    # mat bang gia da dong bang
+    fr=round(8+17*min(1,t*1.3))
+    c.ellipse(CX-fr,CY-fr+3,CX+fr,CY+fr+6,SHADOW)
+    c.ellipse(CX-fr+2,CY-fr+4,CX+fr-2,CY+fr+3,NIGHT)
+    for k in range(16):
+        a=k*math.pi/8
+        dot(c,a,fr-2,DEEP)
+    # 8 canh hoa mo dan
+    length=round(6+15*min(1,t*1.15))
+    width=max(2,round(3+3*min(1,t*1.4)))
+    for k in range(8):
+        a=k*math.pi/4 + (0.05 if i%2 else -0.05)
+        petal(c,a,length,width,ICE_D,DEEP,ICE_M)
+    if i>=3:
         for k in range(8):
-            a=math.radians(k*45+i*5)
-            rad=round(r1*1.12)
-            p(c,round(CX+math.cos(a)*rad),round(CY+math.sin(a)*rad),CORE)
-    if i==7:
-        # tàn: vài mảnh rơi
-        for k in range(6):
-            a=math.radians(k*60+12)
-            p(c,round(CX+math.cos(a)*(R-2)),round(CY+math.sin(a)*(R-2)),DEEP)
+            a=k*math.pi/4+math.pi/8
+            petal(c,a,round(length*0.62),max(1,width-1),ICE,ICE_D,ICE_M)
+    # nhuy hoa
+    cr=max(2,round(5*(1-t*0.5)))
+    c.ellipse(CX-cr,CY-cr,CX+cr,CY+cr,ICE)
+    c.ellipse(CX-2,CY-2,CX+2,CY+2,CORE if i<6 else FROST)
+    # tuyet roi
+    for k in range(6):
+        a=k*1.7+i*0.3
+        dot(c,a,fr-4+k%3,SNOW)
     return c
 
-ANIM=[("burst",[frame(i) for i in range(8)],14,False,
+ANIM=[("burst",[frame(i) for i in range(8)],13,False,
        {"hitbox":{"shape":"circle","center":[float(CX),float(CY)],"active":[2,6]}})]
 if __name__=="__main__":
     export(HERE,NAME,ANIM,anchor=ANCHOR)
