@@ -134,6 +134,37 @@
       }
     },
     {
+      "name": "battle-axe",
+      "meta": {
+        "frames": 6,
+        "frame_size": [
+          32,
+          32
+        ],
+        "fps": 6.0,
+        "loop": true,
+        "anchor": [
+          14.0,
+          30.0
+        ],
+        "anchor_source": "explicit",
+        "animations": [
+          {
+            "name": "idle",
+            "start": 0,
+            "frames": 6,
+            "fps": 6.0,
+            "loop": true
+          }
+        ]
+      },
+      "strip": "sprites/battle-axe/battle-axe_strip.png",
+      "preview": "sprites/battle-axe/preview.png",
+      "gifs": {
+        "idle": "sprites/battle-axe/idle.gif"
+      }
+    },
+    {
       "name": "cleave-wave",
       "meta": {
         "frames": 7,
@@ -358,6 +389,37 @@
       }
     },
     {
+      "name": "greatsword",
+      "meta": {
+        "frames": 6,
+        "frame_size": [
+          32,
+          32
+        ],
+        "fps": 5.0,
+        "loop": true,
+        "anchor": [
+          16.0,
+          30.0
+        ],
+        "anchor_source": "explicit",
+        "animations": [
+          {
+            "name": "idle",
+            "start": 0,
+            "frames": 6,
+            "fps": 5.0,
+            "loop": true
+          }
+        ]
+      },
+      "strip": "sprites/greatsword/greatsword_strip.png",
+      "preview": "sprites/greatsword/preview.png",
+      "gifs": {
+        "idle": "sprites/greatsword/idle.gif"
+      }
+    },
+    {
       "name": "ground-slam",
       "meta": {
         "frames": 8,
@@ -545,6 +607,68 @@
       }
     },
     {
+      "name": "iron-sword",
+      "meta": {
+        "frames": 6,
+        "frame_size": [
+          24,
+          24
+        ],
+        "fps": 6.0,
+        "loop": true,
+        "anchor": [
+          12.0,
+          22.0
+        ],
+        "anchor_source": "explicit",
+        "animations": [
+          {
+            "name": "idle",
+            "start": 0,
+            "frames": 6,
+            "fps": 6.0,
+            "loop": true
+          }
+        ]
+      },
+      "strip": "sprites/iron-sword/iron-sword_strip.png",
+      "preview": "sprites/iron-sword/preview.png",
+      "gifs": {
+        "idle": "sprites/iron-sword/idle.gif"
+      }
+    },
+    {
+      "name": "knight-helmet",
+      "meta": {
+        "frames": 6,
+        "frame_size": [
+          32,
+          28
+        ],
+        "fps": 5.0,
+        "loop": true,
+        "anchor": [
+          16.0,
+          26.0
+        ],
+        "anchor_source": "explicit",
+        "animations": [
+          {
+            "name": "idle",
+            "start": 0,
+            "frames": 6,
+            "fps": 5.0,
+            "loop": true
+          }
+        ]
+      },
+      "strip": "sprites/knight-helmet/knight-helmet_strip.png",
+      "preview": "sprites/knight-helmet/preview.png",
+      "gifs": {
+        "idle": "sprites/knight-helmet/idle.gif"
+      }
+    },
+    {
       "name": "lightning-strike",
       "meta": {
         "frames": 7,
@@ -652,6 +776,37 @@
         "jump": "sprites/mage/jump.gif",
         "run": "sprites/mage/run.gif",
         "spell": "sprites/mage/spell.gif"
+      }
+    },
+    {
+      "name": "magic-staff",
+      "meta": {
+        "frames": 6,
+        "frame_size": [
+          24,
+          32
+        ],
+        "fps": 6.0,
+        "loop": true,
+        "anchor": [
+          12.0,
+          30.0
+        ],
+        "anchor_source": "explicit",
+        "animations": [
+          {
+            "name": "idle",
+            "start": 0,
+            "frames": 6,
+            "fps": 6.0,
+            "loop": true
+          }
+        ]
+      },
+      "strip": "sprites/magic-staff/magic-staff_strip.png",
+      "preview": "sprites/magic-staff/preview.png",
+      "gifs": {
+        "idle": "sprites/magic-staff/idle.gif"
       }
     },
     {
@@ -786,6 +941,37 @@
       }
     },
     {
+      "name": "oak-bow",
+      "meta": {
+        "frames": 6,
+        "frame_size": [
+          24,
+          32
+        ],
+        "fps": 7.0,
+        "loop": true,
+        "anchor": [
+          12.0,
+          30.0
+        ],
+        "anchor_source": "explicit",
+        "animations": [
+          {
+            "name": "idle",
+            "start": 0,
+            "frames": 6,
+            "fps": 7.0,
+            "loop": true
+          }
+        ]
+      },
+      "strip": "sprites/oak-bow/oak-bow_strip.png",
+      "preview": "sprites/oak-bow/preview.png",
+      "gifs": {
+        "idle": "sprites/oak-bow/idle.gif"
+      }
+    },
+    {
       "name": "raindrop",
       "meta": {
         "frames": 1,
@@ -804,6 +990,37 @@
       "strip": "sprites/raindrop/raindrop_strip.png",
       "preview": "sprites/raindrop/preview.png",
       "gifs": {}
+    },
+    {
+      "name": "round-shield",
+      "meta": {
+        "frames": 6,
+        "frame_size": [
+          32,
+          30
+        ],
+        "fps": 5.0,
+        "loop": true,
+        "anchor": [
+          16.0,
+          28.0
+        ],
+        "anchor_source": "explicit",
+        "animations": [
+          {
+            "name": "idle",
+            "start": 0,
+            "frames": 6,
+            "fps": 5.0,
+            "loop": true
+          }
+        ]
+      },
+      "strip": "sprites/round-shield/round-shield_strip.png",
+      "preview": "sprites/round-shield/preview.png",
+      "gifs": {
+        "idle": "sprites/round-shield/idle.gif"
+      }
     },
     {
       "name": "splash",
@@ -825,6 +1042,37 @@
       "preview": "sprites/splash/preview.png",
       "gifs": {
         "anim": "sprites/splash/anim.gif"
+      }
+    },
+    {
+      "name": "steel-chestplate",
+      "meta": {
+        "frames": 6,
+        "frame_size": [
+          32,
+          28
+        ],
+        "fps": 5.0,
+        "loop": true,
+        "anchor": [
+          16.0,
+          26.0
+        ],
+        "anchor_source": "explicit",
+        "animations": [
+          {
+            "name": "idle",
+            "start": 0,
+            "frames": 6,
+            "fps": 5.0,
+            "loop": true
+          }
+        ]
+      },
+      "strip": "sprites/steel-chestplate/steel-chestplate_strip.png",
+      "preview": "sprites/steel-chestplate/preview.png",
+      "gifs": {
+        "idle": "sprites/steel-chestplate/idle.gif"
       }
     },
     {
@@ -987,6 +1235,37 @@
       }
     },
     {
+      "name": "tower-shield",
+      "meta": {
+        "frames": 6,
+        "frame_size": [
+          32,
+          32
+        ],
+        "fps": 5.0,
+        "loop": true,
+        "anchor": [
+          16.0,
+          30.0
+        ],
+        "anchor_source": "explicit",
+        "animations": [
+          {
+            "name": "idle",
+            "start": 0,
+            "frames": 6,
+            "fps": 5.0,
+            "loop": true
+          }
+        ]
+      },
+      "strip": "sprites/tower-shield/tower-shield_strip.png",
+      "preview": "sprites/tower-shield/preview.png",
+      "gifs": {
+        "idle": "sprites/tower-shield/idle.gif"
+      }
+    },
+    {
       "name": "void-orb",
       "meta": {
         "frames": 12,
@@ -1023,6 +1302,37 @@
       "gifs": {
         "fly": "sprites/void-orb/fly.gif",
         "impact": "sprites/void-orb/impact.gif"
+      }
+    },
+    {
+      "name": "war-hammer",
+      "meta": {
+        "frames": 6,
+        "frame_size": [
+          32,
+          32
+        ],
+        "fps": 5.0,
+        "loop": true,
+        "anchor": [
+          14.0,
+          30.0
+        ],
+        "anchor_source": "explicit",
+        "animations": [
+          {
+            "name": "idle",
+            "start": 0,
+            "frames": 6,
+            "fps": 5.0,
+            "loop": true
+          }
+        ]
+      },
+      "strip": "sprites/war-hammer/war-hammer_strip.png",
+      "preview": "sprites/war-hammer/preview.png",
+      "gifs": {
+        "idle": "sprites/war-hammer/idle.gif"
       }
     },
     {
