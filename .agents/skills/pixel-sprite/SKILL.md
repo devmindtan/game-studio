@@ -125,6 +125,9 @@ Không báo "xong" khi chưa xem `preview.png`, ảnh `sheet` và ảnh `move`.
   mặt, biểu tượng. Công thức (vòng lặp co giãn, lệch theo k²…) chỉ dùng để đặt vị trí và tạo chuyển động; dựng
   hình dáng bằng công thức cho ra bậc thang lởm chởm (bài học 2026-11-16: nón pháp sư "méo xẹo"). Cần biến thể
   (gió, nghiêng) thì vẽ thêm một bản đồ, đừng uốn bằng công thức.
+- **Đường chéo đặc (lưỡi kiếm, vệt chém…) điền theo từng cột**: với mỗi cột `x`, tính tâm `y` rồi tô một
+  đoạn `y` liên tiếp; vòng lặp kiểu `(x+t, y-t)` chỉ cho pixel chạm góc → nhìn như caro/đứt gãy (bài học
+  2026-11-16: sword/greatsword). Guard phải **vuông góc** với trục lưỡi, cán/pommel **cùng trục** với lưỡi.
 
 - Không anti-alias, không gradient mịn; dùng màu phẳng và banding.
 - 1 pixel = 1 đơn vị thiết kế; scale nguyên, nearest.
