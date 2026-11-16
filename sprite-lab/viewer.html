@@ -118,6 +118,7 @@ label.ctrlLbl{font-size:11px;color:var(--muted);display:flex;align-items:center;
             <label class="ctrlLbl">Tốc độ <select id="speedSel" class="ctrl"><option value="0.25">0.25×</option><option value="0.5">0.5×</option><option value="1" selected>1×</option><option value="1.5">1.5×</option><option value="2">2×</option></select></label>
             <label class="ctrlLbl">Nền <select id="bgSel" class="ctrl"><option value="checker">Caro</option><option value="dark">Tối</option><option value="light">Sáng</option><option value="green">Cỏ</option></select></label>
             <label class="ctrlLbl"><input type="checkbox" id="showAnchor" checked> Neo + đất</label>
+            <label class="ctrlLbl"><input type="checkbox" id="showHitbox"> Hitbox</label>
           </div>
           <div id="frameInfo"></div>
           <div class="film" id="film"></div>
@@ -139,7 +140,7 @@ label.ctrlLbl{font-size:11px;color:var(--muted);display:flex;align-items:center;
 </div>
 <script>
 let data=null,current=null,img=null;
-let anims=[],animIdx=0,frameInAnim=0,playing=true,acc=0,lastT=0,scale=4,speed=1,showAnchor=true;
+let anims=[],animIdx=0,frameInAnim=0,playing=true,acc=0,lastT=0,scale=4,speed=1,showAnchor=true,showHitbox=false;
 let activeFilter='all',lastManifest='';
 const collapsed={};
 const BGS=['checker','dark','light','green'];
@@ -363,6 +364,32 @@ function draw(){
     ctx.beginPath(); ctx.moveTo(ax-scale*1.5,ay); ctx.lineTo(ax+scale*1.5,ay); ctx.stroke();
     ctx.beginPath(); ctx.moveTo(ax,ay-scale*1.5); ctx.lineTo(ax,ay+scale*1.5); ctx.stroke();
   }
+  if(showHitbox){
+    const hb=a.hitbox;
+    if(hb && hb.active && frameInAnim>=hb.active[0] && frameInAnim<=hb.active[1]){
+      const cx=(hb.center[0]||0)*scale, cy=(hb.center[1]||0)*scale;
+      const r=(hb.radius||0)*scale, ir=(hb.inner||0)*scale;
+      ctx.save();
+      ctx.lineWidth=Math.max(1,Math.floor(scale/4));
+      ctx.strokeStyle='rgba(255,80,80,.95)';
+      ctx.fillStyle='rgba(255,80,80,.18)';
+      if(hb.shape==='circle'){
+        if(r>0){ ctx.beginPath(); ctx.arc(cx,cy,r,0,Math.PI*2); ctx.fill(); ctx.stroke(); }
+        if(ir>0){ ctx.save(); ctx.globalCompositeOperation='destination-out'; ctx.beginPath(); ctx.arc(cx,cy,ir,0,Math.PI*2); ctx.fill(); ctx.restore(); ctx.beginPath(); ctx.arc(cx,cy,ir,0,Math.PI*2); ctx.strokeStyle='rgba(255,160,80,.9)'; ctx.stroke(); }
+      }else if(hb.shape==='arc'){
+        const dir=(hb.dir_deg||0)*Math.PI/180, ha=(hb.half_angle_deg||0)*Math.PI/180;
+        const a0=dir-ha, a1=dir+ha;
+        ctx.beginPath();
+        ctx.arc(cx,cy,r,a0,a1);
+        if(ir>0) ctx.arc(cx,cy,ir,a1,a0,true); else ctx.lineTo(cx,cy);
+        ctx.closePath(); ctx.fill(); ctx.stroke();
+        if(ir>0){ ctx.beginPath(); ctx.arc(cx,cy,ir,a0,a1); ctx.strokeStyle='rgba(255,160,80,.9)'; ctx.stroke(); }
+        // direction line
+        ctx.beginPath(); ctx.moveTo(cx,cy); ctx.lineTo(cx+Math.cos(dir)*r, cy+Math.sin(dir)*r); ctx.strokeStyle='rgba(255,255,255,.5)'; ctx.stroke();
+      }
+      ctx.restore();
+    }
+  }
   $('frameInfo').innerHTML='<b>'+a.name+'</b> · frame '+(frameInAnim+1)+'/'+a.frames+' · '+Math.round(frameMs(a,frameInAnim))+' ms'+
     ' · '+(a.loop===false?'phát 1 lần':'lặp')+' · frame '+globalFrame+' trên strip';
   markFilm();
@@ -398,6 +425,7 @@ $('scaleSel').addEventListener('change',()=>{resizeCanvas(); $('scaleSel').blur(
 $('speedSel').addEventListener('change',e=>{speed=parseFloat(e.target.value)||1; e.target.blur();});
 $('bgSel').addEventListener('change',e=>{setBg(e.target.value); e.target.blur();});
 $('showAnchor').addEventListener('change',e=>{showAnchor=e.target.checked;});
+$('showHitbox').addEventListener('change',e=>{showHitbox=e.target.checked;});
 $('btnPlay').onclick=()=>{ const a=currentAnim(); if(!playing && a && a.loop===false && frameInAnim===a.frames-1) frameInAnim=0; playing=!playing; updatePlayBtn(); };
 $('btnPrev').onclick=()=>stepFrame(-1);
 $('btnNext').onclick=()=>stepFrame(1);
