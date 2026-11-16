@@ -21,6 +21,14 @@
       "buff"
     ]
   },
+  "arcane-empower-pickup": {
+    "cat": "item",
+    "tags": [
+      "pickup",
+      "buff",
+      "power"
+    ]
+  },
   "arcane-sigil": {
     "cat": "aoe",
     "tags": [
@@ -416,11 +424,35 @@
       "buff"
     ]
   },
+  "haste-rune-pickup": {
+    "cat": "item",
+    "tags": [
+      "pickup",
+      "buff",
+      "haste"
+    ]
+  },
   "heal-bloom": {
     "cat": "status",
     "tags": [
       "heal",
       "buff"
+    ]
+  },
+  "heal-bloom-pickup": {
+    "cat": "item",
+    "tags": [
+      "pickup",
+      "buff",
+      "heal"
+    ]
+  },
+  "health-pickup": {
+    "cat": "item",
+    "tags": [
+      "pickup",
+      "buff",
+      "heal"
     ]
   },
   "holy-column": {
@@ -572,6 +604,14 @@
     "tags": [
       "power",
       "buff"
+    ]
+  },
+  "magnetic-shield-pickup": {
+    "cat": "item",
+    "tags": [
+      "pickup",
+      "buff",
+      "shield"
     ]
   },
   "meteor-burst": {
