@@ -425,7 +425,7 @@
     {
       "name": "cleave-wave",
       "meta": {
-        "frames": 7,
+        "frames": 35,
         "frame_size": [
           48,
           48
@@ -433,7 +433,7 @@
         "fps": 16.0,
         "loop": false,
         "anchor": [
-          8.0,
+          24.0,
           24.0
         ],
         "anchor_source": "explicit",
@@ -444,13 +444,45 @@
             "frames": 7,
             "fps": 16.0,
             "loop": false
+          },
+          {
+            "name": "sweep_right",
+            "start": 7,
+            "frames": 7,
+            "fps": 16.0,
+            "loop": false
+          },
+          {
+            "name": "sweep_left",
+            "start": 14,
+            "frames": 7,
+            "fps": 16.0,
+            "loop": false
+          },
+          {
+            "name": "sweep_up",
+            "start": 21,
+            "frames": 7,
+            "fps": 16.0,
+            "loop": false
+          },
+          {
+            "name": "sweep_down",
+            "start": 28,
+            "frames": 7,
+            "fps": 16.0,
+            "loop": false
           }
         ]
       },
       "strip": "sprites/cleave-wave/cleave-wave_strip.png",
       "preview": "sprites/cleave-wave/preview.png",
       "gifs": {
-        "sweep": "sprites/cleave-wave/sweep.gif"
+        "sweep": "sprites/cleave-wave/sweep.gif",
+        "sweep_down": "sprites/cleave-wave/sweep_down.gif",
+        "sweep_left": "sprites/cleave-wave/sweep_left.gif",
+        "sweep_right": "sprites/cleave-wave/sweep_right.gif",
+        "sweep_up": "sprites/cleave-wave/sweep_up.gif"
       }
     },
     {
@@ -1901,7 +1933,7 @@
     {
       "name": "scatter-volley",
       "meta": {
-        "frames": 7,
+        "frames": 35,
         "frame_size": [
           48,
           48
@@ -1909,7 +1941,7 @@
         "fps": 15.0,
         "loop": false,
         "anchor": [
-          4.0,
+          24.0,
           24.0
         ],
         "anchor_source": "explicit",
@@ -1920,28 +1952,60 @@
             "frames": 7,
             "fps": 15.0,
             "loop": false
+          },
+          {
+            "name": "volley_right",
+            "start": 7,
+            "frames": 7,
+            "fps": 15.0,
+            "loop": false
+          },
+          {
+            "name": "volley_left",
+            "start": 14,
+            "frames": 7,
+            "fps": 15.0,
+            "loop": false
+          },
+          {
+            "name": "volley_up",
+            "start": 21,
+            "frames": 7,
+            "fps": 15.0,
+            "loop": false
+          },
+          {
+            "name": "volley_down",
+            "start": 28,
+            "frames": 7,
+            "fps": 15.0,
+            "loop": false
           }
         ]
       },
       "strip": "sprites/scatter-volley/scatter-volley_strip.png",
       "preview": "sprites/scatter-volley/preview.png",
       "gifs": {
-        "volley": "sprites/scatter-volley/volley.gif"
+        "volley": "sprites/scatter-volley/volley.gif",
+        "volley_down": "sprites/scatter-volley/volley_down.gif",
+        "volley_left": "sprites/scatter-volley/volley_left.gif",
+        "volley_right": "sprites/scatter-volley/volley_right.gif",
+        "volley_up": "sprites/scatter-volley/volley_up.gif"
       }
     },
     {
       "name": "shadow-dash",
       "meta": {
-        "frames": 7,
+        "frames": 35,
         "frame_size": [
           48,
-          32
+          48
         ],
         "fps": 15.0,
         "loop": false,
         "anchor": [
-          12.0,
-          28.0
+          24.0,
+          24.0
         ],
         "anchor_source": "explicit",
         "animations": [
@@ -1951,19 +2015,51 @@
             "frames": 7,
             "fps": 15.0,
             "loop": false
+          },
+          {
+            "name": "dash_right",
+            "start": 7,
+            "frames": 7,
+            "fps": 15.0,
+            "loop": false
+          },
+          {
+            "name": "dash_left",
+            "start": 14,
+            "frames": 7,
+            "fps": 15.0,
+            "loop": false
+          },
+          {
+            "name": "dash_up",
+            "start": 21,
+            "frames": 7,
+            "fps": 15.0,
+            "loop": false
+          },
+          {
+            "name": "dash_down",
+            "start": 28,
+            "frames": 7,
+            "fps": 15.0,
+            "loop": false
           }
         ]
       },
       "strip": "sprites/shadow-dash/shadow-dash_strip.png",
       "preview": "sprites/shadow-dash/preview.png",
       "gifs": {
-        "dash": "sprites/shadow-dash/dash.gif"
+        "dash": "sprites/shadow-dash/dash.gif",
+        "dash_down": "sprites/shadow-dash/dash_down.gif",
+        "dash_left": "sprites/shadow-dash/dash_left.gif",
+        "dash_right": "sprites/shadow-dash/dash_right.gif",
+        "dash_up": "sprites/shadow-dash/dash_up.gif"
       }
     },
     {
       "name": "shadow-slash",
       "meta": {
-        "frames": 6,
+        "frames": 30,
         "frame_size": [
           48,
           48
@@ -1971,7 +2067,7 @@
         "fps": 16.0,
         "loop": false,
         "anchor": [
-          8.0,
+          24.0,
           24.0
         ],
         "anchor_source": "explicit",
@@ -1982,13 +2078,45 @@
             "frames": 6,
             "fps": 16.0,
             "loop": false
+          },
+          {
+            "name": "slash_right",
+            "start": 6,
+            "frames": 6,
+            "fps": 16.0,
+            "loop": false
+          },
+          {
+            "name": "slash_left",
+            "start": 12,
+            "frames": 6,
+            "fps": 16.0,
+            "loop": false
+          },
+          {
+            "name": "slash_up",
+            "start": 18,
+            "frames": 6,
+            "fps": 16.0,
+            "loop": false
+          },
+          {
+            "name": "slash_down",
+            "start": 24,
+            "frames": 6,
+            "fps": 16.0,
+            "loop": false
           }
         ]
       },
       "strip": "sprites/shadow-slash/shadow-slash_strip.png",
       "preview": "sprites/shadow-slash/preview.png",
       "gifs": {
-        "slash": "sprites/shadow-slash/slash.gif"
+        "slash": "sprites/shadow-slash/slash.gif",
+        "slash_down": "sprites/shadow-slash/slash_down.gif",
+        "slash_left": "sprites/shadow-slash/slash_left.gif",
+        "slash_right": "sprites/shadow-slash/slash_right.gif",
+        "slash_up": "sprites/shadow-slash/slash_up.gif"
       }
     },
     {

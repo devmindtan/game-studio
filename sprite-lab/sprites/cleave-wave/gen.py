@@ -1,11 +1,12 @@
 #!/usr/bin/env python3
 """Generator cho sprite "cleave-wave": sóng chém AOE của hệ đại kiếm.
 
-  sweep   7 frame một lần: vệt chém hình cung quét ngang rồi lan thành sóng khí
-          hình lưỡi liềm về phía trước, kèm tia lửa va chạm.
+  sweep/sweep_right  7 frame một lần: quét/chém sang phải;
+  sweep_left         7 frame một lần: quét/chém sang trái;
+  sweep_up           7 frame một lần: quét/chém lên trên;
+  sweep_down         7 frame một lần: quét/chém xuống dưới.
 
-Neo (8, 24) gần tay cầm/điểm xuất phát bên trái, để sóng vung ra phía trước (phải).
-Sprite 48x48.
+AOE định hướng cho game top-down. Neo tâm (sprite 48x48).
 
 Chạy:  gamekit art run cleave-wave
 """
@@ -25,10 +26,11 @@ def _workspace() -> Path:
 sys.path.insert(0, str(_workspace() / "tools/gamekit/pipeline"))
 
 from spritekit import Canvas, gif, preview, strip, write_anim_meta  # noqa: E402
+from PIL import Image
 
 NAME = "cleave-wave"
 SIZE = 48
-ANCHOR = (8.0, 24.0)
+ANCHOR = (24.0, 24.0)
 HERE = Path(__file__).resolve().parent
 OUT = HERE
 
@@ -54,16 +56,14 @@ def arc_stroke(c, cx, cy, r, a0, a1, col, thick=1):
         a += 3
 
 
-def sweep(i):
+def sweep_base(i):
     c = Canvas(SIZE, SIZE)
     ox, oy = 8, 24
     if i == 0:
-        # khởi động vệt chém
         arc_stroke(c, ox, oy, 10, -60, -10, EDGE, 2)
         arc_stroke(c, ox, oy, 8, -55, -15, CORE, 1)
         return c
     if i == 1:
-        # quét qua giữa
         glow = Canvas(SIZE, SIZE)
         arc_stroke(glow, ox, oy, 18, -70, 40, GLOW, 4)
         c.paste(glow)
@@ -74,7 +74,6 @@ def sweep(i):
             p(c, ox + dx, oy + dy, SPARK)
         return c
     if i == 2:
-        # cung rộng nhất
         glow = Canvas(SIZE, SIZE)
         arc_stroke(glow, ox, oy, 26, -75, 60, GLOW, 5)
         c.paste(glow)
@@ -85,7 +84,6 @@ def sweep(i):
             p(c, ox + dx, oy + dy, SPARK)
         return c
     if i == 3:
-        # sóng khí tách ra phía trước
         arc_stroke(c, ox + 4, oy, 30, -55, 55, SLASH, 2)
         arc_stroke(c, ox + 6, oy, 26, -50, 50, EDGE, 2)
         arc_stroke(c, ox + 8, oy, 22, -40, 40, CORE, 1)
@@ -103,14 +101,33 @@ def sweep(i):
         for dx, dy in ((34, -4), (36, 0), (34, 4), (28, -10), (28, 10)):
             p(c, ox + dx, oy + dy, STEEL)
         return c
-    # tàn sóng
     for dx, dy in ((36, -2), (38, 0), (36, 2), (32, -8), (32, 8)):
         p(c, ox + dx, oy + dy, SLASH)
     return c
 
 
+def rot(c, deg):
+    nc = Canvas(c.width, c.height)
+    nc.img = c.img.rotate(deg, resample=Image.Resampling.NEAREST, expand=False)
+    return nc
+
+
+_SIDE = [sweep_base(i) for i in range(7)]
+
+def dir_frames(base_frames, direction):
+    if direction == "right": return [f.copy() for f in base_frames]
+    if direction == "up": return [rot(f, 90) for f in base_frames]
+    if direction == "left": return [rot(f, 180) for f in base_frames]
+    if direction == "down": return [rot(f, 270) for f in base_frames]
+    raise ValueError(direction)
+
+
 ANIMATIONS = [
-    ("sweep", [sweep(i) for i in range(7)], 16, False),
+    ("sweep", dir_frames(_SIDE, "right"), 16, False),
+    ("sweep_right", dir_frames(_SIDE, "right"), 16, False),
+    ("sweep_left", dir_frames(_SIDE, "left"), 16, False),
+    ("sweep_up", dir_frames(_SIDE, "up"), 16, False),
+    ("sweep_down", dir_frames(_SIDE, "down"), 16, False),
 ]
 
 

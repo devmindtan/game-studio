@@ -1,5 +1,5 @@
 {
-  "frames": 7,
+  "frames": 35,
   "frame_size": [
     48,
     48
@@ -7,7 +7,7 @@
   "fps": 15.0,
   "loop": false,
   "anchor": [
-    4.0,
+    24.0,
     24.0
   ],
   "anchor_source": "explicit",
@@ -15,6 +15,34 @@
     {
       "name": "volley",
       "start": 0,
+      "frames": 7,
+      "fps": 15.0,
+      "loop": false
+    },
+    {
+      "name": "volley_right",
+      "start": 7,
+      "frames": 7,
+      "fps": 15.0,
+      "loop": false
+    },
+    {
+      "name": "volley_left",
+      "start": 14,
+      "frames": 7,
+      "fps": 15.0,
+      "loop": false
+    },
+    {
+      "name": "volley_up",
+      "start": 21,
+      "frames": 7,
+      "fps": 15.0,
+      "loop": false
+    },
+    {
+      "name": "volley_down",
+      "start": 28,
       "frames": 7,
       "fps": 15.0,
       "loop": false

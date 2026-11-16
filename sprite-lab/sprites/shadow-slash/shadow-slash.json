@@ -1,5 +1,5 @@
 {
-  "frames": 6,
+  "frames": 30,
   "frame_size": [
     48,
     48
@@ -7,7 +7,7 @@
   "fps": 16.0,
   "loop": false,
   "anchor": [
-    8.0,
+    24.0,
     24.0
   ],
   "anchor_source": "explicit",
@@ -15,6 +15,34 @@
     {
       "name": "slash",
       "start": 0,
+      "frames": 6,
+      "fps": 16.0,
+      "loop": false
+    },
+    {
+      "name": "slash_right",
+      "start": 6,
+      "frames": 6,
+      "fps": 16.0,
+      "loop": false
+    },
+    {
+      "name": "slash_left",
+      "start": 12,
+      "frames": 6,
+      "fps": 16.0,
+      "loop": false
+    },
+    {
+      "name": "slash_up",
+      "start": 18,
+      "frames": 6,
+      "fps": 16.0,
+      "loop": false
+    },
+    {
+      "name": "slash_down",
+      "start": 24,
       "frames": 6,
       "fps": 16.0,
       "loop": false

@@ -1,9 +1,14 @@
 #!/usr/bin/env python3
 """Nhát chém bóng tối (hệ sát thủ, AOE): vệt chém nhanh kèm bóng tím.
 
-  slash   6 frame một lần: vệt chém xẹt qua theo cung.
+  slash/slash_right  6 frame một lần: chém sang phải;
+  slash_left         6 frame một lần: chém sang trái;
+  slash_up           6 frame một lần: chém lên trên;
+  slash_down         6 frame một lần: chém xuống dưới.
 
-Neo (8, 24) điểm xuất phát (sprite 48x48). Chém sang phải.
+AOE định hướng cho game top-down. Neo tâm (sprite 48x48).
+
+Chạy:  gamekit art run shadow-slash
 """
 import sys,math
 from pathlib import Path
@@ -13,10 +18,14 @@ def _ws():
     raise SystemExit("no workspace")
 sys.path.insert(0,str(_ws()/"tools/gamekit/pipeline"))
 from spritekit import Canvas,gif,preview,strip,write_anim_meta
-NAME="shadow-slash"; S=48; ANCHOR=(8.0,24.0); HERE=Path(__file__).resolve().parent; OUT=HERE
+from PIL import Image
+
+NAME="shadow-slash"; S=48; ANCHOR=(24.0,24.0); HERE=Path(__file__).resolve().parent; OUT=HERE
 CORE="#f5d0fe"; EDGE="#d946ef"; DARK="#6b21a8"; SHADOW="#2a1038"
+
 def p(c,x,y,col):
     if 0<=x<S and 0<=y<S: c.pixel(x,y,col)
+
 def arc(c,cx,cy,r,a0,a1,col,step=3,th=1):
     a=a0
     while a<=a1:
@@ -25,7 +34,8 @@ def arc(c,cx,cy,r,a0,a1,col,step=3,th=1):
             rr=r-t
             p(c,round(cx+math.cos(rad)*rr),round(cy+math.sin(rad)*rr),col)
         a+=step
-def slash(i):
+
+def slash_base(i):
     c=Canvas(S,S); ox,oy=8,24
     if i==0:
         arc(c,ox,oy,14,-50,0,DARK,4,2); p(c,18,18,EDGE); return c
@@ -44,7 +54,29 @@ def slash(i):
         return c
     arc(c,ox,oy,34,-20,30,DARK,5,1)
     return c
-ANIMATIONS=[("slash",[slash(i) for i in range(6)],16,False)]
+
+def rot(c, deg):
+    nc = Canvas(c.width, c.height)
+    nc.img = c.img.rotate(deg, resample=Image.Resampling.NEAREST, expand=False)
+    return nc
+
+_SIDE=[slash_base(i) for i in range(6)]
+
+def dir_frames(base_frames, direction):
+    if direction=="right": return [f.copy() for f in base_frames]
+    if direction=="up": return [rot(f,90) for f in base_frames]
+    if direction=="left": return [rot(f,180) for f in base_frames]
+    if direction=="down": return [rot(f,270) for f in base_frames]
+    raise ValueError(direction)
+
+ANIMATIONS=[
+    ("slash",dir_frames(_SIDE,"right"),16,False),
+    ("slash_right",dir_frames(_SIDE,"right"),16,False),
+    ("slash_left",dir_frames(_SIDE,"left"),16,False),
+    ("slash_up",dir_frames(_SIDE,"up"),16,False),
+    ("slash_down",dir_frames(_SIDE,"down"),16,False),
+]
+
 def main():
     flat=[f for _,fr,_,_ in ANIMATIONS for f in fr]
     strip(flat).save(OUT/f"{NAME}_strip.png"); flat[0].save(OUT/f"{NAME}.png")
@@ -54,4 +86,5 @@ def main():
     for a,fr,fps,_ in ANIMATIONS: gif(fr,HERE/f"{a}.gif",fps=fps,scale=4)
     write_anim_meta(OUT/f"{NAME}.json",[{"name":n,"frames":f,"fps":fps,"loop":lp} for n,f,fps,lp in ANIMATIONS],anchor=ANCHOR)
     print(OUT/"preview.png")
+
 if __name__=="__main__": main()

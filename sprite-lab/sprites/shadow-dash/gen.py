@@ -1,9 +1,14 @@
 #!/usr/bin/env python3
 """Lướt bóng tối (hệ sát thủ, skill): vệt dịch chuyển/biến mất trong khói tím.
 
-  dash    7 frame một lần: bùng khói bóng tối tại chỗ rồi vệt lướt về trước.
+  dash/dash_right  7 frame một lần: lướt sang phải;
+  dash_left        7 frame một lần: lướt sang trái;
+  dash_up          7 frame một lần: lướt lên trên;
+  dash_down        7 frame một lần: lướt xuống dưới.
 
-Neo (12, 28) điểm xuất phát (sprite 48x32). Lướt sang phải.
+Skill định hướng cho game top-down. Neo tâm (sprite vuông 48x48).
+
+Chạy:  gamekit art run shadow-dash
 """
 import sys
 from pathlib import Path
@@ -13,14 +18,20 @@ def _ws():
     raise SystemExit("no workspace")
 sys.path.insert(0,str(_ws()/"tools/gamekit/pipeline"))
 from spritekit import Canvas,gif,preview,strip,write_anim_meta
-NAME="shadow-dash"; W,H=48,32; ANCHOR=(12.0,28.0); HERE=Path(__file__).resolve().parent; OUT=HERE
+from PIL import Image
+
+NAME="shadow-dash"; SW,SH=48,32; S=48; OX,OY=(S-SW)//2,(S-SH)//2
+ANCHOR=(24.0,24.0); HERE=Path(__file__).resolve().parent; OUT=HERE
 CORE="#e9d5ff"; EDGE="#b06cff"; DARK="#4a1d6b"; SMOKE="#2a1038"; SMOKE2="#1a0c24"
+
 def p(c,x,y,col):
-    if 0<=x<W and 0<=y<H: c.pixel(x,y,col)
+    if 0<=x<SW and 0<=y<SH: c.pixel(x,y,col)
+
 def puff(c,cx,cy,rx,ry,col):
     c.ellipse(cx-rx,cy-ry,cx+rx,cy+ry,col)
-def dash(i):
-    c=Canvas(W,H)
+
+def dash_base(i):
+    c=Canvas(SW,SH)
     if i==0:
         puff(c,12,24,4,5,SMOKE); puff(c,12,22,3,3,DARK); p(c,12,20,EDGE); return c
     if i==1:
@@ -45,14 +56,40 @@ def dash(i):
         return c
     puff(c,44,23,2,2,SMOKE2); p(c,44,22,DARK)
     return c
-ANIMATIONS=[("dash",[dash(i) for i in range(7)],15,False)]
+
+def centered(base):
+    out=Canvas(S,S); out.paste(base,OX,OY); return out
+
+def rot(c, deg):
+    nc = Canvas(c.width, c.height)
+    nc.img = c.img.rotate(deg, resample=Image.Resampling.NEAREST, expand=False)
+    return nc
+
+_SIDE=[centered(dash_base(i)) for i in range(7)]
+
+def dir_frames(base_frames, direction):
+    if direction=="right": return [f.copy() for f in base_frames]
+    if direction=="up": return [rot(f,90) for f in base_frames]
+    if direction=="left": return [rot(f,180) for f in base_frames]
+    if direction=="down": return [rot(f,270) for f in base_frames]
+    raise ValueError(direction)
+
+ANIMATIONS=[
+    ("dash",dir_frames(_SIDE,"right"),15,False),
+    ("dash_right",dir_frames(_SIDE,"right"),15,False),
+    ("dash_left",dir_frames(_SIDE,"left"),15,False),
+    ("dash_up",dir_frames(_SIDE,"up"),15,False),
+    ("dash_down",dir_frames(_SIDE,"down"),15,False),
+]
+
 def main():
     flat=[f for _,fr,_,_ in ANIMATIONS for f in fr]
     strip(flat).save(OUT/f"{NAME}_strip.png"); flat[0].save(OUT/f"{NAME}.png")
-    cols=max(len(fr) for _,fr,_,_ in ANIMATIONS); sheet=Canvas(cols*W,len(ANIMATIONS)*H)
-    for r,(_,fr,_,_) in enumerate(ANIMATIONS): sheet.paste(strip(fr),0,r*H)
+    cols=max(len(fr) for _,fr,_,_ in ANIMATIONS); sheet=Canvas(cols*S,len(ANIMATIONS)*S)
+    for r,(_,fr,_,_) in enumerate(ANIMATIONS): sheet.paste(strip(fr),0,r*S)
     preview([sheet],HERE/"preview.png",scale=4)
     for a,fr,fps,_ in ANIMATIONS: gif(fr,HERE/f"{a}.gif",fps=fps,scale=4)
     write_anim_meta(OUT/f"{NAME}.json",[{"name":n,"frames":f,"fps":fps,"loop":lp} for n,f,fps,lp in ANIMATIONS],anchor=ANCHOR)
     print(OUT/"preview.png")
+
 if __name__=="__main__": main()
