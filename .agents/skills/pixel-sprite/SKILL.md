@@ -51,7 +51,7 @@ workspace. Không copy helper vào từng game, không hard-code đường dẫn
 
 ## Quy trình
 
-1. **Chốt spec**: kích thước (16/24/32/48/64), palette 4–16 màu, số frame, fps,
+1. **Chốt spec**: kích thước (16/24/32/48/64), palette 4–16 màu, số frame, fps, **điểm neo (anchor)**,
    hướng nhìn, anchor (chân giữa), nền trong suốt. Mơ hồ thì chọn mặc định và
    nói rõ.
 2. **Vẽ silhouette trước** bằng ASCII map trong `gen.py`:
@@ -72,9 +72,15 @@ workspace. Không copy helper vào từng game, không hard-code đường dẫn
 3. **Chạy và nhìn**: `gamekit art run <g> <name>`, rồi dùng công cụ đọc ảnh của agent (Read, read, view…)
    mở `preview.png` (ảnh tĩnh, phóng to, có lưới). Nhiều agent không đọc được GIF động: xem các frame trong
    `preview.png`, còn `anim.gif` là cho người xem. Sửa, lặp 2–3 vòng.
-4. **Kiểm tra trong game**: thêm PNG vào `Sprite2D`/`AnimatedSprite2D` hoặc
+4. **Metadata + điểm neo (bắt buộc)**: `gen.py` gọi
+   `write_meta(OUT / f"{NAME}.json", frames, fps=FPS, anchor=ANCHOR, loop=LOOP)`. `ANCHOR` là pixel nguồn sẽ
+   đặt lên vị trí của vật thể: tâm thân, chân, đầu giọt mưa… `None` = tâm phần có hình, chỉ đúng khi hình đối
+   xứng. Hình mà khung bao thay đổi theo frame (cánh vỗ, vung kiếm) **phải** đặt anchor rõ ràng.
+   `gamekit art run` dừng nếu thiếu `.json` hoặc anchor nằm ngoài khung. Game đọc frames/fps/anchor từ file
+   này, **không gõ tay vào config** (bài học 2026-11-16 trong `LESSONS.md`).
+5. **Kiểm tra trong game**: thêm PNG vào `Sprite2D`/`AnimatedSprite2D` hoặc
    `_draw`, chạy `gamekit test <g>` + `gamekit shot <g>` rồi xem ảnh.
-5. **Bàn giao**: PNG trong `assets/sprites/custom/`; `.ase` trong `assets/source/`
+6. **Bàn giao**: PNG trong `assets/sprites/custom/`; `.ase` trong `assets/source/`
    nếu người dùng muốn chỉnh tay.
 
 ## Quy tắc pixel art
@@ -87,6 +93,11 @@ workspace. Không copy helper vào từng game, không hard-code đường dẫn
 - Nền trong suốt (`RGBA`), không viền quanh cả canvas.
 
 ## Godot 4.7
+
+- Đặt sprite bằng điểm neo: `SpriteAnchor.dest_rect(point, frame_size, anchor, scale, flip_h)` (có trong game
+  dom-dom-dem-mua, `src/core/sprite_anchor.gd`). **Không** căn theo tâm canvas, **không** tự tính lại rect khi
+  lật bằng chiều rộng âm (Godot giữ vùng vẽ, chỉ lật texture). Kiểm vị trí bằng một chấm debug tại anchor
+  (game này có `--debug-anchors`).
 
 - Pixel art cần lọc Nearest. Game do `gamekit new` tạo đã có sẵn
   `rendering/textures/canvas_textures/default_texture_filter=0`; game cũ thì thêm dòng này vào `project.godot`

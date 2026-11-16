@@ -10,6 +10,7 @@ rồi dùng đúng công cụ ghi trong đó.** Mọi thao tác máy móc đi qu
 game-studio/
 ├── AGENTS.md                     workflow này (bản gốc); CLAUDE.md trỏ về đây
 ├── README.md                     hướng dẫn cho người
+├── LESSONS.md                    lỗi đã gặp → chỗ đã chặn (đọc trước khi làm việc cùng loại)
 ├── .agents/skills/<tên>/SKILL.md skill dùng chung (bản gốc), ví dụ pixel-sprite
 ├── .claude/skills/<tên>          symlink → .agents/skills/<tên> (do `gamekit agents-link` tạo)
 ├── templates/
@@ -80,13 +81,32 @@ xuất kéo dài thì khuyên người dùng mở phiên mới ở đó.
 - **Không sửa** `templates/` và `tools/lpc-generator/` (cả hai là clone upstream). Muốn tùy biến thì sửa ở
   `games/<g>` hoặc `tools/gamekit`.
 - **Addon `games/<g>/addons/gamekit/` là bản sao.** Sửa ở `tools/gamekit/addon/` rồi chạy `gamekit install`.
-- **Git có ba tầng:** repo gốc `game-studio/` quản lý `AGENTS.md`, `CLAUDE.md`, `README.md`, `.agents/`,
+- **Git có ba tầng:** repo gốc `game-studio/` quản lý `AGENTS.md`, `LESSONS.md`, `CLAUDE.md`, `README.md`, `.agents/`,
   `.claude/skills/` (symlink), `.aider.conf.yml` và `tools/gamekit`. Mỗi game là một repo riêng: remote `framework`
   trỏ về upstream của framework, còn `origin` để dành cho repo riêng của game. `templates/` và
   `tools/lpc-generator/` là clone upstream. Commit theo mục "Quy tắc commit" bên dưới.
 - **README của game nói về game** (cách chơi, phím, cấu trúc, ai sở hữu thư mục nào). Tài liệu về công cụ
   nằm ở `tools/gamekit/README.md` và trong template, không chép vào game.
 - API Godot 4.7: tra `games/<g>/docs/engine-reference/godot/` trước khi dùng API mà mình không chắc.
+- **Shell là zsh.** Không dựa vào word splitting (`set -- $s`, `for x in $list` với chuỗi có dấu cách): gọi
+  từng lệnh riêng hoặc dùng mảng. Script trong `tools/gamekit` viết bằng bash (`#!/usr/bin/env bash`).
+- **Sprite đặt theo điểm neo, không theo tâm canvas.** Sprite nào cũng có `<tên>.json` (do `gen.py` gọi
+  `write_meta`) và game vẽ qua `SpriteAnchor`. Chi tiết trong skill `pixel-sprite`.
+
+## Sai một lần → sửa rule (bắt buộc, chỉ thị của người dùng từ 2026-11-16)
+
+Mỗi khi agent làm sai, hoặc người dùng chỉ ra lỗi, thì **sửa lỗi chưa phải là xong**. Trong cùng lượt đó:
+
+1. **Tìm nguyên nhân gốc**, không chỉ triệu chứng ("sprite lệch" → "code căn theo tâm canvas, số liệu gõ tay").
+2. **Chặn ở tầng mạnh nhất có thể**, theo thứ tự ưu tiên:
+   1. công cụ tự từ chối (`gamekit`, script báo lỗi và exit khác 0);
+   2. test tự động (cho thấy **test fail trước khi sửa**);
+   3. rule trong skill liên quan (`.agents/skills/<tên>/SKILL.md`) hoặc trong `AGENTS.md`;
+   4. chỉ ghi chú, khi ba cách trên không làm được.
+3. **Ghi một dòng vào `LESSONS.md`**: ngày, triệu chứng → nguyên nhân gốc, chặn bằng gì.
+4. **Commit** phần sửa rule cùng lúc với phần sửa lỗi (rule ở repo gốc, code ở repo game: mỗi repo một commit).
+
+Trước khi làm một việc, đọc các dòng liên quan trong `LESSONS.md` để không lặp lại lỗi cũ.
 
 ## Quy tắc commit (bắt buộc, chỉ thị cố định của người dùng từ 2026-11-16)
 
@@ -99,7 +119,7 @@ yêu cầu, nên không cần hỏi lại trước mỗi commit. Áp dụng cho 
 | File đã sửa | Repo | Ghi chú |
 |---|---|---|
 | `games/<g>/**` | repo của game đó (`git -C games/<g>`) | |
-| `AGENTS.md`, `CLAUDE.md`, `README.md`, `.gitignore`, `.aider.conf.yml`, `.agents/**`, `.claude/skills/**`, `tools/gamekit/**` | repo gốc `game-studio/` | |
+| `AGENTS.md`, `LESSONS.md`, `CLAUDE.md`, `README.md`, `.gitignore`, `.aider.conf.yml`, `.agents/**`, `.claude/skills/**`, `tools/gamekit/**` | repo gốc `game-studio/` | |
 | `templates/**`, `tools/lpc-generator/**` | **không bao giờ** | clone upstream, chỉ đọc. Lỡ sửa thì `git checkout -- .` để hoàn tác |
 
 Thay đổi trải trên nhiều repo thì **mỗi repo một commit**. Ví dụ sửa gamekit:
@@ -127,6 +147,11 @@ dùng bảo commit dở dang thì mới commit, và dùng type `wip`.
 
 - Chạy `git status --short` trước, đọc từng dòng. Stage **đúng các file của thay đổi này** bằng đường dẫn cụ thể
   (`git add <paths>`). Chỉ dùng `git add -A` khi `status` cho thấy mọi thứ đều thuộc thay đổi này.
+- **Ngay trước mỗi `git commit`**, xem `git diff --cached --stat`: commit lấy **mọi thứ đang staged**, kể cả
+  file `git mv`/`git rm` từ trước. Một lệnh commit lỗi thì dừng, kiểm tra lại index rồi mới chạy commit kế
+  tiếp; không xâu nhiều commit bằng `;` (dùng `&&`).
+- Sửa `.gitignore`: pattern chỉ dành cho thư mục gốc phải có `/` đầu (`/templates/`), rồi chạy `git status`
+  xem có file nào vừa biến mất khỏi danh sách.
 - Commit kèm file `.uid` mà Godot sinh ra cạnh script/shader (quy tắc của framework); **không** commit `.godot/`,
   `builds/`, file tạm, log, `*.import` của file bị xóa, hay credential/khóa ký.
 - **Có** commit: `export_presets.cfg`, `assets/source/lpc/*.zip`, `assets/source/sprites/<tên>/gen.py`,

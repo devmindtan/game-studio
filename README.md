@@ -7,6 +7,7 @@ Cursor, Aider…
 |---|---|
 | `games/<slug>/` | Mỗi game là một repo riêng: framework Claude Code Game Studios + Godot + addon gamekit |
 | `AGENTS.md` | **Workflow cho mọi agent** (bản gốc duy nhất). `CLAUDE.md` import nó |
+| `LESSONS.md` | Lỗi đã gặp và chỗ đã chặn chúng. Mỗi lần sai, agent sửa rule/công cụ và ghi thêm một dòng |
 | `.agents/skills/` | Skill dùng chung (ví dụ `pixel-sprite`). `.claude/skills/` chỉ chứa symlink trỏ về đây |
 | `templates/claude-code-game-studios/` | Bản gốc của framework để tạo game mới (không sửa trực tiếp) |
 | `tools/gamekit/` | Bộ công cụ: CLI `gamekit`, pipeline sprite LPC, pixel art, build/export. Xem [README](tools/gamekit/README.md) |
