@@ -303,7 +303,7 @@ cmd_shot() {
   local tmp out; tmp="$(mktemp -d)"; mkdir -p "$g/builds/shots"
   out="$g/builds/shots/$(date +%Y%m%d-%H%M%S).png"
   "${RUN[@]}" "$GODOT" --path "$g" --windowed --resolution 1280x720 --write-movie "$tmp/f.png" \
-    --quit-after "$frames" $scene "${extra[@]}" 2>&1 | grep -E "ERROR|Run over" || true
+    --quit-after "$frames" $scene "${extra[@]}" 2>&1 | grep -E "ERROR|Run over" >&2 || true  # stdout = path only
   local last; last="$(ls "$tmp"/f*.png 2>/dev/null | sort | tail -1)"
   [[ -n "$last" ]] || { rm -rf "$tmp"; die "no frame captured"; }
   cp "$last" "$out"; rm -rf "$tmp"
