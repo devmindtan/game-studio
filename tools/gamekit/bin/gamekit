@@ -136,6 +136,13 @@ cmd_tidy() {
     sed "s/__TITLE__/${title:-$(basename "$game")}/g" "$KIT/templates/README.game.md" > "$game/README.md"
     echo "   README.md -> game README (fill it in)"
   fi
+  # A "## This game" block at the top of CLAUDE.md: pointers + the commit rule.
+  if [[ -f "$game/CLAUDE.md" ]] && ! grep -q '^## This game' "$game/CLAUDE.md"; then
+    SECTION="$(sed "s/__TITLE__/${title:-$(basename "$game")}/g" "$KIT/templates/CLAUDE.game-section.md")" \
+      awk 'done==0 && /^## / {print ENVIRON["SECTION"]; print ""; done=1} {print}' \
+      "$game/CLAUDE.md" > "$game/CLAUDE.md.tmp" && mv "$game/CLAUDE.md.tmp" "$game/CLAUDE.md"
+    echo "   CLAUDE.md: added '## This game' (pointers + commit rule)"
+  fi
   # origin pointed at the framework; keep it as 'framework' so 'origin' is free for the game's own remote.
   if [[ "$(git -C "$game" remote get-url origin 2>/dev/null)" == "$UPSTREAM" ]]; then
     git -C "$game" remote rename origin framework
