@@ -103,10 +103,11 @@ cmd_install() {
   [[ -f "$game/export_presets.cfg" ]] || sed "s/__SLUG__/$slug/g" "$KIT/templates/export_presets.cfg" > "$game/export_presets.cfg"
   [[ -f "$game/Makefile" ]] || cp "$KIT/templates/Makefile" "$game/Makefile"
   # Godot must not import the framework's docs, tools and raw art drops.
-  local d; for d in .claude docs design studio-tests production assets/source; do
-    mkdir -p "$game/$d"; [[ -f "$game/$d/.gdignore" ]] || : > "$game/$d/.gdignore"
-  done
+  # Only folders that exist: never recreate one that `tidy` removed (studio-tests).
   mkdir -p "$game/assets/source/lpc" "$game/assets/data"
+  local d; for d in .claude docs design studio-tests production assets/source; do
+    [[ -d "$game/$d" && ! -f "$game/$d/.gdignore" ]] && : > "$game/$d/.gdignore"
+  done
   # The template ignores export_presets.cfg and *.zip. Godot 4 keeps signing
   # secrets in .godot/export_credentials.cfg, so the presets are safe to commit,
   # and the LPC source zips are the art's source of truth.
