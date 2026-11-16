@@ -1,0 +1,36 @@
+{
+  "frames": 10,
+  "frame_size": [
+    88,
+    88
+  ],
+  "fps": 11.0,
+  "loop": false,
+  "anchor": [
+    44.0,
+    44.0
+  ],
+  "anchor_source": "explicit",
+  "animations": [
+    {
+      "name": "burst",
+      "start": 0,
+      "frames": 10,
+      "fps": 11.0,
+      "loop": false,
+      "hitbox": {
+        "shape": "circle",
+        "center": [
+          44.0,
+          44.0
+        ],
+        "active": [
+          3,
+          8
+        ],
+        "radius": 48.0,
+        "inner": 0.0
+      }
+    }
+  ]
+}
