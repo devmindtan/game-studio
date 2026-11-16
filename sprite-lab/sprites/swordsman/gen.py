@@ -257,7 +257,7 @@ def main() -> None:
     write_anim_meta(OUT / f"{NAME}.json",
                     [{"name": n, "frames": f, "fps": fps, "loop": loop, **extra}
                      for n, f, fps, loop, extra in ANIMATIONS],
-                    anchor=ANCHOR, ground=True)
+                    anchor=ANCHOR, ground=True, body="idle")
     print(f"strip:   {OUT / f'{NAME}_strip.png'}")
 
 

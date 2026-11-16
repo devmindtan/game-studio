@@ -58,5 +58,13 @@
       ]
     }
   ],
-  "ground": true
+  "ground": true,
+  "body": {
+    "anim": "move",
+    "center": [
+      26.0,
+      31.5
+    ],
+    "radius": 9.5
+  }
 }

@@ -102,5 +102,13 @@
       ]
     }
   ],
-  "ground": true
+  "ground": true,
+  "body": {
+    "anim": "idle",
+    "center": [
+      25.0,
+      31.5
+    ],
+    "radius": 10.5
+  }
 }

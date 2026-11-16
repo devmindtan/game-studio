@@ -119,7 +119,7 @@ ANIMATIONS = [
 
 
 def main() -> None:
-    export(HERE, NAME, ANIMATIONS, anchor=ANCHOR, ground=False)
+    export(HERE, NAME, ANIMATIONS, anchor=ANCHOR, ground=False, body="move")
     print(f"strip: {HERE / f'{NAME}_strip.png'}")
 
 
