@@ -127,7 +127,7 @@ Không báo "xong" khi chưa xem `preview.png`, ảnh `sheet` và ảnh `move`.
   (gió, nghiêng) thì vẽ thêm một bản đồ, đừng uốn bằng công thức.
 - **Đường chéo đặc (lưỡi kiếm, vệt chém…) điền theo từng cột**: với mỗi cột `x`, tính tâm `y` rồi tô một
   đoạn `y` liên tiếp; vòng lặp kiểu `(x+t, y-t)` chỉ cho pixel chạm góc → nhìn như caro/đứt gãy (bài học
-  2026-11-16: sword/greatsword). Guard phải **vuông góc** với trục lưỡi, cán/pommel **cùng trục** với lưỡi.
+  2026-11-16: sword/greatsword). Guard phải **vuông góc** với trục lưỡi, cán/pommel **cùng trục** với lưỡi. Đầu lưỡi nhọn dần qua 2–3 cột (rộng 3→2→1 px), không chừa một điểm 1px đơn lẻ trông như bị teo.
 
 - Không anti-alias, không gradient mịn; dùng màu phẳng và banding.
 - 1 pixel = 1 đơn vị thiết kế; scale nguyên, nearest.
