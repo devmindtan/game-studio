@@ -12,6 +12,7 @@ import os
 import sys
 
 HERE = os.path.dirname(os.path.abspath(__file__))
+TAGS_PATH = os.path.join(HERE, "sprite-tags.json")
 
 
 def url(path):
@@ -22,6 +23,10 @@ def url(path):
 
 def build():
     base = os.path.join(HERE, "sprites")
+    # Nhãn phân loại do con người gán, không đoán bằng regex trong viewer.
+    # Sprite mới chưa có nhãn vẫn vào manifest (cat/tags rỗng) và hiện ở "Tất cả".
+    with open(TAGS_PATH, encoding="utf-8") as f:
+        tags = json.load(f)
     sprites = []
     for name in sorted(os.listdir(base)):
         d = os.path.join(base, name)
@@ -30,8 +35,11 @@ def build():
             continue
         with open(meta_path, encoding="utf-8") as f:
             meta = json.load(f)
+        label = tags.get(name, {})
         entry = {
             "name": name,
+            "cat": label.get("cat", ""),
+            "tags": label.get("tags", []),
             "meta": meta,
             "strip": url(f"sprites/{name}/{name}_strip.png"),
             "preview": url(f"sprites/{name}/preview.png"),

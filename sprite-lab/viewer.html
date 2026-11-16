@@ -20,6 +20,12 @@ aside{border-right:1px solid var(--border);display:flex;flex-direction:column;mi
 .filters{display:flex;gap:4px;flex-wrap:wrap}
 .chip{background:var(--panel);border:1px solid var(--border);border-radius:999px;padding:3px 8px;font-size:11px;cursor:pointer;color:var(--muted)}
 .chip:hover{color:var(--text);border-color:#3a4660} .chip.active{background:#173a46;border-color:#2b7d91;color:#dffaff}
+.adv{display:grid;grid-template-columns:1fr 1fr;gap:5px 6px;padding:7px;border-top:1px solid var(--border);border-radius:8px;background:var(--panel)}
+.adv .ctrlLbl{flex-direction:column;align-items:flex-start;gap:2px;font-size:10px}
+.adv select.ctrl{width:100%;padding:4px 6px;font-size:11px}
+.adv .wide{grid-column:1/-1;flex-direction:row;justify-content:space-between;align-items:center}
+.adv .btn{padding:3px 8px;font-size:11px}
+.filterNote{font-size:10px;color:var(--muted);grid-column:1/-1}
 #list{overflow-y:auto;overflow-x:hidden;padding:6px;flex:1 1 auto;min-height:0;scrollbar-width:thin;scrollbar-color:#3a4a63 transparent}
 #list::-webkit-scrollbar, main::-webkit-scrollbar{width:8px;height:8px}
 #list::-webkit-scrollbar-track, main::-webkit-scrollbar-track{background:transparent}
@@ -39,6 +45,7 @@ main{scrollbar-width:thin;scrollbar-color:#3a4a63 transparent;padding:10px;overf
 .item .name{font-weight:600;font-size:13px;flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .item .tag{font-size:10px;color:var(--muted);background:var(--panel3);border-radius:4px;padding:0 5px}
 .item .meta{color:var(--muted);font-size:11px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:1px}
+.item .tags{display:flex;gap:3px;flex-wrap:wrap;margin-top:3px} .item .tags .tag{font-size:9px;padding:0 4px;background:var(--panel3)}
 .card{background:var(--panel);border:1px solid var(--border);border-radius:10px}
 .empty{padding:24px;color:var(--muted)}
 .topbar{padding:8px 10px;border-bottom:1px solid var(--border);display:flex;gap:8px;align-items:center;flex-wrap:wrap}
@@ -92,8 +99,23 @@ label.ctrlLbl{font-size:11px;color:var(--muted);display:flex;align-items:center;
 <div class="layout">
   <aside>
     <div class="sideTop">
-      <input id="q" class="search" placeholder="Tìm sprite…  ( / )" />
+      <input id="q" class="search" placeholder="Tìm sprite / animation…  ( / )" />
       <div class="filters" id="filters"></div>
+      <div class="adv" id="advFilters">
+        <label class="ctrlLbl">Chất liệu<select id="tierSel" class="ctrl">
+          <option value="all">Tất cả</option><option value="wood">Gỗ</option><option value="iron">Sắt</option><option value="gold">Vàng</option><option value="other">Khác</option>
+        </select></label>
+        <label class="ctrlLbl">Kích thước<select id="sizeSel" class="ctrl">
+          <option value="all">Tất cả</option><option value="16">≤ 16px</option><option value="24">24px</option><option value="32">32px</option><option value="48">48px</option><option value="64">≥ 64px</option>
+        </select></label>
+        <label class="ctrlLbl">Hitbox<select id="shapeSel" class="ctrl">
+          <option value="all">Tất cả</option><option value="rect">Rect</option><option value="circle">Circle</option><option value="arc">Arc</option><option value="mixed">Nhiều hình</option><option value="none">Không có</option>
+        </select></label>
+        <label class="ctrlLbl">Animation<select id="kindSel" class="ctrl">
+          <option value="all">Tất cả</option><option value="fly">Bay (projectile)</option><option value="melee">Cận chiến</option><option value="area">Phép/AOE</option><option value="idle">Tĩnh (idle)</option><option value="other">Khác</option>
+        </select></label>
+        <label class="ctrlLbl wide"><span>Chỉ 4 hướng</span><span><input type="checkbox" id="dirOnly"> <button id="clearFilters" class="btn">Xoá lọc</button></span></label>
+      </div>
     </div>
     <div id="list"></div>
   </aside>
@@ -117,12 +139,13 @@ label.ctrlLbl{font-size:11px;color:var(--muted);display:flex;align-items:center;
             <label class="ctrlLbl">Tỉ lệ <select id="scaleSel" class="ctrl"><option value="fit" selected>Vừa khung</option><option>2</option><option>3</option><option>4</option><option>6</option><option>8</option><option>10</option></select></label>
             <label class="ctrlLbl">Tốc độ <select id="speedSel" class="ctrl"><option value="0.25">0.25×</option><option value="0.5">0.5×</option><option value="1" selected>1×</option><option value="1.5">1.5×</option><option value="2">2×</option></select></label>
             <label class="ctrlLbl">Nền <select id="bgSel" class="ctrl"><option value="checker">Caro</option><option value="dark">Tối</option><option value="light">Sáng</option><option value="green">Cỏ</option></select></label>
+            <label class="ctrlLbl">Xem <select id="viewSel" class="ctrl"><option value="none">Màu</option><option value="gray">Greyscale</option><option value="contrast">Tương phản</option><option value="invert">Đảo màu</option></select></label>
             <label class="ctrlLbl"><input type="checkbox" id="showAnchor" checked> Neo + đất</label>
             <label class="ctrlLbl"><input type="checkbox" id="showHitbox"> Hitbox</label>
           </div>
           <div id="frameInfo"></div>
           <div class="film" id="film"></div>
-          <div class="keys"><kbd>Space</kbd> phát/dừng · <kbd>←</kbd><kbd>→</kbd> frame · <kbd>↑</kbd><kbd>↓</kbd> animation · <kbd>1</kbd>–<kbd>9</kbd> chọn animation · <kbd>[</kbd><kbd>]</kbd> sprite trước/sau · <kbd>+</kbd><kbd>-</kbd> tỉ lệ · <kbd>B</kbd> nền · <kbd>R</kbd> từ đầu · <kbd>/</kbd> tìm</div>
+          <div class="keys"><kbd>Space</kbd> phát/dừng · <kbd>←</kbd><kbd>→</kbd> frame · <kbd>↑</kbd><kbd>↓</kbd> animation · <kbd>1</kbd>–<kbd>9</kbd> chọn animation · <kbd>[</kbd><kbd>]</kbd> sprite trước/sau · <kbd>+</kbd><kbd>-</kbd> tỉ lệ · <kbd>B</kbd> nền · <kbd>V</kbd> chế độ xem · <kbd>C</kbd> xoá lọc · <kbd>R</kbd> từ đầu · <kbd>/</kbd> tìm</div>
         </div>
         <div class="sidePane">
           <div class="panel" id="gifPanel">
@@ -141,24 +164,26 @@ label.ctrlLbl{font-size:11px;color:var(--muted);display:flex;align-items:center;
 <script>
 let data=null,current=null,img=null;
 let anims=[],animIdx=0,frameInAnim=0,playing=true,acc=0,lastT=0,scale=4,speed=1,showAnchor=true,showHitbox=false;
-let activeFilter='all',lastManifest='';
+let activeFilter='all',viewMode='none',lastManifest='';
 const collapsed={};
 const BGS=['checker','dark','light','green'];
 const $=id=>document.getElementById(id);
 const cv=$('cv'),ctx=cv.getContext('2d');
 
+// Nhãn category/tags lấy từ sprite-tags.json (qua manifest), không đoán bằng regex.
 const CATS=[
   {id:'all',label:'Tất cả'},
-  {id:'projectile',label:'Projectile'},
-  {id:'aoe',label:'AOE'},
-  {id:'buff',label:'Buff/Shield'},
-  {id:'status',label:'Trạng thái'},
+  {id:'character',label:'Nhân vật'},
   {id:'weapon',label:'Vũ khí'},
   {id:'armor',label:'Giáp'},
-  {id:'character',label:'Nhân vật'},
-  {id:'base',label:'Vật phẩm/Môi trường'}
+  {id:'strike',label:'Đòn đánh'},
+  {id:'projectile',label:'Projectile'},
+  {id:'aoe',label:'AOE'},
+  {id:'status',label:'Trạng thái'},
+  {id:'item',label:'Vật phẩm'},
+  {id:'base',label:'Môi trường'}
 ];
-const ORDER=['character','weapon','armor','projectile','aoe','buff','status','base'];
+const ORDER=['character','weapon','armor','strike','projectile','aoe','status','item','base'];
 
 function categoryOf(s){
   const n=s.name, aNames=(s.meta.animations||[]).map(a=>a.name);
@@ -175,6 +200,43 @@ function categoryOf(s){
   return 'base';
 }
 function catLabel(id){const c=CATS.find(x=>x.id===id);return c?c.label:id;}
+
+// --- bộ lọc mở rộng: mọi thuộc tính suy ra từ tên + metadata, không sửa manifest ---
+function tierOf(s){
+  const m=s.name.match(/-(wood|iron|gold)$/); return m?m[1]:'other';
+}
+function sizeOf(s){
+  const w=(s.meta.frame_size||[])[0]||0;
+  return w<=16?'16':w<=24?'24':w<=32?'32':w<=48?'48':'64';
+}
+function shapeOf(s){
+  const set=new Set((s.meta.animations||[]).map(a=>a.hitbox&&a.hitbox.shape).filter(Boolean));
+  if(!set.size) return 'none';
+  if(set.size>1) return 'mixed';
+  return [...set][0];
+}
+function kindOf(s){
+  const names=((s.meta.animations||[]).map(a=>a.name).join(' ')+' '+s.name).toLowerCase();
+  if(/\bfly(_|$)/.test(names)) return 'fly';
+  if(/slash|strike|chop|attack|melee/.test(names)) return 'melee';
+  if(/spell|cast|nova|burst|storm|sigil|rift|pool|aoe/.test(names)) return 'area';
+  if(/idle|loop/.test(names)) return 'idle';
+  return 'other';
+}
+function dirOf(s){ return (s.meta.animations||[]).some(a=>/_(right|left|up|down)$/.test(a.name)); }
+function applyDerived(s){ s._tier=tierOf(s); s._size=sizeOf(s); s._shape=shapeOf(s); s._kind=kindOf(s); s._dir=dirOf(s); }
+function activeFilterCount(){
+  let n=0;
+  ['tierSel','sizeSel','shapeSel','kindSel'].forEach(id=>{if($(id).value!=='all') n++;});
+  if($('dirOnly').checked) n++;
+  if($('q').value.trim()) n++;
+  if(activeFilter!=='all') n++;
+  return n;
+}
+function clearFilters(){
+  activeFilter='all'; ['tierSel','sizeSel','shapeSel','kindSel'].forEach(id=>{$(id).value='all';});
+  $('dirOnly').checked=false; $('q').value=''; buildFilters(); updateCount(); renderList();
+}
 
 // --- manifest + live reload --------------------------------------------------------
 async function fetchManifest(){
@@ -197,9 +259,19 @@ async function init(){
   setInterval(poll,2000);
 }
 function setData(json){
-  data=json; data.sprites.forEach(s=>s._cat=categoryOf(s));
-  $('count').innerHTML='<span class="ok">'+data.sprites.length+' sprites</span>';
+  data=json; data.sprites.forEach(s=>{
+    s._cat=s.cat||categoryOf(s);        // nhãn từ registry; fallback cho sprite mới
+    s._tags=Array.isArray(s.tags)?s.tags:[];
+    applyDerived(s);
+  });
+  buildFilters();
+  updateCount();
   renderList();
+}
+function updateCount(){
+  if(!data) return;
+  const n=activeFilterCount(), total=data.sprites.length;
+  $('count').innerHTML='<span class="ok">'+(n?filtered().length+' / ':'')+total+' sprites</span>'+(n?' <span class="pill" style="margin-left:6px">'+n+' bộ lọc</span>':'');
 }
 // `gamekit art run` rewrites the manifest; a re-rendered sprite has new ?v= URLs.
 async function poll(){
@@ -222,13 +294,24 @@ function buildFilters(){
   const wrap=$('filters'); wrap.innerHTML='';
   CATS.forEach(c=>{
     const b=document.createElement('button'); b.className='chip'+(c.id===activeFilter?' active':''); b.textContent=c.label;
-    b.onclick=()=>{activeFilter=c.id; buildFilters(); renderList();};
+    b.onclick=()=>{activeFilter=c.id; buildFilters(); updateCount(); renderList();};
     wrap.appendChild(b);
   });
 }
 function filtered(){
   const q=$('q').value.toLowerCase().trim();
-  return data.sprites.filter(s=>(activeFilter==='all'||s._cat===activeFilter)&&(!q||s.name.includes(q)));
+  const tier=$('tierSel').value, size=$('sizeSel').value, shape=$('shapeSel').value, kind=$('kindSel').value;
+  const dir=$('dirOnly').checked;
+  return data.sprites.filter(s=>{
+    if(activeFilter!=='all'&&s._cat!==activeFilter) return false;
+    if(q && !(s.name.toLowerCase().includes(q)||s._tags.some(t=>t.includes(q))||((s.meta.animations||[]).some(a=>a.name.toLowerCase().includes(q))))) return false;
+    if(tier!=='all'&&s._tier!==tier) return false;
+    if(size!=='all'&&s._size!==size) return false;
+    if(shape!=='all'&&s._shape!==shape) return false;
+    if(kind!=='all'&&s._kind!==kind) return false;
+    if(dir&&!s._dir) return false;
+    return true;
+  });
 }
 function visibleOrder(){ // sprites in the order the list shows them (for [ and ])
   const items=filtered(), out=[];
@@ -253,7 +336,8 @@ function renderList(){
       const a=(s.meta.animations||[]).map(x=>x.name).join(', ')||'1 animation';
       const fs=(s.meta.frame_size||[]).join('×');
       const thumb=s.thumb||('sprites/'+s.name+'/'+s.name+'.png');
-      d.innerHTML='<img class="thumb" src="'+thumb+'" alt="" loading="lazy"><div class="info"><div class="row1"><div class="name">'+s.name+'</div><div class="tag">'+fs+'</div></div><div class="meta">'+a+'</div></div>';
+      const tg=(s._tags||[]).slice(0,4).map(t=>'<span class="tag">'+t+'</span>').join(' ');
+      d.innerHTML='<img class="thumb" src="'+thumb+'" alt="" loading="lazy"><div class="info"><div class="row1"><div class="name">'+s.name+'</div><div class="tag">'+fs+'</div></div><div class="meta">'+a+'</div><div class="tags">'+tg+'</div></div>';
       const im=d.querySelector('img.thumb'); im.onerror=()=>{im.style.visibility='hidden';};
       d.onclick=()=>selectSprite(s); body.appendChild(d);
     });
@@ -356,7 +440,9 @@ function draw(){
     const gy=Math.round((current.meta.anchor||[0,fs[1]])[1]*scale);
     ctx.fillStyle='rgba(110,224,110,.55)'; ctx.fillRect(0,gy,cv.width,Math.max(1,Math.floor(scale/3)));
   }
+  ctx.filter = viewMode==='gray' ? 'grayscale(1)' : viewMode==='contrast' ? 'contrast(1.7) saturate(1.4)' : viewMode==='invert' ? 'invert(1)' : 'none';
   ctx.drawImage(img,globalFrame*fs[0],0,fs[0],fs[1],0,0,fs[0]*scale,fs[1]*scale);
+  ctx.filter='none';
   if(showAnchor){
     const anc=current.meta.anchor||[fs[0]/2,fs[1]/2];
     const ax=Math.round(anc[0]*scale), ay=Math.round(anc[1]*scale);
@@ -424,10 +510,16 @@ function stepSprite(d){
 }
 function setBg(v){ const st=$('stage'); BGS.forEach(b=>st.classList.remove('bg-'+b)); st.classList.add('bg-'+v); $('bgSel').value=v; try{localStorage.setItem('viewerBg',v);}catch(e){} }
 
-$('q').addEventListener('input',renderList);
+$('q').addEventListener('input',()=>{updateCount(); renderList();});
 $('scaleSel').addEventListener('change',()=>{resizeCanvas(); $('scaleSel').blur();});
 $('speedSel').addEventListener('change',e=>{speed=parseFloat(e.target.value)||1; e.target.blur();});
 $('bgSel').addEventListener('change',e=>{setBg(e.target.value); e.target.blur();});
+['tierSel','sizeSel','shapeSel','kindSel'].forEach(id=>$(id).addEventListener('change',e=>{updateCount(); renderList(); e.target.blur();}));
+$('dirOnly').addEventListener('change',()=>{updateCount(); renderList();});
+$('clearFilters').onclick=clearFilters;
+const VIEWS=['none','gray','contrast','invert'];
+function setView(v){ viewMode=v; $('viewSel').value=v; }
+$('viewSel').addEventListener('change',e=>{setView(e.target.value); e.target.blur();});
 $('showAnchor').addEventListener('change',e=>{showAnchor=e.target.checked;});
 $('showHitbox').addEventListener('change',e=>{showHitbox=e.target.checked;});
 $('btnPlay').onclick=()=>{ const a=currentAnim(); if(!playing && a && a.loop===false && frameInAnim===a.frames-1) frameInAnim=0; playing=!playing; updatePlayBtn(); };
@@ -451,6 +543,8 @@ document.addEventListener('keydown',e=>{
   else if(e.key==='+'||e.key==='='){ stepScale(1); }
   else if(e.key==='-'){ stepScale(-1); }
   else if(e.key==='b'||e.key==='B'){ setBg(BGS[(BGS.indexOf($('bgSel').value)+1)%BGS.length]); }
+  else if(e.key==='v'||e.key==='V'){ setView(VIEWS[(VIEWS.indexOf(viewMode)+1)%VIEWS.length]); }
+  else if(e.key==='c'||e.key==='C'){ clearFilters(); }
   else if(e.key==='r'||e.key==='R'){ $('btnRestart').onclick(); }
 });
 try{ const b=localStorage.getItem('viewerBg'); if(b&&BGS.includes(b)) setBg(b); }catch(e){}
