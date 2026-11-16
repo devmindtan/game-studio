@@ -1461,6 +1461,45 @@
       }
     },
     {
+      "name": "poison-dart",
+      "meta": {
+        "frames": 9,
+        "frame_size": [
+          18,
+          8
+        ],
+        "fps": 18.0,
+        "loop": true,
+        "anchor": [
+          15.0,
+          4.0
+        ],
+        "anchor_source": "explicit",
+        "animations": [
+          {
+            "name": "fly",
+            "start": 0,
+            "frames": 4,
+            "fps": 18.0,
+            "loop": true
+          },
+          {
+            "name": "impact",
+            "start": 4,
+            "frames": 5,
+            "fps": 13.0,
+            "loop": false
+          }
+        ]
+      },
+      "strip": "sprites/poison-dart/poison-dart_strip.png",
+      "preview": "sprites/poison-dart/preview.png",
+      "gifs": {
+        "fly": "sprites/poison-dart/fly.gif",
+        "impact": "sprites/poison-dart/impact.gif"
+      }
+    },
+    {
       "name": "raindrop",
       "meta": {
         "frames": 1,
@@ -1667,6 +1706,138 @@
       }
     },
     {
+      "name": "shadow-dash",
+      "meta": {
+        "frames": 7,
+        "frame_size": [
+          48,
+          32
+        ],
+        "fps": 15.0,
+        "loop": false,
+        "anchor": [
+          12.0,
+          28.0
+        ],
+        "anchor_source": "explicit",
+        "animations": [
+          {
+            "name": "dash",
+            "start": 0,
+            "frames": 7,
+            "fps": 15.0,
+            "loop": false
+          }
+        ]
+      },
+      "strip": "sprites/shadow-dash/shadow-dash_strip.png",
+      "preview": "sprites/shadow-dash/preview.png",
+      "gifs": {
+        "dash": "sprites/shadow-dash/dash.gif"
+      }
+    },
+    {
+      "name": "shadow-slash",
+      "meta": {
+        "frames": 6,
+        "frame_size": [
+          48,
+          48
+        ],
+        "fps": 16.0,
+        "loop": false,
+        "anchor": [
+          8.0,
+          24.0
+        ],
+        "anchor_source": "explicit",
+        "animations": [
+          {
+            "name": "slash",
+            "start": 0,
+            "frames": 6,
+            "fps": 16.0,
+            "loop": false
+          }
+        ]
+      },
+      "strip": "sprites/shadow-slash/shadow-slash_strip.png",
+      "preview": "sprites/shadow-slash/preview.png",
+      "gifs": {
+        "slash": "sprites/shadow-slash/slash.gif"
+      }
+    },
+    {
+      "name": "shuriken",
+      "meta": {
+        "frames": 9,
+        "frame_size": [
+          16,
+          16
+        ],
+        "fps": 18.0,
+        "loop": true,
+        "anchor": [
+          8.0,
+          8.0
+        ],
+        "anchor_source": "explicit",
+        "animations": [
+          {
+            "name": "fly",
+            "start": 0,
+            "frames": 4,
+            "fps": 18.0,
+            "loop": true
+          },
+          {
+            "name": "impact",
+            "start": 4,
+            "frames": 5,
+            "fps": 14.0,
+            "loop": false
+          }
+        ]
+      },
+      "strip": "sprites/shuriken/shuriken_strip.png",
+      "preview": "sprites/shuriken/preview.png",
+      "gifs": {
+        "fly": "sprites/shuriken/fly.gif",
+        "impact": "sprites/shuriken/impact.gif"
+      }
+    },
+    {
+      "name": "smoke-bomb",
+      "meta": {
+        "frames": 8,
+        "frame_size": [
+          48,
+          40
+        ],
+        "fps": 10.0,
+        "loop": false,
+        "anchor": [
+          24.0,
+          28.0
+        ],
+        "anchor_source": "explicit",
+        "animations": [
+          {
+            "name": "burst",
+            "start": 0,
+            "frames": 8,
+            "fps": 10.0,
+            "loop": false
+          }
+        ]
+      },
+      "strip": "sprites/smoke-bomb/smoke-bomb_strip.png",
+      "preview": "sprites/smoke-bomb/preview.png",
+      "gifs": {
+        "burst": "sprites/smoke-bomb/burst.gif"
+      }
+    },
+    {
       "name": "splash",
       "meta": {
         "frames": 3,
@@ -1837,6 +2008,45 @@
         "jump": "sprites/swordsman/jump.gif",
         "run": "sprites/swordsman/run.gif",
         "spell": "sprites/swordsman/spell.gif"
+      }
+    },
+    {
+      "name": "throwing-knife",
+      "meta": {
+        "frames": 9,
+        "frame_size": [
+          20,
+          16
+        ],
+        "fps": 16.0,
+        "loop": true,
+        "anchor": [
+          10.0,
+          8.0
+        ],
+        "anchor_source": "explicit",
+        "animations": [
+          {
+            "name": "fly",
+            "start": 0,
+            "frames": 4,
+            "fps": 16.0,
+            "loop": true
+          },
+          {
+            "name": "impact",
+            "start": 4,
+            "frames": 5,
+            "fps": 14.0,
+            "loop": false
+          }
+        ]
+      },
+      "strip": "sprites/throwing-knife/throwing-knife_strip.png",
+      "preview": "sprites/throwing-knife/preview.png",
+      "gifs": {
+        "fly": "sprites/throwing-knife/fly.gif",
+        "impact": "sprites/throwing-knife/impact.gif"
       }
     },
     {
