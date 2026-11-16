@@ -12,50 +12,33 @@ sys.path.insert(0,str(HERE.parents[1]/"lib"))
 from spritekit import Canvas
 from sheet import export
 
-NAME="sword-gold"; W,H=24,24; ANCHOR=(5.0,22.0)
-
+NAME="sword-gold"; W,H=24,24; ANCHOR=(12.0,22.0)
 L="#f2d98a"; M="#e6c35c"; D="#a67c1a"; E="#fff6c8"
-HILT="#8a5a2e"; HILT_D="#563418"; GUARD="#8f6a1f"; POMMEL="#8f6a1f"; ORB="#ff7ac0"
-
-def col(c, x, yc, lo, hi, colors):
-    for j, dy in enumerate(range(lo, hi + 1)):
-        y = yc + dy
-        if 0 <= x < W and 0 <= y < H:
-            c.pixel(x, y, colors[j])
-
-def blade(c, bx, by, tx, lo, hi, colors, tips):
-    for x in range(bx, tx + 1):
-        yc = by - (x - bx)
-        dist = tx - x
-        tlo, thi, tcolors = lo, hi, colors
-        for d, lo2, hi2, cols2 in tips:
-            if d == dist:
-                tlo, thi, tcolors = lo2, hi2, cols2
-                break
-        col(c, x, yc, tlo, thi, tcolors)
+HILT="#8a5a2e"; HILT_D="#563418"; GUARD="#8f6a1f"; POMMEL="#8f6a1f"
 
 def draw(c, glint=False):
-    # luoi cheo 45 do, day dac, dau khong teo (2px o cot cuoi)
-    blade(c, 9, 17, 20, -1, 1, [L, M, D], [
-        (0, 0, 1, [L, M]),          # dinh: 2px
-        (1, -1, 1, [L, M, D]),      # cot ke dinh: day 3px
-    ])
-    # guard vuong goc truc luoi
-    for x in range(6, 13):
-        yc = 17 + (x - 9)
-        col(c, x, yc, 0, 1, [GUARD, HILT_D])
-    c.pixel(6, 14, GUARD); c.pixel(12, 20, GUARD)
-    # can cung truc luoi
-    for i in range(3):
-        x, yc = 8 - i, 18 + i
-        col(c, x, yc, 0, 1, [HILT, HILT_D])
-    c.rect(5, 22, 6, 22, POMMEL); c.pixel(5, 22, GUARD)
+    # Luoi thang dung, doi xung quanh truc X=12
+    for y in range(6, 16):
+        c.pixel(11, y, D); c.pixel(12, y, M); c.pixel(13, y, D)
+    # dinh nhon doi xung
+    c.pixel(12, 4, L); c.pixel(12, 5, L)
+    c.pixel(11, 6, D); c.pixel(12, 6, L); c.pixel(13, 6, D)
+    # guard ngang, tam dung 12
+    c.line(7, 16, 17, 16, GUARD)
+    c.line(7, 17, 17, 17, HILT_D)
+    c.pixel(7, 16, E); c.pixel(17, 16, E)
+    # can 3px, cung truc
+    for y in range(18, 22):
+        c.pixel(11, y, HILT_D); c.pixel(12, y, HILT); c.pixel(13, y, HILT_D)
+    # pommel 3px, cung truc
+    c.line(11, 22, 13, 22, POMMEL)
+    c.pixel(12, 23, POMMEL)
     if glint:
-        c.pixel(12, 14, E); c.pixel(15, 11, E)
+        c.pixel(12, 9, E); c.pixel(12, 13, E)
 
 def idle(i):
     c = Canvas(W, H)
-    c.ellipse(3, 20, 9, 23, "#00000033")
+    c.ellipse(8,21,15,23, "#00000033")
     draw(c, glint=(i in (2, 3)))
     return c
 

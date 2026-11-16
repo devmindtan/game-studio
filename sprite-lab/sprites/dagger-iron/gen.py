@@ -12,49 +12,31 @@ sys.path.insert(0,str(HERE.parents[1]/"lib"))
 from spritekit import Canvas
 from sheet import export
 
-NAME="dagger-iron"; W,H=20,20; ANCHOR=(3.0,19.0)
-
+NAME="dagger-iron"; W,H=20,20; ANCHOR=(10.0,18.0)
 L="#d8e4f0"; M="#b8c7d9"; D="#6b7f96"; E="#f2fbff"
-HILT="#8a5a2e"; HILT_D="#563418"; GUARD="#d9b44a"; POMMEL="#d9b44a"; ORB="#45a8ff"
-
-def col(c, x, yc, lo, hi, colors):
-    for j, dy in enumerate(range(lo, hi + 1)):
-        y = yc + dy
-        if 0 <= x < W and 0 <= y < H:
-            c.pixel(x, y, colors[j])
-
-def blade(c, bx, by, tx, lo, hi, colors, tips):
-    for x in range(bx, tx + 1):
-        yc = by - (x - bx)
-        dist = tx - x
-        tlo, thi, tcolors = lo, hi, colors
-        for d, lo2, hi2, cols2 in tips:
-            if d == dist:
-                tlo, thi, tcolors = lo2, hi2, cols2
-                break
-        col(c, x, yc, tlo, thi, tcolors)
+HILT="#8a5a2e"; HILT_D="#563418"; GUARD="#d9b44a"; POMMEL="#d9b44a"
 
 def draw(c, glint=False):
-    # dao gam ngan, luoi la, dau 2px
-    blade(c, 6, 15, 14, -1, 1, [L, M, D], [
-        (0, 0, 0, [L]),            # dinh nhon 1px
-        (1, -1, 0, [L, M]),        # 2px
-        (2, -1, 1, [L, M, D]),     # 3px -> than luoi
-    ])
-    for x in range(4, 9):
-        yc = 15 + (x - 6)
-        col(c, x, yc, 0, 1, [GUARD, HILT_D])
-    c.pixel(4, 13, GUARD); c.pixel(8, 17, GUARD)
-    for i in range(2):
-        x, yc = 5 - i, 16 + i
-        col(c, x, yc, 0, 1, [HILT, HILT_D])
-    c.rect(3, 19, 4, 19, POMMEL); c.pixel(3, 19, GUARD)
+    # Dao gam thang dung, doi xung quanh truc X=10
+    for y in range(4, 12):
+        c.pixel(9, y, D); c.pixel(10, y, M); c.pixel(11, y, D)
+    c.pixel(10, 2, E); c.pixel(10, 3, L)
+    c.pixel(9, 4, D); c.pixel(10, 4, L); c.pixel(11, 4, D)
+    # guard ngang tam 10
+    c.line(6, 12, 14, 12, GUARD)
+    c.line(6, 13, 14, 13, HILT_D)
+    c.pixel(6, 12, E); c.pixel(14, 12, E)
+    # can
+    for y in range(14, 18):
+        c.pixel(9, y, HILT_D); c.pixel(10, y, HILT); c.pixel(11, y, HILT_D)
+    c.line(9, 18, 11, 18, POMMEL)
+    c.pixel(10, 19, POMMEL)
     if glint:
-        c.pixel(10, 9, E); c.pixel(12, 7, E)
+        c.pixel(10, 7, E)
 
 def idle(i):
     c = Canvas(W, H)
-    c.ellipse(2, 18, 7, 19, "#00000033")
+    c.ellipse(7,17,14,19, "#00000033")
     draw(c, glint=(i in (2, 3)))
     return c
 

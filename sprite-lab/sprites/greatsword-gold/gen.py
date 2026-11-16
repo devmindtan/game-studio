@@ -12,49 +12,34 @@ sys.path.insert(0,str(HERE.parents[1]/"lib"))
 from spritekit import Canvas
 from sheet import export
 
-NAME="greatsword-gold"; W,H=32,32; ANCHOR=(6.0,29.0)
-
+NAME="greatsword-gold"; W,H=32,32; ANCHOR=(16.0,30.0)
 L="#f2d98a"; M="#e6c35c"; D="#a67c1a"; E="#fff6c8"
-HILT="#8a5a2e"; HILT_D="#563418"; GUARD="#8f6a1f"; POMMEL="#8f6a1f"; ORB="#ff7ac0"
-
-def col(c, x, yc, lo, hi, colors):
-    for j, dy in enumerate(range(lo, hi + 1)):
-        y = yc + dy
-        if 0 <= x < W and 0 <= y < H:
-            c.pixel(x, y, colors[j])
-
-def blade(c, bx, by, tx, lo, hi, colors, tips):
-    for x in range(bx, tx + 1):
-        yc = by - (x - bx)
-        dist = tx - x
-        tlo, thi, tcolors = lo, hi, colors
-        for d, lo2, hi2, cols2 in tips:
-            if d == dist:
-                tlo, thi, tcolors = lo2, hi2, cols2
-                break
-        col(c, x, yc, tlo, thi, tcolors)
+HILT="#8a5a2e"; HILT_D="#563418"; GUARD="#8f6a1f"; POMMEL="#8f6a1f"
 
 def draw(c, glint=False):
-    blade(c, 11, 23, 27, -2, 1, [L, M, M, D], [
-        (0, -1, 1, [L, M, M]),      # dinh 3px, khong teo
-        (1, -2, 1, [L, M, M, D]),   # cot ke dinh day 4px
-    ])
-    # guard rong vuong goc
-    for x in range(7, 16):
-        yc = 23 + (x - 11)
-        col(c, x, yc, 0, 1, [GUARD, HILT_D])
-    c.pixel(7, 19, GUARD); c.pixel(15, 27, GUARD)
-    # can dai
-    for i in range(4):
-        x, yc = 10 - i, 24 + i
-        col(c, x, yc, 0, 1, [HILT, HILT_D])
-    c.rect(6, 29, 7, 29, POMMEL); c.pixel(6, 29, GUARD)
+    # Dai kiem thang dung, doi xung quanh truc X=16
+    for y in range(5, 22):
+        c.pixel(14, y, D); c.pixel(15, y, M)
+        c.pixel(16, y, L)
+        c.pixel(17, y, M); c.pixel(18, y, D)
+    # dinh nhon
+    c.pixel(16, 3, E); c.pixel(15, 4, L); c.pixel(16, 4, M); c.pixel(17, 4, L)
+    # guard ngang tam 16
+    c.line(9, 22, 23, 22, GUARD)
+    c.line(9, 23, 23, 23, HILT_D)
+    c.pixel(9, 22, E); c.pixel(23, 22, E)
+    # can 3px cung truc
+    for y in range(24, 30):
+        c.pixel(15, y, HILT_D); c.pixel(16, y, HILT); c.pixel(17, y, HILT_D)
+    # pommel
+    c.line(14, 30, 18, 30, POMMEL)
+    c.pixel(16, 31, POMMEL)
     if glint:
-        c.pixel(17, 17, E); c.pixel(20, 14, E); c.pixel(23, 11, E)
+        c.pixel(16, 8, E); c.pixel(16, 15, E)
 
 def idle(i):
     c = Canvas(W, H)
-    c.ellipse(4, 28, 12, 31, "#00000033")
+    c.ellipse(11,29,21,31, "#00000033")
     draw(c, glint=(i in (2, 3)))
     return c
 

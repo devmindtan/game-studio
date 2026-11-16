@@ -7,8 +7,8 @@
   "fps": 1.0,
   "loop": false,
   "anchor": [
-    3.0,
-    19.0
+    10.0,
+    18.0
   ],
   "anchor_source": "explicit",
   "animations": [
@@ -21,15 +21,15 @@
       "hitbox": {
         "shape": "rect",
         "center": [
-          9.0,
-          13.5
+          10.5,
+          11.0
         ],
         "active": [
           0,
           0
         ],
-        "half_w": 6.0,
-        "half_h": 6.5
+        "half_w": 4.5,
+        "half_h": 9.0
       }
     }
   ]
