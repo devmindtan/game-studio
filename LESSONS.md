@@ -22,5 +22,6 @@ Cột "Chặn bằng" ưu tiên theo thứ tự: **công cụ / test tự kiểm
 | 2026-11-16 | `P=$(gamekit shot …)` lấy lẫn log của game → `cp` hỏng | `gamekit shot`: stdout chỉ có đường dẫn, log ra stderr |
 | 2026-11-16 | Vòng `for s in "a 16" …; set -- $s` truyền cả chuỗi làm tên sprite → shell là **zsh**, không tự tách từ | `AGENTS.md` mục shell: không dựa vào word splitting; gọi lệnh riêng từng dòng hoặc dùng mảng |
 | 2026-11-16 | Commit đầu bị lỗi pathspec, commit kế tiếp nuốt luôn thay đổi đã stage (rename skill vào nhầm commit) | rule commit: trước **mỗi** `git commit` xem `git diff --cached --stat`; một lệnh commit lỗi thì dừng, kiểm tra index rồi mới chạy tiếp |
+| 2026-11-16 | Lặp lại lỗi trên ngay sau khi viết rule: file test `git mv` từ trước lọt vào commit "update addon" → `git diff --cached --stat && git commit` nối liền nên không đọc stage | rule: **commit kèm đường dẫn** (`git commit -- <paths>` chỉ lấy đúng các file đó) và xem stage ở một lệnh riêng; đã tách lại 2 commit (chưa push) |
 | 2026-11-16 | Cửa sổ game giành focus, phím người dùng gõ chỗ khác làm ván chơi bắt đầu lại | chụp bằng `--demo/--idle` + kiểm tra log; game in `Restart input during demo` khi bị phím ngoài tác động |
 | 2026-11-16 | Skill nằm ở `.opencode/skills/` nên Claude Code không thấy | một bản gốc `.agents/skills/`, `gamekit agents-link` tạo link, `doctor` kiểm tra |

@@ -147,9 +147,10 @@ dùng bảo commit dở dang thì mới commit, và dùng type `wip`.
 
 - Chạy `git status --short` trước, đọc từng dòng. Stage **đúng các file của thay đổi này** bằng đường dẫn cụ thể
   (`git add <paths>`). Chỉ dùng `git add -A` khi `status` cho thấy mọi thứ đều thuộc thay đổi này.
-- **Ngay trước mỗi `git commit`**, xem `git diff --cached --stat`: commit lấy **mọi thứ đang staged**, kể cả
-  file `git mv`/`git rm` từ trước. Một lệnh commit lỗi thì dừng, kiểm tra lại index rồi mới chạy commit kế
-  tiếp; không xâu nhiều commit bằng `;` (dùng `&&`).
+- **Commit kèm đường dẫn:** `git commit -F - -- <các đường dẫn của thay đổi này>`. Với đường dẫn, Git chỉ
+  commit đúng các file đó; thứ khác đang staged (một `git mv`/`git rm` từ trước) không lọt vào được.
+- **Xem stage ở một lệnh riêng**, đọc xong mới commit: `git diff --cached --stat -M` không được nối `&&`
+  với `git commit` (nối thì không kịp đọc). Một lệnh commit lỗi thì dừng, kiểm tra index rồi mới làm tiếp.
 - Sửa `.gitignore`: pattern chỉ dành cho thư mục gốc phải có `/` đầu (`/templates/`), rồi chạy `git status`
   xem có file nào vừa biến mất khỏi danh sách.
 - Commit kèm file `.uid` mà Godot sinh ra cạnh script/shader (quy tắc của framework); **không** commit `.godot/`,
