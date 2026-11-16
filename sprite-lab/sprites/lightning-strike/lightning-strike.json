@@ -1,0 +1,23 @@
+{
+  "frames": 7,
+  "frame_size": [
+    48,
+    56
+  ],
+  "fps": 14.0,
+  "loop": false,
+  "anchor": [
+    24.0,
+    52.0
+  ],
+  "anchor_source": "explicit",
+  "animations": [
+    {
+      "name": "strike",
+      "start": 0,
+      "frames": 7,
+      "fps": 14.0,
+      "loop": false
+    }
+  ]
+}
