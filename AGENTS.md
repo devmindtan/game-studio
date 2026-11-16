@@ -60,7 +60,7 @@ xuất kéo dài thì khuyên người dùng mở phiên mới ở đó.
 | Âm thanh | `/team-audio` (kit chưa có công cụ âm thanh) |
 | "Game bị lỗi…" | `/bug-report` → viết test hồi quy, **chạy cho thấy test fail trước** → sửa → `gamekit test` |
 | "Review code" | `/code-review` của game (bản scoped `games/<g>`), không dùng bản chung |
-| "Chơi thử / chạy xem" | `gamekit run <g>` (người chơi), `gamekit shot <g> [scene] [frames] [-- args]` (agent tự nhìn) |
+| "Chơi thử / chạy xem" | `gamekit run <g>` (người chơi), `gamekit shot <g> [scene] [frames] [-- args]` (agent tự nhìn; nhiều thời điểm thì một lần chạy `frames=300,600,900`, tua nhanh bằng cờ của game như `--sim-steps`) |
 | "Giờ làm gì tiếp?", "dự án tới đâu rồi?" | `/next-step`, `/project-stage-detect` |
 | "Xuất game", "build", "phát hành" | tăng `config/version` trong `project.godot` → `gamekit export <g>` → `gamekit smoke-web <g>` → `/release-checklist`, `/patch-notes` |
 | "Cập nhật framework" | `gamekit update-template`; với từng game, làm theo `UPGRADING.md` của template |
@@ -74,6 +74,9 @@ xuất kéo dài thì khuyên người dùng mở phiên mới ở đó.
 - **Nhìn tận mắt rồi mới báo xong.** Thay đổi nào người chơi thấy được thì phải chạy game và xem ảnh
   (`gamekit shot`); ảnh dùng làm bằng chứng lưu ở `games/<g>/production/qa/evidence/`. Parse được code
   chưa có nghĩa là game chạy được.
+- **Chụp nhanh:** cần nhiều ảnh thì **một** lệnh `gamekit shot <g> "" 300,320,340 -- …`, không gọi `shot` lặp lại
+  trong vòng lặp (mỗi lần là một lần mở Godot và chạy lại từ đầu). Cảnh muộn trong game thì tua bằng cờ của game
+  (ví dụ `--sim-steps=4`), không chụp ở frame 1500.
 - **Test fail thì không export.** `gamekit export` tự chặn; không dùng `SKIP_TESTS=1` để lách.
 - **Credit LPC là bắt buộc** (CC-BY-SA / GPL / OGA-BY). `gamekit sprites` dừng nếu thiếu credit; game nào
   dùng nhân vật LPC thì phải có màn hình Credits đọc từ `assets/credits/`.

@@ -99,6 +99,7 @@ gamekit art rig motion <tên> <anim> [px/s] # xem tiếp đất, trượt chân,
 gamekit art rig build <tên>            # xuất Pixelbolt thành strip/metadata Sprite Lab
 gamekit art run <tên>                 # vẽ + kiểm tra <tên>.json (frames, animation, điểm neo)
 gamekit art shot <tên> sheet|move     # ảnh để xem: mọi animation / 8 khoảnh khắc thử di chuyển
+gamekit shot <game> "" 300,600 -- …  # ảnh game: 60 fps cố định, không vsync, nhiều frame trong một lần chạy
 gamekit art lab [<tên>] [sheet|move]  # mở lab (người dùng tự điều khiển)
 gamekit art test | check | list       # test lab / kiểm mọi sprite / sprite nào ở game nào
 gamekit art promote <tên> <game>      # chép strip + json (+ "source") vào game

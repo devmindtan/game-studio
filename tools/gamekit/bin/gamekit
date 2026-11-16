@@ -52,7 +52,8 @@ Play and test
   run <game>                   play
   edit <game>                  open the Godot editor
   test <game>                  import + unit/integration tests (exit 1 on failure)
-  shot <game> [scene] [frames] [-- args]  run windowed, save the last frame to <game>/builds/shots/
+  shot <game> [scene] [frames] [-- args]  fixed 60 fps, no vsync; frames = N or N,N,... (one run, one
+                               image per frame) into <game>/builds/shots/, one path per line
 
 Sprites (LPC)
   lpc                          start the LPC character generator (http://localhost:5173)
@@ -297,20 +298,37 @@ cmd_test() {
   return "${PIPESTATUS[0]}"
 }
 
+# Screenshots: one Godot run, a fixed 60 fps step (deterministic), no vsync or
+# real-time waits, and only the requested frames are written. `frames` may be a
+# list (300,600,900): one image per frame, one path per line on stdout.
+# (2026-11-16: --write-movie wrote every frame as PNG and each image was its own
+# Godot run, so a burst of 8 late-run shots took over 10 minutes.)
 cmd_shot() {
   local g; g="$(resolve_game "${1:-}")"; shift || true
   local scene="" frames=120 extra=()
   [[ $# -gt 0 && "$1" != "--" ]] && { scene="$1"; shift; }
   [[ $# -gt 0 && "$1" != "--" ]] && { frames="$1"; shift; }
-  [[ "${1:-}" == "--" ]] && { shift; extra=(-- "$@"); }
-  local tmp out; tmp="$(mktemp -d)"; mkdir -p "$g/builds/shots"
-  out="$g/builds/shots/$(date +%Y%m%d-%H%M%S).png"
-  "${RUN[@]}" "$GODOT" --path "$g" --windowed --resolution 1280x720 --write-movie "$tmp/f.png" \
-    --quit-after "$frames" $scene "${extra[@]}" 2>&1 | grep -E "ERROR|Run over" >&2 || true  # stdout = path only
-  local last; last="$(ls "$tmp"/f*.png 2>/dev/null | sort | tail -1)"
-  [[ -n "$last" ]] || { rm -rf "$tmp"; die "no frame captured"; }
-  cp "$last" "$out"; rm -rf "$tmp"
-  echo "$out"
+  [[ "${1:-}" == "--" ]] && { shift; extra=("$@"); }
+  [[ "$frames" =~ ^[0-9]+(,[0-9]+)*$ ]] || die "frames must be N or N,N,... (got $frames)"
+  [[ -f "$g/addons/gamekit/debug/shot_capture.gd" ]] || die "addon too old for shot - gamekit install $(basename "$g")"
+  GK_SHOT_TMP="$(mktemp -d)"; local tmp="$GK_SHOT_TMP"
+  trap 'rm -rf "${GK_SHOT_TMP:-}"' EXIT        # also on die / Ctrl-C / kill
+  trap 'exit 130' INT TERM
+  mkdir -p "$g/builds/shots"
+  "${RUN[@]}" "$GODOT" --path "$g" --windowed --resolution 1280x720 --fixed-fps 60 \
+    -s res://addons/gamekit/debug/shot_capture.gd -- --gk-scene="$scene" --gk-capture="$frames" \
+    --gk-out="$tmp" "${extra[@]}" 2>&1 | grep -E "ERROR|Run over" >&2 || true  # stdout = paths only
+  local stamp; stamp="$(date +%Y%m%d-%H%M%S)"
+  local f n=0 many=0
+  [[ "$frames" == *,* ]] && many=1
+  for f in "$tmp"/*.png; do
+    [[ -f "$f" ]] || continue
+    local out="$g/builds/shots/$stamp.png"
+    [[ $many == 1 ]] && out="$g/builds/shots/$stamp-f$((10#$(basename "$f" .png))).png"
+    mv "$f" "$out"; echo "$out"; n=$((n + 1))
+  done
+  rm -rf "$tmp"
+  [[ $n -gt 0 ]] || die "no frame captured"
 }
 
 cmd_lpc() {
