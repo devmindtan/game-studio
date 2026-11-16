@@ -18,7 +18,12 @@ aside{border-right:1px solid var(--border);display:flex;flex-direction:column;mi
 .filters{display:flex;gap:4px;flex-wrap:wrap}
 .chip{background:var(--panel);border:1px solid var(--border);border-radius:999px;padding:3px 8px;font-size:11px;cursor:pointer;color:var(--muted)}
 .chip:hover{color:var(--text);border-color:#3a4660} .chip.active{background:#173a46;border-color:#2b7d91;color:#dffaff}
-#list{overflow-y:auto;overflow-x:hidden;padding:6px;flex:1 1 auto;min-height:0}
+#list{overflow-y:auto;overflow-x:hidden;padding:6px;flex:1 1 auto;min-height:0;scrollbar-width:thin;scrollbar-color:#3a4a63 transparent}
+#list::-webkit-scrollbar, main::-webkit-scrollbar{width:8px;height:8px}
+#list::-webkit-scrollbar-track, main::-webkit-scrollbar-track{background:transparent}
+#list::-webkit-scrollbar-thumb, main::-webkit-scrollbar-thumb{background:#2e3a50;border-radius:999px;border:2px solid transparent;background-clip:padding-box}
+#list::-webkit-scrollbar-thumb:hover, main::-webkit-scrollbar-thumb:hover{background:#465a78;border:2px solid transparent;background-clip:padding-box}
+main{scrollbar-width:thin;scrollbar-color:#3a4a63 transparent}
 .group{margin-bottom:4px}
 .groupHead{display:flex;align-items:center;gap:6px;padding:4px 6px;cursor:pointer;color:var(--muted);font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;border-radius:6px;user-select:none}
 .groupHead:hover{background:var(--panel);color:var(--text)}
