@@ -76,7 +76,9 @@ xuất kéo dài thì khuyên người dùng mở phiên mới ở đó.
   chưa có nghĩa là game chạy được.
 - **Soát giao diện ở độ phân giải thật, phóng to từng vùng** (×2): xem ảnh cả màn chỉ để thấy bố cục; sau đó cắt
   từng khối (thanh HUD, từng thẻ, từng khung) và kiểm: icon và chữ cùng một đường tâm, chữ nằm giữa thanh/nút theo
-  chiều dọc, nội dung khung không dồn một phía, khoảng cách đều, không gì bị cắt, chữ đọc được trên nền. Vị trí
+  chiều dọc, nội dung thẻ/khung căn từ trên xuống (không căn giữa dọc: người dùng thấy xấu, 2026-11-17) và các
+  thẻ cùng hàng cao bằng nhau theo nội dung dài nhất, khoảng cách đều, không gì bị cắt hay tràn khung, chữ đọc
+  được trên nền. Vị trí
   chữ tính theo cỡ font (không gõ baseline tay). Ghi các lỗi tìm được rồi mới sửa (bài học 2026-11-17).
 - **Giao diện hiện tại** của game là `production/ui/` (danh sách màn hình trong `production/ui/screens.json`):
   đổi thứ người chơi thấy thì chạy `gamekit ui-shots <g>`, xem ảnh, commit `production/ui`. Dashboard (`games.html`)
