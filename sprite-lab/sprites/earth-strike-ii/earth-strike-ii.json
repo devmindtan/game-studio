@@ -22,14 +22,14 @@
         "shape": "circle",
         "center": [
           28.0,
-          28.0
+          30.0
         ],
         "active": [
           2,
           6
         ],
-        "radius": 26.0,
-        "inner": 0.0
+        "radius": 20.0,
+        "inner": 2.0
       }
     }
   ]
