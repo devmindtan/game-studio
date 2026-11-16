@@ -15,9 +15,10 @@
     ]
   },
   "arcane-empower": {
-    "cat": "buff",
+    "cat": "status",
     "tags": [
-      "power"
+      "power",
+      "buff"
     ]
   },
   "arcane-sigil": {
@@ -175,6 +176,52 @@
       "poison"
     ]
   },
+  "earth-strike-i": {
+    "cat": "aoe",
+    "tags": [
+      "nature",
+      "earth",
+      "upgrade",
+      "tier-I"
+    ]
+  },
+  "earth-strike-ii": {
+    "cat": "aoe",
+    "tags": [
+      "nature",
+      "earth",
+      "upgrade",
+      "tier-II"
+    ]
+  },
+  "earth-strike-iii": {
+    "cat": "aoe",
+    "tags": [
+      "nature",
+      "earth",
+      "upgrade",
+      "tier-III"
+    ]
+  },
+  "earth-strike-iv": {
+    "cat": "aoe",
+    "tags": [
+      "nature",
+      "earth",
+      "upgrade",
+      "tier-IV"
+    ]
+  },
+  "earth-strike-v": {
+    "cat": "aoe",
+    "tags": [
+      "nature",
+      "earth",
+      "ultimate",
+      "worldbreaker",
+      "tier-V"
+    ]
+  },
   "earthquake-rift": {
     "cat": "aoe",
     "tags": [
@@ -207,13 +254,6 @@
     "tags": [
       "magic",
       "fire"
-    ]
-  },
-  "frost-nova": {
-    "cat": "aoe",
-    "tags": [
-      "magic",
-      "ice"
     ]
   },
   "frost-nova-i": {
@@ -350,15 +390,17 @@
     ]
   },
   "haste-rune": {
-    "cat": "buff",
+    "cat": "status",
     "tags": [
-      "power"
+      "power",
+      "buff"
     ]
   },
   "heal-bloom": {
-    "cat": "buff",
+    "cat": "status",
     "tags": [
-      "heal"
+      "heal",
+      "buff"
     ]
   },
   "holy-column": {
@@ -506,9 +548,10 @@
     ]
   },
   "magnetic-shield": {
-    "cat": "buff",
+    "cat": "status",
     "tags": [
-      "power"
+      "power",
+      "buff"
     ]
   },
   "meteor-burst": {

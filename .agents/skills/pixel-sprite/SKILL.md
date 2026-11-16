@@ -125,6 +125,14 @@ Không báo "xong" khi chưa xem `preview.png`, ảnh `sheet` và ảnh `move`.
   mặt, biểu tượng. Công thức (vòng lặp co giãn, lệch theo k²…) chỉ dùng để đặt vị trí và tạo chuyển động; dựng
   hình dáng bằng công thức cho ra bậc thang lởm chởm (bài học 2026-11-16: nón pháp sư "méo xẹo"). Cần biến thể
   (gió, nghiêng) thì vẽ thêm một bản đồ, đừng uốn bằng công thức.
+- **Quy ước chiêu thức nâng cấp I–V** (khi một chiêu có nhiều bậc): mỗi bậc là một sprite riêng `<tên>-i`…`<tên>-v`, **không giữ bản không đánh số**. Thiết kế phải khác biệt rõ, không phải cùng một vòng phóng to dần:
+  - **I** = bản khởi đầu, đọc được ngay (tầm nhỏ, ít chi tiết).
+  - **II** = đổi **silhouette/hình dáng** (vd nổ → hoa, quét → chẻ).
+  - **III** = thêm **cấu trúc/khối 3D** (cọc, trụ, mảnh đá, mặt phẳng có bóng).
+  - **IV** = thêm **chuyển động** (xoáy, xoay, kéo theo hạt) thay vì chỉ phóng to.
+  - **V** = **chiêu hoàn toàn khác**, tinh chỉnh nhất (nhiều lớp, glyph/lưỡi/hạt, ultimate); không được là bản I phóng to.
+  - Mọi bậc có hitbox đo từ pixel (shape đúng hình thật), neo giữ nguyên trục, đăng ký nhãn `tier-I`…`tier-V` trong `sprite-tags.json`, cat/tags phải nằm trong `CATS` của viewer.
+
 - **Vũ khí đối xứng (kiếm, đại kiếm, dao găm) vẽ thẳng đứng**, trục là tâm lưỡi; guard/cán/pommel nằm cùng trục. **Tự kiểm tra bằng script**: với mỗi hàng, tập pixel active (alpha ≥ 96) phải khớp tập phản chiếu qua trục (mirror `x' = 2*axis - x`); xem preview trước khi báo xong. Không tự đo thì không được nói là đã xong.
 - **Đường chéo đặc (lưỡi kiếm, vệt chém…) điền theo từng cột**: với mỗi cột `x`, tính tâm `y` rồi tô một
   đoạn `y` liên tiếp; vòng lặp kiểu `(x+t, y-t)` chỉ cho pixel chạm góc → nhìn như caro/đứt gãy (bài học
