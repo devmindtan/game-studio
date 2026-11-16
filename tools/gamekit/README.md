@@ -15,12 +15,14 @@ tools/gamekit/
 │   └── test/run_tests.gd           bộ chạy test headless, fail nếu có test không load được (không vào bản export)
 ├── pipeline/
 │   ├── lpc_ingest.py               ZIP/PNG từ generator → assets/sprites/characters + credit gộp
-│   └── lpc_sample_compose.py       ghép nhân vật mẫu offline từ tools/lpc-generator
+│   ├── lpc_sample_compose.py       ghép nhân vật mẫu offline từ tools/lpc-generator
+│   └── spritekit.py                helper Pillow cho pixel art agent tự vẽ
 ├── build/
 │   ├── install_export_templates.sh tải template export (kiểm tra checksum, chỉ giữ Linux/Windows/Web)
 │   ├── export.sh                   import → test → export → zip
 │   └── smoke_web.sh + web_smoke_cdp.mjs   mở bản Web trong Chrome headless, in console, chụp ảnh
 └── templates/                  project.godot, export_presets.cfg, Makefile cho game mới
+    └── sprite/gen.py           mẫu generator cho `gamekit art new`
 ```
 
 ## Tách game khỏi công cụ
@@ -39,7 +41,9 @@ games/<slug>/
 ├── src/                       code game (core = luật chơi thuần, test được; game = scene)
 ├── assets/data/*.json         số liệu cân bằng
 ├── assets/source/lpc/         ← thả file ZIP/PNG xuất từ generator (Godot bỏ qua, không vào bản build)
+├── assets/source/sprites/     ← generator + preview + .ase của pixel art tự vẽ (Godot bỏ qua)
 ├── assets/sprites/characters/<tên>/   pipeline sinh ra: standard/*.png, <tên>_frames.tres, credits.csv
+├── assets/sprites/custom/<tên>/       PNG cho Godot do `gamekit art` sinh ra
 ├── assets/credits/            CREDITS.md + lpc_credits.csv (có trong bản build)
 ├── addons/gamekit/            bản sao addon (không sửa ở đây)
 ├── tests/unit, tests/integration
@@ -68,6 +72,27 @@ games/<slug>/
 Tốc độ và chế độ lặp của từng animation nằm trong `addon/gamekit/lpc/lpc_layout.json`. Sửa xong thì chạy
 `gamekit install <g>` rồi `gamekit sprites <g>`. Animation cỡ lớn (128/192px, thư mục `custom/`) hiện mới
 được chép sang, chưa chuyển thành SpriteFrames.
+
+## Pixel art tự vẽ (agent)
+
+Dùng cho tile, icon, hiệu ứng, quái, nhân vật không theo LPC. Agent viết generator Python (Pillow), render
+ra PNG, tự xem preview rồi sửa; LibreSprite chỉ dùng để người chỉnh tay và chuyển `.ase`.
+
+```bash
+gamekit art new <game> light-mote --size 24   # tạo assets/source/sprites/light-mote/gen.py
+gamekit art run <game> light-mote             # chạy gen.py -> PNG + preview.png + anim.gif
+gamekit art ase <game> light-mote             # PNG -> .ase trong assets/source/
+gamekit art open <game> light-mote            # mở .ase bằng LibreSprite
+```
+
+- File sinh ra:
+  - `assets/sprites/custom/<tên>/<tên>.png` và `<tên>_strip.png` — Godot import.
+  - `assets/source/sprites/<tên>/` — `gen.py`, `preview.png`, `anim.gif`, `<tên>.ase`; Godot bỏ qua.
+- `gen.py` import helper `pipeline/spritekit.py` (ASCII map, outline, strip, grid, GIF, preview, `.ase`).
+  Sửa `gen.py`, không sửa helper trong game.
+- Preview là ảnh phóng to nearest có lưới, để agent đọc bằng tool `read`. `anim.gif` để xem chuyển động.
+- `gamekit doctor` kiểm tra `libresprite`. Bản 1.3 không có MCP; xem `.opencode/skills/pixel-sprite/SKILL.md`
+  để biết giới hạn và quy trình đầy đủ.
 
 ## Xuất game
 

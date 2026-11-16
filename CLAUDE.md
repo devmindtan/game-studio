@@ -6,6 +6,7 @@ rồi dùng đúng công cụ ghi trong đó.** Mọi thao tác máy móc đi qu
 ```text
 game-studio/
 ├── CLAUDE.md, README.md          workflow này + hướng dẫn cho người
+├── .opencode/skills/             skill cho agent làm việc trong workspace (pixel-sprite, …)
 ├── templates/
 │   └── claude-code-game-studios/ framework gốc (49 agent, 74 skill), CHỈ ĐỌC. Mỗi game mới clone từ đây
 ├── games/
@@ -30,7 +31,7 @@ người dùng mở phiên mới ở đó.
 | "Thêm tính năng" (lớn, nhiều hệ thống) | `/quick-design` (thay đổi nhỏ) hoặc `/design-system` → `/create-stories` → `/dev-story` → `/story-done` |
 | "Game khó/dễ quá", "chỉnh tốc độ…" | sửa `assets/data/*.json` (không hardcode trong code) → `/balance-check` → `gamekit test` + `gamekit shot` |
 | "Thêm nhân vật", "sprite người/quái dạng người" | `gamekit lpc` (người dùng phối đồ, xuất **ZIP split animations**) → chép vào `games/<g>/assets/source/lpc/<tên>.zip` → `gamekit sprites <g>` → `gamekit preview <g> <tên>` → dùng `LpcCharacter` trong code |
-| Art khác (tile, cảnh, hiệu ứng, icon) | kit chưa có công cụ. Định hướng bằng `/art-bible`, `/asset-spec`; tạm thời vẽ bằng code (`_draw`) như game đom đóm |
+| Art khác (tile, cảnh, hiệu ứng, icon, sprite không LPC) | `gamekit art new <g> <tên> [--size N]` → sửa `assets/source/sprites/<tên>/gen.py` → `gamekit art run <g> <tên>` → xem `preview.png`/`anim.gif` → `gamekit shot <g>` để kiểm tra trong game; hướng nghệ thuật bằng `/art-bible`, `/asset-spec`; skill `.opencode/skills/pixel-sprite` |
 | Menu, HUD, giao diện | `/ux-design` → `/team-ui`; bắt buộc chụp màn hình bằng `gamekit shot` |
 | Âm thanh | `/team-audio` (kit chưa có công cụ âm thanh) |
 | "Game bị lỗi…" | `/bug-report` → viết test hồi quy, **chạy cho thấy test fail trước** → sửa → `gamekit test` |
@@ -74,7 +75,7 @@ yêu cầu, nên không cần hỏi lại trước mỗi commit.
 | File đã sửa | Repo | Ghi chú |
 |---|---|---|
 | `games/<g>/**` | repo của game đó (`git -C games/<g>`) | |
-| `CLAUDE.md`, `README.md`, `.gitignore`, `tools/gamekit/**` | repo gốc `game-studio/` | |
+| `CLAUDE.md`, `README.md`, `.gitignore`, `.opencode/**`, `tools/gamekit/**` | repo gốc `game-studio/` | |
 | `templates/**`, `tools/lpc-generator/**` | **không bao giờ** | clone upstream, chỉ đọc. Lỡ sửa thì `git checkout -- .` để hoàn tác |
 
 Thay đổi trải trên nhiều repo thì **mỗi repo một commit**. Ví dụ sửa gamekit:
