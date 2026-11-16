@@ -384,12 +384,15 @@ art_check_one() {  # validate sprite-lab/sprites/<n>/<n>.json against its strip
 import json, os, sys
 sys.path.insert(0, os.environ["GAMEKIT_PIPELINE"])
 from PIL import Image
-from spritekit import check_meta, check_ground
+from spritekit import check_meta, check_ground, check_hitbox
 m = json.load(open(sys.argv[1]))
 check_meta(m, Image.open(sys.argv[2]).size)
 ground = check_ground(m, Image.open(sys.argv[2]).convert("RGBA"))
 if ground:
     sys.exit("ground: " + "; ".join(ground))
+hit = check_hitbox(m, Image.open(sys.argv[2]).convert("RGBA"))
+if hit:
+    sys.exit("hitbox: " + "; ".join(hit))
 anims = m.get("animations") or [{"name": "default", "frames": m["frames"], "fps": m["fps"], "loop": m.get("loop", True)}]
 print("   %-12s %2d frame %sx%s  neo %s (%s)" % (sys.argv[3], m["frames"], *m["frame_size"], m["anchor"], m["anchor_source"]))
 print("                " + ", ".join("%s:%d@%sfps%s" % (a["name"], a["frames"], a["fps"], "" if a.get("loop", True) else " 1x") for a in anims))

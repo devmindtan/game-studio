@@ -13,7 +13,7 @@ sprite-lab/
 │   ├── preview.png           mỗi animation một hàng, phóng to có lưới (agent đọc)
 │   └── <animation>.gif       chuyển động (người xem)
 ├── lab/sprite_lab.tscn       trình thử: chế độ sheet và move
-├── tests/                    unit (SpriteSheet, SpriteAnchor) + integration (mọi sprite hợp lệ)
+├── tests/                    unit (SpriteSheet, SpriteAnchor, SpriteHitbox) + integration (mọi sprite hợp lệ)
 └── addons/gamekit/           bản sao addon (gamekit tự cài, git bỏ qua)
 ```
 
@@ -62,6 +62,8 @@ một tư thế bằng số (`bob`, `lean`, `feet`, `hands`, `weapon`, `eyes`, `
 không đổi giữa các animation. Có sẵn thân `tunic` (áo + quần) và `robe` (áo choàng), chu kỳ chạy 8 frame,
 nháy trắng khi trúng đòn (giữ viền), ngã xoay về đất, và `keep_above_floor` để vũ khí không xuyên đất.
 Nhân vật dùng `write_anim_meta(..., ground=True)`: `art run` kiểm tra mọi frame chạm đất.
+Hiệu ứng gây sát thương khai báo `"hitbox"` cho animation (xem skill `pixel-sprite`): `art run` đo và kiểm tra nó
+từ pixel, ảnh `art shot <tên> sheet` vẽ hitbox (đỏ = frame gây sát thương).
 
 ## Xem trên web (`./serve-viewer.sh`)
 

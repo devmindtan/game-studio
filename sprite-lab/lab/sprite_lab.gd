@@ -6,7 +6,7 @@ extends Node2D
 ##   move   a stage: walk/run, jump, attack… with mirroring, to judge the sprite
 ##          in motion the way a game would play it.
 ##
-## Keys: Tab next sprite · M mode · B background · +/- scale · A anchors/boxes
+## Keys: Tab next sprite · M mode · B background · +/- scale · A anchors/boxes/hitboxes
 ##       move mode: ←/→ walk, Shift run, ↑/↓ (top-down sprites only),
 ##       Space jump, J attack, K spell, H hurt, X death, R reset.
 ## Args (after --): --sprite=<name> --mode=sheet|move --demo --bg=dark|light|checker
@@ -297,7 +297,7 @@ func _draw_header(font: Font) -> void:
 	draw_rect(Rect2(0, 0, _screen.x, 58), Color(0, 0, 0, 0.45))
 	draw_string(font, Vector2(16, 24), line1, HORIZONTAL_ALIGNMENT_LEFT, -1, 18, COL_TEXT)
 	var keys := "Tab sprite · M chế độ (%s) · B nền · +/- tỉ lệ" % _mode
-	keys += " · A neo/khung" if _mode == "sheet" else " · ←→ đi · Shift chạy · Space nhảy · J đánh · K phép · H trúng đòn · X chết · R đặt lại"
+	keys += " · A neo/khung/hitbox" if _mode == "sheet" else " · ←→ đi · Shift chạy · Space nhảy · J đánh · K phép · H trúng đòn · X chết · R đặt lại"
 	draw_string(font, Vector2(16, 48), keys, HORIZONTAL_ALIGNMENT_LEFT, -1, 14, COL_DIM)
 
 
@@ -322,6 +322,11 @@ func _draw_sheet(font: Font) -> void:
 		_sheet.draw_index(self, idx, point, _scale)
 		if _anchors:
 			draw_rect(Rect2(point - Vector2(2, 2), Vector2(4, 4)), Color.MAGENTA)
+			# hit area from the json: bright on damage frames, faint otherwise
+			var hb := SpriteHitbox.of(_sheet, anim, point, _scale)
+			if hb != null:
+				var on := hb.is_active(t)
+				hb.draw(self, Color(1.0, 0.25, 0.2, 0.95) if on else Color(1.0, 0.6, 0.2, 0.35), 2.0 if on else 1.0)
 		var label := "%s  %d/%d  %sfps %s" % [anim, idx - int(a.get("start", 0)) + 1, int(a.get("frames", 1)),
 			a.get("fps", 0), "loop" if bool(a.get("loop", true)) else "1 lần"]
 		draw_string(font, Vector2(c.x + 12, c.y + cell.y - 22), label, HORIZONTAL_ALIGNMENT_LEFT, -1, 15, COL_TEXT)

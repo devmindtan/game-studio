@@ -81,6 +81,22 @@ chọn nguồn `.poses.json` nếu sprite có file đó; sprite dùng `gen.py` t
 
 Không báo "xong" khi chưa xem `preview.png`, ảnh `sheet` và ảnh `move`.
 
+## Hiệu ứng đòn đánh / phép (hitbox)
+
+> Bài học 2026-11-16 (`LESSONS.md`): đòn mặc định của kiếm sĩ dùng một sóng chém lớn không hợp kiếm ngắn, và
+> tầm đánh gõ tay trong data game không khớp với hình.
+
+- **Vẽ theo vũ khí**: đòn mặc định của một nhân vật có cỡ bằng tầm vũ khí của chính sprite đó (tay + lưỡi);
+  sóng chém bay xa, vùng nổ lớn là nâng cấp, không phải đòn đầu.
+- **Neo = điểm xoay** của hiệu ứng (vai/tay với vệt chém, tâm với vòng xoáy), không phải tâm canvas tùy tiện.
+- **Mọi hiệu ứng gây sát thương có `hitbox`** trong animation: truyền spec
+  `{"shape": "arc"|"circle", "center": [x, y], "active": [frame_đầu, frame_cuối], "dir_deg": d}` vào
+  `export(...)`/`write_anim_meta`; bán kính, góc do `fit_hitbox` đo từ pixel (alpha ≥ 96, quầng mờ không tính).
+  `gamekit art run` từ chối hitbox lệch với pixel. Xem hitbox trên ảnh `gamekit art shot <tên> sheet`
+  (đỏ = frame gây sát thương).
+- Trong game: vùng trúng lấy bằng `SpriteHitbox.of(sheet, anim, điểm_vẽ, tỉ_lệ, lật)`, cùng điểm và tỉ lệ với
+  lúc vẽ; data game chỉ chứa hệ số (sát thương, `area`), **không** chứa bán kính/tầm đánh gõ tay.
+
 ## Quy tắc pixel art
 
 - **Hình đặc trưng vẽ bằng bản đồ pixel tay** (`from_rows` hoặc danh sách chuỗi): nón, mũ, đầu vũ khí, khuôn

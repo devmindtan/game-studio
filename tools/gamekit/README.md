@@ -111,9 +111,11 @@ gamekit art ase|open <tên>            # .ase cho LibreSprite
   `SpriteSheet` giữ nguyên timing này qua `durations_ms`. Package cục bộ được ghim trong `tools/gamekit/package-lock.json`;
   cài bằng `npm ci --prefix tools/gamekit` (Node.js 20+). `gen.py` vẫn phù hợp với sprite vẽ theo pixel/tọa độ.
 - Addon `addons/gamekit/sprites/`: `SpriteSheet` (đọc json, chọn frame theo animation và thời gian, vẽ)
-  và `SpriteAnchor` (đặt theo điểm neo, kể cả khi lật). Dùng chung cho lab và mọi game.
+  , `SpriteAnchor` (đặt theo điểm neo, kể cả khi lật) và `SpriteHitbox` (vùng trúng của hiệu ứng, đặt cùng neo
+  và tỉ lệ với hình vẽ). Dùng chung cho lab và mọi game.
 - `spritekit.py`: `from_rows`, `outline`, `strip`, `preview`, `gif`, `write_meta` / `write_anim_meta`
-  (`ground=True` + `check_ground`: nhân vật phải chạm đất ở mọi frame không `airborne`)
+  (`ground=True` + `check_ground`: nhân vật phải chạm đất ở mọi frame không `airborne`;
+  `"hitbox"` của animation được `fit_hitbox` đo từ pixel, `check_hitbox` từ chối hitbox lệch)
   (ghi `<tên>.json`), `check_meta`, `.ase` qua LibreSprite.
 - Export preset gói `assets/sprites/*.json` để game đọc được metadata.
 

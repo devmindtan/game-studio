@@ -289,6 +289,10 @@ def write_anim_meta(path, animations, anchor=None, ground=False):
             entries[-1]["durations_ms"] = [float(value) for value in durations]
         if anim.get("airborne"):
             entries[-1]["airborne"] = True
+        if anim.get("hitbox"):
+            # measured from the pixels of this animation's active frames, so the
+            # hit area always matches the art (lesson 2026-11-16)
+            entries[-1]["hitbox"] = fit_hitbox(frames, anim["hitbox"])
         flat.extend(frames)
     if not flat:
         raise ValueError("no animations")
@@ -313,6 +317,9 @@ def write_anim_meta(path, animations, anchor=None, ground=False):
         problems = check_ground(meta, sheet)
         if problems:
             raise ValueError("; ".join(problems))
+    problems = check_hitbox(meta, strip(flat).img)
+    if problems:
+        raise ValueError("; ".join(problems))
     Path(path).write_text(json.dumps(meta, indent=2) + "\n", encoding="utf-8")
     return Path(path)
 
@@ -365,6 +372,96 @@ def check_ground(meta, strip_img):
         if bad:
             problems.append(f"{anim['name']}: frames off the floor (frame:rows, + = sinks, - = floats) "
                             + ", ".join(bad))
+    return problems
+
+
+HITBOX_ALPHA = 96  # pixels fainter than this (glow, haze) never count as the hit area
+HITBOX_SHAPES = ("arc", "circle")
+
+
+def _hit_pixels(frames, centre, alpha_min=HITBOX_ALPHA):
+    """(distance, angle_deg) of every solid pixel centre, relative to `centre`."""
+    import math
+
+    cx, cy = centre
+    out = []
+    for f in frames:
+        img = f.img if hasattr(f, "img") else f
+        a = img.getchannel("A")
+        w, h = img.size
+        px = a.load()
+        for y in range(h):
+            for x in range(w):
+                if px[x, y] >= alpha_min:
+                    dx, dy = x + 0.5 - cx, y + 0.5 - cy
+                    out.append((math.hypot(dx, dy), math.degrees(math.atan2(dy, dx))))
+    return out
+
+
+def _angle_diff(a, b):
+    return (a - b + 180.0) % 360.0 - 180.0
+
+
+def fit_hitbox(frames, spec):
+    """Measure an effect's hit area from its pixels.
+
+    spec: {"shape": "arc"|"circle", "center": [x, y], "active": [first, last],
+           "dir_deg": d (arc only; 0 = right, 90 = down)}
+    `center` is the pivot in source pixels (the hand for a sword swipe, the
+    middle of a spin). Only frames first..last (the frames that deal damage)
+    and pixels with alpha >= HITBOX_ALPHA are measured. Returns the spec plus
+    "radius" (outer), "inner" and, for arcs, "half_angle_deg", all from pixels,
+    so nobody types hit numbers by hand."""
+    import math
+
+    shape = spec.get("shape")
+    if shape not in HITBOX_SHAPES:
+        raise ValueError(f"hitbox shape must be one of {HITBOX_SHAPES}, got {shape!r}")
+    first, last = spec.get("active", [0, len(frames) - 1])
+    pts = _hit_pixels(frames[first:last + 1], spec["center"])
+    if not pts:
+        raise ValueError("hitbox: the active frames have no solid pixels")
+    box = {"shape": shape, "center": [float(v) for v in spec["center"]], "active": [int(first), int(last)],
+           "radius": float(math.ceil(max(d for d, _ in pts))),
+           "inner": float(math.floor(min(d for d, _ in pts)))}
+    if shape == "arc":
+        direction = float(spec.get("dir_deg", 0.0))
+        box["dir_deg"] = direction
+        box["half_angle_deg"] = float(math.ceil(max(abs(_angle_diff(a, direction)) for _, a in pts)))
+    return box
+
+
+def check_hitbox(meta, strip_img):
+    """Problems where an animation's "hitbox" does not match its pixels.
+
+    The hitbox must be what fit_hitbox measures from the active frames (within
+    1 px / 3 degrees): a hand-typed or stale hitbox is refused."""
+    problems = []
+    w, h = meta["frame_size"]
+    for anim in meta.get("animations") or []:
+        box = anim.get("hitbox")
+        if not box:
+            continue
+        name = anim["name"]
+        cx, cy = box.get("center", [-1, -1])
+        if not (0 <= cx <= w and 0 <= cy <= h):
+            problems.append(f"{name}: hitbox center ({cx}, {cy}) outside the {w}x{h} frame")
+            continue
+        first, last = box.get("active", [-1, -1])
+        if not (0 <= first <= last < anim["frames"]):
+            problems.append(f"{name}: hitbox active {box.get('active')} outside 0..{anim['frames'] - 1}")
+            continue
+        frames = [strip_img.crop(((anim["start"] + i) * w, 0, (anim["start"] + i + 1) * w, h))
+                  for i in range(anim["frames"])]
+        try:
+            fit = fit_hitbox(frames, box)
+        except ValueError as e:
+            problems.append(f"{name}: {e}")
+            continue
+        for key, tol in (("radius", 1.0), ("inner", 1.0), ("half_angle_deg", 3.0)):
+            if key in fit and abs(float(box.get(key, -999)) - fit[key]) > tol:
+                problems.append(f"{name}: hitbox {key} is {box.get(key)}, pixels say {fit[key]} "
+                                "(regenerate: pass the hitbox spec to write_anim_meta / export)")
     return problems
 
 
