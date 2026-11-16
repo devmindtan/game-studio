@@ -82,9 +82,10 @@ def export_layered(here: Path, name: str, animations, anchor, outline, ground=Fa
     meta = json.loads(meta_path.read_text(encoding="utf-8"))
     meta["layers"] = used
     meta["outline"] = outline
-    # equipment slots -> their layers (only layers this sprite uses)
+    # equipment slots -> their layers (only layers this sprite uses); the base is not a slot
     meta["slots"] = {slot: [k for k in parts if k in used] for slot, parts in mf.SLOTS.items()
                      if any(k in used for k in parts)}
+    meta["base"] = [k for k in mf.BASE if k in used]
     from PIL import Image
     problems = check_layers(meta, Image.open(here / f"{name}_strip.png"), layer_dir)
     if problems:

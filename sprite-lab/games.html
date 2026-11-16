@@ -28,6 +28,13 @@ h2{font-size:18px;margin:0 0 4px} h3{font-size:14px;margin:0 0 8px}
 .g2{grid-template-columns:repeat(auto-fill,minmax(min(100%,420px),1fr))}
 .g3{grid-template-columns:repeat(auto-fill,minmax(min(100%,300px),1fr))}
 .g4{grid-template-columns:repeat(auto-fill,minmax(min(100%,150px),1fr))}
+.heroCard{display:grid;grid-template-columns:200px minmax(0,1fr);gap:14px;margin-bottom:12px}
+.slots{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px}
+.stats{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:6px}
+.statCell{display:flex;align-items:center;gap:8px;background:var(--panel2);border:1px solid var(--border);border-radius:8px;padding:6px 8px}
+.statCell b{font-size:15px}
+.heroCard .btn{padding:3px 7px;font-size:11px}
+.itemCard{display:flex;gap:10px;align-items:flex-start;background:var(--panel2);border:1px solid var(--border);border-radius:8px;padding:8px}
 .side2{display:grid;gap:12px;grid-template-columns:minmax(0,420px) minmax(0,1fr);margin-top:10px}
 .tableWrap{overflow-x:auto;max-width:100%}
 .stage canvas{max-width:100%;height:auto}
@@ -79,7 +86,7 @@ td.cell{text-align:center}
 @media (max-width:1000px){.layout{grid-template-columns:1fr;grid-template-rows:auto 1fr;align-content:start} .split{grid-template-columns:1fr}
   nav#tabs{position:sticky;top:0;z-index:10;height:auto;flex-direction:row;flex-wrap:nowrap;overflow-x:auto;border-right:none;border-bottom:1px solid var(--border);background:var(--bg);padding:6px}
   .tab{white-space:nowrap;padding:6px 10px} header{position:static}}
-@media (max-width:600px){main{padding:12px 10px} h2{font-size:16px} .counter .big{font-size:20px} .card{padding:10px} th,td{padding:5px 6px}}
+@media (max-width:600px){.heroCard{grid-template-columns:1fr} main{padding:12px 10px} h2{font-size:16px} .counter .big{font-size:20px} .card{padding:10px} th,td{padding:5px 6px}}
 </style>
 </head>
 <body>
@@ -112,7 +119,7 @@ const mmss=s=>String(Math.floor(s/60)).padStart(2,'0')+':'+String(Math.floor(s%6
 let games=[],game=null,labSprites=[],tab='overview';
 const TABS=[
   ['overview','Tổng quan'],['rules','Luật gameplay'],['ui','Giao diện'],['map','Bản đồ & ải'],['heroes','Nhân vật'],
-  ['monsters','Quái vật'],['skills','Kỹ năng'],['effects','Hiệu ứng']];
+  ['monsters','Quái vật'],['skills','Kỹ năng'],['items','Vật phẩm'],['effects','Hiệu ứng']];
 
 /* ---------- sprites: load a strip + meta, draw an animation at time t ---------- */
 const imgCache={};
@@ -180,7 +187,7 @@ async function selectGame(g){
 }
 function renderTabs(){
   const n={overview:'',rules:(game.rules&&game.rules.rules||[]).length,ui:game.ui.shots.length,map:game.stages.length,heroes:game.heroes.length,
-    monsters:game.monsters.length,skills:game.skills.length,effects:(game.statuses||[]).length};
+    monsters:game.monsters.length,skills:game.skills.length,items:(game.items.pickups.length+game.items.equipment.length),effects:(game.statuses||[]).length};
   const nav=$('tabs'); nav.innerHTML='';
   TABS.forEach(([id,label])=>{const b=el('button',{class:'tab'+(tab===id?' active':'')},label,n[id]!==''?el('span',{class:'n'},n[id]):null);
     b.onclick=()=>{tab=id; renderTabs(); render();}; nav.appendChild(b);});
@@ -188,7 +195,7 @@ function renderTabs(){
 function render(){
   const keep=decodeURIComponent(location.hash.slice(1)).split('/').slice(2).join('/');
   history.replaceState(null,'','#'+game.slug+'/'+tab+(tab==='skills'&&keep?'/'+keep:'')); painters=[];
-  const m=$('main'); m.innerHTML=''; ({overview,rules,ui,map,heroes,monsters,skills,effects})[tab](m);
+  const m=$('main'); m.innerHTML=''; ({overview,rules,ui,map,heroes,monsters,skills,items,effects})[tab](m);
   wrapTables(m);
 }
 
@@ -360,57 +367,66 @@ async function composeLayers(info,enabled){
   const c=document.createElement('canvas'); c.width=first.width; c.height=first.height; const g=c.getContext('2d');
   imgs.forEach(im=>{ if(im) g.drawImage(im,0,0); });
   return outlineFrames(c,info.meta.frame_size[0],info.meta.frame_size[1],info.meta.outline||'#1b1726');}
-const STAT_ICON={max_hp:['heart','Máu tối đa'],damage:['sword','Sát thương'],move_speed:['boot','Tốc độ chạy'],cooldown:['clock','Hồi chiêu (s)'],
-  area:['star','Vùng đánh ×'],regen:['heart','Hồi máu /s'],armor:['skull','Giáp'],magnet:['gem','Hút vật phẩm ×']};
+const STAT_ICON={max_hp:['heart','Máu tối đa'],damage:['sword','Sát thương'],move_speed:['boot','Tốc độ chạy'],cooldown:['haste','Hồi chiêu (s)'],
+  area:['reach','Vùng đánh ×'],regen:['regen','Hồi máu /s'],armor:['shield','Giáp'],magnet:['magnet','Hút vật phẩm ×']};
 function heroes(m){
   m.appendChild(el('h2',{},'Nhân vật'));
-  m.appendChild(el('p',{class:'lead'},'Sprite đúng như game đang dùng (ghép từ các lớp). Bấm một ô trang bị để tắt/bật: đồ mặc (giáp đầu, ngực, tay, chân, vũ khí) sẽ thay đúng ô đó.'));
+  m.appendChild(el('p',{class:'lead'},'Sprite như game đang dùng. Bấm một ô trang bị để tắt/bật phần đó trên người: đồ mặc sẽ thay đúng ô.'));
+  const SLOT_NAME={head:'Giáp đầu',chest:'Giáp ngực',arms:'Giáp tay',legs:'Giáp chân',weapon:'Vũ khí'};
   game.heroes.forEach(h=>{
-    const card=el('div',{class:'card',style:'margin-bottom:12px'});
-    card.appendChild(el('div',{class:'row'},el('h3',{style:'margin:0'},h.name),el('span',{class:'muted small'},'sprite: '+(h.sprite?h.sprite.name:'—')+' · '+h.pool_size+' nâng cấp trong pool')));
-    const grid=el('div',{class:'side2'});
-    const left=el('div',{}); const right=el('div',{});
-    if(h.sprite){
-      const info=h.sprite, enabled={}; (info.meta.layers||[]).forEach(n=>enabled[n]=true);
-      let sheet=null, src=null, anim='idle', flip=false;
-      sheetOf(info).then(s=>{sheet=s;});
-      const refresh=async()=>{ src=info.meta.layers?await composeLayers(info,enabled):null; };
-      refresh();
-      const cv=liveCanvas(300,260,(g,t)=>{ g.clearRect(0,0,300,260);
-        g.fillStyle='#2f4a2c'; g.fillRect(0,200,300,60);
-        g.fillStyle='rgba(0,0,0,.3)'; g.beginPath(); g.ellipse(150,206,60,12,0,0,Math.PI*2); g.fill();
-        if(sheet) sheet.drawIndex(g,sheet.frame(anim,t),150,206,5,flip,null,src||undefined); });
-      left.appendChild(el('div',{class:'stage'},cv));
-      const bar=el('div',{class:'row',style:'margin-top:6px'});
-      (info.meta.animations||[]).forEach(a=>{const b=el('button',{class:'btn'+(a.name===anim?' on':'')},a.name+' · '+a.frames+'f');
-        b.onclick=()=>{anim=a.name; bar.querySelectorAll('.btn').forEach(x=>x.classList.toggle('on',x===b)); t0=performance.now();}; bar.appendChild(b);});
-      const fl=el('button',{class:'btn'},'⇆ Lật'); fl.onclick=()=>{flip=!flip; fl.classList.toggle('on',flip);}; bar.appendChild(fl);
-      left.appendChild(bar);
-      if(info.meta.layers){
-        // equipment slots: each one may have a back and a front part (around the body)
-        const slots=info.meta.slots||Object.fromEntries(info.meta.layers.map(n=>[n,[n]]));
-        const SLOT_NAME={body:'Thân',head:'Giáp đầu',chest:'Giáp ngực',arms:'Giáp tay',legs:'Giáp chân',weapon:'Vũ khí'};
-        right.appendChild(el('h3',{},'Ô trang bị'));
-        const CROP=[8,10,32,36];   // the body area of the 48x48 frame
-        const lw=el('div',{class:'layers'});
-        Object.entries(slots).forEach(([slot,parts])=>{ const c=el('canvas',{width:64,height:72});
-          const box=el('div',{class:'layer'},c,el('span',{},SLOT_NAME[slot]||slot));
-          Promise.all([loadImg(info.strip),...parts.map(n=>loadImg(info.layers[n]))]).then(([whole,...ims])=>{ const g=c.getContext('2d'); g.imageSmoothingEnabled=false;
-            if(whole){ g.globalAlpha=.22; g.drawImage(whole,CROP[0],CROP[1],CROP[2],CROP[3],0,0,64,72); g.globalAlpha=1; }
-            ims.forEach(im=>{ if(im) g.drawImage(im,CROP[0],CROP[1],CROP[2],CROP[3],0,0,64,72); });});
-          box.onclick=async()=>{ const on=!enabled[parts[0]]; parts.forEach(n=>enabled[n]=on); box.classList.toggle('off',!on); await refresh(); };
-          lw.appendChild(box);});
-        right.appendChild(lw);
-      }
+    const card=el('div',{class:'card heroCard'});
+    const info=h.sprite; if(!info){ card.appendChild(el('div',{class:'empty'},'Thiếu sprite')); m.appendChild(card); return; }
+    const enabled={}; (info.meta.layers||[]).forEach(n=>enabled[n]=true);
+    let sheet=null, src=null, anim='idle', flip=false;
+    sheetOf(info).then(x=>{sheet=x;});
+    const refresh=async()=>{ src=info.meta.layers?await composeLayers(info,enabled):null; };
+    refresh();
+    const cv=liveCanvas(200,200,(g,t)=>{ g.clearRect(0,0,200,200); drawGround(g,100,160,1,1e9,200,200);
+      g.fillStyle='rgba(0,0,0,.28)'; g.beginPath(); g.ellipse(100,162,44,9,0,0,Math.PI*2); g.fill();
+      if(sheet) sheet.drawIndex(g,sheet.frame(anim,t),100,162,4,flip,null,src||undefined); });
+    const bar=el('div',{class:'row',style:'margin-top:6px;gap:4px'});
+    (info.meta.animations||[]).forEach(a=>{const b=el('button',{class:'btn'+(a.name===anim?' on':'')},a.name);
+      b.onclick=()=>{anim=a.name; bar.querySelectorAll('.btn').forEach(x=>x.classList.toggle('on',x===b)); t0=performance.now();}; bar.appendChild(b);});
+    const fl=el('button',{class:'btn'},'⇆'); fl.title='Lật'; fl.onclick=()=>{flip=!flip; fl.classList.toggle('on',flip);}; bar.appendChild(fl);
+    const left=el('div',{},el('div',{class:'stage',style:'padding:0'},cv),bar);
+    const right=el('div',{});
+    right.appendChild(el('div',{class:'row',style:'margin-bottom:8px'},el('h3',{style:'margin:0'},h.name),
+      el('span',{class:'muted small'},'Chiêu khởi đầu: '+Object.keys(h.start_skills||{}).map(id=>(game.skills.find(x=>x.id===id)||{name:id}).name).join(', '))));
+    if(info.meta.slots){
+      const CROP=[8,10,32,36];
+      const lw=el('div',{class:'slots'});
+      Object.entries(info.meta.slots).forEach(([slot,parts])=>{ const c=el('canvas',{width:48,height:54});
+        const box=el('div',{class:'layer',title:'Bấm để tắt/bật'},c,el('span',{},SLOT_NAME[slot]||slot));
+        Promise.all([loadImg(info.strip),...parts.map(n=>loadImg(info.layers[n]))]).then(([whole,...ims])=>{ const g=c.getContext('2d'); g.imageSmoothingEnabled=false;
+          if(whole){ g.globalAlpha=.2; g.drawImage(whole,CROP[0],CROP[1],CROP[2],CROP[3],0,0,48,54); g.globalAlpha=1; }
+          ims.forEach(im=>{ if(im) g.drawImage(im,CROP[0],CROP[1],CROP[2],CROP[3],0,0,48,54); });});
+        box.onclick=async()=>{ const on=!enabled[parts[0]]; parts.forEach(n=>enabled[n]=on); box.classList.toggle('off',!on); await refresh(); };
+        lw.appendChild(box);});
+      right.appendChild(lw);
     }
-    const st=el('div',{style:'margin-top:12px'},el('h3',{},'Chỉ số cơ bản'));
-    Object.entries(h.stats||{}).forEach(([k,v])=>{const [ic,l]=STAT_ICON[k]||['star',k]; st.appendChild(statRow(ic,l,String(v)));});
+    const st=el('div',{class:'stats'});
+    Object.entries(h.stats||{}).forEach(([k,v])=>{const [ic,l]=STAT_ICON[k]||['star',k];
+      st.appendChild(el('div',{class:'statCell'},iconCanvas(ic,2),el('div',{},el('b',{},String(v)),el('div',{class:'small muted'},l))));});
     right.appendChild(st);
-    const sk=Object.keys(h.start_skills||{});
-    right.appendChild(el('p',{},el('b',{},'Chiêu khởi đầu: '),sk.map(id=>(game.skills.find(s=>s.id===id)||{name:id}).name).join(', ')||'—'));
-    grid.appendChild(left); grid.appendChild(right); card.appendChild(grid);
-    m.appendChild(card);
+    card.appendChild(left); card.appendChild(right); m.appendChild(card);
   });
+}
+
+/* ---------- items (assets/data/items.json) ---------- */
+function items(m){
+  m.appendChild(el('h2',{},'Vật phẩm'));
+  m.appendChild(el('p',{class:'lead'},'Mọi vật phẩm có trong game (assets/data/items.json).'));
+  const sec=(title,list,emptyText)=>{ const c=el('div',{class:'card',style:'margin-bottom:12px'},el('h3',{},title));
+    if(!list.length){ c.appendChild(el('div',{class:'muted'},emptyText)); m.appendChild(c); return; }
+    const grid=el('div',{class:'grid g3'});
+    list.forEach(it=>{ const info=it.sprite; let sh=null; if(info) sheetOf(info).then(x=>{sh=x;});
+      const cv=liveCanvas(96,96,(g,t)=>{ g.clearRect(0,0,96,96); drawGround(g,48,48,1,1e9,96,96); if(sh) sh.draw(g,sh.anims[0].name,t,48,48,6); });
+      grid.appendChild(el('div',{class:'itemCard'},el('div',{class:'stage',style:'padding:0;flex:0 0 96px'},cv),
+        el('div',{},el('b',{},it.name),el('div',{class:'small muted',style:'margin:2px 0 4px'},it.desc),
+          ...(it.facts||[]).map(f=>el('div',{class:'small'},'· '+f)))));});
+    c.appendChild(grid); m.appendChild(c); };
+  sec('Nhặt trong ải',game.items.pickups,'Chưa có.');
+  sec('Trang bị',game.items.equipment,'Game chưa có trang bị. Mỗi món sẽ thuộc một ô: giáp đầu, giáp ngực, giáp tay, giáp chân hoặc vũ khí.');
 }
 
 /* ---------- 5. monsters ---------- */

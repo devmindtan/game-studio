@@ -95,9 +95,10 @@ trang tải), để xem và quyết định có áp dụng vào game không:
 | Luật gameplay | luật trong `games/<g>/assets/data/gameplay_rules.json` + bảng chấm mọi kỹ năng của game |
 | Giao diện | bộ màn hình hiện tại `production/ui/` (chụp bằng `gamekit ui-shots <g>`), báo khi ảnh cũ hơn code |
 | Bản đồ & ải | bãi đấu vẽ đúng nền cỏ của game, vòng spawn, khung màn hình; biểu đồ đợt quái theo thời gian |
-| Nhân vật | animation, các lớp (bật/tắt từng lớp = chỗ đồ mặc thay vào), chỉ số kèm icon |
+| Nhân vật | animation, 5 ô trang bị bật/tắt được (giáp đầu, ngực, tay, chân, vũ khí), chỉ số kèm icon |
 | Quái vật | animation cùng tỉ lệ game, thân đo từ pixel, chỉ số, xuất hiện ở ải nào |
 | Kỹ năng | demo như trong game (nền bản đồ thật, slime làm hình nhân, chớp đỏ + số sát thương + thanh máu), nút "Khoảnh khắc trúng", bảng giá trị từng cấp, nâng cấp chỉ số; đường dẫn `games.html#<g>/skills/<kỹ năng>/hit/<cấp>` mở thẳng lúc trúng |
+| Vật phẩm | mọi vật phẩm trong `assets/data/items.json`: đồ nhặt trong ải (kèm số liệu) và trang bị |
 | Hiệu ứng | hiệu ứng trạng thái vẽ lên người (buff/debuff: chảy máu, bỏng, độc…, cho mọi nhân vật); trống khi game chưa có |
 
 Trang chỉ để xem; đánh giá và quyết định trao đổi trực tiếp với agent. Script dựng manifest và server **chỉ đọc**

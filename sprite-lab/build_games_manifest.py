@@ -315,6 +315,25 @@ def check_skill(skill, cls, rules_doc, sprite_meta, scale):
     return grade(res, rules)
 
 
+def items_of(root, data, cfg, monsters):
+    """assets/data/items.json with each item's sprite and the numbers behind it."""
+    items = load(os.path.join(data, "items.json"))
+    pick = cfg.get("pickups", {})
+    out = {"pickups": [], "equipment": []}
+    for group in out:
+        for iid, it in clean(items.get(group, {})).items():
+            e = {"id": iid, "name": it.get("name", iid), "desc": it.get("desc", ""), "slot": it.get("slot", ""),
+                 "sprite": sprite_info(root, str(it.get("sprite", "")))}
+            if iid == "xp_gem":
+                e["facts"] = ["%s: %g kinh nghiệm" % (mid, float(m.get("xp", 1))) for mid, m in monsters.items()]
+            elif iid == "gold":
+                e["facts"] = ["Tỉ lệ rơi %d%% mỗi quái" % round(float(pick.get("gold_chance", 0)) * 100)]
+            if group == "pickups":
+                e.setdefault("facts", []).append("Tầm hút %g px × chỉ số hút" % float(pick.get("radius", 0)))
+            out[group].append(e)
+    return out
+
+
 def build_game(slug):
     root = os.path.join(GAMES, slug)
     data = os.path.join(root, "assets", "data")
@@ -375,6 +394,7 @@ def build_game(slug):
         "sprites": sprites,
         "rules": rules_doc, "rule_doc": rel(os.path.join(root, "design", "gameplay-rules.md")),
         "statuses": [],   # buff/debuff effects drawn on characters: none in the game yet
+        "items": items_of(root, data, cfg, monsters),
     }
 
 

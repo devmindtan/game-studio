@@ -134,9 +134,6 @@
   ],
   "outline": "#1b1726",
   "slots": {
-    "body": [
-      "body"
-    ],
     "head": [
       "head"
     ],
@@ -156,5 +153,8 @@
       "weapon_back",
       "weapon"
     ]
-  }
+  },
+  "base": [
+    "body"
+  ]
 }

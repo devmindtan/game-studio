@@ -14,7 +14,7 @@ Painters get (canvas, pose, geometry) and draw extra parts; "fx" runs after the
 outline, for glows / slashes / sparks that must not be outlined.
 
 Layers (for equipment): draw_layers() paints the figure split by EQUIPMENT SLOT
-(SLOTS: body, head, chest, arms, legs, weapon), without outline, in LAYERS z order;
+(SLOTS: head, chest, arms, legs, weapon; BASE: the face, never replaced), without outline, in LAYERS z order;
 compose() + outline gives exactly what draw() returns. A slot that wraps around
 the body has a back and a front part (the back arm is under the torso, the front
 arm over it), but it is one slot: an armour piece replaces all its parts, drawn
@@ -200,11 +200,12 @@ def eyes(c, x, y, kind, pal):
 
 # --- the figure -------------------------------------------------------------------
 
-# Z order, back to front. Equipment slots group these (see SLOTS).
+# Z order, back to front. BASE is the bare figure under everything (not a slot);
+# the equipment slots group the rest (see SLOTS).
 LAYERS = ["chest_back", "legs_back", "arms_back", "weapon_back", "chest", "legs_front",
           "body", "head", "weapon", "arms_front", "front"]
+BASE = ["body"]                               # the bare figure (face, eyes, skin): never replaced
 SLOTS = {
-    "body": ["body"],                         # the bare figure: face (eyes, skin)
     "head": ["head"],                         # hair / helmet
     "chest": ["chest_back", "chest"],         # cape or scarf tail behind; tunic, robe, collar
     "arms": ["arms_back", "arms_front"],      # sleeves and hands (gloves, gauntlets)
