@@ -193,7 +193,12 @@ Design: <design/game-brief.md | design/gdd/<x>.md | Story: <ID>>     (với thay
 
 ### 6. Sau khi commit
 
-- `git log --oneline -1` để xác nhận; báo cho người dùng **hash và subject** của từng commit (ghi rõ repo nào).
+- **`git show --stat HEAD`** và so với danh sách file định commit: commit thiếu file (ví dụ một agent khác vừa
+  khôi phục thư mục đó) thì dừng, tìm lại thay đổi (`git fsck --unreachable` giữ các blob đã `git add`), rồi mới
+  báo. Chỉ báo "đã commit" khi danh sách khớp.
+- Có agent khác đang chạy cùng workspace (`pgrep -af "claude|opencode|codex"`): commit **ngay** khi một phần
+  việc đã kiểm tra xong, không để việc đã xong nằm chưa commit sang lượt sau.
+- Báo cho người dùng **hash và subject** của từng commit (ghi rõ repo nào).
 - **Không push** trừ khi người dùng yêu cầu. Không `--amend` commit đã push, không `--force`, không `--no-verify`
   (hook của framework là lớp bảo vệ, không được lách).
 - Hook commit của game chỉ chạy với Claude Code mở trong `games/<g>/`. Agent khác, hoặc commit từ repo gốc,

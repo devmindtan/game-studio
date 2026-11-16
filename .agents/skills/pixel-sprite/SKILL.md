@@ -83,6 +83,11 @@ Không báo "xong" khi chưa xem `preview.png`, ảnh `sheet` và ảnh `move`.
 
 ## Quy tắc pixel art
 
+- **Hình đặc trưng vẽ bằng bản đồ pixel tay** (`from_rows` hoặc danh sách chuỗi): nón, mũ, đầu vũ khí, khuôn
+  mặt, biểu tượng. Công thức (vòng lặp co giãn, lệch theo k²…) chỉ dùng để đặt vị trí và tạo chuyển động; dựng
+  hình dáng bằng công thức cho ra bậc thang lởm chởm (bài học 2026-11-16: nón pháp sư "méo xẹo"). Cần biến thể
+  (gió, nghiêng) thì vẽ thêm một bản đồ, đừng uốn bằng công thức.
+
 - Không anti-alias, không gradient mịn; dùng màu phẳng và banding.
 - 1 pixel = 1 đơn vị thiết kế; scale nguyên, nearest.
 - Silhouette phải đọc được ở 1x; outline tối 1px hoặc selective outline.
