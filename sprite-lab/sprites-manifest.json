@@ -134,6 +134,76 @@
       }
     },
     {
+      "name": "arrow",
+      "meta": {
+        "frames": 9,
+        "frame_size": [
+          20,
+          8
+        ],
+        "fps": 16.0,
+        "loop": true,
+        "anchor": [
+          17.0,
+          4.0
+        ],
+        "anchor_source": "explicit",
+        "animations": [
+          {
+            "name": "fly",
+            "start": 0,
+            "frames": 4,
+            "fps": 16.0,
+            "loop": true
+          },
+          {
+            "name": "impact",
+            "start": 4,
+            "frames": 5,
+            "fps": 14.0,
+            "loop": false
+          }
+        ]
+      },
+      "strip": "sprites/arrow/arrow_strip.png",
+      "preview": "sprites/arrow/preview.png",
+      "gifs": {
+        "fly": "sprites/arrow/fly.gif",
+        "impact": "sprites/arrow/impact.gif"
+      }
+    },
+    {
+      "name": "arrow-rain",
+      "meta": {
+        "frames": 10,
+        "frame_size": [
+          48,
+          56
+        ],
+        "fps": 12.0,
+        "loop": false,
+        "anchor": [
+          24.0,
+          52.0
+        ],
+        "anchor_source": "explicit",
+        "animations": [
+          {
+            "name": "rain",
+            "start": 0,
+            "frames": 10,
+            "fps": 12.0,
+            "loop": false
+          }
+        ]
+      },
+      "strip": "sprites/arrow-rain/arrow-rain_strip.png",
+      "preview": "sprites/arrow-rain/preview.png",
+      "gifs": {
+        "rain": "sprites/arrow-rain/rain.gif"
+      }
+    },
+    {
       "name": "assassin-armor",
       "meta": {
         "frames": 1,
@@ -697,6 +767,37 @@
       "preview": "sprites/holy-column/preview.png",
       "gifs": {
         "descend": "sprites/holy-column/descend.gif"
+      }
+    },
+    {
+      "name": "hunter-snare",
+      "meta": {
+        "frames": 8,
+        "frame_size": [
+          48,
+          44
+        ],
+        "fps": 11.0,
+        "loop": false,
+        "anchor": [
+          24.0,
+          40.0
+        ],
+        "anchor_source": "explicit",
+        "animations": [
+          {
+            "name": "snare",
+            "start": 0,
+            "frames": 8,
+            "fps": 11.0,
+            "loop": false
+          }
+        ]
+      },
+      "strip": "sprites/hunter-snare/hunter-snare_strip.png",
+      "preview": "sprites/hunter-snare/preview.png",
+      "gifs": {
+        "snare": "sprites/hunter-snare/snare.gif"
       }
     },
     {
@@ -1282,6 +1383,84 @@
       }
     },
     {
+      "name": "piercing-arrow",
+      "meta": {
+        "frames": 9,
+        "frame_size": [
+          26,
+          10
+        ],
+        "fps": 18.0,
+        "loop": true,
+        "anchor": [
+          23.0,
+          5.0
+        ],
+        "anchor_source": "explicit",
+        "animations": [
+          {
+            "name": "fly",
+            "start": 0,
+            "frames": 4,
+            "fps": 18.0,
+            "loop": true
+          },
+          {
+            "name": "impact",
+            "start": 4,
+            "frames": 5,
+            "fps": 15.0,
+            "loop": false
+          }
+        ]
+      },
+      "strip": "sprites/piercing-arrow/piercing-arrow_strip.png",
+      "preview": "sprites/piercing-arrow/preview.png",
+      "gifs": {
+        "fly": "sprites/piercing-arrow/fly.gif",
+        "impact": "sprites/piercing-arrow/impact.gif"
+      }
+    },
+    {
+      "name": "poison-arrow",
+      "meta": {
+        "frames": 10,
+        "frame_size": [
+          20,
+          8
+        ],
+        "fps": 14.0,
+        "loop": true,
+        "anchor": [
+          17.0,
+          4.0
+        ],
+        "anchor_source": "explicit",
+        "animations": [
+          {
+            "name": "fly",
+            "start": 0,
+            "frames": 4,
+            "fps": 14.0,
+            "loop": true
+          },
+          {
+            "name": "impact",
+            "start": 4,
+            "frames": 6,
+            "fps": 12.0,
+            "loop": false
+          }
+        ]
+      },
+      "strip": "sprites/poison-arrow/poison-arrow_strip.png",
+      "preview": "sprites/poison-arrow/preview.png",
+      "gifs": {
+        "fly": "sprites/poison-arrow/fly.gif",
+        "impact": "sprites/poison-arrow/impact.gif"
+      }
+    },
+    {
       "name": "raindrop",
       "meta": {
         "frames": 1,
@@ -1454,6 +1633,37 @@
       "preview": "sprites/round-shield/preview.png",
       "gifs": {
         "idle": "sprites/round-shield/idle.gif"
+      }
+    },
+    {
+      "name": "scatter-volley",
+      "meta": {
+        "frames": 7,
+        "frame_size": [
+          48,
+          48
+        ],
+        "fps": 15.0,
+        "loop": false,
+        "anchor": [
+          4.0,
+          24.0
+        ],
+        "anchor_source": "explicit",
+        "animations": [
+          {
+            "name": "volley",
+            "start": 0,
+            "frames": 7,
+            "fps": 15.0,
+            "loop": false
+          }
+        ]
+      },
+      "strip": "sprites/scatter-volley/scatter-volley_strip.png",
+      "preview": "sprites/scatter-volley/preview.png",
+      "gifs": {
+        "volley": "sprites/scatter-volley/volley.gif"
       }
     },
     {

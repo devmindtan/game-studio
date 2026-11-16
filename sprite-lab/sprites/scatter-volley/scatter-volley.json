@@ -1,0 +1,23 @@
+{
+  "frames": 7,
+  "frame_size": [
+    48,
+    48
+  ],
+  "fps": 15.0,
+  "loop": false,
+  "anchor": [
+    4.0,
+    24.0
+  ],
+  "anchor_source": "explicit",
+  "animations": [
+    {
+      "name": "volley",
+      "start": 0,
+      "frames": 7,
+      "fps": 15.0,
+      "loop": false
+    }
+  ]
+}

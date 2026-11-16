@@ -152,10 +152,11 @@ function categoryOf(s){
   if(/^(iron-sword|greatsword|battle-axe|war-hammer|oak-bow|magic-staff)$/.test(n) || /sword|axe|hammer|bow|staff|dagger|spear|mace|wand/.test(n)) return 'weapon';
   if(/helmet|hood|cap|chestplate|robe|tunic|armor|gloves|gauntlets|boots|greaves|shield$|cuirass|leggings|pauldron/.test(n) && !/magnetic/.test(n)) return 'armor';
   if(aNames.includes('fly')) return 'projectile';
+  if(/arrow-rain|scatter-volley|hunter-snare/.test(n)) return 'aoe';
   if(/magnetic-shield|haste|empower|heal|bloom|buff|rune|ward|barrier/.test(n)) return 'buff';
   if(/circle|zone|aura/.test(n)) return 'buff';
+  if(/cleave|slam|whirlwind|nova|burst|meteor|strike|spikes|geyser|column|pillar|wave|eruption|fall|quake|rain|volley|snare|trap/.test(n)) return 'aoe';
   if(/bolt|shard|fireball|orb|javelin|arrow|missile/.test(n)) return 'projectile';
-  if(/cleave|slam|whirlwind|nova|burst|meteor|strike|spikes|geyser|column|pillar|wave|eruption|fall|quake/.test(n)) return 'aoe';
   return 'base';
 }
 function catLabel(id){const c=CATS.find(x=>x.id===id);return c?c.label:id;}
