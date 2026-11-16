@@ -1,0 +1,1060 @@
+{
+  "sprites": [
+    {
+      "name": "arcane-bolt",
+      "meta": {
+        "frames": 12,
+        "frame_size": [
+          20,
+          20
+        ],
+        "fps": 14.0,
+        "loop": true,
+        "anchor": [
+          11.0,
+          10.0
+        ],
+        "anchor_source": "explicit",
+        "animations": [
+          {
+            "name": "fly",
+            "start": 0,
+            "frames": 6,
+            "fps": 14.0,
+            "loop": true
+          },
+          {
+            "name": "impact",
+            "start": 6,
+            "frames": 6,
+            "fps": 16.0,
+            "loop": false
+          }
+        ]
+      },
+      "strip": "sprites/arcane-bolt/arcane-bolt_strip.png",
+      "preview": "sprites/arcane-bolt/preview.png",
+      "gifs": {
+        "fly": "sprites/arcane-bolt/fly.gif",
+        "impact": "sprites/arcane-bolt/impact.gif"
+      }
+    },
+    {
+      "name": "arcane-circle",
+      "meta": {
+        "frames": 19,
+        "frame_size": [
+          48,
+          48
+        ],
+        "fps": 12.0,
+        "loop": false,
+        "anchor": [
+          24.0,
+          26.0
+        ],
+        "anchor_source": "explicit",
+        "animations": [
+          {
+            "name": "cast",
+            "start": 0,
+            "frames": 6,
+            "fps": 12.0,
+            "loop": false
+          },
+          {
+            "name": "loop",
+            "start": 6,
+            "frames": 8,
+            "fps": 10.0,
+            "loop": true
+          },
+          {
+            "name": "end",
+            "start": 14,
+            "frames": 5,
+            "fps": 12.0,
+            "loop": false
+          }
+        ]
+      },
+      "strip": "sprites/arcane-circle/arcane-circle_strip.png",
+      "preview": "sprites/arcane-circle/preview.png",
+      "gifs": {
+        "cast": "sprites/arcane-circle/cast.gif",
+        "end": "sprites/arcane-circle/end.gif",
+        "loop": "sprites/arcane-circle/loop.gif"
+      }
+    },
+    {
+      "name": "arcane-empower",
+      "meta": {
+        "frames": 19,
+        "frame_size": [
+          32,
+          32
+        ],
+        "fps": 12.0,
+        "loop": false,
+        "anchor": [
+          16.0,
+          22.0
+        ],
+        "anchor_source": "explicit",
+        "animations": [
+          {
+            "name": "cast",
+            "start": 0,
+            "frames": 6,
+            "fps": 12.0,
+            "loop": false
+          },
+          {
+            "name": "loop",
+            "start": 6,
+            "frames": 8,
+            "fps": 10.0,
+            "loop": true
+          },
+          {
+            "name": "release",
+            "start": 14,
+            "frames": 5,
+            "fps": 12.0,
+            "loop": false
+          }
+        ]
+      },
+      "strip": "sprites/arcane-empower/arcane-empower_strip.png",
+      "preview": "sprites/arcane-empower/preview.png",
+      "gifs": {
+        "cast": "sprites/arcane-empower/cast.gif",
+        "loop": "sprites/arcane-empower/loop.gif",
+        "release": "sprites/arcane-empower/release.gif"
+      }
+    },
+    {
+      "name": "cleave-wave",
+      "meta": {
+        "frames": 7,
+        "frame_size": [
+          48,
+          48
+        ],
+        "fps": 16.0,
+        "loop": false,
+        "anchor": [
+          8.0,
+          24.0
+        ],
+        "anchor_source": "explicit",
+        "animations": [
+          {
+            "name": "sweep",
+            "start": 0,
+            "frames": 7,
+            "fps": 16.0,
+            "loop": false
+          }
+        ]
+      },
+      "strip": "sprites/cleave-wave/cleave-wave_strip.png",
+      "preview": "sprites/cleave-wave/preview.png",
+      "gifs": {
+        "sweep": "sprites/cleave-wave/sweep.gif"
+      }
+    },
+    {
+      "name": "earth-spikes",
+      "meta": {
+        "frames": 8,
+        "frame_size": [
+          48,
+          44
+        ],
+        "fps": 12.0,
+        "loop": false,
+        "anchor": [
+          24.0,
+          40.0
+        ],
+        "anchor_source": "explicit",
+        "animations": [
+          {
+            "name": "erupt",
+            "start": 0,
+            "frames": 8,
+            "fps": 12.0,
+            "loop": false
+          }
+        ]
+      },
+      "strip": "sprites/earth-spikes/earth-spikes_strip.png",
+      "preview": "sprites/earth-spikes/preview.png",
+      "gifs": {
+        "erupt": "sprites/earth-spikes/erupt.gif"
+      }
+    },
+    {
+      "name": "fireball",
+      "meta": {
+        "frames": 13,
+        "frame_size": [
+          24,
+          24
+        ],
+        "fps": 14.0,
+        "loop": true,
+        "anchor": [
+          10.0,
+          12.0
+        ],
+        "anchor_source": "explicit",
+        "animations": [
+          {
+            "name": "fly",
+            "start": 0,
+            "frames": 6,
+            "fps": 14.0,
+            "loop": true
+          },
+          {
+            "name": "impact",
+            "start": 6,
+            "frames": 7,
+            "fps": 14.0,
+            "loop": false
+          }
+        ]
+      },
+      "strip": "sprites/fireball/fireball_strip.png",
+      "preview": "sprites/fireball/preview.png",
+      "gifs": {
+        "fly": "sprites/fireball/fly.gif",
+        "impact": "sprites/fireball/impact.gif"
+      }
+    },
+    {
+      "name": "firefly",
+      "meta": {
+        "frames": 4,
+        "frame_size": [
+          16,
+          16
+        ],
+        "fps": 12,
+        "loop": true,
+        "anchor": [
+          7.5,
+          8.5
+        ],
+        "anchor_source": "explicit"
+      },
+      "strip": "sprites/firefly/firefly_strip.png",
+      "preview": "sprites/firefly/preview.png",
+      "gifs": {
+        "anim": "sprites/firefly/anim.gif"
+      }
+    },
+    {
+      "name": "flame-geyser",
+      "meta": {
+        "frames": 8,
+        "frame_size": [
+          48,
+          48
+        ],
+        "fps": 12.0,
+        "loop": false,
+        "anchor": [
+          24.0,
+          44.0
+        ],
+        "anchor_source": "explicit",
+        "animations": [
+          {
+            "name": "erupt",
+            "start": 0,
+            "frames": 8,
+            "fps": 12.0,
+            "loop": false
+          }
+        ]
+      },
+      "strip": "sprites/flame-geyser/flame-geyser_strip.png",
+      "preview": "sprites/flame-geyser/preview.png",
+      "gifs": {
+        "erupt": "sprites/flame-geyser/erupt.gif"
+      }
+    },
+    {
+      "name": "frost-nova",
+      "meta": {
+        "frames": 8,
+        "frame_size": [
+          48,
+          48
+        ],
+        "fps": 14.0,
+        "loop": false,
+        "anchor": [
+          24.0,
+          24.0
+        ],
+        "anchor_source": "explicit",
+        "animations": [
+          {
+            "name": "burst",
+            "start": 0,
+            "frames": 8,
+            "fps": 14.0,
+            "loop": false
+          }
+        ]
+      },
+      "strip": "sprites/frost-nova/frost-nova_strip.png",
+      "preview": "sprites/frost-nova/preview.png",
+      "gifs": {
+        "burst": "sprites/frost-nova/burst.gif"
+      }
+    },
+    {
+      "name": "frost-shard",
+      "meta": {
+        "frames": 12,
+        "frame_size": [
+          20,
+          20
+        ],
+        "fps": 14.0,
+        "loop": true,
+        "anchor": [
+          11.0,
+          10.0
+        ],
+        "anchor_source": "explicit",
+        "animations": [
+          {
+            "name": "fly",
+            "start": 0,
+            "frames": 6,
+            "fps": 14.0,
+            "loop": true
+          },
+          {
+            "name": "impact",
+            "start": 6,
+            "frames": 6,
+            "fps": 15.0,
+            "loop": false
+          }
+        ]
+      },
+      "strip": "sprites/frost-shard/frost-shard_strip.png",
+      "preview": "sprites/frost-shard/preview.png",
+      "gifs": {
+        "fly": "sprites/frost-shard/fly.gif",
+        "impact": "sprites/frost-shard/impact.gif"
+      }
+    },
+    {
+      "name": "ground-slam",
+      "meta": {
+        "frames": 8,
+        "frame_size": [
+          48,
+          32
+        ],
+        "fps": 14.0,
+        "loop": false,
+        "anchor": [
+          24.0,
+          26.0
+        ],
+        "anchor_source": "explicit",
+        "animations": [
+          {
+            "name": "slam",
+            "start": 0,
+            "frames": 8,
+            "fps": 14.0,
+            "loop": false
+          }
+        ]
+      },
+      "strip": "sprites/ground-slam/ground-slam_strip.png",
+      "preview": "sprites/ground-slam/preview.png",
+      "gifs": {
+        "slam": "sprites/ground-slam/slam.gif"
+      }
+    },
+    {
+      "name": "haste-rune",
+      "meta": {
+        "frames": 18,
+        "frame_size": [
+          32,
+          32
+        ],
+        "fps": 14.0,
+        "loop": false,
+        "anchor": [
+          16.0,
+          26.0
+        ],
+        "anchor_source": "explicit",
+        "animations": [
+          {
+            "name": "cast",
+            "start": 0,
+            "frames": 5,
+            "fps": 14.0,
+            "loop": false
+          },
+          {
+            "name": "loop",
+            "start": 5,
+            "frames": 8,
+            "fps": 12.0,
+            "loop": true
+          },
+          {
+            "name": "end",
+            "start": 13,
+            "frames": 5,
+            "fps": 12.0,
+            "loop": false
+          }
+        ]
+      },
+      "strip": "sprites/haste-rune/haste-rune_strip.png",
+      "preview": "sprites/haste-rune/preview.png",
+      "gifs": {
+        "cast": "sprites/haste-rune/cast.gif",
+        "end": "sprites/haste-rune/end.gif",
+        "loop": "sprites/haste-rune/loop.gif"
+      }
+    },
+    {
+      "name": "heal-bloom",
+      "meta": {
+        "frames": 18,
+        "frame_size": [
+          32,
+          32
+        ],
+        "fps": 12.0,
+        "loop": false,
+        "anchor": [
+          16.0,
+          26.0
+        ],
+        "anchor_source": "explicit",
+        "animations": [
+          {
+            "name": "cast",
+            "start": 0,
+            "frames": 5,
+            "fps": 12.0,
+            "loop": false
+          },
+          {
+            "name": "loop",
+            "start": 5,
+            "frames": 8,
+            "fps": 11.0,
+            "loop": true
+          },
+          {
+            "name": "end",
+            "start": 13,
+            "frames": 5,
+            "fps": 12.0,
+            "loop": false
+          }
+        ]
+      },
+      "strip": "sprites/heal-bloom/heal-bloom_strip.png",
+      "preview": "sprites/heal-bloom/preview.png",
+      "gifs": {
+        "cast": "sprites/heal-bloom/cast.gif",
+        "end": "sprites/heal-bloom/end.gif",
+        "loop": "sprites/heal-bloom/loop.gif"
+      }
+    },
+    {
+      "name": "holy-column",
+      "meta": {
+        "frames": 8,
+        "frame_size": [
+          48,
+          56
+        ],
+        "fps": 12.0,
+        "loop": false,
+        "anchor": [
+          24.0,
+          52.0
+        ],
+        "anchor_source": "explicit",
+        "animations": [
+          {
+            "name": "descend",
+            "start": 0,
+            "frames": 8,
+            "fps": 12.0,
+            "loop": false
+          }
+        ]
+      },
+      "strip": "sprites/holy-column/holy-column_strip.png",
+      "preview": "sprites/holy-column/preview.png",
+      "gifs": {
+        "descend": "sprites/holy-column/descend.gif"
+      }
+    },
+    {
+      "name": "ice-pillar",
+      "meta": {
+        "frames": 8,
+        "frame_size": [
+          48,
+          48
+        ],
+        "fps": 12.0,
+        "loop": false,
+        "anchor": [
+          24.0,
+          44.0
+        ],
+        "anchor_source": "explicit",
+        "animations": [
+          {
+            "name": "erupt",
+            "start": 0,
+            "frames": 8,
+            "fps": 12.0,
+            "loop": false
+          }
+        ]
+      },
+      "strip": "sprites/ice-pillar/ice-pillar_strip.png",
+      "preview": "sprites/ice-pillar/preview.png",
+      "gifs": {
+        "erupt": "sprites/ice-pillar/erupt.gif"
+      }
+    },
+    {
+      "name": "lightning-strike",
+      "meta": {
+        "frames": 7,
+        "frame_size": [
+          48,
+          56
+        ],
+        "fps": 14.0,
+        "loop": false,
+        "anchor": [
+          24.0,
+          52.0
+        ],
+        "anchor_source": "explicit",
+        "animations": [
+          {
+            "name": "strike",
+            "start": 0,
+            "frames": 7,
+            "fps": 14.0,
+            "loop": false
+          }
+        ]
+      },
+      "strip": "sprites/lightning-strike/lightning-strike_strip.png",
+      "preview": "sprites/lightning-strike/preview.png",
+      "gifs": {
+        "strike": "sprites/lightning-strike/strike.gif"
+      }
+    },
+    {
+      "name": "mage",
+      "meta": {
+        "frames": 33,
+        "frame_size": [
+          48,
+          56
+        ],
+        "fps": 6.0,
+        "loop": true,
+        "anchor": [
+          24.0,
+          53.0
+        ],
+        "anchor_source": "explicit",
+        "animations": [
+          {
+            "name": "idle",
+            "start": 0,
+            "frames": 4,
+            "fps": 6.0,
+            "loop": true
+          },
+          {
+            "name": "run",
+            "start": 4,
+            "frames": 6,
+            "fps": 12.0,
+            "loop": true
+          },
+          {
+            "name": "jump",
+            "start": 10,
+            "frames": 4,
+            "fps": 10.0,
+            "loop": false
+          },
+          {
+            "name": "attack",
+            "start": 14,
+            "frames": 5,
+            "fps": 12.0,
+            "loop": false
+          },
+          {
+            "name": "spell",
+            "start": 19,
+            "frames": 6,
+            "fps": 10.0,
+            "loop": false
+          },
+          {
+            "name": "hurt",
+            "start": 25,
+            "frames": 3,
+            "fps": 12.0,
+            "loop": false
+          },
+          {
+            "name": "death",
+            "start": 28,
+            "frames": 5,
+            "fps": 8.0,
+            "loop": false
+          }
+        ]
+      },
+      "strip": "sprites/mage/mage_strip.png",
+      "preview": "sprites/mage/preview.png",
+      "gifs": {
+        "attack": "sprites/mage/attack.gif",
+        "death": "sprites/mage/death.gif",
+        "hurt": "sprites/mage/hurt.gif",
+        "idle": "sprites/mage/idle.gif",
+        "jump": "sprites/mage/jump.gif",
+        "run": "sprites/mage/run.gif",
+        "spell": "sprites/mage/spell.gif"
+      }
+    },
+    {
+      "name": "magnetic-shield",
+      "meta": {
+        "frames": 20,
+        "frame_size": [
+          32,
+          32
+        ],
+        "fps": 12.0,
+        "loop": false,
+        "anchor": [
+          16.0,
+          16.0
+        ],
+        "anchor_source": "explicit",
+        "animations": [
+          {
+            "name": "form",
+            "start": 0,
+            "frames": 6,
+            "fps": 12.0,
+            "loop": false
+          },
+          {
+            "name": "loop",
+            "start": 6,
+            "frames": 8,
+            "fps": 10.0,
+            "loop": true
+          },
+          {
+            "name": "break",
+            "start": 14,
+            "frames": 6,
+            "fps": 12.0,
+            "loop": false
+          }
+        ]
+      },
+      "strip": "sprites/magnetic-shield/magnetic-shield_strip.png",
+      "preview": "sprites/magnetic-shield/preview.png",
+      "gifs": {
+        "break": "sprites/magnetic-shield/break.gif",
+        "form": "sprites/magnetic-shield/form.gif",
+        "loop": "sprites/magnetic-shield/loop.gif"
+      }
+    },
+    {
+      "name": "meteor-burst",
+      "meta": {
+        "frames": 9,
+        "frame_size": [
+          48,
+          40
+        ],
+        "fps": 13.0,
+        "loop": false,
+        "anchor": [
+          24.0,
+          28.0
+        ],
+        "anchor_source": "explicit",
+        "animations": [
+          {
+            "name": "blast",
+            "start": 0,
+            "frames": 9,
+            "fps": 13.0,
+            "loop": false
+          }
+        ]
+      },
+      "strip": "sprites/meteor-burst/meteor-burst_strip.png",
+      "preview": "sprites/meteor-burst/preview.png",
+      "gifs": {
+        "blast": "sprites/meteor-burst/blast.gif"
+      }
+    },
+    {
+      "name": "meteor-fall",
+      "meta": {
+        "frames": 9,
+        "frame_size": [
+          48,
+          56
+        ],
+        "fps": 12.0,
+        "loop": false,
+        "anchor": [
+          24.0,
+          52.0
+        ],
+        "anchor_source": "explicit",
+        "animations": [
+          {
+            "name": "strike",
+            "start": 0,
+            "frames": 9,
+            "fps": 12.0,
+            "loop": false
+          }
+        ]
+      },
+      "strip": "sprites/meteor-fall/meteor-fall_strip.png",
+      "preview": "sprites/meteor-fall/preview.png",
+      "gifs": {
+        "strike": "sprites/meteor-fall/strike.gif"
+      }
+    },
+    {
+      "name": "mote",
+      "meta": {
+        "frames": 4,
+        "frame_size": [
+          8,
+          8
+        ],
+        "fps": 6,
+        "loop": true,
+        "anchor": [
+          3.5,
+          3.5
+        ],
+        "anchor_source": "content_centre"
+      },
+      "strip": "sprites/mote/mote_strip.png",
+      "preview": "sprites/mote/preview.png",
+      "gifs": {
+        "anim": "sprites/mote/anim.gif"
+      }
+    },
+    {
+      "name": "raindrop",
+      "meta": {
+        "frames": 1,
+        "frame_size": [
+          4,
+          10
+        ],
+        "fps": 1,
+        "loop": false,
+        "anchor": [
+          1.5,
+          8.5
+        ],
+        "anchor_source": "explicit"
+      },
+      "strip": "sprites/raindrop/raindrop_strip.png",
+      "preview": "sprites/raindrop/preview.png",
+      "gifs": {}
+    },
+    {
+      "name": "splash",
+      "meta": {
+        "frames": 3,
+        "frame_size": [
+          10,
+          6
+        ],
+        "fps": 10,
+        "loop": false,
+        "anchor": [
+          5.0,
+          6.0
+        ],
+        "anchor_source": "explicit"
+      },
+      "strip": "sprites/splash/splash_strip.png",
+      "preview": "sprites/splash/preview.png",
+      "gifs": {
+        "anim": "sprites/splash/anim.gif"
+      }
+    },
+    {
+      "name": "swordsman",
+      "meta": {
+        "frames": 35,
+        "frame_size": [
+          48,
+          48
+        ],
+        "fps": 5.0,
+        "loop": true,
+        "anchor": [
+          24.0,
+          44.0
+        ],
+        "anchor_source": "explicit",
+        "animations": [
+          {
+            "name": "idle",
+            "start": 0,
+            "frames": 4,
+            "fps": 5.0,
+            "loop": true,
+            "durations_ms": [
+              240.0,
+              160.0,
+              240.0,
+              120.0
+            ]
+          },
+          {
+            "name": "run",
+            "start": 4,
+            "frames": 8,
+            "fps": 12.0,
+            "loop": true
+          },
+          {
+            "name": "jump",
+            "start": 12,
+            "frames": 4,
+            "fps": 10.0,
+            "loop": false,
+            "durations_ms": [
+              80.0,
+              160.0,
+              160.0,
+              100.0
+            ],
+            "airborne": true
+          },
+          {
+            "name": "attack",
+            "start": 16,
+            "frames": 5,
+            "fps": 14.0,
+            "loop": false,
+            "durations_ms": [
+              140.0,
+              50.0,
+              60.0,
+              90.0,
+              150.0
+            ]
+          },
+          {
+            "name": "spell",
+            "start": 21,
+            "frames": 6,
+            "fps": 12.0,
+            "loop": false,
+            "durations_ms": [
+              120.0,
+              120.0,
+              140.0,
+              60.0,
+              80.0,
+              160.0
+            ]
+          },
+          {
+            "name": "hurt",
+            "start": 27,
+            "frames": 3,
+            "fps": 12.0,
+            "loop": false,
+            "durations_ms": [
+              90.0,
+              110.0,
+              120.0
+            ]
+          },
+          {
+            "name": "death",
+            "start": 30,
+            "frames": 5,
+            "fps": 8.0,
+            "loop": false,
+            "durations_ms": [
+              120.0,
+              140.0,
+              110.0,
+              100.0,
+              400.0
+            ]
+          }
+        ],
+        "ground": true
+      },
+      "strip": "sprites/swordsman/swordsman_strip.png",
+      "preview": "sprites/swordsman/preview.png",
+      "gifs": {
+        "attack": "sprites/swordsman/attack.gif",
+        "death": "sprites/swordsman/death.gif",
+        "hurt": "sprites/swordsman/hurt.gif",
+        "idle": "sprites/swordsman/idle.gif",
+        "jump": "sprites/swordsman/jump.gif",
+        "run": "sprites/swordsman/run.gif",
+        "spell": "sprites/swordsman/spell.gif"
+      }
+    },
+    {
+      "name": "thunder-javelin",
+      "meta": {
+        "frames": 12,
+        "frame_size": [
+          28,
+          20
+        ],
+        "fps": 16.0,
+        "loop": true,
+        "anchor": [
+          14.0,
+          10.0
+        ],
+        "anchor_source": "explicit",
+        "animations": [
+          {
+            "name": "fly",
+            "start": 0,
+            "frames": 6,
+            "fps": 16.0,
+            "loop": true
+          },
+          {
+            "name": "impact",
+            "start": 6,
+            "frames": 6,
+            "fps": 15.0,
+            "loop": false
+          }
+        ]
+      },
+      "strip": "sprites/thunder-javelin/thunder-javelin_strip.png",
+      "preview": "sprites/thunder-javelin/preview.png",
+      "gifs": {
+        "fly": "sprites/thunder-javelin/fly.gif",
+        "impact": "sprites/thunder-javelin/impact.gif"
+      }
+    },
+    {
+      "name": "void-orb",
+      "meta": {
+        "frames": 12,
+        "frame_size": [
+          20,
+          20
+        ],
+        "fps": 13.0,
+        "loop": true,
+        "anchor": [
+          10.0,
+          10.0
+        ],
+        "anchor_source": "explicit",
+        "animations": [
+          {
+            "name": "fly",
+            "start": 0,
+            "frames": 6,
+            "fps": 13.0,
+            "loop": true
+          },
+          {
+            "name": "impact",
+            "start": 6,
+            "frames": 6,
+            "fps": 14.0,
+            "loop": false
+          }
+        ]
+      },
+      "strip": "sprites/void-orb/void-orb_strip.png",
+      "preview": "sprites/void-orb/preview.png",
+      "gifs": {
+        "fly": "sprites/void-orb/fly.gif",
+        "impact": "sprites/void-orb/impact.gif"
+      }
+    },
+    {
+      "name": "whirlwind",
+      "meta": {
+        "frames": 8,
+        "frame_size": [
+          48,
+          48
+        ],
+        "fps": 14.0,
+        "loop": true,
+        "anchor": [
+          24.0,
+          24.0
+        ],
+        "anchor_source": "explicit",
+        "animations": [
+          {
+            "name": "spin",
+            "start": 0,
+            "frames": 8,
+            "fps": 14.0,
+            "loop": true
+          }
+        ]
+      },
+      "strip": "sprites/whirlwind/whirlwind_strip.png",
+      "preview": "sprites/whirlwind/preview.png",
+      "gifs": {
+        "spin": "sprites/whirlwind/spin.gif"
+      }
+    }
+  ]
+}

@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Sprite Lab Viewer</title>
+<style>
+:root{--bg:#111318;--panel:#1a1e27;--panel2:#222838;--text:#e7ecf5;--muted:#9aa6bf;--accent:#7ef0ff;--accent2:#b06cff;--border:#30384d;--good:#6ee06e}
+*{box-sizing:border-box} body{margin:0;font:14px/1.4 system-ui,-apple-system,Segoe UI,Roboto,sans-serif;background:var(--bg);color:var(--text)}
+header{padding:14px 18px;border-bottom:1px solid var(--border);display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+header h1{font-size:18px;margin:0} header .sub{color:var(--muted)}
+.wrap{display:grid;grid-template-columns:320px 1fr;min-height:calc(100vh - 60px)}
+aside{border-right:1px solid var(--border);padding:12px;overflow:auto}
+main{padding:16px;overflow:auto}
+input,select,button{font:inherit;color:var(--text);background:var(--panel2);border:1px solid var(--border);border-radius:8px;padding:8px 10px}
+button{cursor:pointer} button:hover{border-color:var(--accent);color:#fff} button.primary{background:#204a5a;border-color:#2f7a90}
+.search{width:100%;margin-bottom:10px}
+.list{display:flex;flex-direction:column;gap:6px}
+.item{padding:8px 10px;border:1px solid var(--border);border-radius:8px;background:var(--panel);cursor:pointer}
+.item:hover{border-color:#47506b} .item.active{border-color:var(--accent);box-shadow:0 0 0 1px #7ef0ff33 inset}
+.item .name{font-weight:600} .item .meta{color:var(--muted);font-size:12px}
+.card{background:var(--panel);border:1px solid var(--border);border-radius:12px;padding:14px;margin-bottom:14px}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.title{font-size:20px;font-weight:700;margin:0 0 4px} .muted{color:var(--muted)}
+.stage{display:flex;gap:16px;flex-wrap:wrap;align-items:flex-start}
+canvas{image-rendering:pixelated;image-rendering:crisp-edges;background:
+  linear-gradient(45deg,#1c2230 25%,transparent 25%),linear-gradient(-45deg,#1c2230 25%,transparent 25%),
+  linear-gradient(45deg,transparent 75%,#1c2230 75%),linear-gradient(-45deg,transparent 75%,#1c2230 75%);
+  background-size:16px 16px;background-position:0 0,0 8px,8px -8px,-8px 0px;border:1px solid var(--border);border-radius:8px}
+.previewBox img{image-rendering:pixelated;max-width:100%;border:1px solid var(--border);border-radius:8px;background:#151922}
+.pill{display:inline-block;padding:2px 8px;border-radius:999px;background:#223049;color:#b9d7ff;font-size:12px;margin-right:6px}
+.controls{margin-top:10px}
+label{color:var(--muted);font-size:13px}
+.gifRow{display:flex;gap:12px;flex-wrap:wrap;margin-top:8px}
+.gifRow figure{margin:0} .gifRow img{image-rendering:pixelated;border:1px solid var(--border);border-radius:8px;background:#151922;height:120px}
+.gifRow figcaption{font-size:12px;color:var(--muted);margin-top:4px;text-align:center}
+.err{color:#ff9f9f} .ok{color:var(--good)}
+@media (max-width:900px){.wrap{grid-template-columns:1fr} aside{border-right:none;border-bottom:1px solid var(--border);max-height:40vh}}
+</style>
+</head>
+<body>
+<header>
+  <h1>Sprite Lab Viewer</h1>
+  <div class="sub">Xem và test animation hiệu ứng — chọn sprite, bấm Play/Step</div>
+  <div id="status" class="sub"></div>
+</header>
+<div class="wrap">
+  <aside>
+    <input id="q" class="search" placeholder="Tìm sprite..." />
+    <div id="list" class="list"></div>
+  </aside>
+  <main>
+    <div id="empty" class="card muted">Đang tải danh sách sprite… (mở qua server: <code>./serve-viewer.sh</code> hoặc <code>python3 -m http.server -d sprite-lab</code>)</div>
+    <div id="view" style="display:none">
+      <div class="card">
+        <div class="title" id="vName"></div>
+        <div id="vMeta" class="muted"></div>
+        <div id="vAnims" style="margin-top:8px"></div>
+      </div>
+      <div class="card">
+        <div class="stage">
+          <div>
+            <canvas id="cv" width="128" height="128"></canvas>
+            <div class="controls row">
+              <button id="btnPlay" class="primary">Play</button>
+              <button id="btnPause">Pause</button>
+              <button id="btnStep">Step</button>
+              <button id="btnRestart">Restart</button>
+            </div>
+            <div class="controls row">
+              <label>Animation <select id="animSel"></select></label>
+              <label>Scale <select id="scaleSel"><option>2</option><option selected>4</option><option>6</option><option>8</option></select></label>
+              <label>Speed <select id="speedSel"><option value="0.5">0.5x</option><option value="1" selected>1x</option><option value="1.5">1.5x</option><option value="2">2x</option></select></label>
+            </div>
+            <div class="controls muted" id="frameInfo"></div>
+          </div>
+          <div class="previewBox">
+            <div class="muted" style="margin-bottom:6px">Preview (toàn bộ sheet)</div>
+            <img id="previewImg" alt="preview" style="max-width:520px">
+          </div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="muted" style="margin-bottom:6px">GIF từng animation</div>
+        <div id="gifRow" class="gifRow"></div>
+      </div>
+    </div>
+  </main>
+</div>
+<script>
+let data = null, current = null, img = null;
+let anims = [], animIdx = 0, frameInAnim = 0, playing = true, acc = 0, lastT = 0, scale = 4, speed = 1;
+const $ = id => document.getElementById(id);
+const cv = $('cv'), ctx = cv.getContext('2d');
+
+async function init(){
+  try{
+    const res = await fetch('sprites-manifest.json');
+    if(!res.ok) throw new Error('HTTP '+res.status);
+    data = await res.json();
+    $('status').innerHTML = '<span class="ok">'+data.sprites.length+' sprites</span>';
+    renderList();
+  }catch(e){
+    $('status').innerHTML = '<span class="err">Không tải được manifest. Hãy chạy serve-viewer.sh</span>';
+    $('empty').innerHTML = '<span class="err">Lỗi: '+e.message+'</span><br><br>Chạy trong thư mục sprite-lab: <code>python3 -m http.server 8765</code> rồi mở <code>http://localhost:8765/viewer.html</code>, hoặc chạy <code>./serve-viewer.sh</code>.';
+  }
+}
+
+function renderList(){
+  const q = $('q').value.toLowerCase().trim();
+  const list = $('list'); list.innerHTML = '';
+  data.sprites.filter(s => !q || s.name.includes(q)).forEach(s => {
+    const d = document.createElement('div');
+    d.className = 'item' + (current && current.name===s.name ? ' active':'');
+    const a = (s.meta.animations||[]).map(x=>x.name).join(', ');
+    d.innerHTML = '<div class="name">'+s.name+'</div><div class="meta">'+(s.meta.frame_size||[]).join('x')+' · '+a+'</div>';
+    d.onclick = () => selectSprite(s);
+    list.appendChild(d);
+  });
+}
+
+function selectSprite(s){
+  current = s; renderList();
+  $('empty').style.display='none'; $('view').style.display='block';
+  $('vName').textContent = s.name;
+  const fs = s.meta.frame_size||[0,0];
+  $('vMeta').textContent = fs[0]+'x'+fs[1]+' · neo ['+(s.meta.anchor||[]).join(', ')+'] · '+(s.meta.frame_count||'?')+' frames';
+  $('vAnims').innerHTML = (s.meta.animations||[]).map(a => '<span class="pill">'+a.name+': '+a.frames+'f @'+a.fps+'fps'+(a.loop===false?' 1x':'')+'</span>').join(' ');
+  $('previewImg').src = s.preview || '';
+  // gifs
+  const gr = $('gifRow'); gr.innerHTML='';
+  Object.entries(s.gifs||{}).forEach(([name,src])=>{
+    const f=document.createElement('figure'); f.innerHTML='<img src="'+src+'"><figcaption>'+name+'</figcaption>'; gr.appendChild(f);
+  });
+  // anim select
+  anims = (s.meta.animations && s.meta.animations.length) ? s.meta.animations : [{name:'default',start:0,frames:s.meta.frame_count||1,fps:8,loop:true}];
+  const sel = $('animSel'); sel.innerHTML='';
+  anims.forEach((a,i)=>{ const o=document.createElement('option'); o.value=i; o.textContent=a.name+' ('+a.frames+'f @'+a.fps+'fps'+(a.loop===false?', 1x':'')+')'; sel.appendChild(o); });
+  animIdx = 0; frameInAnim = 0; acc = 0; sel.value = 0;
+  // load strip
+  img = new Image();
+  img.onload = () => { resizeCanvas(); playing = true; };
+  img.src = s.strip;
+}
+
+function resizeCanvas(){
+  if(!current) return; const fs = current.meta.frame_size||[32,32];
+  scale = parseInt($('scaleSel').value,10)||4;
+  cv.width = fs[0]*scale; cv.height = fs[1]*scale; ctx.imageSmoothingEnabled = false;
+}
+
+function currentAnim(){ return anims[animIdx] || anims[0]; }
+
+function draw(){
+  if(!current || !img || !img.complete) return;
+  const fs = current.meta.frame_size||[32,32];
+  const a = currentAnim();
+  const globalFrame = (a.start||0) + frameInAnim;
+  const sx = globalFrame * fs[0];
+  ctx.clearRect(0,0,cv.width,cv.height);
+  ctx.drawImage(img, sx, 0, fs[0], fs[1], 0, 0, fs[0]*scale, fs[1]*scale);
+  $('frameInfo').textContent = a.name + ' — frame '+(frameInAnim+1)+'/'+a.frames+' (global '+globalFrame+')'+(a.loop===false?' · one-shot':' · loop') + (playing?' · playing':' · paused');
+}
+
+function tick(t){
+  requestAnimationFrame(tick);
+  if(!current || !img || !img.complete){ return; }
+  const a = currentAnim();
+  if(!a) return;
+  if(playing){
+    if(!lastT) lastT = t;
+    const dt = (t - lastT)/1000; lastT = t;
+    acc += dt * speed;
+    const dur = 1 / Math.max(1, a.fps || 8);
+    while(acc >= dur){
+      acc -= dur;
+      if(frameInAnim < a.frames - 1){ frameInAnim++; }
+      else { if(a.loop === false){ playing = false; frameInAnim = a.frames - 1; } else { frameInAnim = 0; } }
+    }
+  } else { lastT = t; }
+  draw();
+}
+
+$('q').addEventListener('input', renderList);
+$('animSel').addEventListener('change', e => { animIdx = parseInt(e.target.value,10)||0; frameInAnim=0; acc=0; playing=true; });
+$('scaleSel').addEventListener('change', () => { resizeCanvas(); });
+$('speedSel').addEventListener('change', e => { speed = parseFloat(e.target.value)||1; });
+$('btnPlay').onclick = () => { playing = true; };
+$('btnPause').onclick = () => { playing = false; };
+$('btnStep').onclick = () => { playing = false; const a=currentAnim(); if(frameInAnim < a.frames-1) frameInAnim++; else if(a.loop!==false) frameInAnim=0; };
+$('btnRestart').onclick = () => { frameInAnim = 0; acc = 0; playing = true; };
+
+init();
+requestAnimationFrame(tick);
+</script>
+</body>
+</html>
