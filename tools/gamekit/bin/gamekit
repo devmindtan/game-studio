@@ -1,0 +1,288 @@
+#!/usr/bin/env bash
+# gamekit — one entry point for the game-studio workspace.
+#   gamekit help
+# <game> is a folder name under games/ (e.g. dom-dom-dem-mua) or a path.
+# Inside a game folder it can be omitted.
+set -euo pipefail
+
+KIT="$(cd "$(dirname "$(readlink -f "$0")")/.." && pwd)"
+WS="$(cd "$KIT/../.." && pwd)"                       # workspace root (game-studio/)
+TEMPLATE="$WS/templates/claude-code-game-studios"
+LPC_DIR="$WS/tools/lpc-generator"
+UPSTREAM="https://github.com/Donchitos/Claude-Code-Game-Studios.git"
+GODOT="${GODOT:-godot}"
+RUN=(); command -v limited >/dev/null 2>&1 && RUN=(limited)   # machine rule: keep 10% free
+VERSION="$(cat "$KIT/VERSION")"
+
+die() { echo "gamekit: $*" >&2; exit 1; }
+say() { printf '\033[1m== %s\033[0m\n' "$*"; }
+
+# Resolve <game> to an absolute folder holding project.godot.
+resolve_game() {
+  local arg="${1:-}" d
+  if [[ -z "$arg" ]]; then
+    d="$PWD"
+    while [[ "$d" != / ]]; do [[ -f "$d/project.godot" ]] && { echo "$d"; return; }; d="$(dirname "$d")"; done
+    die "no <game> given and not inside a game folder (gamekit list)"
+  fi
+  for d in "$arg" "$WS/games/$arg"; do
+    [[ -f "$d/project.godot" ]] && { (cd "$d" && pwd); return; }
+  done
+  die "game not found: $arg (gamekit list)"
+}
+
+godot_import() { "${RUN[@]}" "$GODOT" --headless --path "$1" --import >/dev/null 2>&1 || true; }
+
+cmd_help() {
+  cat <<EOF
+gamekit $VERSION — workspace: $WS
+
+Project
+  list                         games in games/, with version and engine
+  new <slug> ["Title"]         new game from the framework template (+ Godot, gamekit addon, export presets)
+  install <game>               (re)install the gamekit addon, presets, Makefile into a game
+  tidy <game>                  move framework repo files out of a game (README, CHANGELOG, .github, ...)
+  update-template              git pull the framework template (templates/claude-code-game-studios)
+  doctor                       check every tool the kit needs
+
+Play and test
+  run <game>                   play
+  edit <game>                  open the Godot editor
+  test <game>                  import + unit/integration tests (exit 1 on failure)
+  shot <game> [scene] [frames] [-- args]  run windowed, save the last frame to <game>/builds/shots/
+
+Sprites (LPC)
+  lpc                          start the LPC character generator (http://localhost:5173)
+  sprites <game>               assets/source/lpc/*.zip|png -> SpriteFrames + merged credits
+  sample-sprite <game>         compose a sample character offline (no browser)
+  preview <game> [character]   character viewer
+
+Release
+  templates                    install Godot export templates (once per Godot version)
+  export <game> [preset...]    tests, then Linux/Windows/Web -> <game>/builds/dist/*.zip
+  smoke-web <game>             load the Web build in headless Chrome, print console, screenshot
+EOF
+}
+
+cmd_list() {
+  local g
+  for g in "$WS"/games/*/; do
+    [[ -f "$g/project.godot" ]] || continue
+    local v; v="$(sed -n 's/^config\/version="\(.*\)"/\1/p' "$g/project.godot")"
+    local t; t="$(sed -n 's/^config\/name="\(.*\)"/\1/p' "$g/project.godot")"
+    local k=""; [[ -f "$g/addons/gamekit/VERSION" ]] && k="gamekit $(cat "$g/addons/gamekit/VERSION")"
+    printf '  %-24s %-8s %-28s %s\n' "$(basename "$g")" "${v:--}" "$t" "$k"
+  done
+}
+
+cmd_doctor() {
+  local ok=1
+  check() { if eval "$2" >/dev/null 2>&1; then printf '  ok    %-22s %s\n' "$1" "$(eval "$3" 2>/dev/null | head -1)"; else printf '  MISS  %-22s %s\n' "$1" "$4"; ok=0; fi; }
+  check godot "command -v $GODOT" "$GODOT --version 2>/dev/null | tail -1" "install Godot 4.7.2 (~/.local/bin/godot)"
+  local ver; ver="$("$GODOT" --version 2>/dev/null | tail -n1 | cut -d. -f1-4)"
+  check "export templates" "test -d ${XDG_DATA_HOME:-$HOME/.local/share}/godot/export_templates/$ver" "echo $ver" "gamekit templates"
+  check python3+PIL "python3 -c 'import PIL'" "python3 --version" "pip install pillow"
+  check node "command -v node" "node --version" "needed for lpc + smoke-web"
+  check chrome "command -v google-chrome || command -v chromium" "command -v google-chrome || command -v chromium" "needed for smoke-web"
+  check zip "command -v zip" "echo zip" "apt install zip"
+  check rsync "command -v rsync" "echo rsync" "apt install rsync"
+  check limited "command -v limited" "echo ~/.local/bin/limited" "heavy jobs will run unlimited"
+  check "framework template" "test -f $TEMPLATE/CLAUDE.md" "git -C $TEMPLATE log --oneline -1" "git clone $UPSTREAM $TEMPLATE"
+  check "lpc generator" "test -f $LPC_DIR/package.json" "git -C $LPC_DIR log --oneline -1" "git clone the generator into tools/lpc-generator"
+  [[ -d "$LPC_DIR/node_modules" ]] || printf '  note  %-22s %s\n' "lpc node_modules" "not installed yet - the first 'gamekit lpc' runs npm ci"
+  [[ $ok == 1 ]]
+}
+
+cmd_install() {
+  local game; game="$(resolve_game "${1:-}")"
+  local slug; slug="$(basename "$game")"
+  say "install gamekit $VERSION -> $game"
+  mkdir -p "$game/addons/gamekit"
+  rsync -a --delete --exclude '*.uid' --exclude '*.import' "$KIT/addon/gamekit/" "$game/addons/gamekit/"
+  cp "$KIT/VERSION" "$game/addons/gamekit/VERSION"
+  [[ -f "$game/export_presets.cfg" ]] || sed "s/__SLUG__/$slug/g" "$KIT/templates/export_presets.cfg" > "$game/export_presets.cfg"
+  [[ -f "$game/Makefile" ]] || cp "$KIT/templates/Makefile" "$game/Makefile"
+  # Godot must not import the framework's docs, tools and raw art drops.
+  local d; for d in .claude docs design studio-tests production assets/source; do
+    mkdir -p "$game/$d"; [[ -f "$game/$d/.gdignore" ]] || : > "$game/$d/.gdignore"
+  done
+  mkdir -p "$game/assets/source/lpc" "$game/assets/data"
+  # The template ignores export_presets.cfg and *.zip. Godot 4 keeps signing
+  # secrets in .godot/export_credentials.cfg, so the presets are safe to commit,
+  # and the LPC source zips are the art's source of truth.
+  local line; for line in ".godot/" "builds/" "!export_presets.cfg" "!assets/source/lpc/*.zip"; do
+    grep -qxF "$line" "$game/.gitignore" 2>/dev/null || printf '%s\n' "$line" >> "$game/.gitignore"
+  done
+  echo "   addon, export_presets.cfg, Makefile, .gdignore files ready"
+}
+
+# Strip the framework repo's own meta files out of a game, so the game folder
+# holds only the game plus what the framework needs to run. The template keeps
+# the originals (templates/claude-code-game-studios).
+FRAMEWORK_META=(CHANGELOG.md CONTRIBUTING.md SECURITY.md UPGRADING.md .github studio-tests
+  docs/WORKFLOW-GUIDE.md docs/skill-flow-diagrams.md docs/migration-guide-v1.1.md)
+cmd_tidy() {
+  local game; game="$(resolve_game "${1:-}")"
+  local title; title="$(sed -n 's/^config\/name="\(.*\)"/\1/p' "$game/project.godot")"
+  say "tidy $game (framework meta out, game README in)"
+  local f; for f in "${FRAMEWORK_META[@]}"; do
+    [[ -e "$game/$f" ]] && { rm -rf "${game:?}/$f"; echo "   removed $f (still in the template)"; }
+  done
+  if [[ -f "$game/LICENSE" ]] && grep -q "Claude Code Game Studios\|Donchitos" "$game/LICENSE"; then
+    mkdir -p "$game/LICENSES"; mv "$game/LICENSE" "$game/LICENSES/claude-code-game-studios-MIT.txt"
+    echo "   LICENSE -> LICENSES/claude-code-game-studios-MIT.txt (MIT notice must stay)"
+  fi
+  if [[ ! -f "$game/README.md" ]] || head -5 "$game/README.md" | grep -q "Claude Code Game Studios"; then
+    sed "s/__TITLE__/${title:-$(basename "$game")}/g" "$KIT/templates/README.game.md" > "$game/README.md"
+    echo "   README.md -> game README (fill it in)"
+  fi
+  # origin pointed at the framework; keep it as 'framework' so 'origin' is free for the game's own remote.
+  if [[ "$(git -C "$game" remote get-url origin 2>/dev/null)" == "$UPSTREAM" ]]; then
+    git -C "$game" remote rename origin framework
+    echo "   git remote origin -> framework (add your own: git remote add origin <url>)"
+  fi
+}
+
+cmd_new() {
+  local slug="${1:-}" title="${2:-}"
+  [[ "$slug" =~ ^[a-z0-9]+(-[a-z0-9]+)*$ ]] || die "slug must be lowercase-kebab, e.g. space-miner"
+  local game="$WS/games/$slug"
+  [[ -e "$game" ]] && die "$game already exists"
+  [[ -f "$TEMPLATE/CLAUDE.md" ]] || die "framework template missing: $TEMPLATE"
+  title="${title:-$slug}"
+  say "new game $slug from template ($(git -C "$TEMPLATE" log --oneline -1))"
+  git clone -q "$TEMPLATE" "$game"
+  git -C "$game" remote set-url origin "$UPSTREAM"
+  sed "s/__TITLE__/$title/" "$KIT/templates/project.godot" > "$game/project.godot"
+  cmd_install "$game"
+  cmd_tidy "$game"
+  local gver; gver="$("$GODOT" --version 2>/dev/null | tail -n1 | cut -d. -f1-3)"
+  if ! grep -q '^engine:' "$game/project.yaml"; then
+    cat >> "$game/project.yaml" <<EOF
+
+engine:
+  name: "Godot"
+  version: "$gver"
+  language: "GDScript"
+  rendering: "Compatibility"
+  physics: "Godot Physics 2D"
+
+specialists:
+  code: godot-gdscript-specialist
+  shader: godot-shader-specialist
+  ui: godot-specialist
+  additional: [godot-gdextension-specialist]
+
+commands:
+  run: "gamekit run"
+  test: "gamekit test"
+  build: "gamekit export"
+  sprites: "gamekit sprites"
+EOF
+  fi
+  sed -i \
+    -e "s|^- \*\*Engine\*\*: \[CHOOSE:.*|- **Engine**: Godot $gver (Compatibility renderer, 2D)|" \
+    -e 's|^- \*\*Language\*\*: \[CHOOSE:.*|- **Language**: GDScript|' \
+    -e 's|^- \*\*Build System\*\*: \[SPECIFY.*|- **Build System**: `gamekit export` (presets in export_presets.cfg: Linux, Windows, Web)|' \
+    -e 's|^- \*\*Asset Pipeline\*\*: \[SPECIFY.*|- **Asset Pipeline**: `gamekit sprites` for LPC characters; tuning data in assets/data/*.json. See ../../tools/gamekit/README.md|' \
+    "$game/CLAUDE.md"
+  godot_import "$game"
+  echo
+  echo "Next:  cd games/$slug && claude    then  /start  (or describe the game: /prototype)"
+}
+
+cmd_update_template() {
+  say "update framework template"
+  git -C "$TEMPLATE" pull --ff-only
+  echo "Existing games are not changed; see the template's UPGRADING.md to bring one up to date."
+}
+
+cmd_run()  { local g; g="$(resolve_game "${1:-}")"; "$GODOT" --path "$g"; }
+cmd_edit() { local g; g="$(resolve_game "${1:-}")"; "$GODOT" -e --path "$g"; }
+
+cmd_test() {
+  local g; g="$(resolve_game "${1:-}")"
+  [[ -f "$g/addons/gamekit/test/run_tests.gd" ]] || die "no test runner - gamekit install $g"
+  godot_import "$g"
+  "${RUN[@]}" "$GODOT" --headless --path "$g" -s res://addons/gamekit/test/run_tests.gd 2>&1 | grep -v -i fontconfig
+  return "${PIPESTATUS[0]}"
+}
+
+cmd_shot() {
+  local g; g="$(resolve_game "${1:-}")"; shift || true
+  local scene="" frames=120 extra=()
+  [[ $# -gt 0 && "$1" != "--" ]] && { scene="$1"; shift; }
+  [[ $# -gt 0 && "$1" != "--" ]] && { frames="$1"; shift; }
+  [[ "${1:-}" == "--" ]] && { shift; extra=(-- "$@"); }
+  local tmp out; tmp="$(mktemp -d)"; mkdir -p "$g/builds/shots"
+  out="$g/builds/shots/$(date +%Y%m%d-%H%M%S).png"
+  "${RUN[@]}" "$GODOT" --path "$g" --windowed --resolution 1280x720 --write-movie "$tmp/f.png" \
+    --quit-after "$frames" $scene "${extra[@]}" 2>&1 | grep -E "ERROR|Run over" || true
+  local last; last="$(ls "$tmp"/f*.png 2>/dev/null | sort | tail -1)"
+  [[ -n "$last" ]] || { rm -rf "$tmp"; die "no frame captured"; }
+  cp "$last" "$out"; rm -rf "$tmp"
+  echo "$out"
+}
+
+cmd_lpc() {
+  [[ -f "$LPC_DIR/package.json" ]] || die "generator missing: $LPC_DIR"
+  cd "$LPC_DIR"
+  [[ -d node_modules ]] || { say "npm ci (first run)"; npm ci; }
+  npm run dev
+}
+
+cmd_sprites() {
+  local g; g="$(resolve_game "${1:-}")"
+  say "ingest assets/source/lpc"
+  python3 "$KIT/pipeline/lpc_ingest.py" --game "$g"
+  say "import"
+  godot_import "$g"
+  say "build SpriteFrames"
+  "${RUN[@]}" "$GODOT" --headless --path "$g" -s res://addons/gamekit/lpc/build_sprite_frames.gd 2>&1 | grep -E "^OK|ERROR|No "
+  return "${PIPESTATUS[0]}"
+}
+
+cmd_sample_sprite() {
+  local g; g="$(resolve_game "${1:-}")"
+  python3 "$KIT/pipeline/lpc_sample_compose.py" --generator "$LPC_DIR" --name sample_hero \
+    --out "$g/assets/source/lpc/sample_hero.zip"
+  echo "Now: gamekit sprites $(basename "$g")"
+}
+
+cmd_preview() {
+  local g; g="$(resolve_game "${1:-}")"
+  local args=(); [[ -n "${2:-}" ]] && args=(-- "--character=$2")
+  "$GODOT" --path "$g" res://addons/gamekit/debug/character_viewer.tscn "${args[@]}"
+}
+
+cmd_templates() { GODOT="$GODOT" "$KIT/build/install_export_templates.sh"; }
+
+cmd_export() {
+  local g; g="$(resolve_game "${1:-}")"; shift || true
+  GODOT="$GODOT" "$KIT/build/export.sh" "$g" "$@"
+}
+
+cmd_smoke_web() { local g; g="$(resolve_game "${1:-}")"; "$KIT/build/smoke_web.sh" "$g" "${2:-30000}"; }
+
+sub="${1:-help}"; shift || true
+case "$sub" in
+  help|-h|--help) cmd_help ;;
+  list) cmd_list ;;
+  doctor) cmd_doctor ;;
+  new) cmd_new "$@" ;;
+  install) cmd_install "$@" ;;
+  tidy) cmd_tidy "$@" ;;
+  update-template) cmd_update_template ;;
+  run) cmd_run "$@" ;;
+  edit) cmd_edit "$@" ;;
+  test) cmd_test "$@" ;;
+  shot) cmd_shot "$@" ;;
+  lpc) cmd_lpc ;;
+  sprites) cmd_sprites "$@" ;;
+  sample-sprite) cmd_sample_sprite "$@" ;;
+  preview) cmd_preview "$@" ;;
+  templates) cmd_templates ;;
+  export) cmd_export "$@" ;;
+  smoke-web) cmd_smoke_web "$@" ;;
+  *) die "unknown command: $sub (gamekit help)" ;;
+esac

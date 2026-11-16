@@ -1,0 +1,24 @@
+{
+  "_source": "Universal-LPC-Spritesheet-Character-Generator sources/state/constants.ts (ANIMATIONS, ANIMATION_CONFIGS, ANIMATION_OFFSETS), commit 04140673ec",
+  "_doc": "One entry per standard animation. file = PNG stem in the generator's split-animations zip (standard/<file>.png). row = first 64px row on the full sheet. directions = 4 (up, left, down, right) or 1. cycle = frame columns in play order. fps and loop are this game's choices, not the generator's.",
+  "frame_size": 64,
+  "sheet_columns": 13,
+  "direction_order": ["up", "left", "down", "right"],
+  "animations": [
+    { "name": "spellcast",   "file": "spellcast",    "row": 0,  "directions": 4, "cycle": [0, 1, 2, 3, 4, 5, 6], "fps": 10, "loop": false },
+    { "name": "thrust",      "file": "thrust",       "row": 4,  "directions": 4, "cycle": [0, 1, 2, 3, 4, 5, 6, 7], "fps": 12, "loop": false },
+    { "name": "walk",        "file": "walk",         "row": 8,  "directions": 4, "cycle": [1, 2, 3, 4, 5, 6, 7, 8], "fps": 10, "loop": true },
+    { "name": "slash",       "file": "slash",        "row": 12, "directions": 4, "cycle": [0, 1, 2, 3, 4, 5], "fps": 12, "loop": false },
+    { "name": "shoot",       "file": "shoot",        "row": 16, "directions": 4, "cycle": [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12], "fps": 14, "loop": false },
+    { "name": "hurt",        "file": "hurt",         "row": 20, "directions": 1, "cycle": [0, 1, 2, 3, 4, 5], "fps": 10, "loop": false },
+    { "name": "climb",       "file": "climb",        "row": 21, "directions": 1, "cycle": [0, 1, 2, 3, 4, 5], "fps": 8, "loop": true },
+    { "name": "idle",        "file": "idle",         "row": 22, "directions": 4, "cycle": [0, 0, 1], "fps": 3, "loop": true },
+    { "name": "jump",        "file": "jump",         "row": 26, "directions": 4, "cycle": [0, 1, 2, 3, 4, 1], "fps": 10, "loop": false },
+    { "name": "sit",         "file": "sit",          "row": 30, "directions": 4, "cycle": [0, 1, 2], "fps": 3, "loop": false },
+    { "name": "emote",       "file": "emote",        "row": 34, "directions": 4, "cycle": [0, 1, 2], "fps": 3, "loop": false },
+    { "name": "run",         "file": "run",          "row": 38, "directions": 4, "cycle": [0, 1, 2, 3, 4, 5, 6, 7], "fps": 12, "loop": true },
+    { "name": "combat_idle", "file": "combat",       "row": 42, "directions": 4, "cycle": [0, 0, 1], "fps": 3, "loop": true },
+    { "name": "backslash",   "file": "1h_backslash", "row": 46, "directions": 4, "cycle": [0, 1, 2, 3, 4, 5, 7, 8, 9, 10, 11, 12], "fps": 16, "loop": false },
+    { "name": "halfslash",   "file": "1h_halfslash", "row": 50, "directions": 4, "cycle": [0, 1, 2, 3, 4, 5], "fps": 12, "loop": false }
+  ]
+}

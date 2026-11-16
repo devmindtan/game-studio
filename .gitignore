@@ -1,0 +1,11 @@
+# Each of these is its own git repository (or an upstream clone), not tracked here.
+/games/
+/templates/
+/tools/lpc-generator/
+
+# Editor / OS
+.vscode/settings.json
+.idea/
+*.swp
+.DS_Store
+__pycache__/
