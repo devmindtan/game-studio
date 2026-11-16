@@ -317,11 +317,17 @@ def fb_frame(view, bob=0, lifts=(0, 0), hands=None, tip=None, eyes="open", phase
         _sword_fb(c, hands[0], tip)
     _legs_fb(c, bob, lifts)
     _torso_fb(c, top, hip, front)
+    # an arm raised beside the head is drawn first so the head covers the shoulder
+    # (lesson 2026-11-16: drawn after, the sleeve crossed the hair in attack_up)
+    raised = hands[0][1] < top + 2
+    if raised:  # the shoulder of a raised arm sits at the outer edge of the torso
+        _arm_fb(c, 19 if sword_x < 24 else 28, top, hands[0])
     if front:
         _head_front(c, top, eyes)
     else:
         _head_back(c, top, phase, speed)
-    _arm_fb(c, 20 if sword_x < 24 else 27, top, hands[0])
+    if not raised:
+        _arm_fb(c, 20 if sword_x < 24 else 27, top, hands[0])
     _arm_fb(c, 20 if other_x < 24 else 27, top, hands[1])
     if sword_in_front:
         _sword_fb(c, hands[0], tip)
@@ -360,12 +366,13 @@ def attack_down(i):
 
 
 def attack_up(i):
-    """Cut away from the viewer: low on the right, sweep up over the head."""
+    """Cut away from the viewer: low on the right, the arm rises beside the head
+    (never across it), the blade goes up over the head and cuts forward."""
     return [
-        fb_frame("up", bob=1, hands=((29, 36), (18, 34)), tip=(34, 40), sword_in_front=False),
-        fb_frame("up", bob=0, hands=((27, 25), (18, 34)), tip=(28, 15), sword_in_front=False),
-        fb_frame("up", bob=0, hands=((24, 22), (19, 33)), tip=(22, 11), sword_in_front=False),
-        fb_frame("up", bob=1, hands=((21, 25), (19, 34)), tip=(14, 18), sword_in_front=False),
+        fb_frame("up", bob=1, hands=((29, 36), (18, 34)), tip=(34, 40)),
+        fb_frame("up", bob=0, hands=((30, 25), (18, 34)), tip=(32, 15)),
+        fb_frame("up", bob=0, hands=((30, 18), (19, 33)), tip=(29, 7)),
+        fb_frame("up", bob=1, hands=((29, 19), (19, 34)), tip=(22, 11)),
         fb_frame("up", bob=0),
     ][i]
 

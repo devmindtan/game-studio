@@ -101,6 +101,14 @@ Không báo "xong" khi chưa xem `preview.png`, ảnh `sheet` và ảnh `move`.
   `SpriteHitbox.body(sheet, điểm_vẽ, tỉ_lệ, lật)`, cùng điểm và tỉ lệ với lúc vẽ; data game chỉ chứa hệ số
   (sát thương, `area`), **không** chứa bán kính/tầm đánh/tâm thân gõ tay.
 
+## Nhân vật cho game top-down (nhiều hướng)
+
+- Game cho đi 8 hướng thì nhân vật cần ít nhất 3 góc: ngang (`idle`, `run`, `attack`…; trái = lật), mặt trước
+  (`<anim>_down`) và lưng (`<anim>_up`); đi chéo dùng góc ngang. Cùng tỉ lệ, cùng neo, cùng đường đất.
+- Thứ tự vẽ theo góc nhìn: góc lưng/trước, tay giơ cao hơn vai đi **cạnh** đầu và được vẽ trước đầu (đầu che vai),
+  không bao giờ cắt ngang mặt/tóc; vũ khí luôn nối liền với bàn tay (bài học 2026-11-16, `attack_up`).
+- Xem **phóng to từng frame** của mỗi animation mới (preview cả sheet quá nhỏ để thấy lỗi tay/vũ khí).
+
 ## Quy tắc pixel art
 
 - **Hình đặc trưng vẽ bằng bản đồ pixel tay** (`from_rows` hoặc danh sách chuỗi): nón, mũ, đầu vũ khí, khuôn
