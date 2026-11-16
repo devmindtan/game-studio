@@ -27,7 +27,7 @@ h2{font-size:18px;margin:0 0 4px} h3{font-size:14px;margin:0 0 8px}
 .grid{display:grid;gap:12px}
 .g2{grid-template-columns:repeat(auto-fill,minmax(min(100%,420px),1fr))}
 .g3{grid-template-columns:repeat(auto-fill,minmax(min(100%,300px),1fr))}
-.g4{grid-template-columns:repeat(auto-fill,minmax(min(100%,150px),1fr))}
+.g4{grid-template-columns:repeat(auto-fit,minmax(min(100%,150px),1fr))}
 .heroCard{display:grid;grid-template-columns:200px minmax(0,1fr);gap:14px;margin-bottom:12px}
 .slots{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px}
 .stats{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:6px}
@@ -40,7 +40,13 @@ h2{font-size:18px;margin:0 0 4px} h3{font-size:14px;margin:0 0 8px}
 .tableWrap{overflow-x:auto;max-width:100%}
 .stage canvas{max-width:100%;height:auto}
 main,.card,.grid>*{min-width:0}
-td{overflow-wrap:anywhere}
+td{overflow-wrap:break-word}
+th.cell{text-align:center}
+table.mid td{vertical-align:middle}
+.topTable td:first-child{width:118px;font-weight:600}
+.alignTop{align-items:start}
+.shotHead{display:flex;flex-direction:column;gap:1px;margin-bottom:8px}
+.shotHead h3{margin:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
 .muted{color:var(--muted)} .small{font-size:11px}
 .pill{font-size:11px;color:#cfe9ff;background:#1e3348;border:1px solid #2b4866;border-radius:999px;padding:1px 8px;white-space:nowrap}
@@ -208,6 +214,11 @@ function ruleOf(id){ return ruleList().find(r=>r.id===id)||{id,title:id,severity
 function chip(id,res,compact){ const r=ruleOf(id); const st=res[0]==='fail'?(r.severity==='must'?'fail':'warn'):res[0];
   const mark={pass:'✓',fail:'✗',warn:'!',na:'–'}[st];
   return el('span',{class:'chk '+st,title:r.title+': '+res[1]},compact?mark:mark+' '+r.title+(st==='fail'||st==='warn'?' ('+res[1]+')':'')); }
+const EFFECT_NAME={damage:'sát thương',cooldown:'hồi chiêu',area:'vùng đánh',max_hp:'máu tối đa',move_speed:'tốc độ chạy',
+  magnet:'tầm hút',regen:'hồi máu/s',armor:'giáp',back_slash:'nhát chém sau'};
+function effText(eff){ return Object.entries(eff).map(([k,v])=>{
+  const n=k.startsWith('skill_damage.')?'sát thương chiêu':k.startsWith('skill_area.')?'vùng chiêu':(EFFECT_NAME[k]||k);
+  return n+(v.mul!=null?' ×'+v.mul:' +'+v.add); }).join(', '); }
 function ruleLine(check){
   if(!check) return el('div',{});
   const bad=check.fail.map(f=>ruleOf(f).title+' ('+check.results[f][1]+')'), warn=check.warn.map(f=>ruleOf(f).title+' ('+check.results[f][1]+')');
@@ -220,7 +231,7 @@ function rules(m){
   if(!ruleList().length){ m.appendChild(el('div',{class:'empty'},'Game này chưa có assets/data/gameplay_rules.json.')); return; }
   const lim=game.rules.limits||{};
   const t=el('table',{class:'card'}); t.appendChild(el('tr',{},el('th',{},'Luật'),el('th',{},'Mức'),el('th',{},'Nội dung')));
-  const fill=txt=>txt.replace(/\b([a-z_]+_(?:min|max))\b/g,(k)=>lim[k]!=null?'<b>'+lim[k]+'</b>':k);
+  const fill=txt=>txt.replace(/\.\./g,'–').replace(/\b([a-z_]+_(?:min|max))\b/g,(k)=>lim[k]!=null?'<b>'+lim[k]+'</b>':k);
   ruleList().forEach(r=>t.appendChild(el('tr',{},el('td',{},el('b',{},r.title),el('div',{class:'small muted'},r.id)),
     el('td',{},el('span',{class:'chk '+(r.severity==='must'?'fail':'warn')},r.severity==='must'?'bắt buộc':'nên')),el('td',{html:fill(esc(r.text))}))));
   m.appendChild(t);
@@ -246,12 +257,12 @@ function overview(m){
    ['monsters','Quái',game.monsters.length],['skills','Kỹ năng',game.skills.length],['effects','Hiệu ứng trạng thái',(game.statuses||[]).length]]
    .forEach(([id,l,v])=>{const c=el('div',{class:'counter'},el('div',{class:'big'},v),el('div',{class:'lbl'},l)); c.onclick=()=>{tab=id;renderTabs();render();}; counters.appendChild(c);});
   m.appendChild(counters);
-  const g2=el('div',{class:'grid g2'});
+  const g2=el('div',{class:'grid',style:'gap:12px'});   // stacked: the long decisions table never leaves a gap beside it
   const info=el('div',{class:'card'},el('h3',{},'Thiết kế'));
   [['Thể loại',b.genre],['Câu hỏi thiết kế',b.question],['Điểm hút',b.hooks]].forEach(([k,v])=>{ if(v) info.appendChild(el('p',{html:'<b>'+k+':</b> '+md(v)}));});
   g2.appendChild(info);
   const dec=el('div',{class:'card'},el('h3',{},'Đã quyết (roadmap)'));
-  const t=el('table'); t.appendChild(el('tr',{},el('th',{},'Chủ đề'),el('th',{},'Quyết định')));
+  const t=el('table',{class:'topTable'}); t.appendChild(el('tr',{},el('th',{},'Chủ đề'),el('th',{},'Quyết định')));
   (game.decisions||[]).forEach(d=>t.appendChild(el('tr',{},el('td',{},d.topic),el('td',{html:md(d.decision)}))));
   dec.appendChild(t); g2.appendChild(dec);
   m.appendChild(g2);
@@ -275,8 +286,8 @@ function ui(m){
   if(u.stale) m.appendChild(el('div',{class:'card',style:'border-color:#a8902f;margin-bottom:12px',html:'⚠ Ảnh có thể đã cũ: <code>'+esc(u.stale.file)+'</code> đổi lúc '+new Date(u.stale.mtime*1000).toLocaleString()+', sau lần chụp. Chạy <code>gamekit ui-shots '+esc(game.slug)+'</code> để cập nhật.'}));
   if(u.missing.length) m.appendChild(el('div',{class:'card err',style:'margin-bottom:12px'},'Chưa chụp: '+u.missing.join(', ')));
   const grid=el('div',{class:'grid g2'});
-  u.shots.forEach(x=>{ const c=el('div',{class:'card'},el('div',{class:'row'},el('h3',{style:'margin:0'},x.title),el('span',{class:'muted small'},x.name+(x.mtime?' · '+new Date(x.mtime*1000).toLocaleString():''))));
-    if(x.url){ const im=el('img',{src:x.url,style:'width:100%;border-radius:6px;border:1px solid var(--border);margin-top:8px;cursor:zoom-in;display:block'}); im.onclick=()=>openLightbox(x.url,x.title); c.appendChild(im); }
+  u.shots.forEach(x=>{ const c=el('div',{class:'card'},el('div',{class:'shotHead'},el('h3',{title:x.title},x.title),el('span',{class:'muted small'},x.name+(x.mtime?' · '+new Date(x.mtime*1000).toLocaleString():''))));
+    if(x.url){ const im=el('img',{src:x.url,style:'width:100%;border-radius:6px;border:1px solid var(--border);cursor:zoom-in;display:block'}); im.onclick=()=>openLightbox(x.url,x.title); c.appendChild(im); }
     grid.appendChild(c); });
   m.appendChild(grid);
 }
@@ -329,14 +340,14 @@ function map(m){
     const right=el('div',{});
     const mons=Object.keys(st.curves).concat(st.bursts.map(b=>b.monster)).filter((v,i,a)=>a.indexOf(v)===i);
     const col=mid=>MON_COL[mons.indexOf(mid)%MON_COL.length];
-    const W=640,H=260,P=34; const ch=el('canvas',{width:W,height:H}); const c=ch.getContext('2d');
+    const W=640,H=260,P=34,PR=26; const ch=el('canvas',{width:W,height:H}); const c=ch.getContext('2d');
     const maxR=Math.max(1,...Object.values(st.curves).flat());
     c.fillStyle='#121720'; c.fillRect(0,0,W,H); c.strokeStyle='#283142'; c.fillStyle='#93a0b8'; c.font='11px system-ui';
-    for(let s=0;s<=st.duration;s+=60){const x=P+(W-P-10)*s/st.duration; c.beginPath(); c.moveTo(x,10); c.lineTo(x,H-22); c.stroke(); c.fillText(mmss(s),x-14,H-6);}
+    for(let s=0;s<=st.duration;s+=60){const x=P+(W-P-PR)*s/st.duration; c.beginPath(); c.moveTo(x,10); c.lineTo(x,H-22); c.stroke(); c.textAlign='center'; c.fillText(mmss(s),x,H-6); c.textAlign='left';}
     for(let r=0;r<=maxR;r+=Math.max(1,Math.ceil(maxR/4))){const y=H-22-(H-34)*r/maxR; c.beginPath(); c.moveTo(P,y); c.lineTo(W-10,y); c.stroke(); c.fillText(r+'/s',4,y+4);}
     Object.entries(st.curves).forEach(([mid,vals])=>{c.strokeStyle=col(mid); c.lineWidth=2.5; c.beginPath();
-      vals.forEach((v,i)=>{const x=P+(W-P-10)*st.times[i]/st.duration, y=H-22-(H-34)*v/maxR; i?c.lineTo(x,y):c.moveTo(x,y);}); c.stroke();});
-    st.bursts.forEach(b=>{const x=P+(W-P-10)*b.t/st.duration; c.fillStyle=col(b.monster); c.fillRect(x-2,14,4,H-36);
+      vals.forEach((v,i)=>{const x=P+(W-P-PR)*st.times[i]/st.duration, y=H-22-(H-34)*v/maxR; i?c.lineTo(x,y):c.moveTo(x,y);}); c.stroke();});
+    st.bursts.forEach(b=>{const x=P+(W-P-PR)*b.t/st.duration; c.fillStyle=col(b.monster); c.fillRect(x-2,14,4,H-36);
       c.font='bold 11px system-ui'; c.fillText('+'+b.count,x+4,24);});
     right.appendChild(el('div',{class:'stage',style:'padding:0;background:#121720'},ch));
     const lg=el('div',{class:'legend',style:'margin-top:6px'});
@@ -452,10 +463,13 @@ function monsters(m){
     (info?info.meta.animations:[]).forEach(a=>{const b=el('button',{class:'btn'+(a.name===anim?' on':'')},a.name);
       b.onclick=()=>{anim=a.name; bar.querySelectorAll('.btn').forEach(x=>x.classList.toggle('on',x===b)); t0=performance.now();}; bar.appendChild(b);});
     card.appendChild(bar);
-    card.appendChild(statRow('heart','Máu',s.hp)); card.appendChild(statRow('sword','Sát thương chạm',s.damage));
-    card.appendChild(statRow('boot','Tốc độ',s.speed)); card.appendChild(statRow('gem','Kinh nghiệm rơi',s.xp));
+    const st=el('div',{class:'stats',style:'grid-template-columns:repeat(2,minmax(0,1fr));margin-top:8px'});
+    [['heart','Máu',s.hp],['sword','Sát thương chạm',s.damage],['boot','Tốc độ',s.speed],['gem','Kinh nghiệm rơi',s.xp]]
+      .forEach(([ic,l,v])=>st.appendChild(el('div',{class:'statCell'},iconCanvas(ic,2),el('div',{},el('b',{},String(v)),el('div',{class:'small muted'},l)))));
+    card.appendChild(st);
+    const PARAM={wobble:'lượn ngang (px/s)',charge_range:'tầm lao (px)',windup:'lấy đà (s)',dash_speed:'tốc độ lao (px/s)',dash_time:'thời gian lao (s)',charge_cooldown:'hồi lao (s)'};
     const extra=Object.entries(s).filter(([k])=>!['sprite','behaviour','hp','damage','speed','xp','scale'].includes(k));
-    if(extra.length) card.appendChild(el('div',{class:'small muted',style:'margin-top:4px'},extra.map(([k,v])=>k+' '+v).join(' · ')));
+    if(extra.length) card.appendChild(el('div',{class:'small muted',style:'margin-top:6px'},extra.map(([k,v])=>(PARAM[k]||k)+' '+v).join(' · ')));
     card.appendChild(el('div',{class:'small muted',style:'margin-top:6px'},mo.appears.length?mo.appears.map(a=>'Ải '+a.stage+': từ '+mmss(a.from)+', ~'+a.expected+' con').join(' · '):'Chưa xuất hiện ở ải nào'));
     grid.appendChild(card);
   });
@@ -497,10 +511,10 @@ function skills(m){
   show();
   // stat upgrades
   const su=el('div',{class:'card',style:'margin-top:14px'},el('h3',{},'Nâng cấp chỉ số (thẻ lên cấp)'));
-  const t=el('table'); const maxL=Math.max(1,...game.stat_ups.map(u=>u.max_level));
+  const t=el('table',{class:'mid'}); const maxL=Math.max(1,...game.stat_ups.map(u=>u.max_level));
   t.appendChild(el('tr',{},el('th',{},'Thẻ'),el('th',{},'Mô tả'),...Array.from({length:maxL},(_,i)=>el('th',{class:'num'},'Cấp '+(i+1)))));
   game.stat_ups.forEach(u=>{const cells=Array.from({length:maxL},(_,i)=>{const lv=u.levels[i]; if(!lv) return el('td',{});
-      return el('td',{class:'num small'},Object.entries(lv).map(([k,v])=>k+(v.mul!=null?' ×'+v.mul:' +'+v.add)).join(', '));});
+      return el('td',{class:'num small'},effText(lv));});
     t.appendChild(el('tr',{},el('td',{},el('div',{class:'iconRow'},iconCanvas(u.id,2),el('b',{},u.name))),el('td',{class:'small muted'},u.desc),...cells));});
   su.appendChild(t); m.appendChild(su);
 }
@@ -607,15 +621,15 @@ function skillPane(pane,s){
   });
   cv.style.cssText='width:100%;height:auto'; card.appendChild(el('div',{class:'stage',style:'margin-top:8px;padding:0'},cv));
   // per level table
-  const t=el('table',{style:'margin-top:10px'});
+  const t=el('table',{class:'mid',style:'margin-top:10px'});
   t.appendChild(el('tr',{},el('th',{},'Cấp'),el('th',{class:'num'},'Sát thương'),el('th',{class:'num'},'Cỡ ×'),el('th',{class:'num'},'Hồi chiêu'),el('th',{},'Sprite'),el('th',{},'Hiệu ứng nâng cấp')));
   const rows=[];
-  s.levels.forEach(l=>{ const thumb=el('canvas',{width:48,height:48});
+  s.levels.forEach(l=>{ const thumb=el('canvas',{width:32,height:32});
     const info=anySprite(l.sprite); if(info) sheetOf(info).then(sh=>{ if(!sh) return; const g=thumb.getContext('2d'); g.imageSmoothingEnabled=false;
-      const a=sh.anim(effectAnim(sh)); const idx=(a.start||0)+Math.floor(a.frames/2); const fs=sh.fs; const k=48/Math.max(fs[0],fs[1]); g.drawImage(sh.img,idx*fs[0],0,fs[0],fs[1],0,0,fs[0]*k,fs[1]*k);});
+      const a=sh.anim(effectAnim(sh)); const idx=(a.start||0)+Math.floor(a.frames/2); const fs=sh.fs; const k=32/Math.max(fs[0],fs[1]); g.drawImage(sh.img,idx*fs[0],0,fs[0],fs[1],0,0,fs[0]*k,fs[1]*k);});
     const r=el('tr',{},el('td',{},el('b',{},'Cấp '+l.level)),el('td',{class:'num'},l.damage),el('td',{class:'num'},l.size),el('td',{class:'num'},l.cooldown+' s'),
       el('td',{},el('div',{class:'row'},thumb,el('span',{class:'small'},l.sprite))),
-      el('td',{class:'small muted'},Object.entries(l.effects).map(([k,v])=>k+(v.mul!=null?' ×'+v.mul:' +'+v.add)).join(', ')));
+      el('td',{class:'small muted'},effText(l.effects)));
     r.style.cursor='pointer'; r.onclick=()=>{lvSel.value=l.level; lvSel.onchange();}; rows.push(r); t.appendChild(r);});
   const markRow=()=>rows.forEach((r,i)=>r.style.background=i===level-1?'#2f2550':'');
   markRow(); card.appendChild(t);
