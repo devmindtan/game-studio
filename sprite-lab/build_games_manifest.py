@@ -397,7 +397,7 @@ def statuses_of(root, data):
         if f.startswith("upgrades_") and f.endswith(".json"):
             pools[f] = load(os.path.join(data, f))
     for sid, st in sts.items():
-        dps, chain = [], []
+        dps, chain, times, slows = [], [], [], []
         for pool in pools.values():
             for defn in clean(pool.get("skills", {})).values():
                 for e in defn.get("on_hit", []):
@@ -405,13 +405,24 @@ def statuses_of(root, data):
                         continue
                     if "dps_mul" in e:
                         dps.append(float(e["dps_mul"]))
-                    if "mul" in e:
+                    if sid == "shock" and "mul" in e:
                         chain.append(float(e["mul"]))
+                    if sid == "slow" and "mul" in e:
+                        slows.append(float(e["mul"]))
+                    if "time" in e:
+                        times.append(float(e["time"]))
         facts = []
+        if times:
+            lo, hi = min(times), max(times)
+            span = "%g s" % lo if lo == hi else "%g–%g s" % (lo, hi)
+            facts.append("Thời gian %s (tùy chiêu)" % span)
+        if sid == "slow" and slows:
+            lo, hi = min(slows), max(slows)
+            facts.append("Tốc độ ×%s" % ("%g" % lo if lo == hi else "%g–%g" % (lo, hi)))
         if dps:
             r = max(dps)
             facts.append("Sát thương %g mỗi giây (%g%% sát thương đòn, đòn %g)" % (r * base, r * 100, base))
-        elif chain and sid == "shock":
+        elif chain:
             facts.append("Lan ×%g sát thương đòn" % max(chain))
         out.append({"id": sid, "name": st.get("name", sid), "kind": "debuff", "desc": st.get("desc", ""),
                     "at": st.get("at", "body"), "tint": st.get("tint", ""), "sprite": sprite_info(root, str(st.get("sprite", ""))),
