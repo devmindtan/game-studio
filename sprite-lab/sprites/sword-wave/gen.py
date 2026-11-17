@@ -69,7 +69,7 @@ fly = [frame(k) for k in range(6)]
 hb = {"shape": "rect", "center": [S / 2, S / 2], "active": [0, 5]}
 ANIMATIONS = [
     ("fly_right", fly, 14, True, {"hitbox": hb}),
-    ("impact", [impact(k) for k in range(5)], 14, False, {}),
+    ("impact", [impact(k) for k in range(5)], 14, False, {"hitbox": {"shape": "rect", "center": [S / 2, S / 2], "active": [0, 2]}}),
 ]
 ANIMATIONS, ANCHOR = dirs16.with_directions(ANIMATIONS, (S / 2, S / 2), 48)
 

@@ -37,7 +37,20 @@
       "start": 6,
       "frames": 5,
       "fps": 14.0,
-      "loop": false
+      "loop": false,
+      "hitbox": {
+        "shape": "rect",
+        "center": [
+          32.5,
+          30.0
+        ],
+        "active": [
+          0,
+          2
+        ],
+        "half_w": 12.5,
+        "half_h": 21.0
+      }
     },
     {
       "name": "fly_000",
