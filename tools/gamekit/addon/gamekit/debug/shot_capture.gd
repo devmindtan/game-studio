@@ -52,19 +52,24 @@ func _initialize() -> void:
 		quit(1)
 		return
 	_view.add_child(packed.instantiate())
-	RenderingServer.frame_post_draw.connect(_on_frame_drawn)
 
 
-func _on_frame_drawn() -> void:
+# Frames are counted in _process (it always runs) and a capture forces a draw.
+# Counting on RenderingServer.frame_post_draw hung at random (lesson 2026-11-17):
+# when the window was covered or on another workspace Godot skipped drawing, the
+# signal never came and the run spun at 100% CPU until the time limit.
+func _process(_delta: float) -> bool:
 	_count += 1
 	if _frames.has(_count):
+		RenderingServer.force_draw(false)
 		var img := _view.get_texture().get_image()
 		if img.get_size() != _size:   # never hand over a scaled screenshot
 			printerr("ERROR shot_capture: frame is %s, expected %s" % [img.get_size(), _size])
 			quit(1)
-			return
+			return true
 		var path := _out.path_join("%06d.png" % _count)
 		img.save_png(path)
 		print("GK_SHOT ", path)
 	if _count >= _frames[-1]:
 		quit()
+	return false
