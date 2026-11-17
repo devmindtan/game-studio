@@ -1,5 +1,5 @@
 {
-  "frames": 40,
+  "frames": 50,
   "frame_size": [
     16,
     16
@@ -286,8 +286,78 @@
       "loop": false
     },
     {
-      "name": "gear",
+      "name": "iron_helm",
       "start": 39,
+      "frames": 1,
+      "fps": 1.0,
+      "loop": false
+    },
+    {
+      "name": "wizard_hat",
+      "start": 40,
+      "frames": 1,
+      "fps": 1.0,
+      "loop": false
+    },
+    {
+      "name": "steel_chest",
+      "start": 41,
+      "frames": 1,
+      "fps": 1.0,
+      "loop": false
+    },
+    {
+      "name": "mage_robe",
+      "start": 42,
+      "frames": 1,
+      "fps": 1.0,
+      "loop": false
+    },
+    {
+      "name": "war_gloves",
+      "start": 43,
+      "frames": 1,
+      "fps": 1.0,
+      "loop": false
+    },
+    {
+      "name": "arcane_bracer",
+      "start": 44,
+      "frames": 1,
+      "fps": 1.0,
+      "loop": false
+    },
+    {
+      "name": "swift_boots",
+      "start": 45,
+      "frames": 1,
+      "fps": 1.0,
+      "loop": false
+    },
+    {
+      "name": "woven_shoes",
+      "start": 46,
+      "frames": 1,
+      "fps": 1.0,
+      "loop": false
+    },
+    {
+      "name": "steel_sword",
+      "start": 47,
+      "frames": 1,
+      "fps": 1.0,
+      "loop": false
+    },
+    {
+      "name": "crystal_staff",
+      "start": 48,
+      "frames": 1,
+      "fps": 1.0,
+      "loop": false
+    },
+    {
+      "name": "gear",
+      "start": 49,
       "frames": 1,
       "fps": 1.0,
       "loop": false
