@@ -1,0 +1,34 @@
+{
+  "palettes": [
+    {
+      "id": "dawn-32",
+      "name": "DawnBringer 32",
+      "author": "",
+      "colors": 32
+    },
+    {
+      "id": "cc-29",
+      "name": "CC-29",
+      "author": "Alpha6",
+      "colors": 29
+    },
+    {
+      "id": "magicolor-16",
+      "name": "magicolor 16",
+      "author": "polyphrog",
+      "colors": 16
+    },
+    {
+      "id": "resurrect-64",
+      "name": "Resurrect 64",
+      "author": "Kerrie Lake",
+      "colors": 64
+    },
+    {
+      "id": "greyt-bit",
+      "name": "Greyt-bit",
+      "author": "skeddles",
+      "colors": 8
+    }
+  ]
+}
