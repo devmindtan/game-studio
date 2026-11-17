@@ -316,10 +316,18 @@ cmd_shot() {
   trap 'rm -rf "${GK_SHOT_TMP:-}"' EXIT        # also on die / Ctrl-C / kill
   trap 'exit 130' INT TERM
   mkdir -p "$g/builds/shots"
-  "${RUN[@]}" "$GODOT" --path "$g" --windowed --resolution 1280x720 --fixed-fps 60 \
+  # A capture that hangs (seen once: 07-win ran 10 min at 100% CPU, 13 s on retry) must
+  # fail, not block the agent: GK_SHOT_TIMEOUT seconds, then kill.
+  local limit="${GK_SHOT_TIMEOUT:-180}"
+  local rc=0
+  "${RUN[@]}" timeout --kill-after=5 "$limit" "$GODOT" --path "$g" --windowed --resolution 1280x720 --fixed-fps 60 \
     -s res://addons/gamekit/debug/shot_capture.gd -- --gk-scene="$scene" --gk-capture="$frames" \
-    --gk-out="$tmp" "${extra[@]}" 2>&1 | grep -E "ERROR|Run over" >&2 || true  # stdout = paths only
+    --gk-out="$tmp" "${extra[@]}" 2>&1 | { grep -E "ERROR|Run over" >&2 || true; } || rc=$?  # stdout = paths only
+  [[ "$rc" == 124 || "$rc" == 137 ]] && die "shot timed out after ${limit}s (set GK_SHOT_TIMEOUT to allow longer)"
+  # unique name: two shots in the same second once overwrote each other
   local stamp; stamp="$(date +%Y%m%d-%H%M%S)"
+  local k=1 base="$stamp"
+  while compgen -G "$g/builds/shots/$stamp*.png" >/dev/null; do stamp="$base-$k"; k=$((k + 1)); done
   local f n=0 many=0
   [[ "$frames" == *,* ]] && many=1
   for f in "$tmp"/*.png; do

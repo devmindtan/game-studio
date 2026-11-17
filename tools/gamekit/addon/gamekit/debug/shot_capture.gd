@@ -13,6 +13,7 @@ var _frames: Array[int] = []
 var _out := ""
 var _count := 0
 var _size := Vector2i(1280, 720)
+var _view: SubViewport
 
 
 func _initialize() -> void:
@@ -33,23 +34,33 @@ func _initialize() -> void:
 		push_error("shot_capture: need --gk-capture=<frames>, --gk-out=<dir> and a scene")
 		quit(1)
 		return
-	# A decorated window on a small screen is shrunk by the window manager (a 1280x720
-	# request came out 1237x696, scaling the whole game): borderless at (0, 0), exact size.
-	DisplayServer.window_set_flag(DisplayServer.WINDOW_FLAG_BORDERLESS, true)
-	DisplayServer.window_set_position(Vector2i.ZERO)
-	DisplayServer.window_set_size(_size)
+	# The scene renders into a fixed-size SubViewport and that is what we save, so the
+	# OS window does not matter. (Capturing the window failed twice: the window manager
+	# shrank a decorated 1280x720 window to 1237x696, and later grew it to 1280x728.)
 	DisplayServer.window_set_vsync_mode(DisplayServer.VSYNC_DISABLED)
 	Engine.max_fps = 0
-	change_scene_to_file(scene)
+	_view = SubViewport.new()
+	_view.size = _size
+	_view.render_target_update_mode = SubViewport.UPDATE_ALWAYS
+	_view.canvas_item_default_texture_filter = Viewport.DEFAULT_CANVAS_ITEM_TEXTURE_FILTER_NEAREST \
+		if int(ProjectSettings.get_setting("rendering/textures/canvas_textures/default_texture_filter", 1)) == 0 \
+		else Viewport.DEFAULT_CANVAS_ITEM_TEXTURE_FILTER_LINEAR
+	root.add_child(_view)
+	var packed: PackedScene = load(scene)
+	if packed == null:
+		push_error("shot_capture: cannot load %s" % scene)
+		quit(1)
+		return
+	_view.add_child(packed.instantiate())
 	RenderingServer.frame_post_draw.connect(_on_frame_drawn)
 
 
 func _on_frame_drawn() -> void:
 	_count += 1
 	if _frames.has(_count):
-		var img := root.get_texture().get_image()
+		var img := _view.get_texture().get_image()
 		if img.get_size() != _size:   # never hand over a scaled screenshot
-			printerr("ERROR shot_capture: frame is %s, expected %s (window could not be sized)" % [img.get_size(), _size])
+			printerr("ERROR shot_capture: frame is %s, expected %s" % [img.get_size(), _size])
 			quit(1)
 			return
 		var path := _out.path_join("%06d.png" % _count)
