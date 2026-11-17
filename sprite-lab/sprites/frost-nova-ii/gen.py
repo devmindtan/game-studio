@@ -57,13 +57,7 @@ def frame(i):
         c.ellipse(CX-4,CY-4,CX+4,CY+4,ICE_D)
         c.ellipse(CX-2,CY-2,CX+2,CY+2,CORE)
         return c
-    # mat bang gia da dong bang
-    fr=round(8+17*min(1,t*1.3))
-    c.ellipse(CX-fr,CY-fr+3,CX+fr,CY+fr+6,SHADOW)
-    c.ellipse(CX-fr+2,CY-fr+4,CX+fr-2,CY+fr+3,NIGHT)
-    for k in range(16):
-        a=k*math.pi/8
-        dot(c,a,fr-2,DEEP)
+    # chi ngoi sao bang: khong ve nen tron toi ben duoi (nguoi dung 2026-11-17)
     # 8 canh hoa mo dan
     length=round(6+15*min(1,t*1.15))
     width=max(2,round(3+3*min(1,t*1.4)))
@@ -78,10 +72,6 @@ def frame(i):
     cr=max(2,round(5*(1-t*0.5)))
     c.ellipse(CX-cr,CY-cr,CX+cr,CY+cr,ICE)
     c.ellipse(CX-2,CY-2,CX+2,CY+2,CORE if i<6 else FROST)
-    # tuyet roi
-    for k in range(6):
-        a=k*1.7+i*0.3
-        dot(c,a,fr-4+k%3,SNOW)
     return c
 
 ANIM=[("burst",[frame(i) for i in range(8)],13,False,
