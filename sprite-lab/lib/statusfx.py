@@ -162,32 +162,37 @@ _BURN = ["#7a1c0e", "#e43d12", "#ff8a1f", "#ffd24a", "#fff3b0"]
 
 def burn(i):
     c = Canvas(S, S)
-    # one solid flame = filled tapered rows with a dark rim and a bright core
-    widths = [1, 3, 3, 5, 5, 7, 7, 9, 9, 11, 11, 11, 11, 9, 7]
+    # a low fire at the feet that licks up over the lower half of the body.
+    # Nothing is drawn above the head; the tongues grow and sway with the loop.
+    widths = [1, 2, 3, 4, 5, 6, 7, 7, 6, 5]
+    for y, half in ((25, 7), (26, 4)):       # thin glow at the feet
+        for x in range(int(C - half), int(C + half) + 1):
+            _px(c, x, y, "#ff5a1f60" if abs(x - C) > half - 3 else "#ff9a3a70")
 
-    def flame(cx, base, phase):
-        h = len(widths)
-        for j, w in enumerate(widths):
-            t = j / (h - 1)
+    def flame(cx, base, height, phase):
+        for j in range(height):
+            t = j / max(1, height - 1)
+            w = widths[min(len(widths) - 1, int(t * (len(widths) - 1) + 0.5))]
             sway = round(math.sin(i * 0.9 + phase + j * 0.4) * t * 2)
             for q in range(-w // 2, w - w // 2):
-                edge = abs(q) >= w // 2 - 1
-                if edge:
+                if abs(q) >= w // 2 - 1:
                     col = "#7a1c0e"
-                elif t < 0.18:
-                    col = "#c42d10"
-                elif abs(q) <= 1 and t > 0.72:
-                    col = "#fff3b0"
-                elif abs(q) <= 1 and t > 0.4:
+                elif t > 0.78:
+                    col = "#fff3b0" if q == 0 else "#ffd24a"
+                elif t > 0.45 and abs(q) <= 1:
                     col = "#ffd24a"
+                elif t < 0.2:
+                    col = "#c42d10"
                 else:
                     col = "#ff7a1fe0"
-                _px(c, cx + q + sway, base - (h - 1 - j), col)
+                _px(c, cx + q + sway, base - j, col)
 
-    # two side tongues and one above the head; nothing drawn under the feet
-    flame(C - 9, C + 9, 0)
-    flame(C + 9, C + 10, 2)
-    flame(C + 1, C + 2, 4)
+    # four tongues along the feet, mid-height ones tallest
+    for cx, h0, ph in ((C - 10, 8, 0), (C - 4, 11, 1), (C + 3, 12, 3), (C + 9, 9, 5)):
+        flame(cx, C + 9, h0 + round(math.sin(i * 0.8 + ph)), ph)
+    for k in range(3):                        # embers rising off the fire
+        y = 22 - ((i * 3 + k * 6) % 11)
+        _px(c, C - 8 + k * 8 + round(math.sin(i + k)), y, "#ffd24a")
     for k in range(5):                       # embers rising off the flames
         y = 20 - ((i * 3 + k * 5) % 18)
         x = C - 9 + k * 5 + math.sin(i * 0.7 + k) * 2
