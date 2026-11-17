@@ -237,46 +237,6 @@
       "4-dir"
     ]
   },
-  "cleave-wave-ii": {
-    "cat": "strike",
-    "tags": [
-      "melee",
-      "slash",
-      "4-dir",
-      "upgrade",
-      "tier-II"
-    ]
-  },
-  "cleave-wave-iii": {
-    "cat": "strike",
-    "tags": [
-      "melee",
-      "slash",
-      "4-dir",
-      "upgrade",
-      "tier-III"
-    ]
-  },
-  "cleave-wave-iv": {
-    "cat": "strike",
-    "tags": [
-      "melee",
-      "slash",
-      "4-dir",
-      "upgrade",
-      "tier-IV"
-    ]
-  },
-  "cleave-wave-v": {
-    "cat": "strike",
-    "tags": [
-      "melee",
-      "slash",
-      "4-dir",
-      "upgrade",
-      "tier-V"
-    ]
-  },
   "dagger-gold": {
     "cat": "weapon",
     "tags": [
@@ -1359,6 +1319,60 @@
       "melee",
       "slash",
       "4-dir"
+    ]
+  },
+  "sword-wave": {
+    "cat": "projectile",
+    "tags": [
+      "melee",
+      "slash",
+      "16-dir",
+      "tier-I",
+      "class-knight"
+    ]
+  },
+  "sword-wave-ii": {
+    "cat": "projectile",
+    "tags": [
+      "melee",
+      "slash",
+      "16-dir",
+      "upgrade",
+      "tier-II",
+      "class-knight"
+    ]
+  },
+  "sword-wave-iii": {
+    "cat": "projectile",
+    "tags": [
+      "melee",
+      "slash",
+      "16-dir",
+      "upgrade",
+      "tier-III",
+      "class-knight"
+    ]
+  },
+  "sword-wave-iv": {
+    "cat": "projectile",
+    "tags": [
+      "melee",
+      "slash",
+      "16-dir",
+      "upgrade",
+      "tier-IV",
+      "class-knight"
+    ]
+  },
+  "sword-wave-v": {
+    "cat": "projectile",
+    "tags": [
+      "melee",
+      "slash",
+      "16-dir",
+      "upgrade",
+      "tier-V",
+      "class-knight"
     ]
   },
   "sword-wood": {

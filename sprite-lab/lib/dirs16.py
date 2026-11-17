@@ -52,7 +52,12 @@ def with_directions(animations, anchor, size):
     right = None
     for a in animations:
         frames = [_pad(f, anchor, size) for f in a[1]]
-        out.append((a[0], frames) + tuple(a[2:]))
+        rest = tuple(a[2:])
+        if len(rest) >= 3 and isinstance(rest[2], dict) and "hitbox" in rest[2]:
+            hb = dict(rest[2]["hitbox"])
+            hb["center"] = [hb["center"][0] - anchor[0] + size / 2, hb["center"][1] - anchor[1] + size / 2]
+            rest = rest[:2] + (dict(rest[2], hitbox=hb),) + rest[3:]
+        out.append((a[0], frames) + rest)
         if a[0] == "fly_right":
             right = (frames,) + tuple(a[2:])
     if right is not None:

@@ -1,0 +1,363 @@
+{
+  "frames": 107,
+  "frame_size": [
+    48,
+    48
+  ],
+  "fps": 14.0,
+  "loop": true,
+  "anchor": [
+    24.0,
+    24.0
+  ],
+  "anchor_source": "explicit",
+  "animations": [
+    {
+      "name": "fly_right",
+      "start": 0,
+      "frames": 6,
+      "fps": 14.0,
+      "loop": true,
+      "hitbox": {
+        "shape": "rect",
+        "center": [
+          26.0,
+          24.0
+        ],
+        "active": [
+          0,
+          5
+        ],
+        "half_w": 9.0,
+        "half_h": 20.0
+      }
+    },
+    {
+      "name": "impact",
+      "start": 6,
+      "frames": 5,
+      "fps": 14.0,
+      "loop": false
+    },
+    {
+      "name": "fly_000",
+      "start": 11,
+      "frames": 6,
+      "fps": 14.0,
+      "loop": true,
+      "hitbox": {
+        "shape": "rect",
+        "center": [
+          26.0,
+          24.0
+        ],
+        "active": [
+          0,
+          5
+        ],
+        "half_w": 9.0,
+        "half_h": 20.0
+      }
+    },
+    {
+      "name": "fly_022",
+      "start": 17,
+      "frames": 6,
+      "fps": 14.0,
+      "loop": true,
+      "hitbox": {
+        "shape": "rect",
+        "center": [
+          24.5,
+          23.0
+        ],
+        "active": [
+          0,
+          5
+        ],
+        "half_w": 11.5,
+        "half_h": 20.0
+      }
+    },
+    {
+      "name": "fly_045",
+      "start": 23,
+      "frames": 6,
+      "fps": 14.0,
+      "loop": true,
+      "hitbox": {
+        "shape": "rect",
+        "center": [
+          24.0,
+          22.0
+        ],
+        "active": [
+          0,
+          5
+        ],
+        "half_w": 15.0,
+        "half_h": 17.0
+      }
+    },
+    {
+      "name": "fly_068",
+      "start": 29,
+      "frames": 6,
+      "fps": 14.0,
+      "loop": true,
+      "hitbox": {
+        "shape": "rect",
+        "center": [
+          24.0,
+          23.5
+        ],
+        "active": [
+          0,
+          5
+        ],
+        "half_w": 19.0,
+        "half_h": 13.5
+      }
+    },
+    {
+      "name": "fly_090",
+      "start": 35,
+      "frames": 6,
+      "fps": 14.0,
+      "loop": true,
+      "hitbox": {
+        "shape": "rect",
+        "center": [
+          24.0,
+          26.0
+        ],
+        "active": [
+          0,
+          5
+        ],
+        "half_w": 20.0,
+        "half_h": 9.0
+      }
+    },
+    {
+      "name": "fly_112",
+      "start": 41,
+      "frames": 6,
+      "fps": 14.0,
+      "loop": true,
+      "hitbox": {
+        "shape": "rect",
+        "center": [
+          25.0,
+          24.5
+        ],
+        "active": [
+          0,
+          5
+        ],
+        "half_w": 20.0,
+        "half_h": 11.5
+      }
+    },
+    {
+      "name": "fly_135",
+      "start": 47,
+      "frames": 6,
+      "fps": 14.0,
+      "loop": true,
+      "hitbox": {
+        "shape": "rect",
+        "center": [
+          26.0,
+          24.0
+        ],
+        "active": [
+          0,
+          5
+        ],
+        "half_w": 17.0,
+        "half_h": 15.0
+      }
+    },
+    {
+      "name": "fly_158",
+      "start": 53,
+      "frames": 6,
+      "fps": 14.0,
+      "loop": true,
+      "hitbox": {
+        "shape": "rect",
+        "center": [
+          24.5,
+          24.0
+        ],
+        "active": [
+          0,
+          5
+        ],
+        "half_w": 13.5,
+        "half_h": 19.0
+      }
+    },
+    {
+      "name": "fly_180",
+      "start": 59,
+      "frames": 6,
+      "fps": 14.0,
+      "loop": true,
+      "hitbox": {
+        "shape": "rect",
+        "center": [
+          22.0,
+          24.0
+        ],
+        "active": [
+          0,
+          5
+        ],
+        "half_w": 9.0,
+        "half_h": 20.0
+      }
+    },
+    {
+      "name": "fly_202",
+      "start": 65,
+      "frames": 6,
+      "fps": 14.0,
+      "loop": true,
+      "hitbox": {
+        "shape": "rect",
+        "center": [
+          23.5,
+          25.0
+        ],
+        "active": [
+          0,
+          5
+        ],
+        "half_w": 11.5,
+        "half_h": 20.0
+      }
+    },
+    {
+      "name": "fly_225",
+      "start": 71,
+      "frames": 6,
+      "fps": 14.0,
+      "loop": true,
+      "hitbox": {
+        "shape": "rect",
+        "center": [
+          24.0,
+          26.0
+        ],
+        "active": [
+          0,
+          5
+        ],
+        "half_w": 15.0,
+        "half_h": 17.0
+      }
+    },
+    {
+      "name": "fly_248",
+      "start": 77,
+      "frames": 6,
+      "fps": 14.0,
+      "loop": true,
+      "hitbox": {
+        "shape": "rect",
+        "center": [
+          24.0,
+          24.5
+        ],
+        "active": [
+          0,
+          5
+        ],
+        "half_w": 19.0,
+        "half_h": 13.5
+      }
+    },
+    {
+      "name": "fly_270",
+      "start": 83,
+      "frames": 6,
+      "fps": 14.0,
+      "loop": true,
+      "hitbox": {
+        "shape": "rect",
+        "center": [
+          24.0,
+          22.0
+        ],
+        "active": [
+          0,
+          5
+        ],
+        "half_w": 20.0,
+        "half_h": 9.0
+      }
+    },
+    {
+      "name": "fly_292",
+      "start": 89,
+      "frames": 6,
+      "fps": 14.0,
+      "loop": true,
+      "hitbox": {
+        "shape": "rect",
+        "center": [
+          23.0,
+          23.5
+        ],
+        "active": [
+          0,
+          5
+        ],
+        "half_w": 20.0,
+        "half_h": 11.5
+      }
+    },
+    {
+      "name": "fly_315",
+      "start": 95,
+      "frames": 6,
+      "fps": 14.0,
+      "loop": true,
+      "hitbox": {
+        "shape": "rect",
+        "center": [
+          22.0,
+          24.0
+        ],
+        "active": [
+          0,
+          5
+        ],
+        "half_w": 17.0,
+        "half_h": 15.0
+      }
+    },
+    {
+      "name": "fly_338",
+      "start": 101,
+      "frames": 6,
+      "fps": 14.0,
+      "loop": true,
+      "hitbox": {
+        "shape": "rect",
+        "center": [
+          23.5,
+          24.0
+        ],
+        "active": [
+          0,
+          5
+        ],
+        "half_w": 13.5,
+        "half_h": 19.0
+      }
+    }
+  ]
+}
