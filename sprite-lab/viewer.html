@@ -74,7 +74,8 @@ label.ctrlLbl{font-size:11px;color:var(--muted);display:flex;align-items:center;
 .panel.closed .panelBody{display:none} .panel.closed .panelHead{border-bottom:none}
 .panelBody{padding:8px}
 .previewPanel{margin:0 10px 10px}
-.previewScroll{overflow:auto;max-height:62vh;border:1px solid var(--border);border-radius:6px;background:#121720}
+.previewScroll{border:1px solid var(--border);border-radius:6px;background:#121720;width:fit-content;max-width:100%;margin:0 auto;overflow:auto;max-height:46vh}
+/* vừa màn hình: không phóng to quá cỡ gốc, thu nhỏ cho vừa cả ngang lẫn dọc (fitPreview) */
 .previewScroll img{image-rendering:pixelated;display:block;margin:0 auto;max-width:100%;height:auto}
 .gifRow{display:flex;gap:8px;flex-wrap:wrap}
 .gifRow figure{margin:0;cursor:pointer} .gifRow img{image-rendering:pixelated;border:1px solid var(--border);border-radius:6px;background:#121720;height:88px}
@@ -330,6 +331,21 @@ function setAnim(i){
   buildAnimBtns(); buildFilm(); markGif(); updatePlayBtn(); updateHash();
 }
 function currentAnim(){return anims[animIdx]||anims[0];}
+function fitPreview(){
+  // Preview sheet: never bigger than the file itself, and shrink so the whole
+  // sheet fits on screen (width and ~half the window height). Very tall, narrow
+  // sheets stop at 200px wide and scroll inside the box instead of shrinking
+  // to an unreadable sliver.
+  const i=$('previewImg'); if(!i||!i.naturalWidth) return;
+  const panel=i.closest('.previewPanel'); if(panel.classList.contains('closed')) return;
+  const availW=panel.clientWidth-16, availH=Math.max(120,Math.round(innerHeight*0.46)-18);
+  let w=Math.min(i.naturalWidth,Math.max(120,availW));
+  if(w*i.naturalHeight/i.naturalWidth>availH){
+    const fitH=Math.round(availH*i.naturalWidth/i.naturalHeight);
+    if(fitH>=200) w=fitH;
+  }
+  i.style.width=w+'px';
+}
 function frameMs(a,i){ return a.durations_ms? a.durations_ms[i] : 1000/Math.max(1,a.fps||8); }
 function resizeCanvas(){
   if(!current) return; const fs=current.meta.frame_size||[32,32];
@@ -473,7 +489,9 @@ $('btnPlay').onclick=()=>{ const a=currentAnim(); if(!playing && a && a.loop===f
 $('btnPrev').onclick=()=>stepFrame(-1);
 $('btnNext').onclick=()=>stepFrame(1);
 $('btnRestart').onclick=()=>{frameInAnim=0; acc=0; playing=true; updatePlayBtn();};
-document.querySelectorAll('.panelHead').forEach(h=>h.onclick=()=>h.parentElement.classList.toggle('closed'));
+document.querySelectorAll('.panelHead').forEach(h=>h.onclick=()=>{h.parentElement.classList.toggle('closed'); fitPreview();});
+$('previewImg').addEventListener('load',fitPreview);
+window.addEventListener('resize',fitPreview);
 document.addEventListener('keydown',e=>{
   if(e.target===$('q')){ if(e.key==='Escape'){ $('q').blur(); } return; }
   if(e.ctrlKey||e.metaKey||e.altKey) return;
