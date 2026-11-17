@@ -28,6 +28,7 @@ var dir := Vector2.RIGHT
 var half_angle := PI            # radians
 var active_from := 0.0          # seconds into the animation
 var active_to := 0.0
+var loop_len := 0.0             # > 0: the animation loops; is_active wraps t into one loop
 
 
 ## The hitbox of [param anim] drawn with its anchor on [param point] at
@@ -59,6 +60,8 @@ static func of(sheet: SpriteSheet, anim: String, point: Vector2, scale: float, f
 	var span: Array = box.get("active", [0, int(a.get("frames", 1)) - 1])
 	hb.active_from = frame_time(a, int(span[0]))
 	hb.active_to = frame_time(a, int(span[1]) + 1)
+	if bool(a.get("loop", false)):
+		hb.loop_len = frame_time(a, int(a.get("frames", 1)))
 	return hb
 
 
@@ -93,8 +96,12 @@ static func frame_time(a: Dictionary, i: int) -> float:
 	return float(mini(i, n)) / maxf(0.001, float(a.get("fps", 8)))
 
 
-## True while the animation is on a frame that deals damage.
+## True while the animation is on a frame that deals damage. A looping animation
+## (a flying wave or bullet that lives longer than one loop) is active on its
+## active frames in every loop, not only the first.
 func is_active(t: float) -> bool:
+	if loop_len > 0.0:
+		t = fposmod(t, loop_len)
 	return t >= active_from and t < active_to
 
 
