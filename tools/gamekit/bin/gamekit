@@ -312,6 +312,13 @@ cmd_shot() {
   [[ "${1:-}" == "--" ]] && { shift; extra=("$@"); }
   [[ "$frames" =~ ^[0-9]+(,[0-9]+)*$ ]] || die "frames must be N or N,N,... (got $frames)"
   [[ -f "$g/addons/gamekit/debug/shot_capture.gd" ]] || die "addon too old for shot - gamekit install $(basename "$g")"
+  # Re-import when an asset changed since the last import: otherwise Godot draws the
+  # previously imported texture (lesson 2026-11-17: a promoted sprite showed its old art).
+  local stamp_file="$g/.godot/gk_import_stamp"
+  if [[ ! -f "$stamp_file" ]] || [[ -n "$(find "$g/assets" "$g/addons" -newer "$stamp_file" -type f \
+        ! -name '*.import' -print -quit 2>/dev/null)" ]]; then
+    godot_import "$g"; mkdir -p "$g/.godot"; : > "$stamp_file"
+  fi
   GK_SHOT_TMP="$(mktemp -d)"; local tmp="$GK_SHOT_TMP"
   trap 'rm -rf "${GK_SHOT_TMP:-}"' EXIT        # also on die / Ctrl-C / kill
   trap 'exit 130' INT TERM
@@ -409,7 +416,11 @@ lab_install() {
 }
 
 lab_ready() {  # addon present and current, project imported
-  if [[ ! -f "$LAB/addons/gamekit/VERSION" || "$(cat "$LAB/addons/gamekit/VERSION")" != "$VERSION" ]]; then
+  # Compare the files, not only VERSION: an addon edited without a version bump left the
+  # lab on a stale shot_capture.gd that captured blank white frames (lesson 2026-11-17).
+  if [[ ! -f "$LAB/addons/gamekit/VERSION" || "$(cat "$LAB/addons/gamekit/VERSION")" != "$VERSION" ]] \
+      || ! diff -rq --exclude='*.uid' --exclude='*.import' --exclude=VERSION \
+           "$KIT/addon/gamekit" "$LAB/addons/gamekit" >/dev/null 2>&1; then
     lab_install
   fi
   # Always re-import: a running Godot uses the textures imported earlier, so a strip
