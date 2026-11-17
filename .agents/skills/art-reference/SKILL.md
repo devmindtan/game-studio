@@ -15,6 +15,24 @@ Tránh thiết kế mò tốn token: trước khi vẽ một sprite mới, **xem
 layer outline — rồi tự vẽ lại bằng `gen.py` trong Sprite Lab. Không bao giờ sao chép đúng pixel của
 asset người khác; đây chỉ là **tham chiếu ý tưởng**.
 
+## Internet reference là bắt buộc, không phải tùy chọn (rule 2026-11-17)
+
+Tham khảo trong repo (`art-refs/`, LPC) chỉ cho màu sắc và cấu trúc **chung**; nó không cho biết **một hiệu ứng
+đẹp trong game còn thường tự nhiên như thế nào**. Trước khi khóa thiết kế, agent phải:
+
+1. **Tra một tựa game/pixel có phong cách gần** (Survivors-like, roguelite xếp lớp, top-down pixel) hoặc
+   **phong cách pixel đang thịnh hành** (ví dụ pixel noir, cozy 16-bit, hard rim-light, low saturation + selective
+   pop, hoặc rule of thirds cho fire/particle FX).
+2. Xem 2–5 mẫu **chính thống, công khai** — trang chính thức của game, press kit, presskit/itch.io công khai,
+   blog dev của studio, devlog, hoặc tài liệu thiết kế mở; **không** lấy từ bản mod/crack/forum sprite copy trái phép.
+3. Ghi lại 3 dòng: (a) điểm mạnh nên học, (b) điểm nên tránh, (c) quyết định của mình (palette, số khung,
+   hướng, timing) và lý do.
+4. Nếu không có internet (offline hoặc tool bị chặn), báo rõ là đã bỏ bước này và chọn
+   tham chiếu cục bộ + rule "thiết kế conservative"; đừng giả vờ đã tra.
+
+Luôn tuân phép: **học từ, không sao chép**. Muốn reuse nguyên → phải là asset free/CC0 đã ghi credit theo
+`ATTRIBUTIONS.md` / `external-sources.md`; pixel của người khác thì không.
+
 ## Palettes miễn phí (đã tải 27 bộ)
 
 `art-refs/palettes/*.json` + `art-refs/palettes/index.json` (tên, tác giả, số màu). Dùng để chọn bảng
