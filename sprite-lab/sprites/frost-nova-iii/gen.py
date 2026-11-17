@@ -1,5 +1,8 @@
 #!/usr/bin/env python3
-"""Glacial Spires III — cọc băng mọc lên, mặt đất nứt nẻ."""
+"""Frost Nova III — ngôi sao băng 8 cánh của bậc II (giữ nguyên), nay đầu mỗi cánh bắn ra một mảnh băng.
+
+DNA băng: kết tinh, đối xứng tròn, cạnh sắc. Kế thừa: II = ngôi sao; III = ngôi sao + mảnh bắn ra.
+"""
 import math, sys
 from pathlib import Path
 
@@ -36,66 +39,59 @@ def dot(c,a,r,col,size=1):
         for dy in range(-size+1,size):
             p(c,x+dx,y+dy,col)
 
-def gem(c,a,dist,h,size):
-    # tinh thể đứng: đáy có bóng, thân khối lăng trụ, mặt sáng/trối rõ
-    ux,uy=math.cos(a),math.sin(a); vx,vy=-uy,ux
-    bx=CX+ux*dist; by=CY+uy*dist
-    tip=(bx+uy*h*0.15, by-ux*h*0.15-h)
-    base_l=(bx+vx*size,by+vy*size)
-    base_r=(bx-vx*size,by-vy*size)
-    mid_l=(bx+vx*size*0.55-uy*h*0.05, by+vy*size*0.55-ux*h*0.05-h*0.55)
-    mid_r=(bx-vx*size*0.55-uy*h*0.05, by-vy*size*0.55-ux*h*0.05-h*0.55)
-    poly(c,[(base_l[0]+2,base_l[1]+3),(base_r[0]+2,base_r[1]+3),
-            (mid_r[0]+2,mid_r[1]+2),(mid_l[0]+2,mid_l[1]+2)],SHADOW)
-    poly(c,[base_l,base_r,mid_r,mid_l],ICE_D)
-    poly(c,[mid_l,mid_r,tip],ICE)
-    poly(c,[mid_r,tip,(bx+ux*size*0.2,by+uy*size*0.2-h*0.6)],DEEP)
-    c.line(int(mid_l[0]),int(mid_l[1]),int(tip[0]),int(tip[1]),ICE_M)
-    c.line(int(base_l[0]),int(base_l[1]),int(mid_l[0]),int(mid_l[1]),FROST)
-    p(c,tip[0],tip[1],CORE)
-    # mat truoc: vach sang
-    c.line(int(base_l[0]),int(base_l[1]),int(mid_l[0]),int(mid_l[1]),CORE)
+def petal(c,a,length,width,col_mid,col_edge,col_core):
+    # canh hoa: thân hẹt, đầu nhọn, có gờ sáng
+    ux,uy=math.cos(a),math.sin(a)
+    vx,vy=-uy,ux
+    base=5
+    tip=(CX+ux*length,CY+uy*length)
+    l=(CX+ux*(base+length*0.45)+vx*width,CY+uy*(base+length*0.45)+vy*width)
+    r=(CX+ux*(base+length*0.45)-vx*width,CY+uy*(base+length*0.45)-vy*width)
+    poly(c,[l,tip,r],col_mid)
+    c.line(int(l[0]),int(l[1]),int(tip[0]),int(tip[1]),col_core)
+    c.line(int(tip[0]),int(tip[1]),int(r[0]),int(r[1]),col_edge)
+    # gân giữa
+    c.line(CX+int(ux*base),CY+int(uy*base),int(tip[0]),int(tip[1]),col_core)
 
-def crack(c,a,reach):
-    x,y=CX,CY
-    for s in range(1,5):
-        rr=reach*s/4
-        wob=math.sin(s*2.3+a*7)*2
-        nx=CX+math.cos(a+wob*0.01)*rr
-        ny=CY+math.sin(a+wob*0.01)*rr
-        c.line(int(round(x)),int(round(y)),int(round(nx)),int(round(ny)),NIGHT,max(1,4-s))
-        if s>2: c.line(int(round(x)),int(round(y)),int(round(nx)),int(round(ny)),ICE_D)
-        x,y=nx,ny
+def shard(c,a,dist,ln,w):
+    # manh bang hinh thoi nhon theo huong bay
+    ux,uy=math.cos(a),math.sin(a); vx,vy=-uy,ux
+    bx,by=CX+ux*dist,CY+uy*dist
+    tip=(bx+ux*ln,by+uy*ln); tail=(bx-ux*ln*0.5,by-uy*ln*0.5)
+    l=(bx+vx*w,by+vy*w); r=(bx-vx*w,by-vy*w)
+    poly(c,[tail,l,tip,r],ICE_M)
+    c.line(int(round(tail[0])),int(round(tail[1])),int(round(tip[0])),int(round(tip[1])),ICE)
+    p(c,tip[0],tip[1],CORE)
 
 def frame(i):
     c=Canvas(SIZE,SIZE)
     t=i/7.0
-    reach=round(6+20*min(1,t*1.2))
-    for k in range(8):
-        crack(c,k*math.pi/4+0.08,reach)
     if i==0:
-        c.ellipse(CX-4,CY-4,CX+4,CY+4,ICE_M)
-        p(c,CX,CY,CORE)
+        c.ellipse(CX-4,CY-4,CX+4,CY+4,ICE_D)
+        c.ellipse(CX-2,CY-2,CX+2,CY+2,CORE)
         return c
-    h=round(4+16*min(1,t*1.15))
-    size=max(2,round(2+2*min(1,t*1.5)))
-    dist=round(5+9*min(1,t*1.2))
-    # 8 tinh the lon theo vong, 8 tinh the nho xen ke
+    # chi ngoi sao bang: khong ve nen tron toi ben duoi (nguoi dung 2026-11-17)
+    # 8 canh hoa mo dan
+    length=round(6+15*min(1,t*1.15))
+    width=max(2,round(3+3*min(1,t*1.4)))
     for k in range(8):
-        gem(c,k*math.pi/4,dist,h,size)
+        a=k*math.pi/4 + (0.05 if i%2 else -0.05)
+        petal(c,a,length,width,ICE_D,DEEP,ICE_M)
+    if i>=3:
+        for k in range(8):
+            a=k*math.pi/4+math.pi/8
+            petal(c,a,round(length*0.62),max(1,width-1),ICE,ICE_D,ICE_M)
+    # moi: manh bang bay ra tu dau moi canh lon (tu frame 4)
     if i>=4:
+        d=min(length+2+(i-4)*2, CX-9)   # tip stays inside the frame, 2 px margin
         for k in range(8):
-            gem(c,k*math.pi/4+math.pi/8,dist+3,round(h*0.6),max(1,size-1))
-    cr=max(1,round(4*(1-t*0.7)))
-    c.ellipse(CX-cr,CY-cr,CX+cr,CY+cr,DEEP)
-    c.ellipse(CX-cr+1,CY-cr+1,CX+cr-1,CY+cr-1,ICE)
-    p(c,CX,CY,CORE)
-    for k in range(10):
-        dot(c,k*2.1+i*0.4,reach-2+k%4,SNOW)
-    if i==7:
-        for k in range(8):
-            dot(c,k*math.pi/4,round(reach*0.65),DEEP)
+            shard(c,k*math.pi/4,d,5,2)
+    # nhuy hoa
+    cr=max(2,round(5*(1-t*0.5)))
+    c.ellipse(CX-cr,CY-cr,CX+cr,CY+cr,ICE)
+    c.ellipse(CX-2,CY-2,CX+2,CY+2,CORE if i<6 else FROST)
     return c
+
 ANIM=[("burst",[frame(i) for i in range(8)],13,False,
        {"hitbox":{"shape":"circle","center":[float(CX),float(CY)],"active":[2,6]}})]
 if __name__=="__main__":
