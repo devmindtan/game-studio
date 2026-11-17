@@ -506,7 +506,7 @@ function skills(m){
   const show=()=>{ list.innerHTML='';
     game.skills.forEach(s=>{
       const it=el('div',{class:'listItem iconRow'+(s.id===curSkillId?' active':'')},iconCanvas(s.id,2),el('div',{},el('div',{class:'t'},s.name),
-        el('div',{class:'s'},s.max_level+' cấp'+(s.tiers.length>1?' · '+s.tiers.length+' bậc sprite':'')+(s.start?' · chiêu khởi đầu':''))));
+        el('div',{class:'s'},((game.heroes.find(h=>h.id===s.class)||{}).name||s.class)+' · '+s.max_level+' cấp'+(s.tiers.length>1?' · '+s.tiers.length+' bậc sprite':'')+(s.start?' · chiêu khởi đầu':''))));
       it.onclick=()=>{curSkillId=s.id; painters=[]; history.replaceState(null,'','#'+game.slug+'/skills/'+s.id); show();}; list.appendChild(it);});
     skillPane(pane,game.skills.find(s=>s.id===curSkillId)); wrapTables(pane); };
   show();
@@ -543,7 +543,8 @@ function skillPane(pane,s){
   const W=720,H=300;
   let Z=2, VW=W/2, VH=H/2;         // zoom: 2x for small attacks, less for big ones so the whole area fits
   let FEET={x:130,y:100};
-  const heroInfo=game.heroes[0]&&game.heroes[0].sprite;
+  // the demo uses the hero of the skill's own class
+  const heroInfo=(game.heroes.find(h=>h.id===s.class)||game.heroes[0]||{}).sprite;
   const dummy=game.monsters.find(x=>x.id==='slime')||game.monsters[0];
   const sheets={};
   [...new Set([...s.tiers,heroInfo&&heroInfo.name,dummy&&dummy.sprite&&dummy.sprite.name].filter(Boolean))]
@@ -558,7 +559,7 @@ function skillPane(pane,s){
     const fx=sheets[lv.sprite], hero=heroInfo&&sheets[heroInfo.name], sl=dummy&&sheets[dummy.sprite.name];
     if(!fx||!hero||!sl) return null;
     const how=s.params.cast||'';
-    if(how==='active'||how==='wave') return moveScene(lv,fx,hero,sl,how);
+    if(how==='active'||how==='wave'||how==='projectile') return moveScene(lv,fx,hero,sl,how);
     const kind=fx.anims.some(a=>a.name.startsWith('slash_'))?'melee':fx.has('spin')?'orbit':s.params.cast_range?'cast':'self';
     const anim0=kind==='melee'?'slash_right':effectAnim(fx), hbz=hbAt(fx,anim0);
     const rz=hbz?(hbz.shape==='rect'?Math.max(hbz.half_w,hbz.half_h):hbz.radius)*2*lv.size:40;
@@ -584,17 +585,18 @@ function skillPane(pane,s){
   // wave: the effect flies right at its speed and hits the dummy on the way;
   // active (dash): the hero dashes right with its dash animation and slashes the dummy
   function moveScene(lv,fx,hero,sl,how){
-    const dash=how==='active', time=Number(s.params.time||0.18), speed=Number(s.params.speed||300);
-    const travel=dash?Number(s.params.distance||130):speed*fx.duration('sweep_right');
+    const dash=how==='active', shot=how==='projectile', time=Number(s.params.time||0.18), speed=Number(s.params.speed||300);
+    const fly=shot?'fly_right':'sweep_right';
+    const travel=dash?Number(s.params.distance||130):shot?Math.min(speed*Number(s.params.duration||1),260):speed*fx.duration(fly);
     Z=Math.max(1,Math.min(2,(W-40)/(travel+160))); VW=W/Z; VH=H/Z;
     FEET={x:60,y:VH/2+24};
     const hb0=hero.meta.body, hc={x:FEET.x+(hb0?(hb0.center[0]-hero.anchor[0])*2:0),y:FEET.y+(hb0?(hb0.center[1]-hero.anchor[1])*2:-26)};
     const ssc=dummy.stats.scale||2, sb=sl.meta.body||{center:sl.anchor,radius:8};
     const dist=travel*0.6, target={x:hc.x+dist,y:hc.y};
     const slFeet={x:target.x-(sb.center[0]-sl.anchor[0])*ssc,y:target.y-(sb.center[1]-sl.anchor[1])*ssc};
-    const lead=0.3, dur=dash?time+0.35:fx.duration('sweep_right');
     const hitAt=dash?time*0.5:dist/speed;
-    return {fx,hero,sl,kind:dash?'dash':'wave',anim:dash?'dash':'sweep_right',sc:2*lv.size,hb:null,lead,dur,a0:hitAt,a1:hitAt+0.1,
+    const lead=0.3, dur=dash?time+0.35:shot?hitAt+(fx.has('impact')?fx.duration('impact'):0.2):fx.duration(fly);
+    return {fx,hero,sl,kind:dash?'dash':shot?'shot':'wave',anim:dash?'dash':fly,sc:2*lv.size,hb:null,lead,dur,a0:hitAt,a1:hitAt+0.1,
       hits:[lead+hitAt],fxAt:{x:hc.x,y:hc.y},hcx:hc.x,hcy:hc.y,slFeet,target,ssc,sb,hc,period:lead+dur+0.8,time,speed,travel};
   }
   hitB.onclick=()=>{ const sc=scene(s.levels[level-1]||s.levels[0]); if(!sc||!sc.hits.length) return false;
@@ -627,7 +629,10 @@ function skillPane(pane,s){
       else sc.hero.draw(g,'idle',u,et>=sc.dur?FEET.x+sc.travel:FEET.x,FEET.y,2,false);
     } else sc.hero.draw(g,'idle',u,FEET.x,FEET.y,2,false);
     if(sc.kind==='wave'&&et>=0&&et<sc.dur){ sc.fx.draw(g,sc.anim,et,sc.fxAt.x+sc.speed*et,sc.fxAt.y,sc.sc); }
-    else if(sc.kind!=='dash'&&et>=0&&et<sc.dur){ const at=sc.kind==='orbit'?et%sc.fx.duration(sc.anim):et; sc.fx.draw(g,sc.anim,at,sc.fxAt.x,sc.fxAt.y,sc.sc);
+    else if(sc.kind==='shot'&&et>=0&&et<sc.dur){
+      if(et<sc.a0) sc.fx.draw(g,sc.anim,et%sc.fx.duration(sc.anim),sc.fxAt.x+sc.speed*et,sc.fxAt.y,sc.sc);   // flying
+      else if(sc.fx.has('impact')) sc.fx.draw(g,'impact',et-sc.a0,sc.target.x,sc.target.y,sc.sc); }         // hit
+    else if(sc.kind!=='dash'&&sc.kind!=='shot'&&et>=0&&et<sc.dur){ const at=sc.kind==='orbit'?et%sc.fx.duration(sc.anim):et; sc.fx.draw(g,sc.anim,at,sc.fxAt.x,sc.fxAt.y,sc.sc);
       const active=sc.kind==='orbit'||(et>=sc.a0&&et<sc.a1);
       if(showHb&&sc.hb) drawHb(g,sc.hb,sc.hcx,sc.hcy,sc.sc,true);
       if(showHb){ g.strokeStyle='rgba(110,255,140,.8)'; g.lineWidth=1.5; g.beginPath(); g.arc(sc.target.x,sc.target.y,sc.sb.radius*sc.ssc,0,Math.PI*2); g.stroke(); } }
@@ -640,7 +645,7 @@ function skillPane(pane,s){
     const hitNow=done.length&&u-lastHit<0.3;
     g.setTransform(1,0,0,1,0,0);
     g.font='12px system-ui'; g.textAlign='left'; g.fillStyle='#e9eef8';
-    g.fillText('×'+Z.toFixed(2).replace(/\.?0+$/,'')+' · Cấp '+lv.level+' · '+lv.sprite+' · '+({melee:'chém gần',orbit:'xoáy quanh người',cast:'bắn ra '+(s.params.cast_range||0)+' px',self:'quanh người',wave:'bay '+(s.params.speed||0)+' px/s',dash:'lướt '+(s.params.distance||0)+' px (Space)'})[sc.kind]+' · sát thương '+lv.damage+' · slime '+hp0+' máu',10,18);
+    g.fillText('×'+Z.toFixed(2).replace(/\.?0+$/,'')+' · Cấp '+lv.level+' · '+lv.sprite+' · '+({melee:'chém gần',orbit:'xoáy quanh người',cast:'bắn ra '+(s.params.cast_range||0)+' px',self:'quanh người',wave:'bay '+(s.params.speed||0)+' px/s',shot:'đạn bay '+(s.params.speed||0)+' px/s'+(s.params.explode?', nổ':'')+(s.params.pierce?', xuyên':''),dash:'lướt '+(s.params.distance||0)+' px (Space)'})[sc.kind]+' · sát thương '+lv.damage+' · slime '+hp0+' máu',10,18);
     if(!sc.hits.length){ g.fillStyle='#ff8a8a'; g.fillText('Không trúng hình nhân ở vị trí này',10,36); }
     if(hitNow){ g.font='bold 22px system-ui'; g.fillStyle='#ffd36b'; g.textAlign='center'; g.fillText(lethal?'HẠ!':'TRÚNG!',W/2,40); }
   });
