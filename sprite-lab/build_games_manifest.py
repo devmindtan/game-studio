@@ -191,6 +191,8 @@ def skill_entry(skill_id, defn, upgrade, cls, root):
             "cooldown": round(cooldown, 2),
             "sprite": tiers[min(lv - 1, len(tiers) - 1)],
             "effects": eff,
+            # statuses the skill puts on monsters at this level (on_hit "from")
+            "statuses": [e for e in defn.get("on_hit", []) if int(e.get("from", 1)) <= lv],
         })
     return {
         "id": skill_id, "name": upgrade.get("name", skill_id), "desc": upgrade.get("desc", ""),
@@ -358,10 +360,42 @@ def buff_facts(it, bcfg):
     return f
 
 
+def status_numbers(sid, e):
+    """One on_hit entry in words: '1,5 s, tốc độ ×0,5'."""
+    out = []
+    if "time" in e:
+        out.append("%g s" % float(e["time"]))
+    if "mul" in e:
+        out.append(("tốc độ ×%g" if sid == "slow" else "×%g sát thương mỗi lần lan") % float(e["mul"]))
+    if "dps_mul" in e:
+        out.append("mỗi giây %g%% sát thương đòn" % (float(e["dps_mul"]) * 100))
+    if "chain" in e:
+        out.append("lan %d quái" % int(e["chain"]))
+    return ", ".join(out)
+
+
 def statuses_of(root, data):
-    """Status effects drawn on characters: today the aura of each buff (items.json buffs)."""
+    """Status effects drawn on characters: the aura of each buff (items.json buffs)
+    and each monster status (statuses.json), with the skills that cause it."""
     items = load(os.path.join(data, "items.json"))
     out = []
+    sts = clean(load(os.path.join(data, "statuses.json")).get("statuses", {}))
+    pools = {}
+    for f in sorted(os.listdir(data)):
+        if f.startswith("upgrades_") and f.endswith(".json"):
+            pools[f] = load(os.path.join(data, f))
+    for sid, st in sts.items():
+        by = []
+        for f, pool in pools.items():
+            names = {u["id"]: u.get("name", u["id"]) for u in pool.get("upgrades", [])}
+            for kid, defn in clean(pool.get("skills", {})).items():
+                for e in defn.get("on_hit", []):
+                    if e.get("status") == sid:
+                        nums = status_numbers(sid, e)
+                        by.append("%s (cấp %s+): %s" % (names.get(kid, kid), e.get("from", 1), nums))
+        out.append({"id": sid, "name": st.get("name", sid), "kind": "debuff", "desc": st.get("desc", ""),
+                    "at": st.get("at", "body"), "tint": st.get("tint", ""), "sprite": sprite_info(root, str(st.get("sprite", ""))),
+                    "facts": by or ["Chưa có chiêu nào gây ra (dành cho class sau)."]})
     for bid, it in clean(items.get("buffs", {})).items():
         if not it.get("aura"):
             continue

@@ -654,7 +654,8 @@ function skillPane(pane,s){
       const a=sh.anim(effectAnim(sh)); const idx=(a.start||0)+Math.floor(a.frames/2); const fs=sh.fs; const k=32/Math.max(fs[0],fs[1]); g.drawImage(sh.img,idx*fs[0],0,fs[0],fs[1],0,0,fs[0]*k,fs[1]*k);});
     const r=el('tr',{},el('td',{},el('b',{},'Cấp '+l.level)),el('td',{class:'num'},l.damage),el('td',{class:'num'},l.size),el('td',{class:'num'},l.cooldown+' s'),
       el('td',{},el('div',{class:'row'},thumb,el('span',{class:'small'},l.sprite))),
-      el('td',{class:'small muted'},effText(l.effects)));
+      el('td',{class:'small muted'},effText(l.effects),
+        ...(l.statuses||[]).map(e=>el('div',{class:'small',style:'color:#ffb08a'},'· '+(((game.statuses||[]).find(x=>x.id===e.status)||{}).name||e.status)+(e.time?' '+e.time+' s':'')))));
     r.style.cursor='pointer'; r.onclick=()=>{lvSel.value=l.level; lvSel.onchange();}; rows.push(r); t.appendChild(r);});
   const markRow=()=>rows.forEach((r,i)=>r.style.background=i===level-1?'#2f2550':'');
   markRow(); card.appendChild(t);
@@ -680,9 +681,31 @@ function effects(m){
     grid.appendChild(el('div',{class:'itemCard'},el('div',{class:'stage',style:'padding:0;flex:0 0 128px'},cv),
       el('div',{},el('b',{},title),el('div',{class:'small muted',style:'margin:2px 0 4px'},desc),
         ...(facts||[]).map(f=>el('div',{class:'small'},'· '+f))))); };
-  game.statuses.forEach(st=>card(st.name,st.desc,st.facts,[st]));
-  card('Cả 4 buff cùng lúc','Mỗi buff có vùng riêng (chân, hai bên thân, trên đầu, bong bóng quanh người) nên không chồng lên nhau.',[],game.statuses);
+  const buffs=game.statuses.filter(st=>st.kind!=='debuff'), debuffs=game.statuses.filter(st=>st.kind==='debuff');
+  buffs.forEach(st=>card(st.name,st.desc,st.facts,[st]));
+  if(buffs.length>1) card('Cả '+buffs.length+' buff cùng lúc','Mỗi buff có vùng riêng (chân, hai bên thân, trên đầu, bong bóng quanh người) nên không chồng lên nhau.',[],buffs);
   c.appendChild(grid); m.appendChild(c);
+  // debuffs: drawn on a slime dummy where the game draws them (body / head / feet), with the tint
+  const d=el('div',{class:'card',style:'margin-top:12px'},el('h3',{},'Debuff lên quái'));
+  const dg=el('div',{class:'grid g3'});
+  const dummy=game.monsters.find(x=>x.id==='slime')||game.monsters[0]; let sl=null; if(dummy&&dummy.sprite) sheetOf(dummy.sprite).then(x=>{sl=x;});
+  const tmp=document.createElement('canvas');
+  debuffs.forEach(st=>{ const sh=sheets[st.id];
+    const cv=liveCanvas(128,128,(g,t)=>{ g.clearRect(0,0,128,128); drawGround(g,64,64,1,1e9,128,128); if(!sl) return;
+      const sc=(dummy.stats.scale||2)*1.5, fx=64, fy=96;
+      if(st.tint){ const [w,h]=sl.fs; tmp.width=w*sc; tmp.height=h*sc; const cg=tmp.getContext('2d'); cg.imageSmoothingEnabled=false;
+        cg.clearRect(0,0,tmp.width,tmp.height); sl.draw(cg,'move',t,sl.anchor[0]*sc,sl.anchor[1]*sc,sc);
+        cg.globalCompositeOperation='multiply'; cg.fillStyle=st.tint; cg.fillRect(0,0,tmp.width,tmp.height);
+        cg.globalCompositeOperation='destination-in'; sl.draw(cg,'move',t,sl.anchor[0]*sc,sl.anchor[1]*sc,sc); cg.globalCompositeOperation='source-over';
+        g.drawImage(tmp,Math.round(fx-sl.anchor[0]*sc),Math.round(fy-sl.anchor[1]*sc)); }
+      else sl.draw(g,'move',t,fx,fy,sc);
+      const b=sl.meta.body||{center:sl.anchor,radius:8}, cx=fx+(b.center[0]-sl.anchor[0])*sc, cy=fy+(b.center[1]-sl.anchor[1])*sc;
+      const at=st.at==='head'?[cx,cy-b.radius*sc-14]:st.at==='feet'?[fx,fy-8]:[cx,cy];
+      if(sheets[st.id]){ const a=sheets[st.id].anims[0]; sheets[st.id].draw(g,a.name,t,at[0],at[1],3); } });
+    dg.appendChild(el('div',{class:'itemCard'},el('div',{class:'stage',style:'padding:0;flex:0 0 128px'},cv),
+      el('div',{},el('b',{},st.name),el('div',{class:'small muted',style:'margin:2px 0 4px'},st.desc),
+        ...(st.facts||[]).map(f=>el('div',{class:'small'},'· '+f))))); });
+  d.appendChild(dg); m.appendChild(d);
 }
 
 init();
