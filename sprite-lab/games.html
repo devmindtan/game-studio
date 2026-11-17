@@ -384,8 +384,9 @@ const STAT_ICON={max_hp:['heart','Máu tối đa'],damage:['sword','Sát thươn
 function heroes(m){
   m.appendChild(el('h2',{},'Nhân vật'));
   m.appendChild(el('p',{class:'lead'},'Sprite như game đang dùng. Bấm một ô trang bị để tắt/bật phần đó trên người: đồ mặc sẽ thay đúng ô.'));
+  classBar(m,()=>{painters=[];render();});
   const SLOT_NAME={head:'Giáp đầu',chest:'Giáp ngực',arms:'Giáp tay',legs:'Giáp chân',weapon:'Vũ khí'};
-  game.heroes.forEach(h=>{
+  game.heroes.filter(h=>h.id===classOf()).forEach(h=>{
     const card=el('div',{class:'card heroCard'});
     const info=h.sprite; if(!info){ card.appendChild(el('div',{class:'empty'},'Thiếu sprite')); m.appendChild(card); return; }
     const enabled={}; (info.meta.layers||[]).forEach(n=>enabled[n]=true);
@@ -482,6 +483,20 @@ function monsters(m){
 
 /* ---------- 6. skills (levels + demo) ---------- */
 let curSkillId=null;
+// one class at a time on the heroes and skills pages (user 2026-11-17: both classes on
+// one page was crowded); the choice is kept across tabs and visits
+let curClass=null;
+try{ curClass=localStorage.getItem('gk.class'); }catch(e){}
+function classOf(){ if(!game.heroes.some(h=>h.id===curClass)) curClass=(game.heroes[0]||{}).id; return curClass; }
+function classBar(m,onPick){
+  const bar=el('div',{class:'row',style:'gap:8px;margin:0 0 14px'});
+  game.heroes.forEach(h=>{ const on=h.id===classOf();
+    const b=el('button',{class:'btn'+(on?' on':''),style:'font-size:15px;padding:8px 16px;'+(on?'border-color:'+(h.color||'#c9a65a')+';box-shadow:0 0 0 1px '+(h.color||'#c9a65a')+' inset':'')},h.name,
+      el('span',{class:'muted small',style:'margin-left:8px'},(h.role||'')));
+    b.onclick=()=>{ curClass=h.id; try{localStorage.setItem('gk.class',h.id);}catch(e){} curSkillId=null; onPick(); };
+    bar.appendChild(b); });
+  m.appendChild(bar);
+}
 const PREF=['slash_right','spin','fly','burst','spell','attack'];
 function effectAnim(sh){ for(const p of PREF) if(sh.has(p)) return p; return sh.anims[0].name; }
 function hbAt(sh,anim){ const a=sh.anim(anim); return a.hitbox||null; }
@@ -501,31 +516,36 @@ function skills(m){
   m.appendChild(el('h2',{},'Kỹ năng'));
   m.appendChild(el('p',{class:'lead'},'Mọi kỹ năng trong pool nâng cấp của class: demo ra chiêu đúng hitbox và nhịp frame của sprite, và bảng giá trị theo từng cấp (tính như PlayerStats của game).'));
   if(!game.skills.length){ m.appendChild(el('div',{class:'empty'},'Game chưa có kỹ năng.')); return; }
+  // a deep link to a skill opens its class (two classes may share an id, e.g. dash: the current class wins)
+  const hb=decodeURIComponent(location.hash.slice(1)).split('/');
+  if(hb[2]&&!game.skills.some(x=>x.id===hb[2]&&x.class===classOf())){ const f=game.skills.find(x=>x.id===hb[2]); if(f) curClass=f.class; }
+  classBar(m,()=>{painters=[];history.replaceState(null,'','#'+game.slug+'/skills');render();});
+  const mine=game.skills.filter(s=>s.class===classOf());
   const split=el('div',{class:'split'}); const list=el('div',{}); const pane=el('div',{});
   split.appendChild(list); split.appendChild(pane); m.appendChild(split);
-  const hb=decodeURIComponent(location.hash.slice(1)).split('/');
-  if(game.skills.some(x=>x.id===hb[2])) curSkillId=hb[2];
-  if(!game.skills.some(s=>s.id===curSkillId)) curSkillId=game.skills[0].id;
+  if(mine.some(x=>x.id===hb[2])) curSkillId=hb[2];
+  if(!mine.some(s=>s.id===curSkillId)) curSkillId=(mine[0]||{}).id;
   const show=()=>{ list.innerHTML='';
-    game.skills.forEach(s=>{
-      const it=el('div',{class:'listItem iconRow'+(s.id===curSkillId?' active':'')},iconCanvas(s.id,2),el('div',{},el('div',{class:'t'},s.name),
-        el('div',{class:'s'},((game.heroes.find(h=>h.id===s.class)||{}).name||s.class)+' · '+s.max_level+' cấp'+(s.tiers.length>1?' · '+s.tiers.length+' bậc sprite':'')+(s.start?' · chiêu khởi đầu':''))));
+    mine.forEach(s=>{
+      const it=el('div',{class:'listItem iconRow'+(s.id===curSkillId?' active':'')},iconCanvas(s.icon||s.id,2),el('div',{},el('div',{class:'t'},s.name),
+        el('div',{class:'s'},s.max_level+' cấp'+(s.tiers.length>1?' · '+s.tiers.length+' bậc hình':'')+(s.start?' · chiêu khởi đầu':''))));
       it.onclick=()=>{curSkillId=s.id; painters=[]; history.replaceState(null,'','#'+game.slug+'/skills/'+s.id); show();}; list.appendChild(it);});
-    skillPane(pane,game.skills.find(s=>s.id===curSkillId)); wrapTables(pane); };
+    const cur=mine.find(s=>s.id===curSkillId); if(cur){ skillPane(pane,cur); wrapTables(pane); } };
   show();
   // stat upgrades
   const su=el('div',{class:'card',style:'margin-top:14px'},el('h3',{},'Nâng cấp chỉ số (thẻ lên cấp)'));
-  const t=el('table',{class:'mid'}); const maxL=Math.max(1,...game.stat_ups.map(u=>u.max_level));
+  const ups=game.stat_ups.filter(u=>u.class===classOf());
+  const t=el('table',{class:'mid'}); const maxL=Math.max(1,...ups.map(u=>u.max_level));
   t.appendChild(el('tr',{},el('th',{},'Thẻ'),el('th',{},'Mô tả'),...Array.from({length:maxL},(_,i)=>el('th',{class:'num'},'Cấp '+(i+1)))));
-  game.stat_ups.forEach(u=>{const cells=Array.from({length:maxL},(_,i)=>{const lv=u.levels[i]; if(!lv) return el('td',{});
+  ups.forEach(u=>{const cells=Array.from({length:maxL},(_,i)=>{const lv=u.levels[i]; if(!lv) return el('td',{});
       return el('td',{class:'num small'},effText(lv));});
-    t.appendChild(el('tr',{},el('td',{},el('div',{class:'iconRow'},iconCanvas(u.id,2),el('b',{},u.name))),el('td',{class:'small muted'},u.desc),...cells));});
+    t.appendChild(el('tr',{},el('td',{},el('div',{class:'iconRow'},iconCanvas(u.icon||u.id,2),el('b',{},u.name))),el('td',{class:'small muted'},u.desc),...cells));});
   su.appendChild(t); m.appendChild(su);
 }
 function skillPane(pane,s){
   pane.innerHTML='';
   const card=el('div',{class:'card'});
-  card.appendChild(el('div',{class:'iconRow'},iconCanvas(s.id,3),el('h3',{style:'margin:0'},s.name)));
+  card.appendChild(el('div',{class:'iconRow'},iconCanvas(s.icon||s.id,3),el('h3',{style:'margin:0'},s.name)));
   card.appendChild(el('p',{class:'muted',style:'margin:6px 0'},s.desc));
   card.appendChild(ruleLine(s.check));
   let level=1, showHb=true, speed=1, paused=false, clock=0, last=performance.now();

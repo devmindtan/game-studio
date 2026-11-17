@@ -196,6 +196,7 @@ def skill_entry(skill_id, defn, upgrade, cls, root):
         })
     return {
         "id": skill_id, "name": upgrade.get("name", skill_id), "desc": upgrade.get("desc", ""),
+        "icon": upgrade.get("icon", skill_id),
         "max_level": int(upgrade.get("max_level", 1)), "weight": upgrade.get("weight", 1),
         "start": skill_id in (cls.get("start_skills") or {}),
         "params": defn, "tiers": tiers, "levels": levels,
@@ -430,6 +431,7 @@ def build_game(slug):
                 skills.append(e)
             else:
                 stat_ups.append({"id": sid, "class": cid, "name": u.get("name", sid), "desc": u.get("desc", ""),
+                                 "icon": u.get("icon", sid),
                                  "max_level": int(u.get("max_level", 1)), "weight": u.get("weight", 1),
                                  "levels": [level_values(u, lv) for lv in range(1, int(u.get("max_level", 1)) + 1)]})
 
