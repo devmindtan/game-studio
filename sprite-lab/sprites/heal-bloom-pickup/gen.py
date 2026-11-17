@@ -1,8 +1,7 @@
 #!/usr/bin/env python3
-"""heal-bloom-pickup — nụ hoa hồi máu (buff heal-over-time trong roadmap Bách Ải).
-Nụ hồng ba sắc trên đài xanh, có lá và cọng — đọc là "nở" chứ không phải dấu cộng
-như health-pickup. Idle nổi/lấp lánh, collect flash rồi vỡ thành đốm sáng.
-Neo (8,8) = tâm item. Chạy: gamekit art run heal-bloom-pickup
+"""heal-bloom-pickup — Hoa hồi phục: buff tạm thời hồi máu mỗi giây. Huy hiệu xanh lá, dấu cộng.
+Họ vật phẩm buff dùng chung lib/buffitem.py (huy hiệu tròn + biểu tượng), thiết kế lại 2026-11-17.
+Neo (9,9) = tâm huy hiệu (khung 18 px). Chạy: gamekit art run heal-bloom-pickup
 """
 import sys
 from pathlib import Path
@@ -16,30 +15,15 @@ def _ws():
 HERE = Path(__file__).resolve().parent
 sys.path.insert(0, str(_ws() / "tools/gamekit/pipeline"))
 sys.path.insert(0, str(HERE.parents[1] / "lib"))
-from itemfx import build
+from buffitem import build
 from sheet import export
 
 NAME = "heal-bloom-pickup"
-ROWS = [
-    "....PPP....",
-    "...PPPPP...",
-    "...PWWPP...",
-    "...PPPPP...",
-    "....PPP....",
-    "....GGG....",
-    "...GGGGG...",
-    "..LGGGGGL..",
-    ".LLL...LLL.",
-    "..L.....L..",
-    ".....S.....",
-    ".....S.....",
-    ".....S.....",
-]
-PAL = {
-    "P": "#e0679b", "W": "#ffd3e6",
-    "G": "#3f8f4a", "L": "#8fe06a", "S": "#2c6a38",
-}
+SYMBOL = ['...LLLM...', '...LLMM...', '...LLMM...', 'LLLLLMMMMD', 'LLMMMMMMMD', 'DDDLMMMDDD', '...LMMD...', '...LMMD...', '...DDDD...']
+PAL = {'L': '#f4fff0', 'M': '#7be476', 'D': '#1c5a24'}
+RIM = ('#b8f5a0', '#46b84c', '#1f6128')   # light, mid, dark
+CORE = "#102c18"
 
 if __name__ == "__main__":
-    build(HERE, NAME, ROWS, PAL, "#ffd3e6", export)
+    build(HERE, NAME, SYMBOL, PAL, RIM, CORE, export)
     print("OK", NAME)

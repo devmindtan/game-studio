@@ -1,27 +1,27 @@
 {
-  "frames": 11,
+  "frames": 13,
   "frame_size": [
-    16,
-    16
+    18,
+    18
   ],
   "fps": 8.0,
   "loop": true,
   "anchor": [
-    8.0,
-    8.0
+    9.0,
+    9.0
   ],
   "anchor_source": "explicit",
   "animations": [
     {
       "name": "idle",
       "start": 0,
-      "frames": 6,
+      "frames": 8,
       "fps": 8.0,
       "loop": true
     },
     {
       "name": "collect",
-      "start": 6,
+      "start": 8,
       "frames": 5,
       "fps": 12.0,
       "loop": false

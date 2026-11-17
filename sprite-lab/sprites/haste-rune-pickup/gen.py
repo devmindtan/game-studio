@@ -1,8 +1,7 @@
 #!/usr/bin/env python3
-"""haste-rune-pickup — rune tăng tốc (buff haste trong roadmap Bách Ải).
-Tia sét vàng ba sắc, gãy khúc rõ (không phải vệt mờ), lõi sáng ở khúc trên;
-idle nổi/lấp lánh, collect flash rồi vỡ thành đốm sáng.
-Neo (8,8) = tâm item. Chạy: gamekit art run haste-rune-pickup
+"""haste-rune-pickup — Rune tốc độ: buff tạm thời tăng tốc chạy và giảm hồi chiêu. Huy hiệu vàng, tia sét.
+Họ vật phẩm buff dùng chung lib/buffitem.py (huy hiệu tròn + biểu tượng), thiết kế lại 2026-11-17.
+Neo (9,9) = tâm huy hiệu (khung 18 px). Chạy: gamekit art run haste-rune-pickup
 """
 import sys
 from pathlib import Path
@@ -16,27 +15,15 @@ def _ws():
 HERE = Path(__file__).resolve().parent
 sys.path.insert(0, str(_ws() / "tools/gamekit/pipeline"))
 sys.path.insert(0, str(HERE.parents[1] / "lib"))
-from itemfx import build
+from buffitem import build
 from sheet import export
 
 NAME = "haste-rune-pickup"
-ROWS = [
-    ".......LL...",
-    "......LLLM..",
-    ".....LLLMM..",
-    "....LLLMM...",
-    "...LLLMM....",
-    "..LLLMMMMMM.",
-    ".LLLMMMMMMD.",
-    ".LLLMMMMMD..",
-    "...LLLMMD...",
-    ".....LLMD...",
-    "....LLLMD...",
-    "...LLLMD....",
-    "..LLLMD.....",
-]
-PAL = {"L": "#ffe98a", "M": "#f2b134", "D": "#b06d16"}
+SYMBOL = ['......LLLD', '.....LLMD.', '....LLMD..', '...LLMD...', '..LLLLLLMD', '..DDLLMMD.', '....LMMD..', '...LMD....', '..LMD.....', '.LD.......']
+PAL = {'L': '#fffbe0', 'M': '#ffd04a', 'D': '#6b3e08'}
+RIM = ('#ffe98a', '#d9961f', '#7a4a0c')   # light, mid, dark
+CORE = "#33240c"
 
 if __name__ == "__main__":
-    build(HERE, NAME, ROWS, PAL, "#fff2a8", export)
+    build(HERE, NAME, SYMBOL, PAL, RIM, CORE, export)
     print("OK", NAME)
