@@ -1,5 +1,8 @@
 #!/usr/bin/env python3
-"""Blizzard Vortex IV — xoáy bão tuyết, chuyển động xoắn ốc."""
+"""Frost Nova IV — ngôi sao + mảnh băng của bậc III (giữ nguyên), nay các mảnh xoáy quanh ngôi sao theo đường xoắn ốc, để lại vệt tuyết.
+
+DNA băng: kết tinh, đối xứng tròn, cạnh sắc. Kế thừa: III = ngôi sao + mảnh bắn ra; IV = + mảnh xoáy quanh (vệt tuyết).
+"""
 import math, sys
 from pathlib import Path
 
@@ -36,58 +39,76 @@ def dot(c,a,r,col,size=1):
         for dy in range(-size+1,size):
             p(c,x+dx,y+dy,col)
 
-def spiral(c,phase,turn,r0,r1,thick,col_main,col_edge):
-    prev=None
-    steps=26
-    for s in range(steps):
-        u=s/(steps-1)
-        r=r0+(r1-r0)*u
-        a=phase+turn*u*2.6
-        x=CX+math.cos(a)*r; y=CY+math.sin(a)*r
-        w=max(1,round(thick*(1-u*0.72)))
-        if prev:
-            c.line(int(prev[0]),int(prev[1]),int(round(x)),int(round(y)),col_main,w)
-            c.line(int(prev[0]),int(prev[1]),int(round(x)),int(round(y)),col_edge,1)
-        for dx in range(-w+1,w):
-            p(c,x+dx,y,w if False else col_edge)
-        prev=(x,y)
+def petal(c,a,length,width,col_mid,col_edge,col_core):
+    # canh hoa: thân hẹt, đầu nhọn, có gờ sáng
+    ux,uy=math.cos(a),math.sin(a)
+    vx,vy=-uy,ux
+    base=5
+    tip=(CX+ux*length,CY+uy*length)
+    l=(CX+ux*(base+length*0.45)+vx*width,CY+uy*(base+length*0.45)+vy*width)
+    r=(CX+ux*(base+length*0.45)-vx*width,CY+uy*(base+length*0.45)-vy*width)
+    poly(c,[l,tip,r],col_mid)
+    c.line(int(l[0]),int(l[1]),int(tip[0]),int(tip[1]),col_core)
+    c.line(int(tip[0]),int(tip[1]),int(r[0]),int(r[1]),col_edge)
+    # gân giữa
+    c.line(CX+int(ux*base),CY+int(uy*base),int(tip[0]),int(tip[1]),col_core)
+
+def shard(c,a,dist,ln,w):
+    # manh bang hinh thoi nhon theo huong bay
+    ux,uy=math.cos(a),math.sin(a); vx,vy=-uy,ux
+    bx,by=CX+ux*dist,CY+uy*dist
+    tip=(bx+ux*ln,by+uy*ln); tail=(bx-ux*ln*0.5,by-uy*ln*0.5)
+    l=(bx+vx*w,by+vy*w); r=(bx-vx*w,by-vy*w)
+    poly(c,[tail,l,tip,r],ICE_M)
+    c.line(int(round(tail[0])),int(round(tail[1])),int(round(tip[0])),int(round(tip[1])),ICE)
+    p(c,tip[0],tip[1],CORE)
+
+def shard_at(c,pos_a,dist,dir_a,ln,w):
+    # manh bang dat o goc pos_a, mui nghieng theo huong xoay dir_a
+    bx,by=CX+math.cos(pos_a)*dist,CY+math.sin(pos_a)*dist
+    ux,uy=math.cos(dir_a),math.sin(dir_a); vx,vy=-uy,ux
+    tip=(bx+ux*ln*0.6,by+uy*ln*0.6); tail=(bx-ux*ln*0.6,by-uy*ln*0.6)
+    l=(bx+vx*w,by+vy*w); r=(bx-vx*w,by-vy*w)
+    poly(c,[tail,l,tip,r],ICE_M)
+    c.line(int(round(tail[0])),int(round(tail[1])),int(round(tip[0])),int(round(tip[1])),ICE)
+    p(c,tip[0],tip[1],CORE)
 
 def frame(i):
     c=Canvas(SIZE,SIZE)
     t=i/7.0
     if i==0:
-        c.ellipse(CX-5,CY-5,CX+5,CY+5,ICE_D)
-        c.ellipse(CX-3,CY-3,CX+3,CY+3,CORE)
-        for k in range(4): dot(c,k*math.pi/2,7,ICE)
+        c.ellipse(CX-4,CY-4,CX+4,CY+4,ICE_D)
+        c.ellipse(CX-2,CY-2,CX+2,CY+2,CORE)
         return c
-    R=round(7+23*min(1,t*1.15))
-    # dia xoay nen
-    for rr in range(4,R+4,5):
-        ring(c,rr,NIGHT if rr%10 else SHADOW)
-    phase=i*0.34
-    # 4 nhanh xoay cung chieu kim dong ho, 3 nhanh nguoc lai
-    for k in range(4):
-        spiral(c,phase+k*math.pi/2,1,4,R,4,ICE_D,ICE_M)
-    for k in range(3):
-        spiral(c,phase+0.5+k*2*math.pi/3,-1,3,round(R*0.78),3,DEEP,FROST)
-    # mat trong xoay nhanh hon
-    spiral(c,-phase*1.6,1,2,round(R*0.45),5,ICE,CORE)
-    # con mat ba nhanh
-    cr=max(2,round(6*(1-t*0.35)))
-    c.ellipse(CX-cr,CY-cr,CX+cr,CY+cr,DEEP)
-    c.ellipse(CX-cr+2,CY-cr+2,CX+cr-2,CY+cr-2,ICE_M)
-    c.ellipse(CX-2,CY-2,CX+2,CY+2,ICE)
-    p(c,CX,CY,CORE if i<6 else FROST)
-    # hat tuyet kéo theo huong xoay
-    for k in range(18):
-        a=phase*1.5+k*1.9; r=round(R*(0.35+((k%7)/12)))
-        dot(c,a,r,SNOW if k%3 else FROST)
-    if i>=5:
-        ring(c,R+2,ICE_D)
+    # chi ngoi sao bang: khong ve nen tron toi ben duoi (nguoi dung 2026-11-17)
+    # 8 canh hoa mo dan
+    length=round(8+18*min(1,t*1.15))
+    width=max(2,round(3+3*min(1,t*1.4)))
+    for k in range(8):
+        a=k*math.pi/4 + (0.05 if i%2 else -0.05)
+        petal(c,a,length,width,ICE_D,DEEP,ICE_M)
+    if i>=3:
         for k in range(8):
-            dot(c,phase+k*math.pi/4+0.6,R+2,FROST)
+            a=k*math.pi/4+math.pi/8
+            petal(c,a,round(length*0.62),max(1,width-1),ICE,ICE_D,ICE_M)
+    # moi: manh bang bay ra tu dau moi canh lon (tu frame 4)
+    if i>=4:
+        d=min(length+3+(i-4)*2, CX-9)   # tip stays inside the frame, 2 px margin
+        spin=(i-4)*0.24                 # moi: manh xoay quanh ngoi sao
+        for k in range(8):
+            a=k*math.pi/4+spin
+            # vet tuyet phia sau theo cung tron
+            for j in range(1,9):
+                col=FROST if j<=2 else (ICE_D if j<=5 else DEEP)
+                dot(c,a-0.07*j,d,col)
+            shard_at(c,a,d,a+math.pi/2,7,2)
+    # nhuy hoa
+    cr=max(2,round(5*(1-t*0.5)))
+    c.ellipse(CX-cr,CY-cr,CX+cr,CY+cr,ICE)
+    c.ellipse(CX-2,CY-2,CX+2,CY+2,CORE if i<6 else FROST)
     return c
-ANIM=[("burst",[frame(i) for i in range(8)],12,False,
+
+ANIM=[("burst",[frame(i) for i in range(8)],13,False,
        {"hitbox":{"shape":"circle","center":[float(CX),float(CY)],"active":[2,6]}})]
 if __name__=="__main__":
     export(HERE,NAME,ANIM,anchor=ANCHOR)

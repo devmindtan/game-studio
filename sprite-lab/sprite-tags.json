@@ -119,6 +119,15 @@
       "axe"
     ]
   },
+  "blizzard-vortex": {
+    "cat": "aoe",
+    "tags": [
+      "magic",
+      "ice",
+      "class-mage",
+      "auto-aoe"
+    ]
+  },
   "bow-gold": {
     "cat": "weapon",
     "tags": [
