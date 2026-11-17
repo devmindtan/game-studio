@@ -9,7 +9,9 @@ với quả cầu xanh phát sáng.
 Giữ từ bản trước: bảng màu, và chiêu "spell" theo nhịp nạp → căng → đẩy gậy → chớp ở đầu gậy → thu về.
 Viên đạn bay (lúc bay, lúc nổ) là sprite riêng "arcane-bolt".
 
-7 animation: idle 4, run 8, jump 4 (airborne), attack 5 (vung gậy), spell 7, hurt 3, death 5.
+Bách Ải (2026-11-17): vẽ THEO LỚP trang bị như kiếm sĩ (mũ = ô đầu; áo choàng = ô ngực; tay; ủng = ô chân;
+gậy = vũ khí; mặt và râu là lớp nền), chỉ di chuyển và trạng thái: idle 4, run 8, hurt 3, dash 5, death 5.
+Phép là sprite hiệu ứng riêng (arcane-bolt, fireball…). Bản cũ có jump/attack/spell nằm trong lịch sử git.
 Chạy:  gamekit art run mage  ·  thử: gamekit art shot mage sheet|move
 """
 
@@ -29,7 +31,7 @@ HERE = Path(__file__).resolve().parent
 sys.path.insert(0, str(_workspace() / "tools/gamekit/pipeline"))
 sys.path.insert(0, str(HERE.parents[1] / "lib"))
 
-from spritekit import Canvas, gif, preview, strip, write_anim_meta  # noqa: E402
+from sheet import export_layered  # noqa: E402
 import minifig as mf  # noqa: E402
 from minifig import line, pose, put, rect, run_pose  # noqa: E402
 
@@ -98,6 +100,11 @@ def head(c, p, g):
         y = hy - 2 + k
         rect(c, hx + x0 + (sway if k > 2 else 0), y, hx + x1 + (sway if k > 2 else 0), y, PAL["beard"])
     put(c, hx - 1, hy, PAL["beard_d"])
+
+
+def hat(c, p, g):
+    """The hat (head slot: equipment can replace it); the face and beard stay in the body."""
+    hx, hy = g["head"]
     # hat: hand-drawn pixel map (the outline is added around it). Column 6 sits on the
     # head's centre, the last row is the brim. "rest" when still; "wind" when moving
     # fast or recoiling: the tip is blown further back.
@@ -128,108 +135,39 @@ def staff(c, p, g):
     rect(c, ox - 1, oy - 1, ox + 1, oy + 1, PAL["magic_mid"])
     put(c, ox, oy, PAL["magic"])
     put(c, ox - 1, oy - 1, PAL["core"])
+    # soft glow round the orb (part of the weapon layer: layered heroes have no fx pass)
+    for deg in range(0, 360, 30):
+        rad = math.radians(deg)
+        put(c, ox + math.cos(rad) * 2.6, oy + math.sin(rad) * 2.6, (126, 240, 255, 70))
 
 
-def fx(c, p, g):
-    """After the outline: orb glow, charge sparks, muzzle flash, swing arc."""
-    top, _ = _staff_ends(p, g)
-    ox, oy = round(top[0]), round(top[1]) - 1
-    t = p["fx_t"]
-    if p["fx"] in ("glow", "charge", "muzzle"):
-        radius = {"glow": 2 + t, "charge": 3 + 2 * t, "muzzle": 4 + 2 * t}[p["fx"]]
-        for r in range(2, int(radius) + 1):
-            alpha = int(90 - 60 * (r - 2) / max(1, radius - 1))
-            for deg in range(0, 360, 20):
-                rad = math.radians(deg)
-                put(c, ox + math.cos(rad) * r, oy + math.sin(rad) * r, (126, 240, 255, max(20, alpha)))
-    if p["fx"] == "charge":
-        for k in range(2 + round(4 * t)):
-            ang = k * 1.9 + t * 4
-            d = 7 - 3 * t
-            put(c, ox + math.cos(ang) * d, oy + math.sin(ang) * d,
-                (139, 92, 246, 230) if k % 2 else (126, 240, 255, 230))
-    if p["fx"] == "muzzle":
-        for k in range(1, 7):  # short beam forward from the orb
-            put(c, ox + 1 + k, oy, (255, 255, 255, 240 - k * 25))
-            if k < 4:
-                put(c, ox + 1 + k, oy - 1, (126, 240, 255, 200 - k * 40))
-                put(c, ox + 1 + k, oy + 1, (126, 240, 255, 200 - k * 40))
-        for dx, dy in ((0, -3), (2, -2), (0, 3), (2, 2)):
-            put(c, ox + dx, oy + dy, (255, 255, 255, 220))
-    if p["fx"] == "swing":
-        sx, sy = g["sh_front"]
-        a0, a1 = -120, -120 + 130 * t
-        for deg in range(int(a0), int(a1) + 1, 3):
-            rad = math.radians(deg)
-            for r, col in ((14, (126, 240, 255, 210)), (13, (139, 92, 246, 120))):
-                put(c, sx + math.cos(rad) * r, sy + math.sin(rad) * r, col)
-
-
-CHAR = {"pal": PAL, "body": "robe", "head": head, "held": staff, "fx": fx}
+CHAR = {"pal": PAL, "body": "robe", "head": head, "hair": hat, "held": staff}
 
 
 def frame(**kw):
-    return mf.draw(CHAR, pose(**kw))
+    return mf.draw_layers(CHAR, pose(**kw))
 
 
-# --- animations (staff angle: direction hand -> orb; -90 = straight up) -----------------
+# --- animations: movement and state only (spells are effect sprites) ------------------
+# (staff angle: direction hand -> orb; -90 = straight up)
 
 def idle(i):
     return frame(bob=[0, 0, 1, 0][i], hands=((-2, 7), (6, 3)), weapon=-88, phase=i * 1.1,
-                 fx="glow", fx_t=[0.3, 0.6, 0.3, 0.0][i], eyes="closed" if i == 3 else "open")
+                 eyes="closed" if i == 3 else "open")
 
 
 def run(i):
-    p = run_pose(i, weapon=-62, fx="glow", fx_t=0.2)
-    return mf.draw(CHAR, p)
+    return mf.draw_layers(CHAR, run_pose(i, weapon=-62))
 
 
-def jump(i):
+def dash(i):
+    """Dash (dash skill): wind-up, launch, two glide frames, recover; staff trails back."""
     return [
-        frame(bob=2, feet=((-2, 0), (2, 0)), hands=((-3, 6), (3, 6)), weapon=-80, tilt=1),        # crouch
-        frame(bob=-1, feet=((-2, 3), (2, 5)), hands=((-4, 2), (3, 1)), weapon=-100, tilt=-1,
-              speed=0.7, phase=1.0, fx="glow", fx_t=0.6),                                         # rise
-        frame(bob=0, feet=((-3, 2), (3, 1)), hands=((-4, 4), (4, 3)), weapon=-70, speed=0.8,
-              phase=2.0),                                                                         # fall
-        frame(bob=2, feet=((-4, 0), (4, 0)), hands=((-3, 6), (4, 5)), weapon=-75, tilt=1),       # land
-    ][i]
-
-
-ATTACK_MS = [150, 50, 70, 90, 150]
-
-
-def attack(i):
-    return [
-        frame(bob=1, lean=-1, feet=((-4, 0), (3, 0)), hands=((-3, 5), (-1, 1)), weapon=-135, tilt=-1),
-        frame(bob=0, lean=2, feet=((-4, 0), (4, 0)), hands=((-2, 6), (4, 1)), weapon=-55,
-              fx="swing", fx_t=0.6),
-        frame(bob=1, lean=3, feet=((-4, 0), (5, 0)), hands=((-2, 6), (6, 3)), weapon=-5,
-              fx="swing", fx_t=1.0),
-        frame(bob=1, lean=2, feet=((-4, 0), (5, 0)), hands=((-2, 7), (5, 4)), weapon=-20,
-              fx="glow", fx_t=0.8),
-        frame(bob=0, lean=1, feet=((-3, 0), (3, 0)), hands=((-2, 7), (6, 3)), weapon=-88),
-    ][i]
-
-
-SPELL_MS = [120, 120, 160, 60, 80, 120, 140]
-
-
-def spell(i):
-    """Charge -> tension -> push the staff -> flash at the orb (the bolt leaves) -> recover."""
-    return [
-        frame(bob=0, lean=-1, hands=((-3, 4), (2, 1)), weapon=-95, fx="charge", fx_t=0.2,
-              eyes="closed"),
-        frame(bob=-1, lean=-1, hands=((-4, 3), (2, -1)), weapon=-100, fx="charge", fx_t=0.6,
-              eyes="closed", speed=0.3, phase=0.8),
-        frame(bob=-1, lean=-2, feet=((-4, 0), (3, 0)), hands=((-4, 3), (1, -1)), weapon=-105,
-              fx="charge", fx_t=1.0, speed=0.6, phase=1.6),
-        frame(bob=1, lean=3, feet=((-5, 0), (5, 0)), hands=((-3, 6), (7, 1)), weapon=-25,
-              fx="muzzle", fx_t=1.0, speed=0.6, phase=2.4),
-        frame(bob=1, lean=3, feet=((-5, 0), (5, 0)), hands=((-3, 6), (7, 1)), weapon=-25,
-              fx="muzzle", fx_t=0.3, speed=0.4, phase=3.0),
-        frame(bob=0, lean=1, feet=((-4, 0), (4, 0)), hands=((-2, 6), (4, 3)), weapon=-55,
-              fx="glow", fx_t=0.6),
-        frame(bob=0, lean=0, hands=((-2, 7), (6, 3)), weapon=-88, fx="glow", fx_t=0.3),
+        frame(bob=2, lean=1, feet=((-4, 0), (3, 0)), hands=((-3, 5), (2, 4)), weapon=-130, speed=0.4),
+        frame(bob=2, lean=3, feet=((-6, 1), (5, 0)), hands=((-6, 4), (-1, 4)), weapon=-160, speed=1.0, phase=0.6),
+        frame(bob=2, lean=3, feet=((-7, 2), (5, 0)), hands=((-7, 3), (-2, 4)), weapon=-165, speed=1.0, phase=1.4),
+        frame(bob=2, lean=3, feet=((-6, 1), (5, 0)), hands=((-7, 4), (-2, 4)), weapon=-162, speed=1.0, phase=2.2),
+        frame(bob=1, lean=1, feet=((-3, 0), (3, 0)), hands=((-2, 6), (5, 3)), weapon=-80, speed=0.5, phase=3.0),
     ][i]
 
 
@@ -257,35 +195,17 @@ def death(i):
     ][i]
 
 
-# (name, frames, fps, loop, extra)
+# (name, [layers per frame], fps, loop, extra)
 ANIMATIONS = [
     ("idle", [idle(i) for i in range(4)], 5, True, {"durations_ms": [240, 160, 240, 120], "hitbox": {"shape": "rect", "center": [24.0, 44.0], "active": [0, 3]}}),
     ("run", [run(i) for i in range(8)], 12, True, {"hitbox": {"shape": "rect", "center": [24.0, 44.0], "active": [0, 7]}}),
-    ("jump", [jump(i) for i in range(4)], 10, False, {"airborne": True, "durations_ms": [80, 160, 160, 100], "hitbox": {"shape": "rect", "center": [24.0, 44.0], "active": [0, 3]}}),
-    ("attack", [attack(i) for i in range(5)], 14, False, {"durations_ms": ATTACK_MS, "hitbox": {"shape": "circle", "center": [ANCHOR[0], ANCHOR[1]], "active": [1, 3]}}),
-    ("spell", [spell(i) for i in range(7)], 12, False, {"durations_ms": SPELL_MS, "hitbox": {"shape": "circle", "center": [ANCHOR[0], ANCHOR[1]], "active": [3, 4]}}),
-    ("hurt", [hurt(i) for i in range(3)], 12, False, {"durations_ms": [90, 110, 120], "hitbox": {"shape":"rect","center":[24.0,44.0],"active":[0,2]}}),
+    ("hurt", [hurt(i) for i in range(3)], 12, False, {"durations_ms": [90, 110, 120], "hitbox": {"shape": "rect", "center": [24.0, 44.0], "active": [0, 2]}}),
+    ("dash", [dash(i) for i in range(5)], 14, False, {"durations_ms": [60, 50, 70, 70, 90], "hitbox": {"shape": "rect", "center": [24.0, 44.0], "active": [0, 4]}}),
     ("death", [death(i) for i in range(5)], 8, False, {"durations_ms": [120, 140, 110, 100, 400], "hitbox": {"shape": "rect", "center": [24.0, 44.0], "active": [0, 4]}}),
 ]
 
 
-def main() -> None:
-    flat = [f for _, frames, _, _, _ in ANIMATIONS for f in frames]
-    strip(flat).save(OUT / f"{NAME}_strip.png")
-    flat[0].save(OUT / f"{NAME}.png")
-    cols = max(len(frames) for _, frames, _, _, _ in ANIMATIONS)
-    sheet = Canvas(cols * mf.W, len(ANIMATIONS) * mf.H)
-    for row, (_, frames, _, _, _) in enumerate(ANIMATIONS):
-        sheet.paste(strip(frames), 0, row * mf.H)
-    preview([sheet], HERE / "preview.png", scale=4, grid_lines=False)
-    for name, frames, fps, _, _ in ANIMATIONS:
-        gif(frames, HERE / f"{name}.gif", fps=fps, scale=4)
-    write_anim_meta(OUT / f"{NAME}.json",
-                    [{"name": n, "frames": f, "fps": fps, "loop": loop, **extra}
-                     for n, f, fps, loop, extra in ANIMATIONS],
-                    anchor=ANCHOR, ground=True)
-    print(f"strip:   {OUT / f'{NAME}_strip.png'}")
-
-
 if __name__ == "__main__":
-    main()
+    export_layered(HERE, NAME, ANIMATIONS, anchor=ANCHOR, outline=mf.OUTLINE, ground=True, body="idle",
+                   preview_scale=4, gif_scale=4)
+    print(f"OK {NAME}")
