@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
-"""magnetic-shield-pickup — khiên nam châm (buff roadmap Bách Ải).
-Khiên xanh có lõi trắng; idle nổi/lấp lánh, collect flash rồi vỡ thành đốm sáng.
-Khác bản hiệu ứng trạng thái magnetic-shield — đây là item nhặt được.
+"""magnetic-shield-pickup — nam châm hút vật phẩm (buff magnetic trong Bách Ải).
+Nam châm móng ngựa: thân đỏ chữ U, hai đầu cực bạc ở trên. Miệng chữ U hở và
+đáy cong kín nên nhìn 1x vẫn ra "nam châm" (khác khiên xanh cũ, vốn giống khiên chung).
 Neo (8,8) = tâm item. Chạy: gamekit art run magnetic-shield-pickup
 """
 import sys
@@ -21,18 +21,23 @@ from sheet import export
 
 NAME = "magnetic-shield-pickup"
 ROWS = [
-    "....bbbb....",
-    "..bbbbbbbb..",
-    ".bbbbbbbbbb.",
-    ".bbwwwwwwbb.",
-    ".bbbwwwwbbb.",
-    "..bbbwwbbb..",
-    "...bbbbbb...",
-    "....bbbb....",
-    ".....bb.....",
+    ".SS....SS.",
+    ".ST....ST.",
+    ".RL....RD.",
+    ".RL....RD.",
+    ".RL....RD.",
+    ".RL....RD.",
+    ".RL....RD.",
+    ".RL....RD.",
+    ".RLLLLLDD.",
+    "..RLLLDD..",
+    "...RLDD...",
 ]
-PAL = {"b": "#4fa3e0", "w": "#dff6ff"}
+PAL = {
+    "S": "#eef3fa", "T": "#a9b8cf",
+    "R": "#d63a3a", "L": "#f27a7a", "D": "#8f2020",
+}
 
 if __name__ == "__main__":
-    build(HERE, NAME, ROWS, PAL, "#dff6ff", export)
+    build(HERE, NAME, ROWS, PAL, "#9fd8ff", export)
     print("OK", NAME)

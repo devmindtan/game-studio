@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """haste-rune-pickup — rune tăng tốc (buff haste trong roadmap Bách Ải).
-Tia sét vàng có lõi trắng; idle nổi/lấp lánh, collect flash rồi vỡ thành đốm sáng.
+Tia sét vàng ba sắc, gãy khúc rõ (không phải vệt mờ), lõi sáng ở khúc trên;
+idle nổi/lấp lánh, collect flash rồi vỡ thành đốm sáng.
 Neo (8,8) = tâm item. Chạy: gamekit art run haste-rune-pickup
 """
 import sys
@@ -20,18 +21,21 @@ from sheet import export
 
 NAME = "haste-rune-pickup"
 ROWS = [
-    "......yyyy..",
-    ".....yyyyy..",
-    "....yyyyyy..",
-    "...yyyyyyy..",
-    "..yyyywwyy..",
-    "...yyywwyy..",
-    "....yyywy...",
-    "...yyyyy....",
-    "..yyyy......",
-    ".yyyy.......",
+    ".......LL...",
+    "......LLLM..",
+    ".....LLLMM..",
+    "....LLLMM...",
+    "...LLLMM....",
+    "..LLLMMMMMM.",
+    ".LLLMMMMMMD.",
+    ".LLLMMMMMD..",
+    "...LLLMMD...",
+    ".....LLMD...",
+    "....LLLMD...",
+    "...LLLMD....",
+    "..LLLMD.....",
 ]
-PAL = {"y": "#f2c14e", "w": "#fff2a8"}
+PAL = {"L": "#ffe98a", "M": "#f2b134", "D": "#b06d16"}
 
 if __name__ == "__main__":
     build(HERE, NAME, ROWS, PAL, "#fff2a8", export)

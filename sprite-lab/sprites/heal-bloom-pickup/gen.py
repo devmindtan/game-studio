@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
-"""heal-bloom-pickup — chồi hồi phục (buff roadmap Bách Ải).
-Dấu cộng xanh có lõi trắng; idle nổi/lấp lánh, collect flash rồi vỡ thành đốm sáng.
-Khác bản hiệu ứng trạng thái heal-bloom — đây là item nhặt được.
+"""heal-bloom-pickup — nụ hoa hồi máu (buff heal-over-time trong roadmap Bách Ải).
+Nụ hồng ba sắc trên đài xanh, có lá và cọng — đọc là "nở" chứ không phải dấu cộng
+như health-pickup. Idle nổi/lấp lánh, collect flash rồi vỡ thành đốm sáng.
 Neo (8,8) = tâm item. Chạy: gamekit art run heal-bloom-pickup
 """
 import sys
@@ -21,17 +21,25 @@ from sheet import export
 
 NAME = "heal-bloom-pickup"
 ROWS = [
-    "....gggg....",
-    "....gwwg....",
-    "ggggwwwwgggg",
-    "gggwwwwwwggg",
-    "gggwwwwwwggg",
-    "ggggwwwwgggg",
-    "....gwwg....",
-    "....gggg....",
+    "....PPP....",
+    "...PPPPP...",
+    "...PWWPP...",
+    "...PPPPP...",
+    "....PPP....",
+    "....GGG....",
+    "...GGGGG...",
+    "..LGGGGGL..",
+    ".LLL...LLL.",
+    "..L.....L..",
+    ".....S.....",
+    ".....S.....",
+    ".....S.....",
 ]
-PAL = {"g": "#6ee06e", "w": "#d9ffe0"}
+PAL = {
+    "P": "#e0679b", "W": "#ffd3e6",
+    "G": "#3f8f4a", "L": "#8fe06a", "S": "#2c6a38",
+}
 
 if __name__ == "__main__":
-    build(HERE, NAME, ROWS, PAL, "#d9ffe0", export)
+    build(HERE, NAME, ROWS, PAL, "#ffd3e6", export)
     print("OK", NAME)

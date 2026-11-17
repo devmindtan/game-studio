@@ -26,7 +26,8 @@ def build(here, name, rows, palette, accent, export_fn):
     idle = []
     for i, dy in enumerate(BOB):
         c = Canvas(SIZE, SIZE)
-        c.paste(art, ox, oy + dy)
+        # tall art (13 rows) would lose its top row at the peak of the bob
+        c.paste(art, ox, oy + max(dy, -oy))
         for k in range(2):
             a = i * 1.05 + k * math.pi
             c.pixel(8 + round(math.cos(a) * 6.5), 8 + round(math.sin(a) * 5.5), accent)

@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
-"""arcane-empower-pickup — cục sáng tăng sát thương (buff roadmap Bách Ải).
-Quả cầu tím có lõi trắng; idle nổi/lấp lánh, collect flash rồi vỡ thành đốm sáng.
-Khác bản hiệu ứng trạng thái arcane-empower (cast/loop/release) — đây là item nhặt được.
+"""arcane-empower-pickup — tinh thể phép (buff power trong roadmap Bách Ải).
+Tinh thể lục giác tím, mặt sáng ở trên trái, lõi trắng — khác viên ngọc kinh
+nghiệm bốn cánh màu xanh và khác quả cầu rỗng cũ (trông như cái vòng).
 Neo (8,8) = tâm item. Chạy: gamekit art run arcane-empower-pickup
 """
 import sys
@@ -21,19 +21,22 @@ from sheet import export
 
 NAME = "arcane-empower-pickup"
 ROWS = [
-    "...pppppp...",
-    "..pppppppp..",
-    ".pppppppppp.",
-    ".pppwwwwppp.",
-    "pppwwwlwwppp",
-    "pppwwwlwwppp",
-    ".pppwwwwppp.",
-    ".pppppppppp.",
-    "..pppppppp..",
-    "...pppppp...",
+    "..LLLLLL..",
+    ".LLWWMMML.",
+    "LLWWMMMMDD",
+    "LLWMMMMMDD",
+    "LMMMMMMMDD",
+    "LMMMMMMMDD",
+    "LMMMMMMMDD",
+    ".LMMMMMDD.",
+    "..LMMMDD..",
+    "..LMMMDD..",
+    "...LMDD...",
+    "...LMDD...",
+    "....LD....",
 ]
-PAL = {"p": "#8b5cf6", "l": "#d8c4ff", "w": "#ffffff"}
+PAL = {"L": "#d9a6ff", "M": "#9a5cf0", "D": "#5c2ea0", "W": "#fff3ff"}
 
 if __name__ == "__main__":
-    build(HERE, NAME, ROWS, PAL, "#e0d0ff", export)
+    build(HERE, NAME, ROWS, PAL, "#e6c2ff", export)
     print("OK", NAME)
