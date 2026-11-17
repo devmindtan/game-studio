@@ -17,7 +17,7 @@ Per game:
               follows PlayerStats (add per level, mul per level, floor 0.2)
   stat_ups    the stat upgrades with their per-level values
   sprites     every sprite folder the game ships (assets/sprites/custom)
-  statuses    buff/debuff effects drawn on characters (empty until the game has them)
+  statuses    buff/debuff effects drawn on characters (the aura of each items.json buff)
 
 Paths are relative to sprite-lab/ (the page lives there; the server is rooted
 at the workspace, see serve-viewer.sh). Image URLs carry ?v=<mtime>.
@@ -319,7 +319,8 @@ def items_of(root, data, cfg, monsters):
     """assets/data/items.json with each item's sprite and the numbers behind it."""
     items = load(os.path.join(data, "items.json"))
     pick = cfg.get("pickups", {})
-    out = {"pickups": [], "equipment": []}
+    out = {"pickups": [], "buffs": [], "equipment": []}
+    bcfg = cfg.get("buffs", {})
     for group in out:
         for iid, it in clean(items.get(group, {})).items():
             e = {"id": iid, "name": it.get("name", iid), "desc": it.get("desc", ""), "slot": it.get("slot", ""),
@@ -330,7 +331,43 @@ def items_of(root, data, cfg, monsters):
                 e["facts"] = ["Tỉ lệ rơi %d%% mỗi quái" % round(float(pick.get("gold_chance", 0)) * 100)]
             if group == "pickups":
                 e.setdefault("facts", []).append("Tầm hút %g px × chỉ số hút" % float(pick.get("radius", 0)))
+            elif group == "buffs":
+                e["facts"] = buff_facts(it, bcfg)
             out[group].append(e)
+    return out
+
+
+STAT_VI = {"max_hp": "Máu tối đa", "damage": "Sát thương", "cooldown": "Hồi chiêu", "area": "Vùng đánh",
+           "move_speed": "Tốc độ chạy", "magnet": "Tầm hút", "regen": "Hồi máu", "armor": "Giáp"}
+
+
+def buff_facts(it, bcfg):
+    """Numbers of one buff (items.json buffs) and how it appears (run_config.json buffs)."""
+    f = ["Thời gian %g s" % float(it.get("duration", 0))]
+    for stat, e in (it.get("effects") or {}).items():
+        if "mul" in e:
+            f.append("%s %+d%%" % (STAT_VI.get(stat, stat), round(float(e["mul"]) * 100)))
+        if "add" in e:
+            f.append("%s %+g" % (STAT_VI.get(stat, stat), float(e["add"])))
+    if it.get("invulnerable"):
+        f.append("Miễn mọi sát thương")
+    if bcfg:
+        ev = bcfg.get("spawn_every", [0, 0])
+        f.append("Xuất hiện ngẫu nhiên: lần đầu sau %g s, rồi mỗi %g–%g s, nằm %g s" % (
+            float(bcfg.get("first_after", 0)), float(ev[0]), float(ev[1]), float(bcfg.get("lifetime", 0))))
+    return f
+
+
+def statuses_of(root, data):
+    """Status effects drawn on characters: today the aura of each buff (items.json buffs)."""
+    items = load(os.path.join(data, "items.json"))
+    out = []
+    for bid, it in clean(items.get("buffs", {})).items():
+        if not it.get("aura"):
+            continue
+        out.append({"id": bid, "name": it.get("name", bid), "kind": "buff", "desc": it.get("desc", ""),
+                    "at": it.get("aura_at", "body"), "sprite": sprite_info(root, str(it["aura"])),
+                    "facts": buff_facts(it, {})})
     return out
 
 
@@ -393,7 +430,7 @@ def build_game(slug):
         "stages": stages, "heroes": heroes, "monsters": mons, "skills": skills, "stat_ups": stat_ups,
         "sprites": sprites,
         "rules": rules_doc, "rule_doc": rel(os.path.join(root, "design", "gameplay-rules.md")),
-        "statuses": [],   # buff/debuff effects drawn on characters: none in the game yet
+        "statuses": statuses_of(root, data),   # buff/debuff effects drawn on characters
         "items": items_of(root, data, cfg, monsters),
     }
 

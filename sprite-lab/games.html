@@ -194,7 +194,7 @@ async function selectGame(g){
 }
 function renderTabs(){
   const n={overview:'',rules:(game.rules&&game.rules.rules||[]).length,ui:game.ui.shots.length,map:game.stages.length,heroes:game.heroes.length,
-    monsters:game.monsters.length,skills:game.skills.length,items:(game.items.pickups.length+game.items.equipment.length),effects:(game.statuses||[]).length};
+    monsters:game.monsters.length,skills:game.skills.length,items:(game.items.pickups.length+(game.items.buffs||[]).length+game.items.equipment.length),effects:(game.statuses||[]).length};
   const nav=$('tabs'); nav.innerHTML='';
   TABS.forEach(([id,label])=>{const b=el('button',{class:'tab'+(tab===id?' active':'')},label,n[id]!==''?el('span',{class:'n'},n[id]):null);
     b.onclick=()=>{tab=id; renderTabs(); render();}; nav.appendChild(b);});
@@ -432,12 +432,13 @@ function items(m){
     if(!list.length){ c.appendChild(el('div',{class:'muted'},emptyText)); m.appendChild(c); return; }
     const grid=el('div',{class:'grid g3'});
     list.forEach(it=>{ const info=it.sprite; let sh=null; if(info) sheetOf(info).then(x=>{sh=x;});
-      const cv=liveCanvas(96,96,(g,t)=>{ g.clearRect(0,0,96,96); drawGround(g,48,48,1,1e9,96,96); if(sh) sh.draw(g,sh.anims[0].name,t,48,48,6); });
+      const cv=liveCanvas(96,96,(g,t)=>{ g.clearRect(0,0,96,96); drawGround(g,48,48,1,1e9,96,96); if(sh) sh.draw(g,sh.anims[0].name,t,48,48,Math.max(1,Math.floor(84/Math.max(sh.fs[0],sh.fs[1])))); });   // fit the 96 px box
       grid.appendChild(el('div',{class:'itemCard'},el('div',{class:'stage',style:'padding:0;flex:0 0 96px'},cv),
         el('div',{},el('b',{},it.name),el('div',{class:'small muted',style:'margin:2px 0 4px'},it.desc),
           ...(it.facts||[]).map(f=>el('div',{class:'small'},'· '+f)))));});
     c.appendChild(grid); m.appendChild(c); };
   sec('Nhặt trong ải',game.items.pickups,'Chưa có.');
+  sec('Buff (xuất hiện ngẫu nhiên, nhặt để kích hoạt)',game.items.buffs||[],'Chưa có buff.');
   sec('Trang bị',game.items.equipment,'Game chưa có trang bị. Mỗi món sẽ thuộc một ô: giáp đầu, giáp ngực, giáp tay, giáp chân hoặc vũ khí.');
 }
 
@@ -641,6 +642,16 @@ function effects(m){
   m.appendChild(el('h2',{},'Hiệu ứng'));
   m.appendChild(el('p',{class:'lead'},'Hiệu ứng trạng thái hiện trực tiếp lên người (buff / debuff), ví dụ chảy máu, bỏng, độc, choáng, tăng tốc. Mỗi hiệu ứng vẽ cho mọi nhân vật và quái. Sprite của kỹ năng nằm ở tab Kỹ năng.'));
   if(!(game.statuses||[]).length){ m.appendChild(el('div',{class:'card empty'},'Game chưa có hiệu ứng trạng thái.')); return; }
+  const c=el('div',{class:'card'},el('h3',{},'Buff'));
+  const grid=el('div',{class:'grid g3'});
+  game.statuses.forEach(st=>{ let sh=null; if(st.sprite) sheetOf(st.sprite).then(x=>{sh=x;});
+    // feet auras stand on the ground line, body auras sit on the body centre
+    const cv=liveCanvas(128,128,(g,t)=>{ g.clearRect(0,0,128,128); drawGround(g,64,64,1,1e9,128,128);
+      if(sh){ const a=sh.anims.find(x=>x.name==='loop')||sh.anims[0]; sh.draw(g,a.name,t,64,st.at==='feet'?100:64,3); } });
+    grid.appendChild(el('div',{class:'itemCard'},el('div',{class:'stage',style:'padding:0;flex:0 0 128px'},cv),
+      el('div',{},el('b',{},st.name),el('div',{class:'small muted',style:'margin:2px 0 4px'},st.desc),
+        ...(st.facts||[]).map(f=>el('div',{class:'small'},'· '+f))))); });
+  c.appendChild(grid); m.appendChild(c);
 }
 
 init();
