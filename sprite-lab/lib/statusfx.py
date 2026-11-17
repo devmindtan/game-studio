@@ -227,21 +227,38 @@ def bleed(i):
     return c
 
 
-# --- slow: sticky puddle and sinking arrows ----------------------------------------
+# --- slow: viscous drag, not a solid ice block ------------------------------------
+# Palette: blue-glass (Lospec, 8 colours) - cold blue/teal. Layout: a sticky pool
+# with drips at the feet, big DOWN arrows sinking past the body, and short drag
+# streaks at the sides. Freeze keeps the solid crystal, so the two read apart.
 def slow(i):
     c = Canvas(S, S)
-    GOO, GOO_L, GOO_D = "#5a8ee8c0", "#a8ccff", "#2f4f9a"
-    for y, half in ((25, 9), (26, 11), (27, 11), (28, 9)):
+    DEEP, MID, FIELD = "#394c62c0", "#626d83d0", "#83aa9ca8"
+    LIGHT, BRIGHT = "#a4c2cd", "#cbdbfc"
+    # sticky pool with a lit surface and two drips
+    for y, half in ((26, 9), (27, 11), (28, 9)):
         for x in range(int(C - half), int(C + half) + 1):
-            _px(c, x, y, GOO_D if y == 28 or abs(x - C) >= half - 0.5 else GOO)
-    for k in range(3):                        # bubbles on the goo
-        x = C - 7 + ((i + k * 3) % 8) * 2
-        _px(c, x, 25 - (i + k) % 2, GOO_L)
-    for k, x in enumerate((C - 9, C + 9)):    # down arrows sinking along the sides
-        y = 8 + ((i * 2 + k * 6) % 14)
-        for j, col in enumerate((GOO_L, "#7fb4ff", GOO_D)):
-            _px(c, x, y + j - 2, col)
-        _px(c, x - 1, y, "#7fb4ff"); _px(c, x + 1, y, "#7fb4ff"); _px(c, x, y + 1, GOO_D)
+            _px(c, x, y, DEEP if y == 28 or abs(x - C) >= half - 1 else MID)
+    for dx in (-6, 5):
+        for j in range(2):
+            _px(c, C + dx, 29 + j, DEEP)
+    for k in range(3):                        # slow bubbles
+        x = C - 6 + ((i + k * 3) % 7) * 2
+        _px(c, x, 25 - (i + k) % 2, LIGHT)
+    # short drag streaks at both sides (the monster is being pulled back)
+    for k in range(2):
+        for x in range(int(C - 13), int(C - 9)):
+            _px(c, x, 11 + k * 6 + (i % 2), FIELD)
+        for x in range(int(C + 9), int(C + 13)):
+            _px(c, x, 13 + k * 6 + (i % 2), FIELD)
+    # two big downward arrows, sinking through the loop
+    for k, x in enumerate((C - 11, C + 11)):
+        y = 6 + ((i * 2 + k * 7) % 14)
+        for j in range(4):
+            _px(c, x, y + j, MID)
+        _px(c, x - 1, y + 3, LIGHT); _px(c, x + 1, y + 3, LIGHT)
+        _px(c, x - 2, y + 2, BRIGHT); _px(c, x + 2, y + 2, BRIGHT)
+        _px(c, x, y + 4, BRIGHT)
     return c
 
 
