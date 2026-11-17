@@ -1,21 +1,21 @@
 {
-  "frames": 6,
+  "frames": 8,
   "frame_size": [
-    16,
-    16
+    32,
+    14
   ],
   "fps": 10.0,
   "loop": true,
   "anchor": [
-    8.0,
-    8.0
+    15.5,
+    13.0
   ],
   "anchor_source": "explicit",
   "animations": [
     {
       "name": "loop",
       "start": 0,
-      "frames": 6,
+      "frames": 8,
       "fps": 10.0,
       "loop": true
     }
