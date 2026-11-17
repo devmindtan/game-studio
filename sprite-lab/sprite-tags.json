@@ -7,6 +7,46 @@
       "4-dir"
     ]
   },
+  "arcane-bolt-ii": {
+    "cat": "projectile",
+    "tags": [
+      "magic",
+      "arcane",
+      "4-dir",
+      "upgrade",
+      "tier-II"
+    ]
+  },
+  "arcane-bolt-iii": {
+    "cat": "projectile",
+    "tags": [
+      "magic",
+      "arcane",
+      "4-dir",
+      "upgrade",
+      "tier-III"
+    ]
+  },
+  "arcane-bolt-iv": {
+    "cat": "projectile",
+    "tags": [
+      "magic",
+      "arcane",
+      "4-dir",
+      "upgrade",
+      "tier-IV"
+    ]
+  },
+  "arcane-bolt-v": {
+    "cat": "projectile",
+    "tags": [
+      "magic",
+      "arcane",
+      "4-dir",
+      "upgrade",
+      "tier-V"
+    ]
+  },
   "arcane-circle": {
     "cat": "aoe",
     "tags": [
@@ -197,6 +237,46 @@
       "4-dir"
     ]
   },
+  "cleave-wave-ii": {
+    "cat": "strike",
+    "tags": [
+      "melee",
+      "slash",
+      "4-dir",
+      "upgrade",
+      "tier-II"
+    ]
+  },
+  "cleave-wave-iii": {
+    "cat": "strike",
+    "tags": [
+      "melee",
+      "slash",
+      "4-dir",
+      "upgrade",
+      "tier-III"
+    ]
+  },
+  "cleave-wave-iv": {
+    "cat": "strike",
+    "tags": [
+      "melee",
+      "slash",
+      "4-dir",
+      "upgrade",
+      "tier-IV"
+    ]
+  },
+  "cleave-wave-v": {
+    "cat": "strike",
+    "tags": [
+      "melee",
+      "slash",
+      "4-dir",
+      "upgrade",
+      "tier-V"
+    ]
+  },
   "dagger-gold": {
     "cat": "weapon",
     "tags": [
@@ -308,6 +388,46 @@
       "magic",
       "fire",
       "4-dir"
+    ]
+  },
+  "fireball-ii": {
+    "cat": "projectile",
+    "tags": [
+      "magic",
+      "fire",
+      "4-dir",
+      "upgrade",
+      "tier-II"
+    ]
+  },
+  "fireball-iii": {
+    "cat": "projectile",
+    "tags": [
+      "magic",
+      "fire",
+      "4-dir",
+      "upgrade",
+      "tier-III"
+    ]
+  },
+  "fireball-iv": {
+    "cat": "projectile",
+    "tags": [
+      "magic",
+      "fire",
+      "4-dir",
+      "upgrade",
+      "tier-IV"
+    ]
+  },
+  "fireball-v": {
+    "cat": "projectile",
+    "tags": [
+      "magic",
+      "fire",
+      "4-dir",
+      "upgrade",
+      "tier-V"
     ]
   },
   "firefly": {
@@ -568,6 +688,42 @@
       "holy"
     ]
   },
+  "holy-column-ii": {
+    "cat": "aoe",
+    "tags": [
+      "magic",
+      "holy",
+      "upgrade",
+      "tier-II"
+    ]
+  },
+  "holy-column-iii": {
+    "cat": "aoe",
+    "tags": [
+      "magic",
+      "holy",
+      "upgrade",
+      "tier-III"
+    ]
+  },
+  "holy-column-iv": {
+    "cat": "aoe",
+    "tags": [
+      "magic",
+      "holy",
+      "upgrade",
+      "tier-IV"
+    ]
+  },
+  "holy-column-v": {
+    "cat": "aoe",
+    "tags": [
+      "magic",
+      "holy",
+      "upgrade",
+      "tier-V"
+    ]
+  },
   "hunter-snare": {
     "cat": "aoe",
     "tags": [
@@ -646,6 +802,42 @@
     "tags": [
       "magic",
       "lightning"
+    ]
+  },
+  "lightning-strike-ii": {
+    "cat": "aoe",
+    "tags": [
+      "magic",
+      "lightning",
+      "upgrade",
+      "tier-II"
+    ]
+  },
+  "lightning-strike-iii": {
+    "cat": "aoe",
+    "tags": [
+      "magic",
+      "lightning",
+      "upgrade",
+      "tier-III"
+    ]
+  },
+  "lightning-strike-iv": {
+    "cat": "aoe",
+    "tags": [
+      "magic",
+      "lightning",
+      "upgrade",
+      "tier-IV"
+    ]
+  },
+  "lightning-strike-v": {
+    "cat": "aoe",
+    "tags": [
+      "magic",
+      "lightning",
+      "upgrade",
+      "tier-V"
     ]
   },
   "mage": {
@@ -740,6 +932,42 @@
     "tags": [
       "magic",
       "arcane"
+    ]
+  },
+  "meteor-fall-ii": {
+    "cat": "aoe",
+    "tags": [
+      "magic",
+      "arcane",
+      "upgrade",
+      "tier-II"
+    ]
+  },
+  "meteor-fall-iii": {
+    "cat": "aoe",
+    "tags": [
+      "magic",
+      "arcane",
+      "upgrade",
+      "tier-III"
+    ]
+  },
+  "meteor-fall-iv": {
+    "cat": "aoe",
+    "tags": [
+      "magic",
+      "arcane",
+      "upgrade",
+      "tier-IV"
+    ]
+  },
+  "meteor-fall-v": {
+    "cat": "aoe",
+    "tags": [
+      "magic",
+      "arcane",
+      "upgrade",
+      "tier-V"
     ]
   },
   "mote": {
@@ -1159,6 +1387,42 @@
     "tags": [
       "physical",
       "4-dir"
+    ]
+  },
+  "thunder-javelin-ii": {
+    "cat": "projectile",
+    "tags": [
+      "physical",
+      "4-dir",
+      "upgrade",
+      "tier-II"
+    ]
+  },
+  "thunder-javelin-iii": {
+    "cat": "projectile",
+    "tags": [
+      "physical",
+      "4-dir",
+      "upgrade",
+      "tier-III"
+    ]
+  },
+  "thunder-javelin-iv": {
+    "cat": "projectile",
+    "tags": [
+      "physical",
+      "4-dir",
+      "upgrade",
+      "tier-IV"
+    ]
+  },
+  "thunder-javelin-v": {
+    "cat": "projectile",
+    "tags": [
+      "physical",
+      "4-dir",
+      "upgrade",
+      "tier-V"
     ]
   },
   "tower-shield": {
