@@ -60,6 +60,16 @@ func _initialize() -> void:
 # signal never came and the run spun at 100% CPU until the time limit.
 func _process(_delta: float) -> bool:
 	_count += 1
+	# The game may scale its root viewport (content_scale_factor, e.g. below 1 when the
+	# window is smaller than its design size). Mirror that on the capture viewport so a
+	# shot at --gk-size shows the layout the player gets at that window size (lesson
+	# 2026-11-17: shots were always laid out at 1280x720 and missed a small-window bug).
+	var f := root.content_scale_factor
+	if not is_equal_approx(f, 1.0) and f > 0.0:
+		var logical := Vector2i((Vector2(_size) / f).round())
+		if _view.size_2d_override != logical:
+			_view.size_2d_override = logical
+			_view.size_2d_override_stretch = true
 	if _frames.has(_count):
 		RenderingServer.force_draw(false)
 		var img := _view.get_texture().get_image()

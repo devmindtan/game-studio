@@ -378,8 +378,12 @@ cmd_shot() {
   # fail, not block the agent: GK_SHOT_TIMEOUT seconds, then kill.
   local limit="${GK_SHOT_TIMEOUT:-180}"
   local rc=0
-  "${RUN[@]}" timeout --kill-after=5 "$limit" "$GODOT" --path "$g" --windowed --resolution 1280x720 --fixed-fps 60 \
-    -s res://addons/gamekit/debug/shot_capture.gd -- --gk-scene="$scene" --gk-capture="$frames" \
+  # GK_SHOT_RES: the window size (default the 1280x720 design); a smaller one shows how
+  # the game copes with small windows (lesson 2026-11-17: a 1280x692 window broke the lobby)
+  local res="${GK_SHOT_RES:-1280x720}"
+  [[ "$res" =~ ^[0-9]+x[0-9]+$ ]] || die "GK_SHOT_RES must be WxH (got $res)"
+  "${RUN[@]}" timeout --kill-after=5 "$limit" "$GODOT" --path "$g" --windowed --resolution "$res" --fixed-fps 60 \
+    -s res://addons/gamekit/debug/shot_capture.gd -- --gk-scene="$scene" --gk-capture="$frames" --gk-size="$res" \
     --gk-out="$tmp" "${extra[@]}" 2>&1 | { grep -E "ERROR|Run over" | tee "$tmp/godot.log" >&2 || true; } || rc=$?  # stdout = paths only
   [[ "$rc" == 124 || "$rc" == 137 ]] && die "shot timed out after ${limit}s (set GK_SHOT_TIMEOUT to allow longer)"
   # unique name: two shots in the same second once overwrote each other
@@ -411,18 +415,19 @@ cmd_shot() {
 cmd_ui_shots() {
   local g; g="$(resolve_game "${1:-}")"
   local spec="$g/production/ui/screens.json"
-  [[ -f "$spec" ]] || die "no $spec (list of {name, title, scene, frames, args})"
+  [[ -f "$spec" ]] || die "no $spec (list of {name, title, scene, frames, res, args})"
   say "ui-shots $(basename "$g")"
   local lines; lines="$(python3 -c '
 import json, sys
 for s in json.load(open(sys.argv[1]))["screens"]:
-    print("\x1f".join([s["name"], s.get("scene", ""), str(s.get("frames", 120))] + list(s.get("args", []))))
+    print("\x1f".join([s["name"], s.get("scene", ""), str(s.get("frames", 120)), s.get("res", "")] + list(s.get("args", []))))
 ' "$spec")" || die "bad $spec"
   local line name scene frames out
   # \x1f, not a tab: tabs are IFS whitespace and an empty scene field would vanish
   while IFS=$'\x1f' read -r -a line; do
     name="${line[0]}"; scene="${line[1]}"; frames="${line[2]}"
-    out="$(cmd_shot "$g" "${scene:-}" "$frames" -- "${line[@]:3}" | tail -1)" || die "shot failed: $name"
+    # "res": WxH window for this screen (small-window checks), else the design size
+    out="$(GK_SHOT_RES="${line[3]:-1280x720}" cmd_shot "$g" "${scene:-}" "$frames" -- "${line[@]:4}" | tail -1)" || die "shot failed: $name"
     [[ -f "$out" ]] || die "no image for $name"
     mv "$out" "$g/production/ui/$name.png"
     echo "   production/ui/$name.png"
