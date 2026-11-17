@@ -5,7 +5,8 @@ Mỗi icon là một animation 1 frame, tên = vai trò: heart (máu), skull (s�
 gem (kinh nghiệm), star (cấp), clock (thời gian), sword (sát thương), boot (tốc độ chạy),
 và 12 icon thẻ nâng cấp với tên trùng upgrade id: blade_arc, back_slash, whirlwind, sharpen,
 haste, reach, vitality, swift, magnet, regen, frost_nova, earth_strike; Đợt 2: ground_slam,
-cleave_wave, holy_column, dash, toughness; pháp sư: arcane_bolt, fireball, lightning, thunder_javelin, meteor.
+cleave_wave, holy_column, dash, toughness; pháp sư: arcane_bolt, fireball, lightning, thunder_javelin, meteor;
+nội tại: unyielding (kiếm sĩ), elemental_resonance (pháp sư).
 Viền tối 1 px như mọi sprite; neo (8, 8) = tâm ô. Game vẽ bằng SpriteSheet theo tên animation.
 Chạy: gamekit art run ui-icons
 """
@@ -409,6 +410,35 @@ ICONS = {
         "..rrrrrd.....",
         "..drrrd......",
         "...ddd.......",
+    ]),
+    # unyielding (knight passive): a steel shield cracked red, a gold flame rising from it
+    "unyielding": ({"r": "#9fb3c8", "d": "#5f7186", "l": "#e8f0f6", "y": "#ffd04a", "w": "#fff2a8", "k": "#c4202f"}, [
+        "......w......",
+        ".....wyw.....",
+        "....yywyy....",
+        ".rrrryyyrrrr.",
+        ".rlllryrrrrd.",
+        ".rlrrrkrrrrd.",
+        ".rlrrkrrrrrd.",
+        "..rrrrkrrrd..",
+        "..rrrrkrrrd..",
+        "...rrrrrdd...",
+        "....rrrdd....",
+        ".....rd......",
+    ]),
+    # elemental_resonance (mage passive): an orb split into fire, ice and lightning
+    "elemental_resonance": ({"f": "#ff6a2a", "o": "#ffb43a", "i": "#7ef0ff", "b": "#37b9e8", "y": "#ffe14a", "w": "#ffffff", "v": "#8b5cf6"}, [
+        "....vvvvv....",
+        "..vffffiiiv..",
+        ".vfffoffiiiv.",
+        ".vffoofiibiv.",
+        "vffoofwwiibiv",
+        "vfffwwwwwiiiv",
+        "vyyyywwwyyyyv",
+        ".vyyyyywyyyv.",
+        ".vyyywyyyyyv.",
+        "..vyyyyyyyv..",
+        "....vvvvv....",
     ]),
     # settings: a steel gear with a hole
     "gear": ({"g": "#9fb3c8", "l": "#e8f0f6", "d": "#5f7186"}, [
