@@ -606,8 +606,11 @@ cmd_art() {
       # grid image (--contact), so one look shows the sprite in motion.
       mkdir -p "$LAB/builds/shots"
       local out; out="$LAB/builds/shots/$(date +%Y%m%d-%H%M%S)-$n-move.png"
-      "${RUN[@]}" "$GODOT" --path "$LAB" --windowed --resolution 1280x720 --fixed-fps 60 \
-        res://lab/sprite_lab.tscn -- --sprite="$n" --contact="$out" "$@" 2>&1 | grep -E "ERROR" >&2 || true
+      # time limit like cmd_shot: this run hung once with no output (2026-11-17)
+      local limit="${GK_SHOT_TIMEOUT:-180}" rc=0
+      "${RUN[@]}" timeout --kill-after=5 "$limit" "$GODOT" --path "$LAB" --windowed --resolution 1280x720 --fixed-fps 60 \
+        res://lab/sprite_lab.tscn -- --sprite="$n" --contact="$out" "$@" 2>&1 | { grep -E "ERROR" >&2 || true; } || rc=$?
+      [[ "$rc" == 124 || "$rc" == 137 ]] && die "art shot move timed out after ${limit}s (set GK_SHOT_TIMEOUT to allow longer)"
       [[ -f "$out" ]] || die "lab wrote no contact sheet"
       echo "$out"
       ;;
