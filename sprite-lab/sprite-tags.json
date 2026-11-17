@@ -181,6 +181,14 @@
       "wood"
     ]
   },
+  "chest": {
+    "cat": "item",
+    "tags": [
+      "pickup",
+      "chest",
+      "elite-drop"
+    ]
+  },
   "cleave-wave": {
     "cat": "strike",
     "tags": [
@@ -579,6 +587,14 @@
     "tags": [
       "sword",
       "small"
+    ]
+  },
+  "king-slime": {
+    "cat": "monster",
+    "tags": [
+      "boss",
+      "slime",
+      "stage-10"
     ]
   },
   "knight-gauntlets": {
