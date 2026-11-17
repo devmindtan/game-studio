@@ -46,6 +46,7 @@ Project
   tidy <game>                  move framework repo files out of a game (README, CHANGELOG, .github, ...)
   update-template              git pull the framework template (templates/claude-code-game-studios)
   update-tools                 every working day: pull template + LPC generator, report tool versions
+  hooks                        enable the root repo hooks (pre-commit: lab tests for sprite-lab changes)
   doctor                       check every tool the kit needs (and the agent links)
   agents-link [--check]        link AGENTS.md + .agents/skills for every agent (Claude, OpenCode, Codex, …)
 
@@ -96,6 +97,7 @@ cmd_list() {
 cmd_doctor() {
   local ok=1
   check() { if eval "$2" >/dev/null 2>&1; then printf '  ok    %-22s %s\n' "$1" "$(eval "$3" 2>/dev/null | head -1)"; else printf '  MISS  %-22s %s\n' "$1" "$4"; ok=0; fi; }
+  check "root repo hooks" "test \"\$(git -C $WS config core.hooksPath)\" = tools/gamekit/hooks" "echo tools/gamekit/hooks" "gamekit hooks"
   check "tools updated today" "tools_updated_today" "cat $UPDATE_STAMP" "gamekit update-tools (daily rule)"
   check godot "command -v $GODOT" "$GODOT --version 2>/dev/null | tail -1" "install Godot 4.7.2 (~/.local/bin/godot)"
   local ver; ver="$("$GODOT" --version 2>/dev/null | tail -n1 | cut -d. -f1-4)"
@@ -306,6 +308,13 @@ cmd_update_tools() {
   [[ $fail == 0 ]] || die "some tools did not update"
   date +%F > "$UPDATE_STAMP"
   echo "Games are not changed: bring a game up to a new template with its UPGRADING.md."
+}
+
+# Root repo hooks (tools/gamekit/hooks): pre-commit runs the lab tests when Sprite Lab
+# files are staged.
+cmd_hooks() {
+  git -C "$WS" config core.hooksPath tools/gamekit/hooks
+  echo "   root repo hooks: tools/gamekit/hooks (pre-commit: lab tests for sprite-lab changes)"
 }
 
 tools_updated_today() { [[ -f "$UPDATE_STAMP" && "$(cat "$UPDATE_STAMP")" == "$(date +%F)" ]]; }
@@ -708,6 +717,7 @@ case "$sub" in
   agents-link) cmd_agents_link "$@" ;;
   update-template) cmd_update_template ;;
   update-tools) cmd_update_tools ;;
+  hooks) cmd_hooks ;;
   run) cmd_run "$@" ;;
   edit) cmd_edit "$@" ;;
   test) cmd_test "$@" ;;

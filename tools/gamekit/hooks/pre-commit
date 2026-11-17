@@ -1,0 +1,19 @@
+#!/usr/bin/env bash
+# Root repo pre-commit (enabled by `gamekit hooks`): a commit that touches Sprite Lab
+# sprites or their shared code must pass the lab tests (lesson 2026-11-17: a sprite
+# was committed while `gamekit art test` reported 1 failed, the test and the commit
+# were chained with ";").
+set -uo pipefail
+staged="$(git diff --cached --name-only)"
+if grep -qE '^sprite-lab/(sprites|lib)/' <<<"$staged"; then
+  echo "pre-commit: Sprite Lab files staged -> gamekit art test" >&2
+  out="$(gamekit art test 2>&1)"
+  summary="$(grep -E '[0-9]+ passed, [0-9]+ failed' <<<"$out" | tail -1)"
+  echo "pre-commit: ${summary:-no test summary}" >&2
+  if [[ -z "$summary" || "$summary" != *" 0 failed"* ]]; then
+    grep -E '^FAIL' <<<"$out" >&2
+    echo "pre-commit: refused - fix the failing lab tests first" >&2
+    exit 1
+  fi
+fi
+exit 0
