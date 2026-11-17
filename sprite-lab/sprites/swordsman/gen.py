@@ -6,7 +6,7 @@ kiểm tra mọi frame chạm đất). Hình dựng từ tư thế bằng sprite
 Dấu hiệu nhận diện: khăn quàng đỏ bay theo chuyển động, kiếm bạc chuôi vàng.
 
 Bách Ải chỉ cần di chuyển hai hướng trái/phải; đòn đánh là sprite hiệu ứng riêng (sword-slash), nên nhân
-vật chỉ có: idle 4, run 8, hurt 3, death 5.
+vật chỉ có: idle 4, run 8, hurt 3, death 5, dash 5 (kỹ năng lướt, thêm 2026-11-17).
 
 Vẽ theo LỚP để mặc giáp sau này (minifig.LAYERS): cape_back (đuôi khăn), leg_*/boot_*, arm_*/hand_*,
 torso, neck (nút khăn), head (da, mắt), hair, weapon_back/weapon (kiếm). Mỗi lớp ghi ra
@@ -152,6 +152,19 @@ def hurt(i):
     ][i]
 
 
+def dash(i):
+    """Dash (2026-11-17, for the dash skill): wind-up, launch, two glide frames, recover.
+    Feet stay on the floor (ground=True); the body leans hard, arms and sword trail back,
+    the scarf flies out at full speed."""
+    return [
+        frame(bob=2, lean=1, feet=((-4, 0), (3, 0)), hands=((-3, 5), (3, 5)), weapon=200, speed=0.4),
+        frame(bob=2, lean=3, feet=((-6, 1), (5, 0)), hands=((-6, 4), (-1, 5)), weapon=190, speed=1.0, phase=0.6),
+        frame(bob=2, lean=3, feet=((-7, 2), (5, 0)), hands=((-7, 3), (-2, 4)), weapon=185, speed=1.0, phase=1.4),
+        frame(bob=2, lean=3, feet=((-6, 1), (5, 0)), hands=((-7, 4), (-2, 5)), weapon=188, speed=1.0, phase=2.2),
+        frame(bob=1, lean=1, feet=((-3, 0), (3, 0)), hands=((-2, 6), (3, 5)), weapon=30, speed=0.5, phase=3.0),
+    ][i]
+
+
 def death(i):
     return [
         frame(bob=1, lean=-2, head=(-1, 0), feet=((-4, 0), (2, 0)), hands=((-4, 3), (1, 4)),
@@ -171,6 +184,7 @@ ANIMATIONS = [
     ("idle", [idle(i) for i in range(4)], 5, True, {"durations_ms": [240, 160, 240, 120], "hitbox": {"shape":"rect","center":[24.0,44.0],"active":[0,3]}}),
     ("run", [run(i) for i in range(8)], 12, True, {"hitbox": {"shape":"rect","center":[24.0,44.0],"active":[0,7]}}),
     ("hurt", [hurt(i) for i in range(3)], 12, False, {"durations_ms": [90, 110, 120], "hitbox": {"shape":"rect","center":[24.0,44.0],"active":[0,2]}}),
+    ("dash", [dash(i) for i in range(5)], 14, False, {"durations_ms": [60, 50, 70, 70, 90], "hitbox": {"shape":"rect","center":[24.0,44.0],"active":[0,4]}}),
     ("death", [death(i) for i in range(5)], 8, False, {"durations_ms": [120, 140, 110, 100, 400], "hitbox": {"shape":"rect","center":[24.0,44.0],"active":[0,4]}}),
 ]
 

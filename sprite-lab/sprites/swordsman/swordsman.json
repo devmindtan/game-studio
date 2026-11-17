@@ -1,5 +1,5 @@
 {
-  "frames": 20,
+  "frames": 25,
   "frame_size": [
     48,
     48
@@ -84,8 +84,35 @@
       }
     },
     {
-      "name": "death",
+      "name": "dash",
       "start": 15,
+      "frames": 5,
+      "fps": 14.0,
+      "loop": false,
+      "durations_ms": [
+        60.0,
+        50.0,
+        70.0,
+        70.0,
+        90.0
+      ],
+      "hitbox": {
+        "shape": "rect",
+        "center": [
+          27.0,
+          31.0
+        ],
+        "active": [
+          0,
+          4
+        ],
+        "half_w": 13.0,
+        "half_h": 13.0
+      }
+    },
+    {
+      "name": "death",
+      "start": 20,
       "frames": 5,
       "fps": 8.0,
       "loop": false,
