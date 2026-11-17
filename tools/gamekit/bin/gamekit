@@ -70,6 +70,7 @@ Sprite Lab (sprite-lab/: make + test sprites here, then promote into a game)
   art lab [<name>] [sheet|move]     open the lab: all animations / a movement test stage
   art shot <name> [sheet|move] [frames]  screenshot the lab (move = scripted demo) for review
   art list | art check | art test   sprites + which games use them / validate all / lab tests
+  art tiers <skill>                 tiers <skill>-i..v side by side: check each keeps the previous motif
   art promote <name> <game>         copy strip + json into games/<g>/assets/sprites/custom/<name>/
   art ase|open <name>               .ase for editing by hand in LibreSprite
 
@@ -578,6 +579,11 @@ cmd_art() {
       done
       ;;
     rig) art_rig "$@" ;;
+    tiers)  # art tiers <skill>: the biggest frame of <skill>-i..v side by side (inheritance check)
+      [[ -n "${1:-}" ]] || die "usage: gamekit art tiers <skill>   (sprites <skill>-i .. <skill>-v)"
+      mkdir -p "$LAB/builds"
+      python3 "$KIT/pipeline/tier_strip.py" "$LAB/sprites" "$1" "$LAB/builds/tiers-$1.png"
+      ;;
     lab)
       lab_ready
       local args=()

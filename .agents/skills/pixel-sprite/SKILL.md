@@ -144,8 +144,17 @@ Không báo "xong" khi chưa xem `preview.png`, ảnh `sheet` và ảnh `move`.
   - **Băng/frost**: kết tinh, **đối xứng tròn**, cạnh sắc, phát sáng lạnh, tuyết.
   - **Đất/earth**: **đứt gãy, dịch chuyển khối, bất đối xứng, nặng**, tảng đá có mặt phẳng/đường vân, bụi, magma lộ ra — KHÔNG được là vòng tròn đối xứng kiểu băng.
   - **Lửa**: ngọn lửa liếc lên, sóng nhiệt, khói, màu nóng chảy. **Sét**: tia thẳng/gãy, chớp tức thời, điểm chạm. **Độc**: chất lỏng loang, bọt, hơi. **Ánh sáng**: chùm tia, halo, lõi trắng.
-- Mỗi bậc phải đổi **silhouette/hành vi**, không chỉ palette hay kích thước. Cấm dùng lại cấu trúc của dòng khác (vd `vòng → hoa → cột → xoáy → mandala` cho cả băng lẫn đất). Khi thiết kế bậc nào, **render và đặt cạnh bậc tương đương của ít nhất một dòng khác**; nếu silhouette giống nhau thì đổi một trong hai trước khi commit. Ghi trong commit message dòng đã so sánh với ai.
-- Quy ước bậc (chỉ là gợi ý nhịp, phải diễn giải theo DNA ở trên): I = ý tưởng nền tảng đọc được ngay; II = đổi hướng/silhouette; III = khối/cấu trúc đặc trưng của chất liệu; IV = chuyển động của chính chất liệu đó (đất = trượt/sạt, băng = xoáy/tuyết…); V = **chiêu hoàn toàn mới**, bố cục khác hẳn mọi V khác, tinh chỉnh nhất. Mọi bậc có hitbox đo từ pixel, neo giữ trục, tag `tier-I`…`tier-V`, **không giữ bản không đánh số**.
+- Mỗi bậc phải thêm **một ý mới về hình/hành vi** (không chỉ palette hay kích thước), trên nền motif kế thừa (xem dưới). Cấm dùng lại cấu trúc của dòng khác (vd `vòng → hoa → cột → xoáy → mandala` cho cả băng lẫn đất). Khi thiết kế bậc nào, **render và đặt cạnh bậc tương đương của ít nhất một dòng khác**; nếu silhouette giống nhau thì đổi một trong hai trước khi commit. Ghi trong commit message dòng đã so sánh với ai.
+- **Bậc sau kế thừa bậc trước** (người dùng 2026-11-17: Frost Nova III cũ thành "cọc băng", trông như một chiêu khác):
+  bậc N **giữ nguyên hình đặc trưng (motif) của bậc N-1**, nhận ra ngay khi đặt cạnh nhau, rồi **thêm hoặc phát triển
+  đúng một ý mới** (lớp ngoài, mảnh bắn ra, vòng thứ hai, hành vi mới của chính motif đó). Ví dụ Frost Nova:
+  I vòng băng → II ngôi sao 8 cánh → III cùng ngôi sao đó + mảnh băng bắn ra từ đầu cánh → IV/V tiếp tục từ ngôi sao.
+  Bậc V là bản đẹp và mạnh nhất, **không phải chiêu khác**: motif vẫn phải còn.
+  **Tự kiểm trước khi commit:** ghép frame lớn nhất của cả 5 bậc thành một hàng và xem; chỉ ra được motif của bậc
+  N-1 nằm ở đâu trong bậc N, không chỉ ra được thì vẽ lại. Ghi trong docstring `gen.py`: "Kế thừa: <motif bậc trước>
+  + <ý mới>". Một thiết kế đẹp nhưng không kế thừa thì **tách thành chiêu riêng** (sprite tên mới, ví dụ
+  `glacial-spires`), không bỏ đi. Mọi bậc có hitbox đo từ pixel, neo giữ trục, tag `tier-I`…`tier-V`, **không giữ
+  bản không đánh số**.
 
 - **Vũ khí đối xứng (kiếm, đại kiếm, dao găm) vẽ thẳng đứng**, trục là tâm lưỡi; guard/cán/pommel nằm cùng trục. **Tự kiểm tra bằng script**: với mỗi hàng, tập pixel active (alpha ≥ 96) phải khớp tập phản chiếu qua trục (mirror `x' = 2*axis - x`); xem preview trước khi báo xong. Không tự đo thì không được nói là đã xong.
 - **Đường chéo đặc (lưỡi kiếm, vệt chém…) điền theo từng cột**: với mỗi cột `x`, tính tâm `y` rồi tô một
