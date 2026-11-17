@@ -377,33 +377,51 @@ def status_numbers(sid, e):
 
 
 def statuses_of(root, data):
-    """Status effects drawn on characters: the aura of each buff (items.json buffs)
-    and each monster status (statuses.json), with the skills that cause it."""
+    """Status effects drawn on characters, in plain words.
+
+    Keep it short: the effect's own description, plus its damage when it deals
+    any, expressed from the character's base damage. No skill names, level
+    gates or spawn timings - those belong on the Skills / Items tabs.
+    """
     items = load(os.path.join(data, "items.json"))
     out = []
     sts = clean(load(os.path.join(data, "statuses.json")).get("statuses", {}))
+    classes = clean(load(os.path.join(data, "classes.json")))
+    base = 0.0
+    for cls in classes.values():
+        base = float(cls.get("stats", {}).get("damage", 0))
+        if base:
+            break
     pools = {}
     for f in sorted(os.listdir(data)):
         if f.startswith("upgrades_") and f.endswith(".json"):
             pools[f] = load(os.path.join(data, f))
     for sid, st in sts.items():
-        by = []
-        for f, pool in pools.items():
-            names = {u["id"]: u.get("name", u["id"]) for u in pool.get("upgrades", [])}
-            for kid, defn in clean(pool.get("skills", {})).items():
+        dps, chain = [], []
+        for pool in pools.values():
+            for defn in clean(pool.get("skills", {})).values():
                 for e in defn.get("on_hit", []):
-                    if e.get("status") == sid:
-                        nums = status_numbers(sid, e)
-                        by.append("%s (cấp %s+): %s" % (names.get(kid, kid), e.get("from", 1), nums))
+                    if e.get("status") != sid:
+                        continue
+                    if "dps_mul" in e:
+                        dps.append(float(e["dps_mul"]))
+                    if "mul" in e:
+                        chain.append(float(e["mul"]))
+        facts = []
+        if dps:
+            r = max(dps)
+            facts.append("Sát thương %g mỗi giây (%g%% sát thương đòn, đòn %g)" % (r * base, r * 100, base))
+        elif chain and sid == "shock":
+            facts.append("Lan ×%g sát thương đòn" % max(chain))
         out.append({"id": sid, "name": st.get("name", sid), "kind": "debuff", "desc": st.get("desc", ""),
                     "at": st.get("at", "body"), "tint": st.get("tint", ""), "sprite": sprite_info(root, str(st.get("sprite", ""))),
-                    "facts": by or ["Chưa có chiêu nào gây ra (dành cho class sau)."]})
+                    "facts": facts})
     for bid, it in clean(items.get("buffs", {})).items():
         if not it.get("aura"):
             continue
         out.append({"id": bid, "name": it.get("name", bid), "kind": "buff", "desc": it.get("desc", ""),
                     "layer": it.get("aura_layer", "front"), "sprite": sprite_info(root, str(it["aura"])),
-                    "facts": buff_facts(it, {})})
+                    "facts": []})
     return out
 
 

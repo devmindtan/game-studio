@@ -697,7 +697,7 @@ function skillPane(pane,s){
 /* ---------- 7. effects: status effects on characters (buff / debuff) ---------- */
 function effects(m){
   m.appendChild(el('h2',{},'Hiệu ứng'));
-  m.appendChild(el('p',{class:'lead'},'Hiệu ứng trạng thái hiện trực tiếp lên người (buff / debuff), ví dụ chảy máu, bỏng, độc, choáng, tăng tốc. Mỗi hiệu ứng vẽ cho mọi nhân vật và quái. Sprite của kỹ năng nằm ở tab Kỹ năng.'));
+  m.appendChild(el('p',{class:'lead'},'Hiệu ứng hiện trực tiếp lên người (buff / debuff): mô tả ngắn và sát thương tính theo sát thương của nhân vật.'));
   if(!(game.statuses||[]).length){ m.appendChild(el('div',{class:'card empty'},'Game chưa có hiệu ứng trạng thái.')); return; }
   // auras are made on the hero's frame and feet anchor: draw them with the hero,
   // "back" ones behind it, "front" ones over it, like the game does
@@ -715,7 +715,6 @@ function effects(m){
         ...(facts||[]).map(f=>el('div',{class:'small'},'· '+f))))); };
   const buffs=game.statuses.filter(st=>st.kind!=='debuff'), debuffs=game.statuses.filter(st=>st.kind==='debuff');
   buffs.forEach(st=>card(st.name,st.desc,st.facts,[st]));
-  if(buffs.length>1) card('Cả '+buffs.length+' buff cùng lúc','Mỗi buff có vùng riêng (chân, hai bên thân, trên đầu, bong bóng quanh người) nên không chồng lên nhau.',[],buffs);
   c.appendChild(grid); m.appendChild(c);
   // debuffs: drawn on a slime dummy where the game draws them (body / head / feet), with the tint
   const d=el('div',{class:'card',style:'margin-top:12px'},el('h3',{},'Debuff lên quái'));
