@@ -1,5 +1,5 @@
 {
-  "frames": 27,
+  "frames": 32,
   "frame_size": [
     16,
     16
@@ -195,8 +195,43 @@
       "loop": false
     },
     {
-      "name": "gear",
+      "name": "arcane_bolt",
       "start": 26,
+      "frames": 1,
+      "fps": 1.0,
+      "loop": false
+    },
+    {
+      "name": "fireball",
+      "start": 27,
+      "frames": 1,
+      "fps": 1.0,
+      "loop": false
+    },
+    {
+      "name": "lightning",
+      "start": 28,
+      "frames": 1,
+      "fps": 1.0,
+      "loop": false
+    },
+    {
+      "name": "thunder_javelin",
+      "start": 29,
+      "frames": 1,
+      "fps": 1.0,
+      "loop": false
+    },
+    {
+      "name": "meteor",
+      "start": 30,
+      "frames": 1,
+      "fps": 1.0,
+      "loop": false
+    },
+    {
+      "name": "gear",
+      "start": 31,
       "frames": 1,
       "fps": 1.0,
       "loop": false

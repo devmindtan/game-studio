@@ -5,7 +5,7 @@ Mỗi icon là một animation 1 frame, tên = vai trò: heart (máu), skull (s�
 gem (kinh nghiệm), star (cấp), clock (thời gian), sword (sát thương), boot (tốc độ chạy),
 và 12 icon thẻ nâng cấp với tên trùng upgrade id: blade_arc, back_slash, whirlwind, sharpen,
 haste, reach, vitality, swift, magnet, regen, frost_nova, earth_strike; Đợt 2: ground_slam,
-cleave_wave, holy_column, dash, toughness.
+cleave_wave, holy_column, dash, toughness; pháp sư: arcane_bolt, fireball, lightning, thunder_javelin, meteor.
 Viền tối 1 px như mọi sprite; neo (8, 8) = tâm ô. Game vẽ bằng SpriteSheet theo tên animation.
 Chạy: gamekit art run ui-icons
 """
@@ -356,6 +356,59 @@ ICONS = {
         "..ssssssd..",
         "...sssdd...",
         "....sdd....",
+    ]),
+    # arcane_bolt (mage): a glowing orb flying right with a violet trail
+    "arcane_bolt": ({"w": "#ffffff", "c": "#7ef0ff", "b": "#37b9e8", "v": "#8b5cf6", "d": "#4a2a7a"}, [
+        "........bbb..",
+        ".......bcwcb.",
+        "vv....bcwwwcb",
+        ".dvvvvbcwwwcb",
+        "vv....bcwwwcb",
+        ".......bcccb.",
+        "........bbb..",
+    ]),
+    # fireball (mage): an orange ball with a flame tail
+    "fireball": ({"y": "#fff2a8", "o": "#ffa23a", "r": "#ff5a1f", "d": "#8a1f10"}, [
+        "........ooo..",
+        "r..r...oyyyo.",
+        ".rrorroyyyyyo",
+        "r.rroooyyyyyo",
+        ".rrorroyyyyyo",
+        "r..r...oyyyo.",
+        "........ddd..",
+    ]),
+    # lightning (mage): a jagged yellow bolt striking down
+    "lightning": ({"w": "#ffffff", "y": "#ffe14a", "o": "#c9922a"}, [
+        "......yyy..",
+        ".....ywy...",
+        "....ywy....",
+        "...ywwyyy..",
+        "....yyywy..",
+        "......ywy..",
+        ".....ywy...",
+        "....ywy....",
+        "...yy......",
+        "..o........",
+    ]),
+    # thunder_javelin (mage): a spear with sparks along it, pointing right
+    "thunder_javelin": ({"w": "#ffffff", "s": "#9fb3c8", "y": "#ffe14a", "b": "#7fe8ff", "g": "#6b4a2b"}, [
+        "..y.....y....",
+        "...b...b...w.",
+        "ggggsssssswww",
+        "...b...b...w.",
+        "..y.....y....",
+    ]),
+    # meteor (mage): a rock falling down-left with a fire trail
+    "meteor": ({"r": "#9a8066", "l": "#c9b08f", "d": "#5a4535", "o": "#ffa23a", "f": "#ff5a1f", "y": "#fff2a8"}, [
+        "..........fo.",
+        ".........foy.",
+        "........foy..",
+        "....ll.foy...",
+        "...lrrfoy....",
+        "..lrrrro.....",
+        "..rrrrrd.....",
+        "..drrrd......",
+        "...ddd.......",
     ]),
     # settings: a steel gear with a hole
     "gear": ({"g": "#9fb3c8", "l": "#e8f0f6", "d": "#5f7186"}, [
