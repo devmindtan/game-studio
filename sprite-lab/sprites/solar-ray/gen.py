@@ -127,6 +127,13 @@ def main():
         ("fly_down", dir_frames(side, "down"), 16, True),
         ("impact", hit, 16, False),
     ]
+    # 16 flight directions (lib/dirs16.py): a bigger square frame, fly_000..fly_337
+    global SIZE, ANCHOR, CX, CY
+    sys.path.insert(0, str(Path(__file__).resolve().parents[2] / "lib"))
+    import dirs16  # noqa: E402
+    anims, ANCHOR = dirs16.with_directions(anims, ANCHOR, 44)
+    SIZE = 44
+    CX, CY = ANCHOR
     flat = [f for _, frames, _, _ in anims for f in frames]
     strip(flat).save(OUT / f"{NAME}_strip.png")
     flat[0].save(OUT / f"{NAME}.png")

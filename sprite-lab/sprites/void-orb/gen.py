@@ -156,6 +156,12 @@ ANIMATIONS = [
     ("impact", [impact(i) for i in range(6)], 14, False),
 ]
 
+# 16 flight directions (lib/dirs16.py): a bigger square frame, fly_000..fly_337
+sys.path.insert(0, str(Path(__file__).resolve().parents[2] / "lib"))
+import dirs16  # noqa: E402
+ANIMATIONS, ANCHOR = dirs16.with_directions(ANIMATIONS, ANCHOR, 28)
+SIZE = 28
+
 
 def main() -> None:
     flat = [f for _, frames, _, _ in ANIMATIONS for f in frames]

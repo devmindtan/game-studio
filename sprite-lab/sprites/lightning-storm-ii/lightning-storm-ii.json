@@ -1,0 +1,36 @@
+{
+  "frames": 6,
+  "frame_size": [
+    76,
+    76
+  ],
+  "fps": 12.0,
+  "loop": false,
+  "anchor": [
+    38.0,
+    38.0
+  ],
+  "anchor_source": "explicit",
+  "animations": [
+    {
+      "name": "spell",
+      "start": 0,
+      "frames": 6,
+      "fps": 12.0,
+      "loop": false,
+      "hitbox": {
+        "shape": "circle",
+        "center": [
+          38.0,
+          38.0
+        ],
+        "active": [
+          1,
+          4
+        ],
+        "radius": 30.0,
+        "inner": 1.0
+      }
+    }
+  ]
+}
