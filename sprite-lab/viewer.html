@@ -9,23 +9,15 @@
 *{box-sizing:border-box} html,body{height:100%} body{margin:0;font:13px/1.4 system-ui,-apple-system,Segoe UI,Roboto,sans-serif;background:var(--bg);color:var(--text)}
 button,input,select{font:inherit;color:var(--text)}
 kbd{font:11px ui-monospace,monospace;background:var(--panel3);border:1px solid var(--border);border-bottom-width:2px;border-radius:4px;padding:0 4px;color:var(--text)}
-header{height:44px;padding:0 12px;border-bottom:1px solid var(--border);display:flex;gap:10px;align-items:center;background:#0e1014f5;position:sticky;top:0;z-index:10}
-header h1{font-size:14px;margin:0;font-weight:700;letter-spacing:.02em} header .sub{color:var(--muted);font-size:12px}
-#status{margin-left:auto;font-size:12px;display:flex;gap:10px;align-items:center}
+header{height:44px;padding:0 12px;border-bottom:1px solid var(--border);display:flex;gap:10px;align-items:center;background:#0e1014f5;position:sticky;top:0;z-index:10;overflow:hidden}
+header h1{font-size:14px;margin:0;font-weight:700;letter-spacing:.02em;flex:0 0 auto}
+header .sub{color:var(--muted);font-size:12px;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#status{margin-left:auto;font-size:12px;display:flex;gap:10px;align-items:center;flex:0 0 auto}
 #live{font-size:11px;color:var(--muted)} #live.flash{color:var(--good)}
 .layout{display:grid;grid-template-columns:280px 1fr;height:calc(100vh - 44px);min-height:0}
 aside{border-right:1px solid var(--border);display:flex;flex-direction:column;min-height:0;height:100%;overflow:hidden}
 .sideTop{padding:8px;border-bottom:1px solid var(--border);display:flex;flex-direction:column;gap:6px;flex:0 0 auto}
 .search{width:100%;background:var(--panel2);border:1px solid var(--border);border-radius:8px;padding:7px 9px}
-.filters{display:flex;gap:4px;flex-wrap:wrap}
-.chip{background:var(--panel);border:1px solid var(--border);border-radius:999px;padding:3px 8px;font-size:11px;cursor:pointer;color:var(--muted)}
-.chip:hover{color:var(--text);border-color:#3a4660} .chip.active{background:#173a46;border-color:#2b7d91;color:#dffaff}
-.adv{display:grid;grid-template-columns:1fr 1fr;gap:5px 6px;padding:7px;border-top:1px solid var(--border);border-radius:8px;background:var(--panel)}
-.adv .ctrlLbl{flex-direction:column;align-items:flex-start;gap:2px;font-size:10px}
-.adv select.ctrl{width:100%;padding:4px 6px;font-size:11px}
-.adv .wide{grid-column:1/-1;flex-direction:row;justify-content:space-between;align-items:center}
-.adv .btn{padding:3px 8px;font-size:11px}
-.filterNote{font-size:10px;color:var(--muted);grid-column:1/-1}
 #list{overflow-y:auto;overflow-x:hidden;padding:6px;flex:1 1 auto;min-height:0;scrollbar-width:thin;scrollbar-color:#3a4a63 transparent}
 #list::-webkit-scrollbar, main::-webkit-scrollbar{width:8px;height:8px}
 #list::-webkit-scrollbar-track, main::-webkit-scrollbar-track{background:transparent}
@@ -56,7 +48,7 @@ main{scrollbar-width:thin;scrollbar-color:#3a4a63 transparent;padding:10px;overf
 .animBtn:hover{border-color:#43506a} .animBtn.active{background:#2f2550;border-color:#7658c8;color:#fff}
 .animBtn .key{color:var(--muted);font-size:10px;margin-right:5px}
 .animBtn .sub{color:var(--muted);font-size:10px;margin-left:4px} .animBtn.active .sub,.animBtn.active .key{color:#d9ccff}
-.work{display:grid;grid-template-columns:minmax(320px,auto) 1fr;gap:12px;padding:10px}
+.work{display:grid;grid-template-columns:minmax(0,1fr) 216px;gap:12px;padding:10px}
 .player{display:flex;flex-direction:column;gap:8px;min-width:0}
 .stage{border:1px solid var(--border);border-radius:8px;display:flex;align-items:center;justify-content:center;padding:12px;min-height:300px}
 .stage.bg-checker{background:linear-gradient(45deg,#191f2b 25%,transparent 25%),linear-gradient(-45deg,#191f2b 25%,transparent 25%),linear-gradient(45deg,transparent 75%,#191f2b 75%),linear-gradient(-45deg,transparent 75%,#191f2b 75%);background-color:#121722;background-size:16px 16px;background-position:0 0,0 8px,8px -8px,-8px 0}
@@ -81,17 +73,20 @@ label.ctrlLbl{font-size:11px;color:var(--muted);display:flex;align-items:center;
 .panelHead .hint{margin-left:auto;font-weight:500;text-transform:none;letter-spacing:0}
 .panel.closed .panelBody{display:none} .panel.closed .panelHead{border-bottom:none}
 .panelBody{padding:8px}
-.previewBox img{image-rendering:pixelated;max-width:100%;border:1px solid var(--border);border-radius:6px;background:#121720;display:block}
+.previewPanel{margin:0 10px 10px}
+.previewScroll{overflow:auto;max-height:62vh;border:1px solid var(--border);border-radius:6px;background:#121720}
+.previewScroll img{image-rendering:pixelated;display:block;margin:0 auto;max-width:100%;height:auto}
 .gifRow{display:flex;gap:8px;flex-wrap:wrap}
 .gifRow figure{margin:0;cursor:pointer} .gifRow img{image-rendering:pixelated;border:1px solid var(--border);border-radius:6px;background:#121720;height:88px}
 .gifRow figure.cur img{border-color:var(--accent2)}
 .gifRow figcaption{font-size:11px;color:var(--muted);margin-top:2px;text-align:center}
 .err{color:#ff9f9f} .ok{color:var(--good)}
 @media (max-width:980px){.layout{grid-template-columns:1fr} aside{border-right:none;border-bottom:1px solid var(--border);max-height:36vh} .work{grid-template-columns:1fr}}
+@media (max-width:760px){header .sub,#live{display:none}}
 
 /* --- studio navigation ------------------------------------------------------ */
 #nav{display:flex;gap:4px;margin-left:8px}
-.navBtn{background:transparent;border:1px solid transparent;border-radius:7px;padding:5px 12px;font-size:12px;font-weight:600;color:var(--muted);cursor:pointer;text-decoration:none}
+.navBtn{background:transparent;border:1px solid transparent;border-radius:7px;padding:5px 12px;font-size:12px;font-weight:600;color:var(--muted);cursor:pointer;text-decoration:none;white-space:nowrap}
 .navBtn:hover{color:var(--text);background:var(--panel)}
 .navBtn.active{background:#1e3348;border-color:#2b4866;color:#dffaff}
 </style>
@@ -110,22 +105,6 @@ label.ctrlLbl{font-size:11px;color:var(--muted);display:flex;align-items:center;
   <aside>
     <div class="sideTop">
       <input id="q" class="search" placeholder="Tìm sprite / animation…  ( / )" />
-      <div class="filters" id="filters"></div>
-      <div class="adv" id="advFilters">
-        <label class="ctrlLbl">Chất liệu<select id="tierSel" class="ctrl">
-          <option value="all">Tất cả</option><option value="wood">Gỗ</option><option value="iron">Sắt</option><option value="gold">Vàng</option><option value="other">Khác</option>
-        </select></label>
-        <label class="ctrlLbl">Kích thước<select id="sizeSel" class="ctrl">
-          <option value="all">Tất cả</option><option value="16">≤ 16px</option><option value="24">24px</option><option value="32">32px</option><option value="48">48px</option><option value="64">≥ 64px</option>
-        </select></label>
-        <label class="ctrlLbl">Hitbox<select id="shapeSel" class="ctrl">
-          <option value="all">Tất cả</option><option value="rect">Rect</option><option value="circle">Circle</option><option value="arc">Arc</option><option value="mixed">Nhiều hình</option><option value="none">Không có</option>
-        </select></label>
-        <label class="ctrlLbl">Animation<select id="kindSel" class="ctrl">
-          <option value="all">Tất cả</option><option value="fly">Bay (projectile)</option><option value="melee">Cận chiến</option><option value="area">Phép/AOE</option><option value="idle">Tĩnh (idle)</option><option value="other">Khác</option>
-        </select></label>
-        <label class="ctrlLbl wide"><span>Chỉ 4 hướng</span><span><input type="checkbox" id="dirOnly"> <button id="clearFilters" class="btn">Xoá lọc</button></span></label>
-      </div>
     </div>
     <div id="list"></div>
   </aside>
@@ -155,18 +134,18 @@ label.ctrlLbl{font-size:11px;color:var(--muted);display:flex;align-items:center;
           </div>
           <div id="frameInfo"></div>
           <div class="film" id="film"></div>
-          <div class="keys"><kbd>Space</kbd> phát/dừng · <kbd>←</kbd><kbd>→</kbd> frame · <kbd>↑</kbd><kbd>↓</kbd> animation · <kbd>1</kbd>–<kbd>9</kbd> chọn animation · <kbd>[</kbd><kbd>]</kbd> sprite trước/sau · <kbd>+</kbd><kbd>-</kbd> tỉ lệ · <kbd>B</kbd> nền · <kbd>V</kbd> chế độ xem · <kbd>C</kbd> xoá lọc · <kbd>R</kbd> từ đầu · <kbd>/</kbd> tìm</div>
+          <div class="keys"><kbd>Space</kbd> phát/dừng · <kbd>←</kbd><kbd>→</kbd> frame · <kbd>↑</kbd><kbd>↓</kbd> animation · <kbd>1</kbd>–<kbd>9</kbd> chọn · <kbd>[</kbd><kbd>]</kbd> sprite · <kbd>+</kbd><kbd>-</kbd> tỉ lệ · <kbd>B</kbd> nền · <kbd>V</kbd> xem · <kbd>R</kbd> từ đầu · <kbd>/</kbd> tìm</div>
         </div>
         <div class="sidePane">
           <div class="panel" id="gifPanel">
             <div class="panelHead">GIF <span class="hint metaText">bấm để chọn</span></div>
             <div class="panelBody"><div id="gifRow" class="gifRow"></div></div>
           </div>
-          <div class="panel" id="prevPanel">
-            <div class="panelHead">Preview sheet <span class="hint metaText">mỗi animation một hàng</span></div>
-            <div class="panelBody previewBox"><img id="previewImg" alt="preview"></div>
-          </div>
         </div>
+      </div>
+      <div class="panel previewPanel" id="prevPanel">
+        <div class="panelHead">Preview sheet <span class="hint metaText">mỗi animation một hàng</span></div>
+        <div class="panelBody previewScroll"><img id="previewImg" alt="preview"></div>
       </div>
     </div>
   </main>
@@ -175,7 +154,7 @@ label.ctrlLbl{font-size:11px;color:var(--muted);display:flex;align-items:center;
 <script>
 let data=null,current=null,img=null;
 let anims=[],animIdx=0,frameInAnim=0,playing=true,acc=0,lastT=0,scale=4,speed=1,showAnchor=true,showHitbox=false;
-let activeFilter='all',viewMode='none',lastManifest='';
+let viewMode='none',lastManifest='';
 const collapsed={};
 const BGS=['checker','dark','light','green'];
 const $=id=>document.getElementById(id);
@@ -212,43 +191,6 @@ function categoryOf(s){
 }
 function catLabel(id){const c=CATS.find(x=>x.id===id);return c?c.label:id;}
 
-// --- bộ lọc mở rộng: mọi thuộc tính suy ra từ tên + metadata, không sửa manifest ---
-function tierOf(s){
-  const m=s.name.match(/-(wood|iron|gold)$/); return m?m[1]:'other';
-}
-function sizeOf(s){
-  const w=(s.meta.frame_size||[])[0]||0;
-  return w<=16?'16':w<=24?'24':w<=32?'32':w<=48?'48':'64';
-}
-function shapeOf(s){
-  const set=new Set((s.meta.animations||[]).map(a=>a.hitbox&&a.hitbox.shape).filter(Boolean));
-  if(!set.size) return 'none';
-  if(set.size>1) return 'mixed';
-  return [...set][0];
-}
-function kindOf(s){
-  const names=((s.meta.animations||[]).map(a=>a.name).join(' ')+' '+s.name).toLowerCase();
-  if(/\bfly(_|$)/.test(names)) return 'fly';
-  if(/slash|strike|chop|attack|melee/.test(names)) return 'melee';
-  if(/spell|cast|nova|burst|storm|sigil|rift|pool|aoe/.test(names)) return 'area';
-  if(/idle|loop/.test(names)) return 'idle';
-  return 'other';
-}
-function dirOf(s){ return (s.meta.animations||[]).some(a=>/_(right|left|up|down)$/.test(a.name)); }
-function applyDerived(s){ s._tier=tierOf(s); s._size=sizeOf(s); s._shape=shapeOf(s); s._kind=kindOf(s); s._dir=dirOf(s); }
-function activeFilterCount(){
-  let n=0;
-  ['tierSel','sizeSel','shapeSel','kindSel'].forEach(id=>{if($(id).value!=='all') n++;});
-  if($('dirOnly').checked) n++;
-  if($('q').value.trim()) n++;
-  if(activeFilter!=='all') n++;
-  return n;
-}
-function clearFilters(){
-  activeFilter='all'; ['tierSel','sizeSel','shapeSel','kindSel'].forEach(id=>{$(id).value='all';});
-  $('dirOnly').checked=false; $('q').value=''; buildFilters(); updateCount(); renderList();
-}
-
 // --- manifest + live reload --------------------------------------------------------
 async function fetchManifest(){
   const res=await fetch('sprites-manifest.json',{cache:'no-store'});
@@ -257,7 +199,6 @@ async function fetchManifest(){
   return {text, json:JSON.parse(text)};
 }
 async function init(){
-  buildFilters();
   try{
     const m=await fetchManifest(); lastManifest=m.text; setData(m.json);
     const [name,anim]=decodeURIComponent(location.hash.slice(1)).split('/');
@@ -273,16 +214,14 @@ function setData(json){
   data=json; data.sprites.forEach(s=>{
     s._cat=s.cat||categoryOf(s);        // nhãn từ registry; fallback cho sprite mới
     s._tags=Array.isArray(s.tags)?s.tags:[];
-    applyDerived(s);
   });
-  buildFilters();
   updateCount();
   renderList();
 }
 function updateCount(){
   if(!data) return;
-  const n=activeFilterCount(), total=data.sprites.length;
-  $('count').innerHTML='<span class="ok">'+(n?filtered().length+' / ':'')+total+' sprites</span>'+(n?' <span class="pill" style="margin-left:6px">'+n+' bộ lọc</span>':'');
+  const n=visibleSprites().length, total=data.sprites.length;
+  $('count').innerHTML='<span class="ok">'+(n<total?n+' / '+total:total)+' sprites</span>';
 }
 // `gamekit art run` rewrites the manifest; a re-rendered sprite has new ?v= URLs.
 async function poll(){
@@ -301,37 +240,20 @@ async function poll(){
 }
 
 // --- sidebar -------------------------------------------------------------------------
-function buildFilters(){
-  const wrap=$('filters'); wrap.innerHTML='';
-  CATS.forEach(c=>{
-    const b=document.createElement('button'); b.className='chip'+(c.id===activeFilter?' active':''); b.textContent=c.label;
-    b.onclick=()=>{activeFilter=c.id; buildFilters(); updateCount(); renderList();};
-    wrap.appendChild(b);
-  });
-}
-function filtered(){
+function visibleSprites(){
+  if(!data) return [];
   const q=$('q').value.toLowerCase().trim();
-  const tier=$('tierSel').value, size=$('sizeSel').value, shape=$('shapeSel').value, kind=$('kindSel').value;
-  const dir=$('dirOnly').checked;
-  return data.sprites.filter(s=>{
-    if(activeFilter!=='all'&&s._cat!==activeFilter) return false;
-    if(q && !(s.name.toLowerCase().includes(q)||s._tags.some(t=>t.includes(q))||((s.meta.animations||[]).some(a=>a.name.toLowerCase().includes(q))))) return false;
-    if(tier!=='all'&&s._tier!==tier) return false;
-    if(size!=='all'&&s._size!==size) return false;
-    if(shape!=='all'&&s._shape!==shape) return false;
-    if(kind!=='all'&&s._kind!==kind) return false;
-    if(dir&&!s._dir) return false;
-    return true;
-  });
+  if(!q) return data.sprites;
+  return data.sprites.filter(s=>s.name.toLowerCase().includes(q)||s._tags.some(t=>t.includes(q))||((s.meta.animations||[]).some(a=>a.name.toLowerCase().includes(q))));
 }
 function visibleOrder(){ // sprites in the order the list shows them (for [ and ])
-  const items=filtered(), out=[];
+  const items=visibleSprites(), out=[];
   ORDER.forEach(cat=>items.filter(s=>s._cat===cat&&!collapsed[cat]).forEach(s=>out.push(s)));
   return out;
 }
 function renderList(){
   const list=$('list'); list.innerHTML='';
-  const items=filtered();
+  const items=visibleSprites();
   const groups={}; items.forEach(s=>{(groups[s._cat]=groups[s._cat]||[]).push(s);});
   let any=false;
   ORDER.forEach(cat=>{
@@ -542,9 +464,6 @@ $('q').addEventListener('input',()=>{updateCount(); renderList();});
 $('scaleSel').addEventListener('change',()=>{resizeCanvas(); $('scaleSel').blur();});
 $('speedSel').addEventListener('change',e=>{speed=parseFloat(e.target.value)||1; e.target.blur();});
 $('bgSel').addEventListener('change',e=>{setBg(e.target.value); e.target.blur();});
-['tierSel','sizeSel','shapeSel','kindSel'].forEach(id=>$(id).addEventListener('change',e=>{updateCount(); renderList(); e.target.blur();}));
-$('dirOnly').addEventListener('change',()=>{updateCount(); renderList();});
-$('clearFilters').onclick=clearFilters;
 const VIEWS=['none','gray','contrast','invert'];
 function setView(v){ viewMode=v; $('viewSel').value=v; }
 $('viewSel').addEventListener('change',e=>{setView(e.target.value); e.target.blur();});
@@ -572,7 +491,6 @@ document.addEventListener('keydown',e=>{
   else if(e.key==='-'){ stepScale(-1); }
   else if(e.key==='b'||e.key==='B'){ setBg(BGS[(BGS.indexOf($('bgSel').value)+1)%BGS.length]); }
   else if(e.key==='v'||e.key==='V'){ setView(VIEWS[(VIEWS.indexOf(viewMode)+1)%VIEWS.length]); }
-  else if(e.key==='c'||e.key==='C'){ clearFilters(); }
   else if(e.key==='r'||e.key==='R'){ $('btnRestart').onclick(); }
 });
 try{ const b=localStorage.getItem('viewerBg'); if(b&&BGS.includes(b)) setBg(b); }catch(e){}
