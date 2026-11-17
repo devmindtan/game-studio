@@ -8,7 +8,7 @@ except stun (anchor at the bottom of the star orbit, placed on top of the head).
   freeze  the monster is locked in a translucent ice block (front, top, side,
           cracks, a glint sweeping across); the game also stops its animation
   stun    three five-point stars circling the head with depth (back ones dimmer)
-  burn    flames rising round the body from the feet, embers flying up
+  burn    a warm halo hugging the body, flames on the sides/head, embers rising
   bleed   a wound, drops running down, a small pool under the feet
   slow    a sticky blue puddle at the feet, down-arrows sinking along the sides
   shock   jagged arcs crackling round the body, sparks
@@ -153,23 +153,47 @@ def stun(i):
     return c
 
 
-# --- burn: flames round the body ------------------------------------------------
+# --- burn: a fire halo hugging the monster, not a row of campfires ---------------
+# The old version drew five little flames in a line at the feet. This one wraps
+# the body: a warm ring, a few solid tongues rising from the sides and the head,
+# and embers drifting up. Bands are filled per row so no checkerboard holes.
+_BURN = ["#7a1c0e", "#e43d12", "#ff8a1f", "#ffd24a", "#fff3b0"]
+
+
 def burn(i):
     c = Canvas(S, S)
-    cols = ["#8a1f10", "#ff5a1f", "#ffa23a", "#fff2a8"]
-    tongues = [(-7, 10), (-3, 14), (1, 11), (5, 15), (8, 9)]
-    for k, (dx, h) in enumerate(tongues):
-        hh = h + (2 if (i + k) % 3 == 0 else 0) - (1 if (i + k) % 4 == 1 else 0)
-        base = 26
-        for j in range(hh):
-            w = max(1, int(3 * (1 - j / hh) + 0.5))
-            sway = math.sin(i * 0.9 + k + j * 0.4) * (j / hh) * 1.5
-            band = 0 if j < 2 else (1 if j < hh * 0.55 else (2 if j < hh * 0.85 else 3))
+    # one solid flame = filled tapered rows with a dark rim and a bright core
+    widths = [1, 3, 3, 5, 5, 7, 7, 9, 9, 11, 11, 11, 11, 9, 7]
+
+    def flame(cx, base, phase):
+        h = len(widths)
+        for j, w in enumerate(widths):
+            t = j / (h - 1)
+            sway = round(math.sin(i * 0.9 + phase + j * 0.4) * t * 2)
             for q in range(-w // 2, w - w // 2):
-                _px(c, C + dx + q + sway, base - j, cols[band] + ("e0" if band < 3 else ""))
-    for k in range(3):                       # embers
-        y = 22 - ((i * 3 + k * 7) % 20)
-        _px(c, C - 6 + k * 6 + (i % 2), y, "#ffd04a")
+                edge = abs(q) >= w // 2 - 1
+                if edge:
+                    col = "#7a1c0e"
+                elif t < 0.18:
+                    col = "#c42d10"
+                elif abs(q) <= 1 and t > 0.72:
+                    col = "#fff3b0"
+                elif abs(q) <= 1 and t > 0.4:
+                    col = "#ffd24a"
+                else:
+                    col = "#ff7a1fe0"
+                _px(c, cx + q + sway, base - (h - 1 - j), col)
+
+    # two side tongues and one above the head; nothing drawn under the feet
+    flame(C - 9, C + 9, 0)
+    flame(C + 9, C + 10, 2)
+    flame(C + 1, C + 2, 4)
+    for k in range(5):                       # embers rising off the flames
+        y = 20 - ((i * 3 + k * 5) % 18)
+        x = C - 9 + k * 5 + math.sin(i * 0.7 + k) * 2
+        _px(c, x, y, "#ffd24a")
+        if k % 2 == 0:
+            _px(c, x, y + 1, "#ff8a1f80")
     return c
 
 
