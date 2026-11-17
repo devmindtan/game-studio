@@ -192,14 +192,14 @@ def progression_of(data, classes):
             if isinstance(u, dict):
                 cards[str(u.get("id", ""))] = u
     milestones = []
-    for stage, ids in sorted(clean(ms.get("stages", {})).items(), key=lambda kv: int(kv[0])):
+    for lv, ids in sorted(clean(ms.get("levels", ms.get("stages", {}))).items(), key=lambda kv: int(kv[0])):
         out = []
         for rid in ids:
             r = ms.get("rewards", {}).get(rid, {})
             card = cards.get(str(r.get("skill", rid)), {}) if r.get("kind") == "skill" else {}
             out.append({"id": rid, "kind": r.get("kind", ""), "class": r.get("class", ""), "icon": r.get("icon", rid),
                         "name": card.get("name", r.get("name", rid)), "desc": card.get("desc", r.get("desc", ""))})
-        milestones.append({"stage": int(stage), "rewards": out})
+        milestones.append({"level": int(lv), "rewards": out})
     return {"count": len(curve), "boss_every": every, "scale": k, "rewards": rw, "curve": curve,
             "regions": [{"id": r.get("id"), "name": r.get("name"), "from": r.get("from"), "to": r.get("to"),
                          "waves": r.get("waves"), "boss_waves": r.get("boss_waves"), "ground": r.get("ground", {})}

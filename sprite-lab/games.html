@@ -313,7 +313,7 @@ function drawGround(g,cx,cy,sc,half,w,h){ // world (0,0) at canvas (cx,cy), sc c
 /* 30 stages: difficulty curve by region, rewards, milestone rewards (stages.json, milestones.json) */
 function progression(m,pr){
   m.appendChild(el('h3',{},'Tiến trình '+pr.count+' ải'));
-  m.appendChild(el('p',{class:'lead'},'Máu, sát thương và mật độ quái tăng theo ải (công thức trong stages.json, giống src/core/stages.gd). Mỗi '+pr.boss_every+' ải là ải boss và là mốc: lần đầu vượt được chọn 1 trong 3 phần thưởng vĩnh viễn.'));
+  m.appendChild(el('p',{class:'lead'},'Máu, sát thương và mật độ quái tăng theo ải (công thức trong stages.json, giống src/core/stages.gd). Mỗi '+pr.boss_every+' ải là ải boss.'));
   const W=900,H=280,PL=44,PR=16,PT=16,PB=40; const cv=el('canvas',{width:W,height:H}); const c=cv.getContext('2d');
   const N=pr.curve.length, top=Math.ceil(Math.max(...pr.curve.map(x=>x.hp)));
   const X=n=>PL+(W-PL-PR)*(n-0.5)/N, Y=v=>H-PB-(H-PT-PB)*v/top;
@@ -333,7 +333,7 @@ function progression(m,pr){
   m.appendChild(el('div',{class:'stage',style:'padding:0;background:#121720'},cv));
   const lg=el('div',{class:'legend',style:'margin-top:6px'});
   lines.forEach(([k,col,name])=>{ const last=pr.curve[N-1][k]; lg.appendChild(el('span',{},el('i',{class:'sw',style:'background:'+col}),name+' ×1 → ×'+last.toFixed(2))); });
-  lg.appendChild(el('span',{class:'muted'},'nền = vùng · vạch vàng = ải boss / mốc'));
+  lg.appendChild(el('span',{class:'muted'},'nền = vùng · vạch vàng = ải boss'));
   m.appendChild(lg);
   const rw=pr.rewards||{};
   const t=el('table',{style:'margin-top:10px'});
@@ -345,11 +345,11 @@ function progression(m,pr){
   m.appendChild(t);
   m.appendChild(el('p',{class:'muted small'},'Thắng ải n: vàng '+(rw.gold_base||0)+' + '+(rw.gold_per_stage||0)+'·n (cộng vàng nhặt trong trận); đá lần đầu '+(rw.gems_first||0)+' (ải boss '+(rw.gems_boss_first||0)+'), các lần sau '+(rw.gems_repeat||0)+'. Thua: giữ vàng đã nhặt.'));
   // milestone rewards
-  m.appendChild(el('h3',{style:'margin-top:18px'},'Phần thưởng mốc ải'));
-  m.appendChild(el('p',{class:'muted small'},'Vượt ải mốc lần đầu → chọn 1 trong 3 (chiêu độc nhất của class mình + nội tại + luật). Chiêu độc nhất có sẵn cấp 1 mỗi trận và lên cấp bằng thẻ.'));
+  m.appendChild(el('h3',{style:'margin-top:18px'},'Phần thưởng mốc cấp (trong trận)'));
+  m.appendChild(el('p',{class:'muted small'},'Lên cấp 10, 20, 30 trong một trận → chọn 1 trong 3 (chiêu độc nhất của class mình + nội tại + luật), chỉ có tác dụng tới hết trận đó. Chiêu độc nhất vào ở cấp 1 rồi lên cấp bằng thẻ.'));
   const KIND={skill:'Chiêu độc nhất',passive:'Nội tại mới',rule:'Luật mới'};
   pr.milestones.forEach(ms=>{
-    m.appendChild(el('div',{class:'row',style:'margin:10px 0 6px'},el('b',{},'Mốc ải '+ms.stage)));
+    m.appendChild(el('div',{class:'row',style:'margin:10px 0 6px'},el('b',{},'Mốc cấp '+ms.level)));
     const grid=el('div',{class:'grid g4'});
     ms.rewards.forEach(r=>{
       const ic=liveCanvas(48,48,(g)=>{ g.clearRect(0,0,48,48); if(iconSheet&&iconSheet.has(r.icon)) iconSheet.draw(g,r.icon,0,24,24,3); });

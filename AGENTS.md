@@ -87,7 +87,8 @@ xuất kéo dài thì khuyên người dùng mở phiên mới ở đó.
   chữ tính theo cỡ font (không gõ baseline tay). Ghi các lỗi tìm được rồi mới sửa (bài học 2026-11-17).
 - **Không đoán mò khi thiết kế** (người dùng 2026-11-17): màn hình, luồng menu, tính năng mới đều bắt đầu từ cách
   các game cùng thể loại đã làm (tìm trên mạng), ghi nguồn vào tài liệu thiết kế rồi mới code. Thiếu thông tin
-  mà tham khảo không trả lời được thì hỏi người dùng.
+  mà tham khảo không trả lời được thì hỏi người dùng. Từ ngữ của người dùng ứng với hơn một hệ thống của game
+  (ví dụ "mốc 10/20/30": ải hay cấp trong trận?) cũng là thiếu thông tin: hỏi lại trước khi làm.
 - **Giao diện hiện tại** của game là `production/ui/` (danh sách màn hình trong `production/ui/screens.json`):
   đổi thứ người chơi thấy thì chạy `gamekit ui-shots <g>`, xem ảnh, commit `production/ui`. Dashboard (`games.html`)
   chỉ hiện bộ này và báo khi nó cũ hơn code; ảnh trong `production/qa/evidence/` là bằng chứng lịch sử, không phải
