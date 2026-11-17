@@ -557,6 +557,8 @@ function skillPane(pane,s){
   function scene(lv){
     const fx=sheets[lv.sprite], hero=heroInfo&&sheets[heroInfo.name], sl=dummy&&sheets[dummy.sprite.name];
     if(!fx||!hero||!sl) return null;
+    const how=s.params.cast||'';
+    if(how==='active'||how==='wave') return moveScene(lv,fx,hero,sl,how);
     const kind=fx.anims.some(a=>a.name.startsWith('slash_'))?'melee':fx.has('spin')?'orbit':s.params.cast_range?'cast':'self';
     const anim0=kind==='melee'?'slash_right':effectAnim(fx), hbz=hbAt(fx,anim0);
     const rz=hbz?(hbz.shape==='rect'?Math.max(hbz.half_w,hbz.half_h):hbz.radius)*2*lv.size:40;
@@ -578,6 +580,22 @@ function skillPane(pane,s){
     const lands=hb&&hitTest(hb,hcx,hcy,target.x,target.y,sc,sb.radius*ssc);
     const hits=lands?Array.from({length:ticks},(_,k)=>lead+(kind==='orbit'?k*dur/ticks:a0)):[];
     return {fx,hero,sl,kind,anim,sc,hb,lead,dur,a0,a1,hits,fxAt,hcx,hcy,slFeet,target,ssc,sb,hc,period:lead+dur+0.8};
+  }
+  // wave: the effect flies right at its speed and hits the dummy on the way;
+  // active (dash): the hero dashes right with its dash animation and slashes the dummy
+  function moveScene(lv,fx,hero,sl,how){
+    const dash=how==='active', time=Number(s.params.time||0.18), speed=Number(s.params.speed||300);
+    const travel=dash?Number(s.params.distance||130):speed*fx.duration('sweep_right');
+    Z=Math.max(1,Math.min(2,(W-40)/(travel+160))); VW=W/Z; VH=H/Z;
+    FEET={x:60,y:VH/2+24};
+    const hb0=hero.meta.body, hc={x:FEET.x+(hb0?(hb0.center[0]-hero.anchor[0])*2:0),y:FEET.y+(hb0?(hb0.center[1]-hero.anchor[1])*2:-26)};
+    const ssc=dummy.stats.scale||2, sb=sl.meta.body||{center:sl.anchor,radius:8};
+    const dist=travel*0.6, target={x:hc.x+dist,y:hc.y};
+    const slFeet={x:target.x-(sb.center[0]-sl.anchor[0])*ssc,y:target.y-(sb.center[1]-sl.anchor[1])*ssc};
+    const lead=0.3, dur=dash?time+0.35:fx.duration('sweep_right');
+    const hitAt=dash?time*0.5:dist/speed;
+    return {fx,hero,sl,kind:dash?'dash':'wave',anim:dash?'dash':'sweep_right',sc:2*lv.size,hb:null,lead,dur,a0:hitAt,a1:hitAt+0.1,
+      hits:[lead+hitAt],fxAt:{x:hc.x,y:hc.y},hcx:hc.x,hcy:hc.y,slFeet,target,ssc,sb,hc,period:lead+dur+0.8,time,speed,travel};
   }
   hitB.onclick=()=>{ const sc=scene(s.levels[level-1]||s.levels[0]); if(!sc||!sc.hits.length) return false;
     clock=sc.hits[0]+0.04; paused=true; playB.textContent='▶ Phát'; playB.classList.remove('on'); return true; };
@@ -602,8 +620,14 @@ function skillPane(pane,s){
     else sc.sl.draw(g,'move',u*0.6,sc.slFeet.x,sc.slFeet.y,sc.ssc,true);
     if(done.length){ const r=sc.sb.radius*sc.ssc, w=Math.max(16,r*2), top={x:Math.round(sc.target.x-w/2),y:Math.round(sc.target.y-r-8)};
       g.fillStyle='#1a0d14'; g.fillRect(top.x-1,top.y-1,w+2,5); g.fillStyle='#e6404d'; g.fillRect(top.x,top.y,Math.round(w*hp/hp0),3); }
-    sc.hero.draw(g,'idle',u,FEET.x,FEET.y,2,false);
-    if(et>=0&&et<sc.dur){ const at=sc.kind==='orbit'?et%sc.fx.duration(sc.anim):et; sc.fx.draw(g,sc.anim,at,sc.fxAt.x,sc.fxAt.y,sc.sc);
+    if(sc.kind==='dash'){
+      const k=Math.max(0,Math.min(1,et/sc.time)), x=FEET.x+sc.travel*k;
+      if(et>=0&&et<sc.dur){ for(let j=1;j<4;j++) drawTint(sc.hero,g,'dash',et,FEET.x+(x-FEET.x)*j/4,FEET.y,2,false,'rgba(165,215,255,'+(0.18*j)+')');
+        sc.hero.draw(g,'dash',et,x,FEET.y,2,false); }
+      else sc.hero.draw(g,'idle',u,et>=sc.dur?FEET.x+sc.travel:FEET.x,FEET.y,2,false);
+    } else sc.hero.draw(g,'idle',u,FEET.x,FEET.y,2,false);
+    if(sc.kind==='wave'&&et>=0&&et<sc.dur){ sc.fx.draw(g,sc.anim,et,sc.fxAt.x+sc.speed*et,sc.fxAt.y,sc.sc); }
+    else if(sc.kind!=='dash'&&et>=0&&et<sc.dur){ const at=sc.kind==='orbit'?et%sc.fx.duration(sc.anim):et; sc.fx.draw(g,sc.anim,at,sc.fxAt.x,sc.fxAt.y,sc.sc);
       const active=sc.kind==='orbit'||(et>=sc.a0&&et<sc.a1);
       if(showHb&&sc.hb) drawHb(g,sc.hb,sc.hcx,sc.hcy,sc.sc,true);
       if(showHb){ g.strokeStyle='rgba(110,255,140,.8)'; g.lineWidth=1.5; g.beginPath(); g.arc(sc.target.x,sc.target.y,sc.sb.radius*sc.ssc,0,Math.PI*2); g.stroke(); } }
@@ -616,7 +640,7 @@ function skillPane(pane,s){
     const hitNow=done.length&&u-lastHit<0.3;
     g.setTransform(1,0,0,1,0,0);
     g.font='12px system-ui'; g.textAlign='left'; g.fillStyle='#e9eef8';
-    g.fillText('×'+Z.toFixed(2).replace(/\.?0+$/,'')+' · Cấp '+lv.level+' · '+lv.sprite+' · '+({melee:'chém gần',orbit:'xoáy quanh người',cast:'bắn ra '+(s.params.cast_range||0)+' px',self:'quanh người'})[sc.kind]+' · sát thương '+lv.damage+' · slime '+hp0+' máu',10,18);
+    g.fillText('×'+Z.toFixed(2).replace(/\.?0+$/,'')+' · Cấp '+lv.level+' · '+lv.sprite+' · '+({melee:'chém gần',orbit:'xoáy quanh người',cast:'bắn ra '+(s.params.cast_range||0)+' px',self:'quanh người',wave:'bay '+(s.params.speed||0)+' px/s',dash:'lướt '+(s.params.distance||0)+' px (Space)'})[sc.kind]+' · sát thương '+lv.damage+' · slime '+hp0+' máu',10,18);
     if(!sc.hits.length){ g.fillStyle='#ff8a8a'; g.fillText('Không trúng hình nhân ở vị trí này',10,36); }
     if(hitNow){ g.font='bold 22px system-ui'; g.fillStyle='#ffd36b'; g.textAlign='center'; g.fillText(lethal?'HẠ!':'TRÚNG!',W/2,40); }
   });

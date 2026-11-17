@@ -416,6 +416,8 @@ def build_game(slug):
 
     if rules_doc.get("rules"):
         for sk in skills:
+            if sk["params"].get("cast") == "active":
+                continue   # player-triggered movement (dash): the rules grade auto attacks, like the game's test
             sk["check"] = check_skill(sk, classes.get(sk["class"], {}), rules_doc, meta_of, scale)
 
     custom = os.path.join(root, "assets", "sprites", "custom")
