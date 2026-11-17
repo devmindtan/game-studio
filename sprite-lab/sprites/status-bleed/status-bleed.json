@@ -1,11 +1,11 @@
 {
-  "frames": 1,
+  "frames": 6,
   "frame_size": [
     16,
     16
   ],
-  "fps": 1.0,
-  "loop": false,
+  "fps": 10.0,
+  "loop": true,
   "anchor": [
     8.0,
     8.0
@@ -13,24 +13,11 @@
   "anchor_source": "explicit",
   "animations": [
     {
-      "name": "idle",
+      "name": "loop",
       "start": 0,
-      "frames": 1,
-      "fps": 1.0,
-      "loop": false,
-      "hitbox": {
-        "shape": "rect",
-        "center": [
-          7.5,
-          8.5
-        ],
-        "active": [
-          0,
-          0
-        ],
-        "half_w": 5.5,
-        "half_h": 6.5
-      }
+      "frames": 6,
+      "fps": 10.0,
+      "loop": true
     }
   ]
 }

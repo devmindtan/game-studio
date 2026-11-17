@@ -933,13 +933,17 @@
   "status-bleed": {
     "cat": "status",
     "tags": [
-      "debuff"
+      "debuff",
+      "bleed",
+      "on-monster"
     ]
   },
   "status-burn": {
     "cat": "status",
     "tags": [
-      "debuff"
+      "debuff",
+      "burn",
+      "on-monster"
     ]
   },
   "status-def-down": {
@@ -957,7 +961,9 @@
   "status-freeze": {
     "cat": "status",
     "tags": [
-      "debuff"
+      "debuff",
+      "freeze",
+      "on-monster"
     ]
   },
   "status-poison": {
@@ -978,6 +984,14 @@
       "buff"
     ]
   },
+  "status-shock": {
+    "cat": "status",
+    "tags": [
+      "debuff",
+      "shock",
+      "on-monster"
+    ]
+  },
   "status-silence": {
     "cat": "status",
     "tags": [
@@ -987,7 +1001,9 @@
   "status-slow": {
     "cat": "status",
     "tags": [
-      "debuff"
+      "debuff",
+      "slow",
+      "on-monster"
     ]
   },
   "status-speed-up": {
@@ -999,7 +1015,9 @@
   "status-stun": {
     "cat": "status",
     "tags": [
-      "debuff"
+      "debuff",
+      "stun",
+      "on-monster"
     ]
   },
   "status-weaken": {
