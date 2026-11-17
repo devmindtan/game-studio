@@ -16,8 +16,19 @@ header .sub{color:var(--muted);font-size:12px;min-width:0;white-space:nowrap;ove
 #live{font-size:11px;color:var(--muted)} #live.flash{color:var(--good)}
 .layout{display:grid;grid-template-columns:280px 1fr;height:calc(100vh - 44px);min-height:0}
 aside{border-right:1px solid var(--border);display:flex;flex-direction:column;min-height:0;height:100%;overflow:hidden}
-.sideTop{padding:8px;border-bottom:1px solid var(--border);display:flex;flex-direction:column;gap:6px;flex:0 0 auto}
-.search{width:100%;background:var(--panel2);border:1px solid var(--border);border-radius:8px;padding:7px 9px}
+.sideTop{padding:8px;border-bottom:1px solid var(--border);display:flex;gap:6px;flex:0 0 auto;position:relative}
+.search{flex:1 1 auto;min-width:0;background:var(--panel2);border:1px solid var(--border);border-radius:8px;padding:7px 9px}
+.fbtn{flex:0 0 auto;display:flex;align-items:center;gap:5px;background:var(--panel2);border:1px solid var(--border);border-radius:8px;padding:0 9px;font-size:12px;color:var(--muted);cursor:pointer}
+.fbtn:hover{color:var(--text);border-color:#3a4660}
+.fbtn.on{background:#173a46;border-color:#2b7d91;color:#dffaff}
+.fbtn .fbadge{background:var(--accent);color:#06232b;border-radius:999px;font-size:10px;font-weight:700;line-height:15px;padding:0 5px}
+.fbtn .fbadge[hidden]{display:none}
+.fpop{position:absolute;left:8px;right:8px;top:calc(100% - 3px);z-index:30;display:flex;flex-direction:column;gap:6px;padding:8px;background:var(--panel2);border:1px solid var(--border);border-radius:9px;box-shadow:0 14px 30px #00000090}
+.fpop[hidden]{display:none}
+.frow{display:flex;align-items:center;gap:8px;font-size:11px;color:var(--muted)}
+.frow select{flex:1 1 auto;min-width:0;padding:4px 6px;font-size:12px}
+.ffoot{display:flex;gap:6px;justify-content:flex-end;padding-top:6px;border-top:1px solid var(--border)}
+.ffoot .btn{padding:3px 8px;font-size:11px}
 #list{overflow-y:auto;overflow-x:hidden;padding:6px;flex:1 1 auto;min-height:0;scrollbar-width:thin;scrollbar-color:#3a4a63 transparent}
 #list::-webkit-scrollbar, main::-webkit-scrollbar{width:8px;height:8px}
 #list::-webkit-scrollbar-track, main::-webkit-scrollbar-track{background:transparent}
@@ -106,6 +117,20 @@ label.ctrlLbl{font-size:11px;color:var(--muted);display:flex;align-items:center;
   <aside>
     <div class="sideTop">
       <input id="q" class="search" placeholder="Tìm sprite / animation…  ( / )" />
+      <button id="fBtn" class="fbtn" title="Bộ lọc">Lọc <span id="fBadge" class="fbadge" hidden>0</span></button>
+      <div id="fPop" class="fpop" hidden>
+        <label class="frow">Nhóm<select id="fCat" class="ctrl"><option value="all">Tất cả</option></select></label>
+        <label class="frow">Cỡ khung<select id="fSize" class="ctrl">
+          <option value="all">Tất cả</option><option value="16">≤ 16 px</option><option value="24">24 px</option><option value="32">32 px</option><option value="48">48 px</option><option value="64">≥ 64 px</option>
+        </select></label>
+        <label class="frow">Hướng<select id="fDir" class="ctrl">
+          <option value="all">Tất cả</option><option value="4">Có 4 hướng</option><option value="1">Chỉ 1 hướng</option>
+        </select></label>
+        <label class="frow">Hitbox<select id="fHit" class="ctrl">
+          <option value="all">Tất cả</option><option value="yes">Có hitbox</option><option value="no">Không có</option>
+        </select></label>
+        <div class="ffoot"><button id="fClear" class="btn">Xoá lọc</button><button id="fClose" class="btn">Đóng</button></div>
+      </div>
     </div>
     <div id="list"></div>
   </aside>
@@ -192,6 +217,17 @@ function categoryOf(s){
 }
 function catLabel(id){const c=CATS.find(x=>x.id===id);return c?c.label:id;}
 
+// --- bộ lọc: thuộc tính suy ra từ metadata, hiện trong popover của nút "Lọc" ------
+function sizeOf(s){ const w=(s.meta.frame_size||[])[0]||0; return w<=16?'16':w<=24?'24':w<=32?'32':w<=48?'48':'64'; }
+function dirOf(s){ return (s.meta.animations||[]).some(a=>/_(right|left|up|down)$/.test(a.name)); }
+function hitOf(s){ return (s.meta.animations||[]).some(a=>a.hitbox)?'yes':'no'; }
+function filterCount(){ let n=0; ['fCat','fSize','fDir','fHit'].forEach(id=>{ if($(id).value!=='all') n++; }); return n; }
+function syncFilters(){
+  const n=filterCount();
+  $('fBtn').classList.toggle('on',n>0);
+  const b=$('fBadge'); b.textContent=n; b.hidden=n===0;
+}
+
 // --- manifest + live reload --------------------------------------------------------
 async function fetchManifest(){
   const res=await fetch('sprites-manifest.json',{cache:'no-store'});
@@ -222,7 +258,8 @@ function setData(json){
 function updateCount(){
   if(!data) return;
   const n=visibleSprites().length, total=data.sprites.length;
-  $('count').innerHTML='<span class="ok">'+(n<total?n+' / '+total:total)+' sprites</span>';
+  const narrowed=n<total;
+  $('count').innerHTML='<span class="ok">'+(narrowed?n+' / '+total:total)+' sprites</span>';
 }
 // `gamekit art run` rewrites the manifest; a re-rendered sprite has new ?v= URLs.
 async function poll(){
@@ -244,8 +281,15 @@ async function poll(){
 function visibleSprites(){
   if(!data) return [];
   const q=$('q').value.toLowerCase().trim();
-  if(!q) return data.sprites;
-  return data.sprites.filter(s=>s.name.toLowerCase().includes(q)||s._tags.some(t=>t.includes(q))||((s.meta.animations||[]).some(a=>a.name.toLowerCase().includes(q))));
+  const cat=$('fCat').value, size=$('fSize').value, dir=$('fDir').value, hit=$('fHit').value;
+  return data.sprites.filter(s=>{
+    if(cat!=='all' && s._cat!==cat) return false;
+    if(size!=='all' && sizeOf(s)!==size) return false;
+    if(dir!=='all' && (dirOf(s)?'4':'1')!==dir) return false;
+    if(hit!=='all' && hitOf(s)!==hit) return false;
+    if(!q) return true;
+    return s.name.toLowerCase().includes(q)||(s._tags||[]).some(t=>t.includes(q))||((s.meta.animations||[]).some(a=>a.name.toLowerCase().includes(q)));
+  });
 }
 function visibleOrder(){ // sprites in the order the list shows them (for [ and ])
   const items=visibleSprites(), out=[];
@@ -477,6 +521,13 @@ function stepSprite(d){
 function setBg(v){ const st=$('stage'); BGS.forEach(b=>st.classList.remove('bg-'+b)); st.classList.add('bg-'+v); $('bgSel').value=v; try{localStorage.setItem('viewerBg',v);}catch(e){} }
 
 $('q').addEventListener('input',()=>{updateCount(); renderList();});
+// --- bộ lọc (nút nhỏ cạnh ô tìm kiếm, popover không chiếm chỗ của danh sách) ---
+CATS.forEach(c=>{ if(c.id==='all') return; const o=document.createElement('option'); o.value=c.id; o.textContent=c.label; $('fCat').appendChild(o); });
+$('fBtn').onclick=e=>{ e.stopPropagation(); $('fPop').hidden=!$('fPop').hidden; };
+$('fClose').onclick=()=>{ $('fPop').hidden=true; };
+['fCat','fSize','fDir','fHit'].forEach(id=>$(id).addEventListener('change',e=>{ syncFilters(); updateCount(); renderList(); e.target.blur(); }));
+$('fClear').onclick=()=>{ ['fCat','fSize','fDir','fHit'].forEach(id=>{ $(id).value='all'; }); syncFilters(); updateCount(); renderList(); };
+document.addEventListener('click',e=>{ if(!e.target.closest('.sideTop')) $('fPop').hidden=true; });
 $('scaleSel').addEventListener('change',()=>{resizeCanvas(); $('scaleSel').blur();});
 $('speedSel').addEventListener('change',e=>{speed=parseFloat(e.target.value)||1; e.target.blur();});
 $('bgSel').addEventListener('change',e=>{setBg(e.target.value); e.target.blur();});
@@ -496,6 +547,7 @@ document.addEventListener('keydown',e=>{
   if(e.target===$('q')){ if(e.key==='Escape'){ $('q').blur(); } return; }
   if(e.ctrlKey||e.metaKey||e.altKey) return;
   if(e.key==='/'){ e.preventDefault(); $('q').focus(); return; }
+  if(e.key==='Escape' && !$('fPop').hidden){ $('fPop').hidden=true; return; }
   if(!current) return;
   if(e.code==='Space'){ e.preventDefault(); $('btnPlay').onclick(); }
   else if(e.key==='ArrowRight'){ e.preventDefault(); stepFrame(1); }
