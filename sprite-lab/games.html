@@ -642,15 +642,22 @@ function effects(m){
   m.appendChild(el('h2',{},'Hiệu ứng'));
   m.appendChild(el('p',{class:'lead'},'Hiệu ứng trạng thái hiện trực tiếp lên người (buff / debuff), ví dụ chảy máu, bỏng, độc, choáng, tăng tốc. Mỗi hiệu ứng vẽ cho mọi nhân vật và quái. Sprite của kỹ năng nằm ở tab Kỹ năng.'));
   if(!(game.statuses||[]).length){ m.appendChild(el('div',{class:'card empty'},'Game chưa có hiệu ứng trạng thái.')); return; }
+  // auras are made on the hero's frame and feet anchor: draw them with the hero,
+  // "back" ones behind it, "front" ones over it, like the game does
   const c=el('div',{class:'card'},el('h3',{},'Buff'));
   const grid=el('div',{class:'grid g3'});
-  game.statuses.forEach(st=>{ let sh=null; if(st.sprite) sheetOf(st.sprite).then(x=>{sh=x;});
-    // feet auras stand on the ground line, body auras sit on the body centre
+  const heroInfo=(game.heroes[0]||{}).sprite; let hero=null; if(heroInfo) sheetOf(heroInfo).then(x=>{hero=x;});
+  const sheets={}; game.statuses.forEach(st=>{ if(st.sprite) sheetOf(st.sprite).then(x=>{sheets[st.id]=x;}); });
+  const card=(title,desc,facts,list)=>{
     const cv=liveCanvas(128,128,(g,t)=>{ g.clearRect(0,0,128,128); drawGround(g,64,64,1,1e9,128,128);
-      if(sh){ const a=sh.anims.find(x=>x.name==='loop')||sh.anims[0]; sh.draw(g,a.name,t,64,st.at==='feet'?100:64,3); } });
+      const layer=L=>list.filter(st=>st.layer===L).forEach(st=>{ const sh=sheets[st.id]; if(!sh) return;
+        const a=sh.anims.find(x=>x.name==='loop')||sh.anims[0]; sh.draw(g,a.name,t,64,112,2); });
+      layer('back'); if(hero) hero.draw(g,'idle',t,64,112,2); layer('front'); });
     grid.appendChild(el('div',{class:'itemCard'},el('div',{class:'stage',style:'padding:0;flex:0 0 128px'},cv),
-      el('div',{},el('b',{},st.name),el('div',{class:'small muted',style:'margin:2px 0 4px'},st.desc),
-        ...(st.facts||[]).map(f=>el('div',{class:'small'},'· '+f))))); });
+      el('div',{},el('b',{},title),el('div',{class:'small muted',style:'margin:2px 0 4px'},desc),
+        ...(facts||[]).map(f=>el('div',{class:'small'},'· '+f))))); };
+  game.statuses.forEach(st=>card(st.name,st.desc,st.facts,[st]));
+  card('Cả 4 buff cùng lúc','Mỗi buff có vùng riêng (chân, hai bên thân, trên đầu, bong bóng quanh người) nên không chồng lên nhau.',[],game.statuses);
   c.appendChild(grid); m.appendChild(c);
 }
 

@@ -366,7 +366,7 @@ def statuses_of(root, data):
         if not it.get("aura"):
             continue
         out.append({"id": bid, "name": it.get("name", bid), "kind": "buff", "desc": it.get("desc", ""),
-                    "at": it.get("aura_at", "body"), "sprite": sprite_info(root, str(it["aura"])),
+                    "layer": it.get("aura_layer", "front"), "sprite": sprite_info(root, str(it["aura"])),
                     "facts": buff_facts(it, {})})
     return out
 
