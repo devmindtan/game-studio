@@ -15,3 +15,6 @@
 .DS_Store
 __pycache__/
 /.gamekit-tools-updated
+
+# Local venv for the tools in tools/free-tools/ (do not commit packages)
+/tools/free-tools/venv/

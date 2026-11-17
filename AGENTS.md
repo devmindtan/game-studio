@@ -53,6 +53,8 @@ xuất kéo dài thì khuyên người dùng mở phiên mới ở đó.
 | "Làm game mới", "tôi có ý tưởng…" | `gamekit new <slug> "Tên"` → trong `games/<slug>`: `/prototype` (đã mô tả được game), `/start` (còn mơ hồ), `/brainstorm` (chưa có ý tưởng) |
 | "Thêm/sửa tính năng" (nhỏ, rõ) | sửa code trong `src/` → `gamekit test <g>` → `gamekit shot <g>` để nhìn kết quả |
 | Mọi việc lớn/nhiều bước | chia thành task **nguyên tử** trước khi code: skill **`.agents/skills/free-agent-workloop/SKILL.md`** — mỗi task một thay đổi, tự kiểm tra và commit được, làm xong một cái mới sang cái kế tiếp; khi tắc/không xem được ảnh thì dừng và báo rõ |
+| Sửa pipeline Python (sprite-lab, gamekit pipeline, dashboard) | `tools/free-tools/venv/bin/ruff check <path> --select F401,F841,F821,F541` (bắt bug nhẹ); toàn bộ linter ở `tools/free-tools/README.md` |
+| Kiểm GDScript khác ngoài gamekit test | `tools/free-tools/venv/bin/gdlint src/` trong game (chỉ đọc; không `--fix` hàng loạt) |
 | "Thêm tính năng" (lớn, nhiều hệ thống) | `/quick-design` (thay đổi nhỏ) hoặc `/design-system` → `/create-stories` → `/dev-story` → `/story-done` |
 | "Game khó/dễ quá", "chỉnh tốc độ…" | sửa `assets/data/*.json` (không hardcode trong code) → `/balance-check` → `gamekit test` + `gamekit shot` |
 | "Thêm nhân vật", "sprite người/quái dạng người" | `gamekit lpc` (người dùng phối đồ, xuất **ZIP split animations**) → chép vào `games/<g>/assets/source/lpc/<tên>.zip` → `gamekit sprites <g>` → `gamekit preview <g> <tên>` → dùng `LpcCharacter` trong code |
