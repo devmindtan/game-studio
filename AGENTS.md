@@ -60,7 +60,7 @@ xuất kéo dài thì khuyên người dùng mở phiên mới ở đó.
 | "Game khó/dễ quá", "chỉnh tốc độ…" | sửa `assets/data/*.json` (không hardcode trong code) → `/balance-check` → `gamekit test` + `gamekit shot` |
 | "Thêm nhân vật", "sprite người/quái dạng người" | `gamekit lpc` (người dùng phối đồ, xuất **ZIP split animations**) → chép vào `games/<g>/assets/source/lpc/<tên>.zip` → `gamekit sprites <g>` → `gamekit preview <g> <tên>` → dùng `LpcCharacter` trong code |
 | Sprite / art pixel (nhân vật, quái, icon, hiệu ứng, tile; không phải LPC), thử animation, thử di chuyển | skill **`.agents/skills/pixel-sprite/SKILL.md`**, làm trong **Sprite Lab** (`sprite-lab/`, không bao giờ trong game). Nhân vật có tay chân/vũ khí: ưu tiên nguồn pose rig `gamekit art rig new` → validate/inspect/motion → `gamekit art run` → xem `preview.png` → `gamekit art shot <tên> sheet` + `… move` → `gamekit art test`; art không phù hợp rig: `gamekit art new` → sửa `gen.py` → cùng bước render/review/test; commit repo gốc → khi game cần: `gamekit art promote <tên> <g>`; hướng nghệ thuật bằng `/art-bible`, `/asset-spec` |
-| Menu, HUD, giao diện | `/ux-design` → `/team-ui`; bắt buộc chụp màn hình bằng `gamekit shot` |
+| Menu, HUD, giao diện | **tham khảo trước**: tìm cách ≥ 2 game cùng thể loại làm màn đó (wiki, ảnh chụp, bài phân tích), ghi nguồn + điều lấy vào `design/ux/<màn>.md` mục "## Tham khảo" (test `ux_spec_test.gd` của game chặn màn menu thiếu spec) → `/ux-design` → `/team-ui`; bắt buộc chụp màn hình bằng `gamekit shot` |
 | Âm thanh | `/team-audio` (kit chưa có công cụ âm thanh) |
 | "Game bị lỗi…" | `/bug-report` → viết test hồi quy, **chạy cho thấy test fail trước** → sửa → `gamekit test` |
 | "Review code" | `/code-review` của game (bản scoped `games/<g>`), không dùng bản chung |
@@ -85,6 +85,9 @@ xuất kéo dài thì khuyên người dùng mở phiên mới ở đó.
   thẻ cùng hàng cao bằng nhau theo nội dung dài nhất, khoảng cách đều, không gì bị cắt hay tràn khung, chữ đọc
   được trên nền. Vị trí
   chữ tính theo cỡ font (không gõ baseline tay). Ghi các lỗi tìm được rồi mới sửa (bài học 2026-11-17).
+- **Không đoán mò khi thiết kế** (người dùng 2026-11-17): màn hình, luồng menu, tính năng mới đều bắt đầu từ cách
+  các game cùng thể loại đã làm (tìm trên mạng), ghi nguồn vào tài liệu thiết kế rồi mới code. Thiếu thông tin
+  mà tham khảo không trả lời được thì hỏi người dùng.
 - **Giao diện hiện tại** của game là `production/ui/` (danh sách màn hình trong `production/ui/screens.json`):
   đổi thứ người chơi thấy thì chạy `gamekit ui-shots <g>`, xem ảnh, commit `production/ui`. Dashboard (`games.html`)
   chỉ hiện bộ này và báo khi nó cũ hơn code; ảnh trong `production/qa/evidence/` là bằng chứng lịch sử, không phải
