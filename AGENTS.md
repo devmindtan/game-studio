@@ -67,6 +67,7 @@ xuất kéo dài thì khuyên người dùng mở phiên mới ở đó.
 | Thư mục game lẫn file của framework (README/CHANGELOG/.github của tool) | `gamekit tidy <g>` (gamekit new đã tự chạy) |
 | "Thêm/sửa skill hoặc cấu hình agent" | sửa `.agents/skills/` hoặc `AGENTS.md` → `gamekit agents-link` → `gamekit doctor` |
 | "Sửa/mở rộng bộ công cụ" | sửa `tools/gamekit` → tăng `tools/gamekit/VERSION` → `gamekit install <g>` cho mỗi game → `gamekit test <g>` |
+| Bắt đầu ngày làm việc | `gamekit update-tools` (pull template + LPC generator, báo phiên bản công cụ); `gamekit doctor` và `gamekit test` nhắc khi hôm nay chưa chạy |
 | Máy mới, lệnh lỗi, thiếu phần mềm | `gamekit doctor` |
 
 ## Quy tắc chung
@@ -105,6 +106,12 @@ xuất kéo dài thì khuyên người dùng mở phiên mới ở đó.
 - **Shell là zsh.** Không dựa vào word splitting (`set -- $s`, `for x in $list` với chuỗi có dấu cách): gọi
   từng lệnh riêng hoặc dùng mảng. **Không gom nhiều đường dẫn vào một biến** (`L="a b"; git add $L` hỏng):
   viết thẳng các đường dẫn vào lệnh. Script trong `tools/gamekit` viết bằng bash (`#!/usr/bin/env bash`).
+- **Mỗi ngày làm việc pull bản mới nhất của công cụ đang dùng** (người dùng 2026-11-17): chạy
+  `gamekit update-tools` trước việc đầu tiên trong ngày. Pull lỗi (có thay đổi cục bộ, lệch nhánh) thì dừng và
+  báo, không ép. Template mới không tự đổi game: nâng game theo `UPGRADING.md` của template.
+- **Tên trong game bằng tiếng Việt** (người dùng 2026-11-17): tên chiêu, thẻ, quái, vật phẩm, buff mà người
+  chơi thấy đều là tiếng Việt; id, tên file, tên sprite giữ tiếng Anh. Test
+  `tests/integration/data/vietnamese_names_test.gd` của game chặn tên không dấu (trừ danh sách cho phép).
 - **Sprite đặt theo điểm neo, không theo tâm canvas.** Sprite nào cũng có `<tên>.json` (do `gen.py` gọi
   `write_meta`) và game vẽ qua `SpriteAnchor`. Chi tiết trong skill `pixel-sprite`.
 

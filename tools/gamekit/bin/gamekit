@@ -45,6 +45,7 @@ Project
   install <game>               (re)install the gamekit addon, presets, Makefile into a game
   tidy <game>                  move framework repo files out of a game (README, CHANGELOG, .github, ...)
   update-template              git pull the framework template (templates/claude-code-game-studios)
+  update-tools                 every working day: pull template + LPC generator, report tool versions
   doctor                       check every tool the kit needs (and the agent links)
   agents-link [--check]        link AGENTS.md + .agents/skills for every agent (Claude, OpenCode, Codex, …)
 
@@ -95,6 +96,7 @@ cmd_list() {
 cmd_doctor() {
   local ok=1
   check() { if eval "$2" >/dev/null 2>&1; then printf '  ok    %-22s %s\n' "$1" "$(eval "$3" 2>/dev/null | head -1)"; else printf '  MISS  %-22s %s\n' "$1" "$4"; ok=0; fi; }
+  check "tools updated today" "tools_updated_today" "cat $UPDATE_STAMP" "gamekit update-tools (daily rule)"
   check godot "command -v $GODOT" "$GODOT --version 2>/dev/null | tail -1" "install Godot 4.7.2 (~/.local/bin/godot)"
   local ver; ver="$("$GODOT" --version 2>/dev/null | tail -n1 | cut -d. -f1-4)"
   check "export templates" "test -d ${XDG_DATA_HOME:-$HOME/.local/share}/godot/export_templates/$ver" "echo $ver" "gamekit templates"
@@ -283,6 +285,35 @@ EOF
   echo "Next:  cd games/$slug and open your agent (claude, opencode, codex, …); start with /start or /prototype"
 }
 
+# Daily tool update (user rule 2026-11-17: pull the latest of the tools in use every
+# working day). Upstream clones fast-forward only; pixelbolt stays pinned on purpose
+# (its version is reported). The date goes to $UPDATE_STAMP; doctor and test warn
+# when it is not today.
+UPDATE_STAMP="$WS/.gamekit-tools-updated"
+cmd_update_tools() {
+  say "update tools ($(date +%F))"
+  local fail=0 repo
+  for repo in "$TEMPLATE" "$WS/tools/lpc-generator"; do
+    if [[ -d "$repo/.git" ]]; then
+      printf '  %-34s ' "${repo#$WS/}"
+      if git -C "$repo" pull --ff-only -q 2>/dev/null; then git -C "$repo" log -1 --format='%h %cs %s' | cut -c1-70
+      else echo "PULL FAILED (local changes or diverged: look before forcing anything)"; fail=1; fi
+    fi
+  done
+  if command -v graphify >/dev/null 2>&1; then printf '  %-34s %s\n' graphify "$(graphify --version 2>/dev/null | head -1)"; fi
+  [[ -f "$KIT/node_modules/pixelbolt/package.json" ]] && printf '  %-34s %s (pinned)\n' pixelbolt "$(node -p "require('$KIT/node_modules/pixelbolt/package.json').version" 2>/dev/null)"
+  printf '  %-34s %s\n' godot "$("$GODOT" --version 2>/dev/null | tail -1)"
+  [[ $fail == 0 ]] || die "some tools did not update"
+  date +%F > "$UPDATE_STAMP"
+  echo "Games are not changed: bring a game up to a new template with its UPGRADING.md."
+}
+
+tools_updated_today() { [[ -f "$UPDATE_STAMP" && "$(cat "$UPDATE_STAMP")" == "$(date +%F)" ]]; }
+
+warn_tools_stale() {
+  tools_updated_today || echo "gamekit: tools not updated today - run: gamekit update-tools" >&2
+}
+
 cmd_update_template() {
   say "update framework template"
   git -C "$TEMPLATE" pull --ff-only
@@ -295,6 +326,7 @@ cmd_edit() { local g; g="$(resolve_game "${1:-}")"; "$GODOT" -e --path "$g"; }
 cmd_test() {
   local g; g="$(resolve_game "${1:-}")"
   [[ -f "$g/addons/gamekit/test/run_tests.gd" ]] || die "no test runner - gamekit install $g"
+  warn_tools_stale
   godot_import "$g"
   "${RUN[@]}" "$GODOT" --headless --path "$g" -s res://addons/gamekit/test/run_tests.gd 2>&1 | grep -v -i fontconfig
   return "${PIPESTATUS[0]}"
@@ -675,6 +707,7 @@ case "$sub" in
   tidy) cmd_tidy "$@" ;;
   agents-link) cmd_agents_link "$@" ;;
   update-template) cmd_update_template ;;
+  update-tools) cmd_update_tools ;;
   run) cmd_run "$@" ;;
   edit) cmd_edit "$@" ;;
   test) cmd_test "$@" ;;
