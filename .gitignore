@@ -18,3 +18,6 @@ __pycache__/
 
 # Local venv for the tools in tools/free-tools/ (do not commit packages)
 /tools/free-tools/venv/
+
+# Ruff cache (local runs)
+/.ruff_cache/
