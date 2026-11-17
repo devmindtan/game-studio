@@ -34,11 +34,11 @@ HERE = Path(__file__).resolve().parent
 OUT = HERE
 
 CORE = "#ffffff"
-LIME = "#c8ff66"
-GREEN = "#6ee06e"
-TEAL = "#2fbfa0"
-DARK = "#1f6b4f"
-FADE = "#6ee06e55"
+LIME = "#fff2a8"   # gold to match the haste pickup badge (2026-11-17)
+GREEN = "#f2c040"
+TEAL = "#d9961f"
+DARK = "#7a4a0c"
+FADE = "#f2c04055"
 
 
 def p(c, x, y, col):
@@ -56,7 +56,7 @@ def base_ring(c, phase, r=10, alpha=True):
     y = GY
     if alpha:
         ring = Canvas(c.width, c.height)
-        ring.ellipse(CX - r, y - 3, CX + r, y + 3, "#6ee06e22")
+        ring.ellipse(CX - r, y - 3, CX + r, y + 3, "#f2c04022")
         c.paste(ring)
     c.ellipse(CX - r, y - 3, CX + r, y + 3, TEAL, fill=False)
     c.ellipse(CX - r + 2, y - 2, CX + r - 2, y + 2, DARK, fill=False)
@@ -88,7 +88,7 @@ def wind_lines(c, phase):
 def cast(i):
     c = Canvas(SIZE, SIZE)
     if i == 0:
-        glow(c, CX, GY, 3, "#c8ff6633")
+        glow(c, CX, GY, 3, "#fff2a833")
         c.ellipse(CX - 3, GY - 1, CX + 3, GY + 1, TEAL)
         p(c, CX, GY, CORE)
         return c
@@ -103,7 +103,7 @@ def cast(i):
 
 def loop(i):
     c = Canvas(SIZE, SIZE)
-    glow(c, CX, GY - 8, 6, "#6ee06e18")
+    glow(c, CX, GY - 8, 6, "#f2c04018")
     base_ring(c, i, r=10, alpha=True)
     wind_lines(c, i)
     # mũi tên năng lượng bay lên, lặp dọc
