@@ -1,10 +1,40 @@
 {
   "palettes": [
     {
-      "id": "dawn-32",
-      "name": "DawnBringer 32",
-      "author": "",
+      "id": "afr-32",
+      "name": "AFR-32",
+      "author": "Alpha6",
       "colors": 32
+    },
+    {
+      "id": "aragon16",
+      "name": "Aragon16",
+      "author": "Space-AgeWrangler",
+      "colors": 16
+    },
+    {
+      "id": "astria-solseturs",
+      "name": "Ástríða sólseturs",
+      "author": "joe70098",
+      "colors": 9
+    },
+    {
+      "id": "blue-glass",
+      "name": "BLUE GLASS",
+      "author": "Eliimperio",
+      "colors": 8
+    },
+    {
+      "id": "brazilian-afternoon",
+      "name": "brazilian afternoon",
+      "author": "Ju",
+      "colors": 42
+    },
+    {
+      "id": "castern",
+      "name": "Castern",
+      "author": "Snowy Owl",
+      "colors": 14
     },
     {
       "id": "cc-29",
@@ -13,10 +43,76 @@
       "colors": 29
     },
     {
+      "id": "coldfire-gb",
+      "name": "Coldfire GB",
+      "author": "Kerrie Lake",
+      "colors": 4
+    },
+    {
+      "id": "comfy52",
+      "name": "comfy52",
+      "author": "bess",
+      "colors": 52
+    },
+    {
+      "id": "dawn-32",
+      "name": "DawnBringer 32",
+      "author": "",
+      "colors": 32
+    },
+    {
+      "id": "dead-ice",
+      "name": "dead ice",
+      "author": "polyphrog",
+      "colors": 4
+    },
+    {
+      "id": "foxfire",
+      "name": "Foxfire",
+      "author": "Lotaru",
+      "colors": 4
+    },
+    {
+      "id": "frozen-fire",
+      "name": "Frozen Fire",
+      "author": "Cool Beans",
+      "colors": 14
+    },
+    {
+      "id": "greyt-bit",
+      "name": "Greyt-bit",
+      "author": "skeddles",
+      "colors": 8
+    },
+    {
+      "id": "hilda32",
+      "name": "Hilda32",
+      "author": "skeddles",
+      "colors": 32
+    },
+    {
+      "id": "icywitch",
+      "name": "IcyWitch",
+      "author": "Naym",
+      "colors": 6
+    },
+    {
       "id": "magicolor-16",
       "name": "magicolor 16",
       "author": "polyphrog",
       "colors": 16
+    },
+    {
+      "id": "mushroom",
+      "name": "Mushroom",
+      "author": "Jimison3",
+      "colors": 14
+    },
+    {
+      "id": "pola5",
+      "name": "POLA5",
+      "author": "|NOXITIVE|",
+      "colors": 5
     },
     {
       "id": "resurrect-64",
@@ -25,9 +121,45 @@
       "colors": 64
     },
     {
-      "id": "greyt-bit",
-      "name": "Greyt-bit",
-      "author": "skeddles",
+      "id": "st-8-phoenix",
+      "name": "ST 8 Phoenix",
+      "author": "Skiller Thomson",
+      "colors": 8
+    },
+    {
+      "id": "summers-past-16",
+      "name": "Summers Past-16",
+      "author": "keidding",
+      "colors": 16
+    },
+    {
+      "id": "sunfall",
+      "name": "sunfall",
+      "author": "sunfall",
+      "colors": 10
+    },
+    {
+      "id": "sunraze",
+      "name": "Sunraze",
+      "author": "Dain Kaplan",
+      "colors": 14
+    },
+    {
+      "id": "verdant-valley",
+      "name": "verdant valley",
+      "author": "polyphrog",
+      "colors": 24
+    },
+    {
+      "id": "wheat-field",
+      "name": "Wheat Field",
+      "author": "bess",
+      "colors": 10
+    },
+    {
+      "id": "winter-wonderland",
+      "name": "Winter Wonderland",
+      "author": "Jimison3",
       "colors": 8
     }
   ]
