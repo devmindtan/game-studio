@@ -160,6 +160,53 @@ def stage_entry(path):
             "bursts": bursts, "expected_spawns": total}
 
 
+def progression_of(data, classes):
+    """Stages 1..count with the difficulty multipliers (same formulas as the game's
+    src/core/stages.gd), regions, which wave file each stage plays, rewards; and the
+    milestone rewards (milestones.json) with names from the class card pools."""
+    st = load(os.path.join(data, "stages.json"))
+    if not st:
+        return {}
+    k = st.get("scale", {})
+    rw = st.get("rewards", {})
+    every = int(st.get("boss_every", 10))
+    regions = [r for r in st.get("regions", []) if isinstance(r, dict)]
+    curve = []
+    for n in range(1, int(st.get("count", 30)) + 1):
+        m = n - 1
+        reg = next((r for r in regions if r.get("from", 0) <= n <= r.get("to", 0)), regions[-1] if regions else {})
+        boss = every > 0 and n % every == 0
+        own = os.path.join(data, "waves", "stage_%03d.json" % n)
+        wfile = os.path.basename(own) if os.path.exists(own) else str(reg.get("boss_waves" if boss else "waves", "")) + ".json"
+        curve.append({"n": n, "boss": boss, "region": reg.get("name", ""), "waves": wfile,
+                      "hp": round(1 + k.get("hp_lin", 0) * m + k.get("hp_quad", 0) * m * m, 3),
+                      "dmg": round(1 + k.get("dmg_lin", 0) * m, 3),
+                      "rate": round(min(max(1.0, k.get("rate_max", 1)), 1 + k.get("rate_lin", 0) * m), 3),
+                      "gold": int(rw.get("gold_base", 0)) + int(rw.get("gold_per_stage", 0)) * n,
+                      "gems_first": int(rw.get("gems_boss_first" if boss else "gems_first", 0)),
+                      "gems_repeat": int(rw.get("gems_repeat", 0))})
+    ms = load(os.path.join(data, "milestones.json"))
+    cards = {}
+    for cid, cls in classes.items():
+        for u in load(os.path.join(data, str(cls.get("upgrades", "")))).get("upgrades", []):
+            if isinstance(u, dict):
+                cards[str(u.get("id", ""))] = u
+    milestones = []
+    for stage, ids in sorted(clean(ms.get("stages", {})).items(), key=lambda kv: int(kv[0])):
+        out = []
+        for rid in ids:
+            r = ms.get("rewards", {}).get(rid, {})
+            card = cards.get(str(r.get("skill", rid)), {}) if r.get("kind") == "skill" else {}
+            out.append({"id": rid, "kind": r.get("kind", ""), "class": r.get("class", ""), "icon": r.get("icon", rid),
+                        "name": card.get("name", r.get("name", rid)), "desc": card.get("desc", r.get("desc", ""))})
+        milestones.append({"stage": int(stage), "rewards": out})
+    return {"count": len(curve), "boss_every": every, "scale": k, "rewards": rw, "curve": curve,
+            "regions": [{"id": r.get("id"), "name": r.get("name"), "from": r.get("from"), "to": r.get("to"),
+                         "waves": r.get("waves"), "boss_waves": r.get("boss_waves"), "ground": r.get("ground", {})}
+                        for r in regions],
+            "milestones": milestones}
+
+
 def level_values(upgrade, level):
     """The upgrade's effects at `level`, as PlayerStats applies them."""
     out = {}
@@ -496,7 +543,7 @@ def build_game(slug):
         "slug": slug, "name": info.get("name") or slug, "version": info.get("version", ""),
         "brief": brief_pitch(root), "decisions": decisions(root), "ui": ui_set(root),
         "world": cfg.get("world", {}), "xp": cfg.get("xp", {}), "pickups": cfg.get("pickups", {}),
-        "stages": stages, "heroes": heroes, "monsters": mons, "skills": skills, "stat_ups": stat_ups,
+        "stages": stages, "progression": progression_of(data, classes), "heroes": heroes, "monsters": mons, "skills": skills, "stat_ups": stat_ups,
         "sprites": sprites,
         "rules": rules_doc, "rule_doc": rel(os.path.join(root, "design", "gameplay-rules.md")),
         "statuses": statuses_of(root, data),   # buff/debuff effects drawn on characters

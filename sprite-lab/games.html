@@ -193,7 +193,7 @@ async function selectGame(g){
   renderTabs(); render();
 }
 function renderTabs(){
-  const n={overview:'',rules:(game.rules&&game.rules.rules||[]).length,ui:game.ui.shots.length,map:game.stages.length,heroes:game.heroes.length,
+  const n={overview:'',rules:(game.rules&&game.rules.rules||[]).length,ui:game.ui.shots.length,map:(game.progression&&game.progression.count)||game.stages.length,heroes:game.heroes.length,
     monsters:game.monsters.length,skills:game.skills.length,items:(game.items.pickups.length+(game.items.buffs||[]).length+game.items.equipment.length),effects:(game.statuses||[]).length};
   const nav=$('tabs'); nav.innerHTML='';
   TABS.forEach(([id,label])=>{const b=el('button',{class:'tab'+(tab===id?' active':'')},label,n[id]!==''?el('span',{class:'n'},n[id]):null);
@@ -253,7 +253,7 @@ function overview(m){
   m.appendChild(el('h2',{},game.name));
   m.appendChild(el('p',{class:'lead',html:md(b.pitch||'')}));
   const counters=el('div',{class:'grid g4',style:'margin-bottom:14px'});
-  [['ui','Màn hình',game.ui.shots.length],['map','Ải',game.stages.length],['heroes','Class',game.heroes.length],
+  [['ui','Màn hình',game.ui.shots.length],['map','Ải',(game.progression&&game.progression.count)||game.stages.length],['heroes','Class',game.heroes.length],
    ['monsters','Quái',game.monsters.length],['skills','Kỹ năng',game.skills.length],['effects','Hiệu ứng trạng thái',(game.statuses||[]).length]]
    .forEach(([id,l,v])=>{const c=el('div',{class:'counter'},el('div',{class:'big'},v),el('div',{class:'lbl'},l)); c.onclick=()=>{tab=id;renderTabs();render();}; counters.appendChild(c);});
   m.appendChild(counters);
@@ -310,15 +310,72 @@ function drawGround(g,cx,cy,sc,half,w,h){ // world (0,0) at canvas (cx,cy), sc c
   }
   g.strokeStyle=EDGE; g.lineWidth=Math.max(2,6*sc); g.strokeRect(cx-half*sc,cy-half*sc,half*2*sc,half*2*sc);
 }
+/* 30 stages: difficulty curve by region, rewards, milestone rewards (stages.json, milestones.json) */
+function progression(m,pr){
+  m.appendChild(el('h3',{},'Tiến trình '+pr.count+' ải'));
+  m.appendChild(el('p',{class:'lead'},'Máu, sát thương và mật độ quái tăng theo ải (công thức trong stages.json, giống src/core/stages.gd). Mỗi '+pr.boss_every+' ải là ải boss và là mốc: lần đầu vượt được chọn 1 trong 3 phần thưởng vĩnh viễn.'));
+  const W=900,H=280,PL=44,PR=16,PT=16,PB=40; const cv=el('canvas',{width:W,height:H}); const c=cv.getContext('2d');
+  const N=pr.curve.length, top=Math.ceil(Math.max(...pr.curve.map(x=>x.hp)));
+  const X=n=>PL+(W-PL-PR)*(n-0.5)/N, Y=v=>H-PB-(H-PT-PB)*v/top;
+  c.fillStyle='#121720'; c.fillRect(0,0,W,H);
+  pr.regions.forEach(r=>{ const g=(r.ground&&r.ground.grass||['2f4a2c'])[0]; c.fillStyle='#'+g; c.globalAlpha=.55;
+    c.fillRect(X(r.from)-(W-PL-PR)/N/2,PT,(W-PL-PR)*(r.to-r.from+1)/N,H-PT-PB); c.globalAlpha=1;
+    c.fillStyle='#d8e0ee'; c.font='bold 12px system-ui'; c.fillText(r.name,X(r.from)-6,PT+14); });
+  c.strokeStyle='#283142'; c.fillStyle='#93a0b8'; c.font='11px system-ui';
+  for(let v=0;v<=top;v++){ const y=Y(v); c.beginPath(); c.moveTo(PL,y); c.lineTo(W-PR,y); c.stroke(); c.fillText('×'+v,8,y+4); }
+  pr.curve.forEach(p=>{ c.textAlign='center'; c.fillStyle=p.boss?'#f2c14e':'#93a0b8'; c.fillText(p.n,X(p.n),H-PB+16);
+    if(p.boss){ c.fillText('BOSS',X(p.n),H-PB+30); c.strokeStyle='rgba(242,193,78,.6)'; c.setLineDash([3,3]); c.beginPath(); c.moveTo(X(p.n),PT); c.lineTo(X(p.n),H-PB); c.stroke(); c.setLineDash([]); c.strokeStyle='#283142'; }
+    c.textAlign='left'; });
+  const lines=[['hp','#e05d5d','Máu quái'],['dmg','#e0a33a','Sát thương quái'],['rate','#5db0e0','Mật độ quái']];
+  lines.forEach(([k,col])=>{ c.strokeStyle=col; c.lineWidth=2.5; c.beginPath(); pr.curve.forEach((p,i)=>{ i?c.lineTo(X(p.n),Y(p[k])):c.moveTo(X(p.n),Y(p[k])); }); c.stroke();
+    c.fillStyle=col; pr.curve.forEach(p=>{ c.beginPath(); c.arc(X(p.n),Y(p[k]),p.boss?4:2.5,0,7); c.fill(); }); });
+  c.lineWidth=1;
+  m.appendChild(el('div',{class:'stage',style:'padding:0;background:#121720'},cv));
+  const lg=el('div',{class:'legend',style:'margin-top:6px'});
+  lines.forEach(([k,col,name])=>{ const last=pr.curve[N-1][k]; lg.appendChild(el('span',{},el('i',{class:'sw',style:'background:'+col}),name+' ×1 → ×'+last.toFixed(2))); });
+  lg.appendChild(el('span',{class:'muted'},'nền = vùng · vạch vàng = ải boss / mốc'));
+  m.appendChild(lg);
+  const rw=pr.rewards||{};
+  const t=el('table',{style:'margin-top:10px'});
+  t.appendChild(el('tr',{},el('th',{},'Vùng'),el('th',{},'Ải'),el('th',{},'Lịch quái (thường / boss)'),el('th',{},'Màu nền'),el('th',{class:'num'},'Máu quái ×'),el('th',{class:'num'},'Vàng khi thắng')));
+  pr.regions.forEach(r=>{ const a=pr.curve[r.from-1], b=pr.curve[r.to-1]; const sw=el('span',{});
+    ((r.ground&&r.ground.grass)||[]).forEach(g=>sw.appendChild(el('i',{class:'sw',style:'background:#'+g+';margin-right:3px'})));
+    t.appendChild(el('tr',{},el('td',{},r.name),el('td',{},r.from+'–'+r.to),el('td',{},r.waves+'.json / '+r.boss_waves+'.json'),el('td',{},sw),
+      el('td',{class:'num'},a.hp.toFixed(2)+' → '+b.hp.toFixed(2)),el('td',{class:'num'},a.gold+' → '+b.gold))); });
+  m.appendChild(t);
+  m.appendChild(el('p',{class:'muted small'},'Thắng ải n: vàng '+(rw.gold_base||0)+' + '+(rw.gold_per_stage||0)+'·n (cộng vàng nhặt trong trận); đá lần đầu '+(rw.gems_first||0)+' (ải boss '+(rw.gems_boss_first||0)+'), các lần sau '+(rw.gems_repeat||0)+'. Thua: giữ vàng đã nhặt.'));
+  // milestone rewards
+  m.appendChild(el('h3',{style:'margin-top:18px'},'Phần thưởng mốc ải'));
+  m.appendChild(el('p',{class:'muted small'},'Vượt ải mốc lần đầu → chọn 1 trong 3 (chiêu độc nhất của class mình + nội tại + luật). Chiêu độc nhất có sẵn cấp 1 mỗi trận và lên cấp bằng thẻ.'));
+  const KIND={skill:'Chiêu độc nhất',passive:'Nội tại mới',rule:'Luật mới'};
+  pr.milestones.forEach(ms=>{
+    m.appendChild(el('div',{class:'row',style:'margin:10px 0 6px'},el('b',{},'Mốc ải '+ms.stage)));
+    const grid=el('div',{class:'grid g4'});
+    ms.rewards.forEach(r=>{
+      const ic=liveCanvas(48,48,(g)=>{ g.clearRect(0,0,48,48); if(iconSheet&&iconSheet.has(r.icon)) iconSheet.draw(g,r.icon,0,24,24,3); });
+      const who=r.class?' · '+((game.heroes.find(h=>h.id===r.class)||{}).name||r.class):'';
+      // icon on top, then name, kind, text: the same layout for short and long texts
+      grid.appendChild(el('div',{class:'card'},ic,
+        el('div',{style:'margin-top:6px'},el('b',{},r.name),el('div',{class:'muted small'},(KIND[r.kind]||r.kind)+who),el('div',{class:'small',style:'margin-top:4px'},r.desc))));
+    });
+    m.appendChild(grid);
+  });
+}
 function map(m){
   m.appendChild(el('h2',{},'Bản đồ & ải'));
   const w=game.world||{}, half=w.arena_half||1400, ring=w.spawn_ring||[760,860];
   m.appendChild(el('p',{class:'lead'},'Bãi đấu vẽ đúng thuật toán nền cỏ của game (RunGround). Khung trắng = màn hình 1280×720 quanh nhân vật; vòng cam = nơi quái xuất hiện ('+ring[0]+'–'+ring[1]+' px); viền tối = mép bãi (±'+half+' px).'));
+  const pr=game.progression||{};
+  if(pr.curve&&pr.curve.length) progression(m,pr);
   if(!game.stages.length){ m.appendChild(el('div',{class:'empty'},'Game chưa có ải (assets/data/waves).')); return; }
+  m.appendChild(el('h3',{style:'margin-top:22px'},'Lịch quái ('+game.stages.length+' file)'));
+  m.appendChild(el('p',{class:'muted small'},'Mỗi vùng có một lịch cho ải thường và một cho ải boss; nhịp ra quái nhân với hệ số mật độ của ải. Biểu đồ dưới là nhịp gốc (×1).'));
   game.stages.forEach(st=>{
     const card=el('div',{class:'card',style:'margin-bottom:14px'});
-    card.appendChild(el('div',{class:'row'},el('h3',{style:'margin:0'},'Ải '+(st.number??'?')+' · '+(st.name||st.file)),
-      el('span',{class:'muted small'},'trụ '+mmss(st.duration))));
+    const used=(pr.curve||[]).filter(c=>c.waves===st.file).map(c=>c.n);
+    const span=used.length?(used.length>1?'ải '+used[0]+'–'+used[used.length-1]:'ải '+used[0]):(st.number?'ải '+st.number:'chưa dùng');
+    card.appendChild(el('div',{class:'row'},el('h3',{style:'margin:0'},(st.name||st.file)+' · '+span),
+      el('span',{class:'muted small'},st.file+' · trụ '+mmss(st.duration))));
     const grid=el('div',{class:'side2'});
     // whole arena
     const S=420, sc=S/(half*2+400); const arena=el('canvas',{width:S,height:S}); const g=arena.getContext('2d');
