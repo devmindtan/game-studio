@@ -135,10 +135,10 @@ def staff(c, p, g):
     rect(c, ox - 1, oy - 1, ox + 1, oy + 1, PAL["magic_mid"])
     put(c, ox, oy, PAL["magic"])
     put(c, ox - 1, oy - 1, PAL["core"])
-    # soft glow round the orb (part of the weapon layer: layered heroes have no fx pass)
-    for deg in range(0, 360, 30):
-        rad = math.radians(deg)
-        put(c, ox + math.cos(rad) * 2.6, oy + math.sin(rad) * 2.6, (126, 240, 255, 70))
+    # glow sparks round the orb, opaque (part of the weapon layer: layered heroes have no fx
+    # pass, and a translucent pixel would not compose back to the strip exactly)
+    for dx, dy in ((-2, 0), (2, 0), (0, -2)):
+        put(c, ox + dx, oy + dy, PAL["magic_deep"])
 
 
 CHAR = {"pal": PAL, "body": "robe", "head": head, "hair": hat, "held": staff}
