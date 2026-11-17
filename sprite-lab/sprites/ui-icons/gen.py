@@ -640,6 +640,148 @@ ICONS = {
         ".dd.ddd.dd.",
         "....ddd....",
     ]),
+    # --- milestone rewards (stages 10/20/30, design/progression.md) ---
+    # earthquake (knight): a cracked ground block, orange light in the cracks
+    "earthquake": ({"b": "#c79a6a", "m": "#8a6a52", "d": "#5a4335", "o": "#ffb04a"}, [
+        "......o......",
+        "..b..o.o..b..",
+        ".bmb.o..obmb.",
+        "bmmmo.mm.ommb",
+        "mmmo.mmmm.omm",
+        "mmo.mmddmm.om",
+        "ddoddddddddod",
+        "ddddddddddddd",
+    ]),
+    # void_orb (mage): a dark orb with a violet spiral
+    "void_orb": ({"k": "#1b1030", "v": "#9b3fe0", "l": "#e0a8ff", "d": "#4a2a7a"}, [
+        "....dddd....",
+        "..ddvvvvdd..",
+        ".dvvlllvvvd.",
+        ".dvlkkkklvd.",
+        "dvlkkvvkklvd",
+        "dvlkvkkkklvd",
+        "dvlkkvvvklvd",
+        ".dvlkkkklvd.",
+        ".dvvllllvvd.",
+        "..ddvvvvdd..",
+        "....dddd....",
+    ]),
+    # solar_ray (knight): a small sun firing a beam to the right
+    "solar_ray": ({"y": "#ffe98a", "w": "#ffffff", "o": "#ffb02a", "d": "#c9852b"}, [
+        "..o.o.......",
+        "o.ooo.o.....",
+        ".oyyyo......",
+        "ooywyoyyyyyy",
+        ".oyyyo.wwwww",
+        "o.ooo.o.....",
+        "..o.o.......",
+    ]),
+    # blizzard (mage): a blue swirl with snow
+    "blizzard": ({"w": "#ffffff", "c": "#bfe9ff", "b": "#5cc8ff", "d": "#2c6a9c"}, [
+        "w...bbbb...w",
+        "..bbccccb...",
+        ".bc.....cb..",
+        "bc..bbb..cb.",
+        "bc.bc.wc..b.",
+        "b..b..cb..cb",
+        ".b..bbc..cb.",
+        ".bc.....cb..",
+        "..dbcccbd..w",
+        "w...dddd....",
+    ]),
+    # god_hammer (knight): a heavy hammer coming down, glowing head
+    "god_hammer": ({"g": "#c8d4e0", "l": "#ffffff", "d": "#6f7f92", "b": "#8a5a2e", "y": "#ffe98a"}, [
+        "..y.......y.",
+        ".yllllllly..",
+        "ylggggggggdy",
+        "ylggggggggdy",
+        ".ddddddddd..",
+        ".....bb.....",
+        ".....bb.....",
+        ".....bb.....",
+        ".....bb.....",
+        ".....dd.....",
+    ]),
+    # storm (mage): a purple cloud with two bolts
+    "storm": ({"c": "#8a7cff", "l": "#c8c0ff", "d": "#4a3a8c", "y": "#fff2a8", "w": "#ffffff"}, [
+        "...llll.....",
+        ".lllcccll...",
+        "llccccccccl.",
+        "dccccccccccd",
+        ".dddddddddd.",
+        "..yw...yw...",
+        "..wy....wy..",
+        ".yw....yw...",
+        "..y.....y...",
+    ]),
+    # bloodthirst: a blood drop with a white shine
+    "bloodthirst": ({"r": "#d9364a", "l": "#ff8a8a", "w": "#ffffff", "d": "#8f1f35"}, [
+        ".....r.....",
+        "....rrr....",
+        "...rrrrr...",
+        "..rrlrrrr..",
+        ".rrlwrrrrr.",
+        ".rrlrrrrrr.",
+        ".rrrrrrrdr.",
+        "..rrrrrdd..",
+        "...ddddd...",
+    ]),
+    # twin_cast: two bolts side by side, "x2"
+    "twin_cast": ({"c": "#7ef0ff", "w": "#ffffff", "y": "#ffd04a", "d": "#2c6a9c"}, [
+        ".cw....cw...",
+        "cwwc..cwwc..",
+        ".cc....cc...",
+        ".d.....d....",
+        "............",
+        "......y...y.",
+        ".......y.y..",
+        "........y...",
+        ".......y.y..",
+        "......y...y.",
+    ]),
+    # guardian: a blue shield bubble round a small cross
+    "guardian": ({"b": "#6fc3ff", "l": "#cfefff", "d": "#2c6a9c", "w": "#ffffff"}, [
+        "...bbbbbb...",
+        "..bllllllb..",
+        ".blb....blb.",
+        ".bl..ww..lb.",
+        ".bl.wwww.lb.",
+        ".bl..ww..lb.",
+        "..bl.ww.lb..",
+        "...bl..lb...",
+        "....bddb....",
+        ".....dd.....",
+    ]),
+    # wide_choice: four cards in a fan
+    "wide_choice": ({"w": "#f2ecd8", "g": "#b9b2a0", "y": "#f2c14e", "r": "#d9364a", "b": "#4fa3e0"}, [
+        "..ww.ww.ww.ww",
+        ".wgw.wgw.wgw.",
+        ".wrw.wyw.wbw.",
+        ".wgw.wgw.wgw.",
+        ".www.www.www.",
+    ]),
+    # undying: a heart with gold wings
+    "undying": ({"r": "#d9364a", "l": "#ff8a8a", "y": "#ffd04a", "o": "#c9852b", "w": "#ffffff"}, [
+        "y...........y",
+        "yy..rr.rr..yy",
+        "oyyrlwrrrryyo",
+        ".oyrlrrrrryo.",
+        "..orrrrrrro..",
+        "....rrrrr....",
+        ".....rrr.....",
+        "......r......",
+    ]),
+    # head_start: a gold double arrow with a star
+    "head_start": ({"y": "#ffd04a", "o": "#c9852b", "w": "#ffffff"}, [
+        ".........w..",
+        "y...y...www.",
+        "yy..yy...w..",
+        "yyy.yyy.....",
+        "yyyyyyyy....",
+        "yyy.yyy.....",
+        "yy..yy......",
+        "o...o.......",
+    ]),
 }
 
 

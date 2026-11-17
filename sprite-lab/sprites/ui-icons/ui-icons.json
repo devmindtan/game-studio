@@ -1,5 +1,5 @@
 {
-  "frames": 50,
+  "frames": 62,
   "frame_size": [
     16,
     16
@@ -358,6 +358,90 @@
     {
       "name": "gear",
       "start": 49,
+      "frames": 1,
+      "fps": 1.0,
+      "loop": false
+    },
+    {
+      "name": "earthquake",
+      "start": 50,
+      "frames": 1,
+      "fps": 1.0,
+      "loop": false
+    },
+    {
+      "name": "void_orb",
+      "start": 51,
+      "frames": 1,
+      "fps": 1.0,
+      "loop": false
+    },
+    {
+      "name": "solar_ray",
+      "start": 52,
+      "frames": 1,
+      "fps": 1.0,
+      "loop": false
+    },
+    {
+      "name": "blizzard",
+      "start": 53,
+      "frames": 1,
+      "fps": 1.0,
+      "loop": false
+    },
+    {
+      "name": "god_hammer",
+      "start": 54,
+      "frames": 1,
+      "fps": 1.0,
+      "loop": false
+    },
+    {
+      "name": "storm",
+      "start": 55,
+      "frames": 1,
+      "fps": 1.0,
+      "loop": false
+    },
+    {
+      "name": "bloodthirst",
+      "start": 56,
+      "frames": 1,
+      "fps": 1.0,
+      "loop": false
+    },
+    {
+      "name": "twin_cast",
+      "start": 57,
+      "frames": 1,
+      "fps": 1.0,
+      "loop": false
+    },
+    {
+      "name": "guardian",
+      "start": 58,
+      "frames": 1,
+      "fps": 1.0,
+      "loop": false
+    },
+    {
+      "name": "wide_choice",
+      "start": 59,
+      "frames": 1,
+      "fps": 1.0,
+      "loop": false
+    },
+    {
+      "name": "undying",
+      "start": 60,
+      "frames": 1,
+      "fps": 1.0,
+      "loop": false
+    },
+    {
+      "name": "head_start",
+      "start": 61,
       "frames": 1,
       "fps": 1.0,
       "loop": false
