@@ -338,6 +338,15 @@
       "4-dir"
     ]
   },
+  "glacial-spires": {
+    "cat": "aoe",
+    "tags": [
+      "magic",
+      "ice",
+      "class-mage",
+      "auto-aoe"
+    ]
+  },
   "goblin": {
     "cat": "character",
     "tags": [
@@ -381,11 +390,59 @@
       "wood"
     ]
   },
-  "ground-slam": {
-    "cat": "strike",
+  "ground-slam-i": {
+    "cat": "aoe",
     "tags": [
-      "melee",
-      "blunt"
+      "nature",
+      "earth",
+      "upgrade",
+      "tier-I",
+      "class-knight",
+      "auto-aoe"
+    ]
+  },
+  "ground-slam-ii": {
+    "cat": "aoe",
+    "tags": [
+      "nature",
+      "earth",
+      "upgrade",
+      "tier-II",
+      "class-knight",
+      "auto-aoe"
+    ]
+  },
+  "ground-slam-iii": {
+    "cat": "aoe",
+    "tags": [
+      "nature",
+      "earth",
+      "upgrade",
+      "tier-III",
+      "class-knight",
+      "auto-aoe"
+    ]
+  },
+  "ground-slam-iv": {
+    "cat": "aoe",
+    "tags": [
+      "nature",
+      "earth",
+      "upgrade",
+      "tier-IV",
+      "class-knight",
+      "auto-aoe"
+    ]
+  },
+  "ground-slam-v": {
+    "cat": "aoe",
+    "tags": [
+      "nature",
+      "earth",
+      "upgrade",
+      "tier-V",
+      "class-knight",
+      "auto-aoe"
     ]
   },
   "hammer-gold": {
