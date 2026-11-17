@@ -1015,6 +1015,66 @@
       "heavy"
     ]
   },
+  "stomp-i": {
+    "cat": "aoe",
+    "tags": [
+      "nature",
+      "earth",
+      "upgrade",
+      "tier-I",
+      "class-knight",
+      "auto-aoe",
+      "hero-centred"
+    ]
+  },
+  "stomp-ii": {
+    "cat": "aoe",
+    "tags": [
+      "nature",
+      "earth",
+      "upgrade",
+      "tier-II",
+      "class-knight",
+      "auto-aoe",
+      "hero-centred"
+    ]
+  },
+  "stomp-iii": {
+    "cat": "aoe",
+    "tags": [
+      "nature",
+      "earth",
+      "upgrade",
+      "tier-III",
+      "class-knight",
+      "auto-aoe",
+      "hero-centred"
+    ]
+  },
+  "stomp-iv": {
+    "cat": "aoe",
+    "tags": [
+      "nature",
+      "earth",
+      "upgrade",
+      "tier-IV",
+      "class-knight",
+      "auto-aoe",
+      "hero-centred"
+    ]
+  },
+  "stomp-v": {
+    "cat": "aoe",
+    "tags": [
+      "nature",
+      "earth",
+      "upgrade",
+      "tier-V",
+      "class-knight",
+      "auto-aoe",
+      "hero-centred"
+    ]
+  },
   "sword-gold": {
     "cat": "weapon",
     "tags": [
