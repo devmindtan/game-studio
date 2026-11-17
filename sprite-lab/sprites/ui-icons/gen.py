@@ -4,7 +4,8 @@
 Mỗi icon là một animation 1 frame, tên = vai trò: heart (máu), skull (số mạng đã hạ), coin (vàng),
 gem (kinh nghiệm), star (cấp), clock (thời gian), sword (sát thương), boot (tốc độ chạy),
 và 12 icon thẻ nâng cấp với tên trùng upgrade id: blade_arc, back_slash, whirlwind, sharpen,
-haste, reach, vitality, swift, magnet, regen, frost_nova, earth_strike.
+haste, reach, vitality, swift, magnet, regen, frost_nova, earth_strike; Đợt 2: ground_slam,
+cleave_wave, holy_column, dash, toughness.
 Viền tối 1 px như mọi sprite; neo (8, 8) = tâm ô. Game vẽ bằng SpriteSheet theo tên animation.
 Chạy: gamekit art run ui-icons
 """
@@ -289,6 +290,72 @@ ICONS = {
         "...ossdo...",
         "....odo....",
         ".....o.....",
+    ]),
+    # ground_slam: a stone fist-arrow slamming into cracked ground
+    "ground_slam": ({"a": "#e8c48a", "m": "#c79a6a", "b": "#ff9a3a", "d": "#5a4335"}, [
+        "....aam....",
+        "....aam....",
+        "....aam....",
+        "..aaaaamm..",
+        "...aaamm...",
+        "....amm....",
+        ".....m.....",
+        "b.b.....b.b",
+        ".bb.ddd.bb.",
+        "mmmddddddmm",
+        "ddd.d.d.ddd",
+    ]),
+    # cleave_wave: a sword crescent flying right, with motion lines
+    "cleave_wave": ({"w": "#e8f0f6", "l": "#6fc3ff", "g": "#9fb3c8"}, [
+        "......www....",
+        ".......wlw...",
+        "........wlw..",
+        "gg.......wlw.",
+        ".........wlw.",
+        "ggg......wlw.",
+        ".........wlw.",
+        "gg.......wlw.",
+        "........wlw..",
+        ".......wlw...",
+        "......www....",
+    ]),
+    # holy_column: a golden beam striking down onto a glowing spot
+    "holy_column": ({"y": "#ffe98a", "w": "#ffffff", "o": "#c9a65a"}, [
+        "...yyyyy...",
+        "....ywy....",
+        "....ywy....",
+        "....ywy....",
+        "....ywy....",
+        "....ywy....",
+        "...yywyy...",
+        "..y.ywy.y..",
+        ".yyyyyyyyy.",
+        "..ooooooo..",
+    ]),
+    # dash: a double chevron in the hero's scarf red, speed lines behind
+    "dash": ({"r": "#d94a4a", "l": "#ff8a8a", "g": "#9fb3c8"}, [
+        "...l...l.....",
+        "...rl..rl....",
+        "gg..rl..rl...",
+        ".....rl..rl..",
+        "ggg...rl..rl.",
+        ".....rr..rr..",
+        "gg..rr..rr...",
+        "...rr..rr....",
+        "...r...r.....",
+    ]),
+    # toughness: a steel breastplate (armour card)
+    "toughness": ({"s": "#9fb3c8", "l": "#e8f0f6", "d": "#5f7186", "o": "#c9a65a"}, [
+        ".ss.....ss.",
+        "sllss.ssssd",
+        "slsssosssdd",
+        ".sssssssss.",
+        ".slsssssssd",
+        ".sssssssssd",
+        "..slssssd..",
+        "..ssssssd..",
+        "...sssdd...",
+        "....sdd....",
     ]),
     # settings: a steel gear with a hole
     "gear": ({"g": "#9fb3c8", "l": "#e8f0f6", "d": "#5f7186"}, [

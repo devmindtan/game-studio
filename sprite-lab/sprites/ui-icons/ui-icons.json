@@ -1,5 +1,5 @@
 {
-  "frames": 22,
+  "frames": 27,
   "frame_size": [
     16,
     16
@@ -160,8 +160,43 @@
       "loop": false
     },
     {
-      "name": "gear",
+      "name": "ground_slam",
       "start": 21,
+      "frames": 1,
+      "fps": 1.0,
+      "loop": false
+    },
+    {
+      "name": "cleave_wave",
+      "start": 22,
+      "frames": 1,
+      "fps": 1.0,
+      "loop": false
+    },
+    {
+      "name": "holy_column",
+      "start": 23,
+      "frames": 1,
+      "fps": 1.0,
+      "loop": false
+    },
+    {
+      "name": "dash",
+      "start": 24,
+      "frames": 1,
+      "fps": 1.0,
+      "loop": false
+    },
+    {
+      "name": "toughness",
+      "start": 25,
+      "frames": 1,
+      "fps": 1.0,
+      "loop": false
+    },
+    {
+      "name": "gear",
+      "start": 26,
       "frames": 1,
       "fps": 1.0,
       "loop": false
