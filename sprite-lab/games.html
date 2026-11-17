@@ -435,15 +435,19 @@ function items(m){
   const sec=(title,list,emptyText)=>{ const c=el('div',{class:'card',style:'margin-bottom:12px'},el('h3',{},title));
     if(!list.length){ c.appendChild(el('div',{class:'muted'},emptyText)); m.appendChild(c); return; }
     const grid=el('div',{class:'grid g3'});
+    const SLOT={head:'Đầu',chest:'Ngực',arms:'Tay',legs:'Chân',weapon:'Vũ khí'}, RAR={common:'Thường',rare:'Hiếm',epic:'Sử thi'};
     list.forEach(it=>{ const info=it.sprite; let sh=null; if(info) sheetOf(info).then(x=>{sh=x;});
-      const cv=liveCanvas(96,96,(g,t)=>{ g.clearRect(0,0,96,96); drawGround(g,48,48,1,1e9,96,96); if(sh) sh.draw(g,sh.anims[0].name,t,48,48,Math.max(1,Math.floor(84/Math.max(sh.fs[0],sh.fs[1])))); });   // fit the 96 px box
+      const cv=liveCanvas(96,96,(g,t)=>{ g.clearRect(0,0,96,96); drawGround(g,48,48,1,1e9,96,96);
+        if(sh) sh.draw(g,sh.anims[0].name,t,48,48,Math.max(1,Math.floor(84/Math.max(sh.fs[0],sh.fs[1]))));   // fit the 96 px box
+        else if(it.icon&&iconSheet&&iconSheet.has(it.icon)) iconSheet.draw(g,it.icon,0,48,48,5); });   // equipment: its ui-icons frame
+      if(it.slot) it.facts=[(SLOT[it.slot]||it.slot)+' · '+(RAR[it.rarity]||it.rarity||'')+(it.class?' · chỉ '+((game.heroes.find(h=>h.id===it.class)||{}).name||it.class):'')].concat(it.facts||[]);
       grid.appendChild(el('div',{class:'itemCard'},el('div',{class:'stage',style:'padding:0;flex:0 0 96px'},cv),
         el('div',{},el('b',{},it.name),el('div',{class:'small muted',style:'margin:2px 0 4px'},it.desc),
           ...(it.facts||[]).map(f=>el('div',{class:'small'},'· '+f)))));});
     c.appendChild(grid); m.appendChild(c); };
   sec('Nhặt trong ải',game.items.pickups,'Chưa có.');
   sec('Buff (xuất hiện ngẫu nhiên, nhặt để kích hoạt)',game.items.buffs||[],'Chưa có buff.');
-  sec('Trang bị',game.items.equipment,'Game chưa có trang bị. Mỗi món sẽ thuộc một ô: giáp đầu, giáp ngực, giáp tay, giáp chân hoặc vũ khí.');
+  sec('Trang bị ('+game.items.equipment.length+' món: thắng ải và rương rơi ra, mặc ở sảnh)',game.items.equipment,'Game chưa có trang bị.');
 }
 
 /* ---------- 5. monsters ---------- */

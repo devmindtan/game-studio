@@ -327,7 +327,8 @@ def items_of(root, data, cfg, monsters):
     for group in out:
         for iid, it in clean(items.get(group, {})).items():
             e = {"id": iid, "name": it.get("name", iid), "desc": it.get("desc", ""), "slot": it.get("slot", ""),
-                 "sprite": sprite_info(root, str(it.get("sprite", "")))}
+                 "sprite": sprite_info(root, str(it.get("sprite", ""))), "icon": it.get("icon", ""),
+                 "rarity": it.get("rarity", ""), "class": it.get("class", "")}
             if iid == "xp_gem":
                 e["facts"] = ["%s: %g kinh nghiệm" % (mid, float(m.get("xp", 1))) for mid, m in monsters.items()]
             elif iid == "gold":
