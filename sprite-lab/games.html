@@ -379,7 +379,7 @@ async function composeLayers(info,enabled){
   const c=document.createElement('canvas'); c.width=first.width; c.height=first.height; const g=c.getContext('2d');
   imgs.forEach(im=>{ if(im) g.drawImage(im,0,0); });
   return outlineFrames(c,info.meta.frame_size[0],info.meta.frame_size[1],info.meta.outline||'#1b1726');}
-const STAT_ICON={max_hp:['heart','Máu tối đa'],damage:['sword','Sát thương'],move_speed:['boot','Tốc độ chạy'],cooldown:['haste','Hồi chiêu (s)'],
+const STAT_ICON={max_hp:['heart','Máu tối đa'],damage:['sword','Sát thương'],move_speed:['boot','Tốc độ chạy'],cooldown:['haste','Hồi chiêu × (mọi chiêu)'],
   area:['reach','Vùng đánh ×'],regen:['regen','Hồi máu /s'],armor:['shield','Giáp'],magnet:['magnet','Hút vật phẩm ×']};
 function heroes(m){
   m.appendChild(el('h2',{},'Nhân vật'));
@@ -404,6 +404,9 @@ function heroes(m){
     const right=el('div',{});
     right.appendChild(el('div',{class:'row',style:'margin-bottom:8px'},el('h3',{style:'margin:0'},h.name),
       el('span',{class:'muted small'},'Chiêu khởi đầu: '+Object.keys(h.start_skills||{}).map(id=>(game.skills.find(x=>x.id===id)||{name:id}).name).join(', '))));
+    if(h.role) right.appendChild(el('div',{class:'small',style:'color:'+(h.color||'#c9a65a')+';margin:-4px 0 8px'},h.role));
+    if(h.passive&&h.passive.name) right.appendChild(el('div',{class:'card',style:'margin-bottom:10px;border-color:'+(h.color||'#c9a65a')},
+      el('b',{},'Nội tại: '+h.passive.name),el('div',{class:'small muted',style:'margin-top:4px'},h.passive.desc||'')));
     if(info.meta.slots){
       const CROP=[8,10,32,36];
       const lw=el('div',{class:'slots'});

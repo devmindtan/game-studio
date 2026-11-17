@@ -420,7 +420,8 @@ def build_game(slug):
         defs = pool.get("skills", {})
         heroes.append({"id": cid, "name": cls.get("name", cid), "stats": cls.get("stats", {}),
                        "start_skills": cls.get("start_skills", {}), "sprite": sprite_info(root, cls.get("sprite", cid)),
-                       "pool_size": len(ups)})
+                       "pool_size": len(ups), "role": cls.get("role", ""), "color": cls.get("color", ""),
+                       "passive": cls.get("passive", {})})
         for u in ups:
             sid = str(u.get("id", ""))
             if u.get("kind") == "skill" and isinstance(defs.get(sid), dict):
