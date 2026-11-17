@@ -35,40 +35,94 @@ def _line(c, x0, y0, x1, y1, col):
         _px(c, x0 + (x1 - x0) * t / n, y0 + (y1 - y0) * t / n, col)
 
 
-# --- freeze: an ice block -------------------------------------------------------
+# --- freeze: a jagged ice crystal round the body ---------------------------------
+# The first version was a rectangular ice cube (user: "too boxy"). Now it is a
+# lump with chipped corners and three planes, translucent so the monster shows
+# through, with frost and icicle-free edges. Any flat face is broken by a seam.
+_ICE = ["#e2f7ffa0", "#b4e0ffa4", "#7ec1eda6", "#4f8fbca8"]   # light -> deep
+_ICE_EDGE, _ICE_OUT = "#eaf9ffa4", "#3f6f96a8"
+_FROST = "#ffffff88"
+
+
+def _poly(c, pts, shade=None):
+    """Fill a polygon per row; returns the set of covered pixels."""
+    mask = set()
+    ys = [p[1] for p in pts]
+    for y in range(int(math.floor(min(ys))), int(math.ceil(max(ys))) + 1):
+        xs = []
+        for (xa, ya), (xb, yb) in zip(pts, pts[1:] + pts[:1]):
+            if (ya <= y < yb) or (yb <= y < ya):
+                xs.append(xa + (xb - xa) * (y - ya) / (yb - ya))
+        xs.sort()
+        for k in range(0, len(xs) - 1, 2):
+            for x in range(int(math.ceil(xs[k])), int(math.floor(xs[k + 1])) + 1):
+                mask.add((x, y))
+                _px(c, x, y, shade(x, y) if shade else _ICE[1])
+    return mask
+
+
 def freeze(i):
     c = Canvas(S, S)
-    x0, x1 = 5, 25           # front face
-    y0, y1 = 9, 27
-    top = 4                  # depth of the top face / side
-    FRONT, TOP, SIDE = "#9fdcffa8", "#dff7ffc8", "#5aa8dcb8"
-    EDGE, OUT, FROST = "#f2fcff", "#2a5f8a", "#ffffff70"
-    for y in range(y0, y1 + 1):
-        for x in range(x0, x1 + 1):
-            _px(c, x, y, FRONT)
-    for k in range(top):                     # top face, slanted right
-        for x in range(x0 + k + 1, x1 + k + 2):
-            _px(c, x, y0 - k - 1, TOP)
-    for k in range(top):                     # right side
-        for y in range(y0 - k, y1 - k + 1):
-            _px(c, x1 + k + 1, y, SIDE)
-    # outline
-    _line(c, x0, y0, x0, y1, OUT); _line(c, x0, y1, x1, y1, OUT)
-    _line(c, x1 + top, y0 - top, x1 + top, y1 - top, OUT); _line(c, x1, y1, x1 + top, y1 - top, OUT)
-    _line(c, x0, y0, x0 + top, y0 - top, OUT); _line(c, x0 + top, y0 - top, x1 + top, y0 - top, OUT)
-    # lit edges
-    _line(c, x0 + 1, y0, x1, y0, EDGE); _line(c, x1, y0, x1, y1 - 1, EDGE)
-    _line(c, x0 + 1, y0 + 1, x0 + 1, y0 + 6, EDGE)
-    # cracks and frost specks
-    _line(c, x0 + 4, y1 - 2, x0 + 8, y1 - 7, "#e8fbffb0"); _line(c, x0 + 8, y1 - 7, x0 + 7, y1 - 11, "#e8fbffb0")
-    _line(c, x1 - 3, y0 + 3, x1 - 7, y0 + 7, "#e8fbffb0")
-    for k in range(7):
-        _px(c, x0 + 2 + (k * 7) % 18, y0 + 3 + (k * 5) % 14, FROST)
-    # glint sweeping across the front face
-    g = (i * 6) % 34 - 6
+    # A lump of ice round the body: irregular hexagon, chipped corners, slightly
+    # slanted top, three big planes. Nothing of it is a straight cube face.
+    top = [(13, 5), (18, 4), (22, 9), (17, 11), (12, 10), (9, 7)]
+    left = [(12, 10), (17, 11), (16, 27), (12, 26), (8, 22), (7, 16), (9, 7)]
+    right = [(18, 4), (22, 9), (24, 15), (23, 21), (19, 26), (16, 28),
+             (16, 27), (17, 11)]
+    sil = [(13, 5), (18, 4), (22, 9), (24, 15), (23, 21), (19, 26), (16, 28),
+           (12, 26), (8, 22), (7, 16), (9, 7)]
+
+    mask = _poly(c, sil, lambda x, y: _ICE[1])
+    _poly(c, top, lambda x, y: _ICE[0])
+    _poly(c, left, lambda x, y: _ICE[1])
+    _poly(c, right, lambda x, y: _ICE[2])
+
+    def inside(x, y):
+        return (x, y) in mask
+
+    # Plane seams: bright refraction lines where the faces meet.
+    for a, b in (((13, 5), (17, 11)), ((17, 11), (16, 27)),
+                 ((18, 4), (17, 11)), ((17, 11), (23, 21))):
+        n = int(max(abs(b[0] - a[0]), abs(b[1] - a[1]))) or 1
+        for t in range(n + 1):
+            x, y = a[0] + (b[0] - a[0]) * t / n, a[1] + (b[1] - a[1]) * t / n
+            if inside(round(x), round(y)):
+                _px(c, x, y, "#f2fdff9e")
+
+    # Rim: pale where the light side meets the outline, blue under the crystal.
+    for (x, y) in mask:
+        if all(inside(x + dx, y + dy) for dx, dy in ((1, 0), (-1, 0), (0, 1), (0, -1))):
+            continue
+        _px(c, x, y, _ICE_EDGE if y < 17 else _ICE_OUT)
+
+    # Frosty band just under the top face, so the ice reads as frozen water.
+    for x in range(9, 23):
+        for y in (12, 13):
+            if inside(x, y) and (x + y) % 3 == 0:
+                _px(c, x, y, "#f4fdff86")
+
+    # Cracks.
+    for (x0, y0), (x1, y1), (x2, y2) in (((8, 16), (12, 16), (13, 11)),
+                                         ((20, 13), (17, 18), (18, 23))):
+        _line(c, x0, y0, x1, y1, "#eefbffa8")
+        _line(c, x1, y1, x2, y2, "#eefbffa8")
+
+    # Frost specks.
     for k in range(5):
-        _px(c, x0 + g + k, y1 - k * 3, "#ffffffc0")
-        _px(c, x0 + g + k + 1, y1 - k * 3, "#ffffff80")
+        x, y = 10 + (k * 5) % 9, 8 + (k * 7) % 11
+        if inside(x, y):
+            _px(c, x, y, _FROST)
+
+    # Specular chip on the lit rim.
+    for x, y in ((9, 7), (10, 6), (11, 6), (12, 5), (13, 5)):
+        _px(c, x, y, "#ffffffd8")
+
+    # Glint sweeping down the lit plane.
+    g = (i * 6) % 20 - 3
+    for k in range(3):
+        for (x, y) in ((8 + g + k, 7 + k), (9 + g + k, 8 + k)):
+            if inside(x, y):
+                _px(c, x, y, "#ffffffc8")
     return c
 
 
