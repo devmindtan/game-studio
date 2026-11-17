@@ -78,6 +78,38 @@
       "assassin"
     ]
   },
+  "aura-haste": {
+    "cat": "status",
+    "tags": [
+      "speed",
+      "buff",
+      "hero-fitted"
+    ]
+  },
+  "aura-heal": {
+    "cat": "status",
+    "tags": [
+      "heal",
+      "buff",
+      "hero-fitted"
+    ]
+  },
+  "aura-power": {
+    "cat": "status",
+    "tags": [
+      "power",
+      "buff",
+      "hero-fitted"
+    ]
+  },
+  "aura-shield": {
+    "cat": "status",
+    "tags": [
+      "shield",
+      "buff",
+      "hero-fitted"
+    ]
+  },
   "axe-chop": {
     "cat": "strike",
     "tags": [
