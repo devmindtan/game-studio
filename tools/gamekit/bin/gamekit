@@ -380,7 +380,7 @@ cmd_shot() {
   local rc=0
   "${RUN[@]}" timeout --kill-after=5 "$limit" "$GODOT" --path "$g" --windowed --resolution 1280x720 --fixed-fps 60 \
     -s res://addons/gamekit/debug/shot_capture.gd -- --gk-scene="$scene" --gk-capture="$frames" \
-    --gk-out="$tmp" "${extra[@]}" 2>&1 | { grep -E "ERROR|Run over" >&2 || true; } || rc=$?  # stdout = paths only
+    --gk-out="$tmp" "${extra[@]}" 2>&1 | { grep -E "ERROR|Run over" | tee "$tmp/godot.log" >&2 || true; } || rc=$?  # stdout = paths only
   [[ "$rc" == 124 || "$rc" == 137 ]] && die "shot timed out after ${limit}s (set GK_SHOT_TIMEOUT to allow longer)"
   # unique name: two shots in the same second once overwrote each other
   local stamp; stamp="$(date +%Y%m%d-%H%M%S)"
@@ -394,8 +394,14 @@ cmd_shot() {
     [[ $many == 1 ]] && out="$g/builds/shots/$stamp-f$((10#$(basename "$f" .png))).png"
     mv "$f" "$out"; echo "$out"; n=$((n + 1))
   done
+  # A script error mid-scene still gives an image, of a half-built screen (lesson
+  # 2026-11-17: the lobby lost its skill row and start button, the shot "passed").
+  local errs=0
+  [[ -f "$tmp/godot.log" ]] && errs="$(grep -c "SCRIPT ERROR" "$tmp/godot.log" || true)"
   rm -rf "$tmp"
   [[ $n -gt 0 ]] || die "no frame captured"
+  [[ "$errs" -gt 0 ]] && die "$errs SCRIPT ERROR(s) while capturing: the image shows a broken scene (errors above)"
+  return 0
 }
 
 # The game's current screens (production/ui/screens.json) captured into
