@@ -337,8 +337,17 @@ cmd_test() {
   [[ -f "$g/addons/gamekit/test/run_tests.gd" ]] || die "no test runner - gamekit install $g"
   warn_tools_stale
   godot_import "$g"
-  "${RUN[@]}" "$GODOT" --headless --path "$g" -s res://addons/gamekit/test/run_tests.gd 2>&1 | grep -v -i fontconfig
-  return "${PIPESTATUS[0]}"
+  local out rc=0
+  out="$("${RUN[@]}" "$GODOT" --headless --path "$g" -s res://addons/gamekit/test/run_tests.gd 2>&1 | grep -v -i fontconfig)" || rc=$?
+  printf '%s\n' "$out"
+  # A runtime error inside a test stops that test without failing it (Godot has no
+  # exceptions), so the runner printed PASS (lesson 2026-11-17): any SCRIPT ERROR fails.
+  local errs; errs="$(grep -c "SCRIPT ERROR" <<<"$out" || true)"
+  if [[ "$errs" -gt 0 ]]; then
+    echo "FAIL  $errs SCRIPT ERROR(s) during the tests: a test that errors is not a pass"
+    [[ $rc -eq 0 ]] && rc=1
+  fi
+  return "$rc"
 }
 
 # Screenshots: one Godot run, a fixed 60 fps step (deterministic), no vsync or
