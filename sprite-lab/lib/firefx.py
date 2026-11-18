@@ -14,8 +14,7 @@ import math
 import random
 
 from spritekit import Canvas
-import fxkit as fk
-from icefx import BAYER, _disk, _fade, _p, _ring
+from icefx import BAYER, _disk, _fade, _p
 
 WHITE = "#fff8e0"
 YEL = "#ffd84a"
@@ -124,23 +123,112 @@ def _rock(c, x, y, r, tier, rng_seed, outline="#1a0e0e"):
     fk.stack(c, lay, outline)
 
 
+def _noise(x, y, salt=0):
+    """A stable 0..1 scatter value (the same idea as burstfx._h01, kept local)."""
+    h = (int(x) * 374761393 + int(y) * 668265263 + int(salt) * 1103515245) & 0xFFFFFFFF
+    h = ((h ^ (h >> 13)) * 1274126177) & 0xFFFFFFFF
+    return ((h ^ (h >> 16)) & 0xFFFF) / 65536.0
+
+
 def _flame(c, x, y, dx, dy, length, width, cols):
-    """A tapered flame trailing back from (x, y) along -(dx, dy): nested layers, outer first."""
+    """A tapered flame streaming back from (x, y): jittered edges and a dithered
+    tip instead of solid triangles (user 2026-11-18: the trail looked too hard)."""
     d = math.hypot(dx, dy) or 1.0
     ux, uy = dx / d, dy / d
     px, py = -uy, ux
     for k, col in enumerate(cols):
         f = 1 - k / (len(cols) + 0.5)
         L, W = length * f, width * f
-        tip = (x - ux * L, y - uy * L)
-        c.polygon([(int(x + px * W), int(y + py * W)), (int(x - px * W), int(y - py * W)), (int(tip[0]), int(tip[1]))], col)
+        steps = max(4, int(L))
+        for s in range(steps):
+            t = s / steps
+            hx, hy = x - ux * L * t, y - uy * L * t
+            half = max(0.8, W * (1 - t) ** 0.8 * (0.85 + 0.30 * math.sin(s * 1.7 + k * 2.1)))
+            for q in range(-int(math.ceil(half)) - 1, int(math.ceil(half)) + 2):
+                ax, ay = hx + px * q, hy + py * q
+                dens = 0.72 - 0.30 * abs(q) / half - 0.42 * t * t + 0.10 * k
+                if _noise(ax, ay, k + 37) < dens:
+                    _p(c, ax, ay, col)
 
 
 def _tongue(c, x, y, h, w, sway, cols):
-    """An upward flame tongue on the ground (fire pillars, burning crater)."""
+    """An upward flame tongue: curved, dithered and fading at the tip."""
+    steps = max(3, int(h))
     for k, col in enumerate(cols):
-        f = 1 - k * 0.3
-        c.polygon([(int(x - w * f), int(y)), (int(x + w * f), int(y)), (int(x + sway), int(y - h * f))], col)
+        f = 1 - k * 0.28
+        H, W = h * f, w * f
+        for s in range(steps):
+            t = s / steps
+            yy = y - H * t
+            xx = x + sway * t * t + math.sin(t * 5 + k * 1.7) * 0.9
+            half = max(0.7, W * (1 - t) ** 0.7)
+            for q in range(-int(math.ceil(half)) - 1, int(math.ceil(half)) + 2):
+                ax, ay = xx + q, yy
+                dens = 0.78 - 0.35 * abs(q) / half - 0.45 * t * t + 0.08 * k
+                if _noise(ax, ay, k + 53) < dens:
+                    _p(c, ax, ay, col)
+
+
+def _scorch_blot(c, cx, cy, r, seed, col=ASH, density=0.7):
+    """An uneven ash blot that fades into a ragged edge, not a filled circle."""
+    ri = int(math.ceil(r))
+    for y in range(-ri, ri + 1):
+        for x in range(-ri, ri + 1):
+            dd = math.hypot(x, y) / max(1.0, r)
+            a = math.atan2(y, x)
+            wob = 0.88 + 0.10 * math.sin(a * 5 + seed) + 0.05 * math.sin(a * 11 - seed)
+            if dd > wob:
+                continue
+            dens = max(0.0, min(1.0, density * (1.05 - 0.85 * dd * dd)))
+            px, py = int(cx + x), int(cy + y)
+            if _noise(px, py, seed + 29) < dens:   # a hash, not a Bayer grid (no plaid)
+                _p(c, px, py, col)
+
+
+def _soft_crack(c, x0, y0, a, length, seed, squash=0.7):
+    """A jagged fissure that tapers, breaks up and fades toward its tip."""
+    x, y = x0, y0
+    steps = max(4, int(length))
+    for s in range(steps):
+        t = s / steps
+        a += (_noise(s, seed, 7) - 0.5) * 0.5
+        x += math.cos(a) * (length / steps)
+        y += math.sin(a) * (length / steps) * squash
+        px, py = int(x), int(y)
+        _p(c, px, py, "#2a1010")
+        if _noise(s, seed, 11) < 0.85 - 0.5 * t:
+            _p(c, px, py - 1, LAVA if _noise(s, seed, 17) > 0.25 else YEL)
+        if s % 3 == 0 and _noise(s, seed, 23) < 0.5 - 0.3 * t:
+            _p(c, px + 1, py, ORA)
+
+
+def _hot_scatter(c, cx, cy, r, seed, phase=0):
+    """A soft radial glow: dithered embers instead of solid colour bands."""
+    ri = int(math.ceil(r))
+    for y in range(-ri, ri + 1):
+        for x in range(-ri, ri + 1):
+            dd = math.hypot(x, y) / max(1.0, r)
+            if dd > 1.0:
+                continue
+            px, py = int(cx + x), int(cy + y)
+            dens = (1 - dd) * 0.8 + 0.10 * math.sin(phase + dd * 8 + seed)
+            if _noise(px, py, seed + 41) < dens:
+                _p(c, px, py, YEL if dd < 0.3 else (ORA if dd < 0.65 else LAVA))
+
+
+def _soft_ring(c, cx, cy, r, cols, seed=0, density=0.8, squash=1.0):
+    """A broken, slightly uneven ring: cooling crater rim, not a drawn circle."""
+    n = max(48, int(math.tau * r * 2.2))
+    for i in range(n):
+        if _noise(i // 5, seed, 3) > density:
+            continue
+        a = i * math.tau / n
+        wob = 0.94 + 0.10 * math.sin(a * 5 + seed) + 0.04 * math.sin(a * 13 - seed)
+        x = cx + math.cos(a) * r * wob
+        y = cy + math.sin(a) * r * wob * squash
+        _p(c, x, y, cols[i % len(cols)])
+        if i % 3 == 0:
+            _p(c, x, y + 1, "#1a0e0e")
 
 
 def meteor(tier, w, h, ground, radius, seed=5):
@@ -227,21 +315,22 @@ def meteor(tier, w, h, ground, radius, seed=5):
             fk.stack(c, lay, "#1a0e0e")
         else:
             k = f - 11
-            _disk(c, cx, cy, radius * 0.72, ASH, density=0.55)
-            fk.ring_band(c, cx, cy, radius * 0.72, ["#1a0e0e", ROCK, ROCK_L])
+            # the crater cools into a ragged scorch, not a solid ring and disc
+            _scorch_blot(c, cx, cy, radius * 0.78, seed + k, ASH, 0.85)
+            _soft_ring(c, cx, cy, radius * 0.72, ["#1a0e0e", ROCK, ROCK_L],
+                       seed=5 + k, density=0.85, squash=0.85)
             if tier >= 2:
                 for a, d in fissures:
-                    c.line(int(cx), int(cy), int(cx + math.cos(a) * radius * d * 0.7), int(cy + math.sin(a) * radius * d * 0.55), LAVA)
-                pool = radius * (0.18 + 0.05 * tier)
-                fk.glow(c, cx, cy, pool, [DRED, LAVA, YEL], density=0.9)
+                    _soft_crack(c, cx, cy, a, radius * d * 0.75, 11 + int(a * 10) + k, squash=0.6)
+                _hot_scatter(c, cx, cy, radius * (0.20 + 0.05 * tier), seed + k, f * 1.1)
             else:
-                _blob(c, cx, cy, radius * 0.25, RED, density=0.7, wobble=1, seed=80 + k)
+                _scorch_blot(c, cx, cy, radius * 0.27, 80 + k, RED, 0.6)
             if tier >= 3:   # flame tongues flicker round the crater
                 n_t = 4 + 2 * (tier - 3) + (6 if tier >= 5 else 0)
                 for j in range(n_t):
                     a = j * math.tau / n_t + 0.2
                     hh = (6 + tier * 2) * (0.6 + 0.4 * ((j + k) % 2)) * (1 - 0.15 * k)
-                    _tongue(c, cx + math.cos(a) * radius * 0.55, cy + math.sin(a) * radius * 0.4, hh, 2.5, (j + k) % 3 - 1, [RED, ORA, YEL])
+                    _tongue(c, cx + math.cos(a) * radius * 0.55, cy + math.sin(a) * radius * 0.4, hh, 2.0, (j + k) % 3 - 1, [RED, ORA, YEL])
             for a, d in embers:
                 fk.streak(c, cx + math.cos(a) * radius * d, cy + math.sin(a) * radius * d * 0.6 - k * 3, 0, -1, 3, YEL, ORA)
             if k % 2 == 0:
@@ -256,8 +345,10 @@ def meteor(tier, w, h, ground, radius, seed=5):
 
 
 def scorch(size, tier=1, n=6, seed=9):
-    """A looping burning-ground decal for a burn zone (meteor craters): cracks glowing
-    with lava, small flames flickering, embers. Drawn under the monsters by the run."""
+    """A looping burning-ground decal for a burn zone (meteor craters): an uneven
+    ash blot, tapering lava cracks and dithered tongues. Drawn under monsters.
+    User 2026-11-18: soften it - the old version was a solid disc with straight
+    radial lines and hard triangles, so it read as a rigid decal."""
     import fxkit as fk
     cx = cy = size / 2
     r = size / 2 - 3
@@ -267,15 +358,14 @@ def scorch(size, tier=1, n=6, seed=9):
     out = []
     for f in range(n):
         c = Canvas(size, size)
-        _disk(c, cx, cy, r, ASH, density=0.35)
+        _scorch_blot(c, cx, cy, r, seed, ASH, 0.72)
+        _scorch_blot(c, cx, cy, r * 0.62, seed + 3, "#2a1616", 0.5)
         for a, d in cracks:
-            x1, y1 = cx + math.cos(a) * r * d, cy + math.sin(a) * r * d * 0.7
-            c.line(int(cx), int(cy), int(x1), int(y1), DRED, 2)
-            c.line(int(cx), int(cy), int(x1), int(y1), LAVA if (f + int(a * 3)) % 3 else YEL)
-        fk.glow(c, cx, cy, r * 0.25, [DRED, LAVA, YEL], density=0.8)
+            _soft_crack(c, cx, cy, a, r * d * 0.92, seed + int(a * 10), squash=0.72)
+        _hot_scatter(c, cx, cy, r * 0.42, seed, f * 1.2)
         for j, (a, d) in enumerate(flames):
-            hh = (5 + tier) * (0.6 + 0.4 * ((j + f) % 3) / 2)
-            _tongue(c, cx + math.cos(a) * r * d, cy + math.sin(a) * r * d * 0.6, hh, 2, (j + f) % 3 - 1, [RED, ORA, YEL])
+            hh = (5 + tier) * (0.55 + 0.45 * ((j + f) % 3) / 2)
+            _tongue(c, cx + math.cos(a) * r * d, cy + math.sin(a) * r * d * 0.6, hh, 1.8, (j + f) % 3 - 1, [RED, ORA, YEL])
         for j in range(3 + tier):
             a = j * 2.1 + f * 0.6
             fk.streak(c, cx + math.cos(a) * r * 0.6, cy + math.sin(a) * r * 0.4 - (f * 2 + j) % 8, 0, -1, 2, YEL, ORA)
