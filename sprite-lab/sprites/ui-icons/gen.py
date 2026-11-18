@@ -813,10 +813,10 @@ ICONS = {
     # Rebuilt after review: dense outlined silhouettes, not sparse specks that
     # turned into blobs once `outline()` filled the gaps.
     "item_shield": ({"y": "#f2c14e", "b": "#6fc3ff", "w": "#ffffff"}, [
-        "..yyyyyyyyyy..", ".ybbbbbbbbbby.", "ybbbbbbbbbbbby", "ybbwbbbbbbwbby",
-        "ybbwbbbbbbwbby", "ybbbbbbbbbbbby", "ybbbwwwwwwbbby", "ybbbbbbbbbbbby",
-        ".ybbbwwwwbbbby.", "..ybbbbbbbby..", "...ybbbbbby...", "....ybbbby....",
-        ".....ybby.....", "......yy......",
+        "..yyyyyyyyyy..", ".yyyyyyyyyyyy.", "yyyyywwwwyyyyy", "yyyyywwwwyyyyy",
+        "yyyyywwwwyyyyy", "wwwwwbbwwwwwww", "wwwwwbbwwwwwww", "yyyyywwwwyyyyy",
+        "yyyyywwwwyyyyy", "yyyyywwwwyyyyy", ".yyyyyyyyyyyy.", "..yyyyyyyyyy..",
+        "....yyyyyy....", "......yy......",
     ]),
     "item_retaliate": ({"y": "#f2c14e", "w": "#fff8e0"}, [
         ".....yyyyyy.....", "...yy......yy...", "..y..........y..", ".y...yyyyyy...y.",
@@ -863,11 +863,11 @@ ICONS = {
         "...yrrry........", "..yrrrrry.......", ".yrrwrrry.......", ".yrrwrrry.......",
         "..yrrrrry.......", "...yrrry........", "....yyy.........",
     ]),
-    "item_low_hp": ({"y": "#f2c14e", "b": "#6fc3ff", "k": "#1b1726"}, [
-        "..yyyyyyyyyy..", ".ybbbbbbbbbby.", "ybbbbbkkbbbbby", "ybbbbbkbbbbbby",
-        "ybbbbbkbbbbbby", "ybbbbbbkbbbbby", "ybbbbbbkbbbbby", "ybbbbbbbkbbbby",
-        "ybbbbbbbkbbbby", ".ybbbbbbkbbby.", "..ybbbbkbby...", "...ybbkbbby....",
-        "....ybbbby.....", ".....yby.......",
+    "item_low_hp": ({"y": "#f2c14e", "s": "#9a8e80", "d": "#5a5048", "r": "#ff6a2a"}, [
+        "..yyyyyyyyyy..", ".yssssssssssy.", "yssdsdssdsssy.", "yssdsdssdsssy.",
+        "ysssssrsssssy.", "ysssssrsssssy.", "ydsssrrssssdy.", "ysdssrrsssdsy.",
+        "yssssdrrdsssy.", "ysssssrrssssy.", ".yssssrrsssy..", "..yssrrsssy...",
+        "...ysrrssy....", "....yrry......", ".....yy.......",
     ]),
 }
 
