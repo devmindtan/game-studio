@@ -1,36 +1,51 @@
 {
-  "frames": 8,
+  "frames": 12,
   "frame_size": [
-    60,
-    68
+    120,
+    163
   ],
   "fps": 12.0,
   "loop": false,
   "anchor": [
-    30.0,
-    58.0
+    60.0,
+    116.0
   ],
   "anchor_source": "explicit",
   "animations": [
     {
       "name": "descend",
       "start": 0,
-      "frames": 8,
+      "frames": 12,
       "fps": 12.0,
       "loop": false,
+      "durations_ms": [
+        80.0,
+        70.0,
+        60.0,
+        50.0,
+        55.0,
+        60.0,
+        80.0,
+        90.0,
+        100.0,
+        110.0,
+        120.0,
+        130.0
+      ],
       "hitbox": {
         "shape": "rect",
         "center": [
-          31.5,
-          35.0
+          61.0,
+          78.5
         ],
         "active": [
-          0,
-          7
+          3,
+          6
         ],
-        "half_w": 19.5,
-        "half_h": 31.0
+        "half_w": 43.0,
+        "half_h": 78.5
       }
     }
-  ]
+  ],
+  "px_scale": 0.5
 }

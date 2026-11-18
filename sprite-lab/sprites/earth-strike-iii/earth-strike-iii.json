@@ -1,36 +1,51 @@
 {
-  "frames": 8,
+  "frames": 12,
   "frame_size": [
-    64,
-    64
+    128,
+    128
   ],
-  "fps": 14.0,
+  "fps": 12.0,
   "loop": false,
   "anchor": [
-    32.0,
-    32.0
+    64.0,
+    64.0
   ],
   "anchor_source": "explicit",
   "animations": [
     {
       "name": "burst",
       "start": 0,
-      "frames": 8,
-      "fps": 14.0,
+      "frames": 12,
+      "fps": 12.0,
       "loop": false,
+      "durations_ms": [
+        70.0,
+        60.0,
+        55.0,
+        55.0,
+        60.0,
+        70.0,
+        80.0,
+        90.0,
+        100.0,
+        110.0,
+        120.0,
+        130.0
+      ],
       "hitbox": {
         "shape": "circle",
         "center": [
-          32.0,
-          32.0
+          64.0,
+          64.0
         ],
         "active": [
           2,
-          6
+          5
         ],
-        "radius": 31.0,
+        "radius": 56.0,
         "inner": 0.0
       }
     }
-  ]
+  ],
+  "px_scale": 0.5
 }
