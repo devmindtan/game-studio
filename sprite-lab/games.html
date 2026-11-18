@@ -663,7 +663,7 @@ function skillPane(pane,s){
   const heroInfo=(game.heroes.find(h=>h.id===s.class)||game.heroes[0]||{}).sprite;
   const dummy=game.monsters.find(x=>x.id==='slime')||game.monsters[0];
   const sheets={};
-  [...new Set([...s.tiers,heroInfo&&heroInfo.name,dummy&&dummy.sprite&&dummy.sprite.name].filter(Boolean))]
+  [...new Set([...s.tiers,...s.levels.map(l=>l.impact),heroInfo&&heroInfo.name,dummy&&dummy.sprite&&dummy.sprite.name].filter(Boolean))]
     .forEach(n=>{const info=anySprite(n); if(info) sheetOf(info).then(x=>{sheets[n]=x;});});
   const tmp=document.createElement('canvas');
   function drawTint(sh,g,anim,t,x,y,sc,flip,col){ const [w,h]=sh.fs; tmp.width=w*sc; tmp.height=h*sc; const c=tmp.getContext('2d'); c.imageSmoothingEnabled=false;
@@ -714,8 +714,10 @@ function skillPane(pane,s){
     const dist=travel*0.6, target={x:hc.x+dist,y:hc.y};
     const slFeet={x:target.x-(sb.center[0]-sl.anchor[0])*ssc,y:target.y-(sb.center[1]-sl.anchor[1])*ssc};
     const hitAt=dash?time*0.5:dist/speed;
-    const lead=0.3, dur=dash?time+0.35:shot?hitAt+(fx.has('impact')?fx.duration('impact'):0.2):fx.duration(fly);
-    return {fx,hero,sl,kind:dash?'dash':shot?'shot':'wave',anim:dash?'dash':fly,sc:2*lv.size,hb:null,lead,dur,a0:hitAt,a1:hitAt+0.1,
+    // the hit's explosion: the level's impact sprite (impact_tiers) like the game, else the shot's own
+    const boom=lv.impact&&sheets[lv.impact]?sheets[lv.impact]:(fx.has('impact')?fx:null);
+    const lead=0.3, dur=dash?time+0.35:shot?hitAt+(boom?boom.duration('impact'):0.2):fx.duration(fly);
+    return {fx,boom,hero,sl,kind:dash?'dash':shot?'shot':'wave',anim:dash?'dash':fly,sc:2*lv.size,hb:null,lead,dur,a0:hitAt,a1:hitAt+0.1,
       hits:[lead+hitAt],fxAt:{x:hc.x,y:hc.y},hcx:hc.x,hcy:hc.y,slFeet,target,ssc,sb,hc,period:lead+dur+0.8,time,speed,travel};
   }
   hitB.onclick=()=>{ const sc=scene(s.levels[level-1]||s.levels[0]); if(!sc||!sc.hits.length) return false;
@@ -750,7 +752,7 @@ function skillPane(pane,s){
     if(sc.kind==='wave'&&et>=0&&et<sc.dur){ sc.fx.draw(g,sc.anim,et,sc.fxAt.x+sc.speed*et,sc.fxAt.y,sc.sc); }
     else if(sc.kind==='shot'&&et>=0&&et<sc.dur){
       if(et<sc.a0) sc.fx.draw(g,sc.anim,et%sc.fx.duration(sc.anim),sc.fxAt.x+sc.speed*et,sc.fxAt.y,sc.sc);   // flying
-      else if(sc.fx.has('impact')) sc.fx.draw(g,'impact',et-sc.a0,sc.target.x,sc.target.y,sc.sc); }         // hit
+      else if(sc.boom) sc.boom.draw(g,'impact',et-sc.a0,sc.target.x,sc.target.y,sc.sc); }         // hit
     else if(sc.kind!=='dash'&&sc.kind!=='shot'&&et>=0&&et<sc.dur){ const at=sc.kind==='orbit'?et%sc.fx.duration(sc.anim):et; sc.fx.draw(g,sc.anim,at,sc.fxAt.x,sc.fxAt.y,sc.sc);
       const active=sc.kind==='orbit'||(et>=sc.a0&&et<sc.a1);
       if(showHb&&sc.hb) drawHb(g,sc.hb,sc.hcx,sc.hcy,sc.hs||sc.sc,true);

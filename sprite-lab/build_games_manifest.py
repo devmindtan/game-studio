@@ -266,6 +266,8 @@ def skill_entry(skill_id, defn, upgrade, cls, root):
             "size": round(float(stats.get("area", 1.0)) * float(defn.get("size_mul", 1.0)) * area_mul, 2),
             "cooldown": round(cooldown, 2),
             "sprite": tiers[min(lv - 1, len(tiers) - 1)],
+            # the explosion on a hit, its own sprite by level (impact_tiers), "" = the shot's own
+            "impact": (lambda it: it[min(lv - 1, len(it) - 1)] if it else "")([str(t) for t in defn.get("impact_tiers", [])]),
             "effects": eff,
             # statuses the skill puts on monsters at this level (on_hit "from")
             "statuses": [e for e in defn.get("on_hit", []) if int(e.get("from", 1)) <= lv],
@@ -349,7 +351,9 @@ def check_sprite(meta, lim, scale, size_max, has_duration):
         out["directional"] = ["na", "không phải đòn định hướng"]
     fs = meta.get("frame_size", [0, 0])
     px = float(meta.get("px_scale", 1.0))   # double-density sprites (icefx): the logical size counts
-    ok = max(fs) * px <= lim["frame_max"] and max(fs) <= lim.get("frame_max_dense", lim["frame_max"])
+    tall = lim.get("frame_max_tall", lim["frame_max"])   # same rule as gameplay_rules_test
+    ok = (fs[0] * px <= lim["frame_max"] and fs[0] <= lim.get("frame_max_dense", lim["frame_max"])
+          and fs[1] * px <= tall and (px == 1.0 or fs[1] <= 2 * tall))
     # fx_craft (should; must in the game's test once a sprite is redrawn with px_scale)
     craft = []
     for a in play:

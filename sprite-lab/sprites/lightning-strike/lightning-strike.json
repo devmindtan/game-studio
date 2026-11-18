@@ -2,13 +2,13 @@
   "frames": 12,
   "frame_size": [
     96,
-    145
+    193
   ],
   "fps": 12.0,
   "loop": false,
   "anchor": [
     48.0,
-    104.0
+    152.0
   ],
   "anchor_source": "explicit",
   "animations": [
@@ -36,7 +36,7 @@
         "shape": "circle",
         "center": [
           48.0,
-          104.0
+          152.0
         ],
         "active": [
           2,

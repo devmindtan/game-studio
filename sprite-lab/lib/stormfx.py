@@ -80,10 +80,13 @@ def storm(tier, size, radius, seed=11):
         elif f < 7:
             _disk(c, cx, cy, radius * 0.9, CLOUD, density=0.15)
             lay = Canvas(size, size)
+            import boltfx
             for i, (x, y) in enumerate(spots):
-                if (i + f) % 2 == 0 or f == 4:
-                    _bolt(lay, x + rng.uniform(-3, 3), 0, x, y, rng, BOLT, GLOW)
-            fk.stack(c, lay, "#1a1a3a")
+                if (i + f) % 2 == 0 or f == 4:   # thin bolt from its own small dark cloud (user 2026-11-18)
+                    top = max(8.0, y - size * 0.55)
+                    boltfx.thin_bolt(lay, x + rng.uniform(-2, 2), top + 5, x, y, rng, tier)
+                    boltfx.dark_cloud(lay, x, top, 5 + tier * 0.6, flash=f == 4)
+            fk.stack(c, lay, None)
             for i, (x, y) in enumerate(spots):
                 if (i + f) % 2 == 0 or f == 4:
                     fk.glow(c, x, y, 6 + tier, [GLOW, BOLT_M, BOLT], density=0.8)

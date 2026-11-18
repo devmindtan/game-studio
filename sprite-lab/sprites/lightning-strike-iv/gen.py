@@ -19,16 +19,16 @@ def _ws():
 HERE = Path(__file__).resolve().parent
 sys.path.insert(0, str(_ws() / "tools/gamekit/pipeline"))
 sys.path.insert(0, str(Path(__file__).resolve().parents[2] / "lib"))
-import burstfx  # noqa: E402
+import boltfx  # noqa: E402
 from sheet import export  # noqa: E402
 
 NAME = HERE.name
-W, H = 120, 164
-GROUND = 116.0
+W, H = 120, 212   # 48 px taller: a long thin bolt from a small dark cloud
+GROUND = 164.0
 RADIUS = 40
 ANCHOR = (W / 2, GROUND)
-ANIM = [("strike", burstfx.lightning_strike(4, W, H, GROUND, RADIUS), 12, False,
-         {"durations_ms": burstfx.BOLT_MS, "hitbox": {"shape": "circle", "center": [W / 2, GROUND], "active": [2, 3]}})]  # only where the bolt lands, only while it lands
+ANIM = [("strike", boltfx.lightning_strike(4, W, H, GROUND, RADIUS), 12, False,
+         {"durations_ms": boltfx.BOLT_MS, "hitbox": {"shape": "circle", "center": [W / 2, GROUND], "active": [2, 3]}})]  # only where the bolt lands, only while it lands
 
 if __name__ == "__main__":
     export(HERE, NAME, ANIM, anchor=ANCHOR, preview_scale=2, gif_scale=2)
