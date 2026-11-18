@@ -1,0 +1,126 @@
+{
+  "frames": 13,
+  "frame_size": [
+    48,
+    48
+  ],
+  "fps": 6.0,
+  "loop": true,
+  "anchor": [
+    24.0,
+    47.0
+  ],
+  "anchor_source": "explicit",
+  "animations": [
+    {
+      "name": "move",
+      "start": 0,
+      "frames": 4,
+      "fps": 6.0,
+      "loop": true,
+      "durations_ms": [
+        180.0,
+        180.0,
+        180.0,
+        180.0
+      ],
+      "hitbox": {
+        "shape": "rect",
+        "center": [
+          25.0,
+          24.0
+        ],
+        "active": [
+          0,
+          3
+        ],
+        "half_w": 19.0,
+        "half_h": 23.0
+      }
+    },
+    {
+      "name": "attack",
+      "start": 4,
+      "frames": 3,
+      "fps": 8.0,
+      "loop": false,
+      "durations_ms": [
+        260.0,
+        220.0,
+        300.0
+      ],
+      "hitbox": {
+        "shape": "rect",
+        "center": [
+          25.0,
+          24.5
+        ],
+        "active": [
+          2,
+          2
+        ],
+        "half_w": 19.0,
+        "half_h": 22.5
+      }
+    },
+    {
+      "name": "hurt",
+      "start": 7,
+      "frames": 2,
+      "fps": 12.0,
+      "loop": false,
+      "durations_ms": [
+        80.0,
+        140.0
+      ],
+      "hitbox": {
+        "shape": "rect",
+        "center": [
+          25.0,
+          24.0
+        ],
+        "active": [
+          0,
+          1
+        ],
+        "half_w": 19.0,
+        "half_h": 23.0
+      }
+    },
+    {
+      "name": "death",
+      "start": 9,
+      "frames": 4,
+      "fps": 6.0,
+      "loop": false,
+      "durations_ms": [
+        160.0,
+        220.0,
+        260.0,
+        400.0
+      ],
+      "hitbox": {
+        "shape": "rect",
+        "center": [
+          24.5,
+          24.5
+        ],
+        "active": [
+          0,
+          3
+        ],
+        "half_w": 19.5,
+        "half_h": 22.5
+      }
+    }
+  ],
+  "ground": true,
+  "body": {
+    "anim": "move",
+    "center": [
+      24.5,
+      24.0
+    ],
+    "radius": 19.0
+  }
+}
