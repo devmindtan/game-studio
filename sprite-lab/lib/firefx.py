@@ -93,7 +93,7 @@ def blast(tier, size, radius, seed=3):
             if f >= 8:
                 _fade(c, min(0.95, 0.1 + 0.2 * (f - 7)))
         out.append(c)
-        masks.append(fk.mask_disk(size, size, cx, cy, radius * 0.3 if f == 0 else radius * 0.6 if f == 1 else radius * (0.55 + 0.45 * (f - 1) / 3) * 0.85 if f <= 4 else radius * 0.5))
+        masks.append(fk.mask_art(c, cx, cy, radius * 0.35 if f == 0 else radius * 0.62 if f == 1 else radius * (0.55 + 0.45 * (f - 1) / 3) + 4 if f <= 4 else radius * 0.6))
     return fk.FxFrames(out, masks)
 
 
@@ -247,5 +247,5 @@ def meteor(tier, w, h, ground, radius, seed=5):
         if 5 <= f <= 8:
             falling(c, f)
         out.append(c)
-        masks.append(fk.mask_disk(w, h, cx, cy, radius * 0.6 if f == 5 else radius * (0.6 + 0.4 * (f - 4) / 3) * 0.85 if f in (6, 7) else 0))
+        masks.append(fk.mask_art(c, cx, cy, radius * 0.75 if f == 5 else radius * (0.6 + 0.4 * (f - 4) / 3) * (1.18 if tier >= 3 else 0.9) + 3 if f in (6, 7) else 0))
     return fk.FxFrames(out, masks)

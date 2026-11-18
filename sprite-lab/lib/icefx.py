@@ -195,7 +195,7 @@ def frost_nova(tier, size, radius, seed=1):
                 fk.streak(c, cx + math.cos(a) * r, cy + math.sin(a) * r - k2 * 2, math.cos(a), math.sin(a), 5, CORE, ICE)
             _fade(c, min(0.9, 0.05 + 0.2 * k2))
         out.append(c)
-        masks.append(fk.mask_disk(size, size, cx, cy, (4 + 6 * (f + 1) / 4 + tier) if f < 4 else radius * 0.55 if f == 4 else radius * (0.55 + 0.45 * (f - 4) / 3) if f < 8 else radius * 0.75))
+        masks.append(fk.mask_art(c, cx, cy, (6 + 6 * (f + 1) / 4 + tier) if f < 4 else radius * 0.6 if f == 4 else radius * (0.55 + 0.45 * (f - 4) / 3) + 3 if f < 8 else radius * 0.82 + cl))
     return fk.FxFrames(out, masks)
 
 
@@ -253,5 +253,5 @@ def blizzard(tier, size, radius, seed=7):
         if f >= 14:
             _fade(c, min(0.95, 0.15 + 0.2 * (f - 13)))
         out.append(c)
-        masks.append(fk.mask_disk(size, size, cx, cy, radius * (0.35 + 0.65 * min(1.0, (f + 1) / 4)) * 0.9))
+        masks.append(fk.mask_art(c, cx, cy, radius * (0.35 + 0.65 * min(1.0, (f + 1) / 4)) + 2))
     return fk.FxFrames(out, masks)

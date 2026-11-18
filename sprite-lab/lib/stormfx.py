@@ -102,7 +102,11 @@ def storm(tier, size, radius, seed=11):
             if k >= 1:
                 _fade(c, min(0.95, 0.1 + 0.2 * k))
         out.append(c)
-        masks.append(_spots_mask(size, spots, 6 + tier if 3 <= f < 7 else 0))
+        mk = Canvas(size, size)
+        if 3 <= f < 7:   # the art around each landing point (its flash and rays), not the bolt shafts
+            for x, y in spots:
+                mk.img.alpha_composite(fk.mask_art(c, x, y, 9 + tier * 1.5).img)
+        masks.append(mk)
     return fk.FxFrames(out, masks)
 
 
@@ -152,7 +156,7 @@ def stomp(tier, size, radius, seed=13):
             if k >= 1:
                 _fade(c, min(0.95, 0.1 + 0.18 * k))
         out.append(c)
-        masks.append(fk.mask_disk(size, size, cx, cy, radius * 0.3 if f == 0 else radius * (0.3 + 0.7 * f / 5) if f < 6 else radius * 0.9))
+        masks.append(fk.mask_art(c, cx, cy, radius * 0.35 if f == 0 else radius * (0.3 + 0.7 * f / 5) + 4 if f < 6 else radius))
     return fk.FxFrames(out, masks)
 
 
@@ -191,5 +195,5 @@ def earthquake(tier, size, radius, seed=17):
         if f >= 8:
             _fade(c, min(0.95, 0.15 + 0.2 * (f - 7)))
         out.append(c)
-        masks.append(fk.mask_disk(size, size, cx, cy, radius * 0.9))
+        masks.append(fk.mask_art(c, cx, cy, radius + 2))
     return fk.FxFrames(out, masks)

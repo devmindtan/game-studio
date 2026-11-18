@@ -72,7 +72,7 @@ def impact_burst(tier, size, radius, pal, seed=21):
             if k >= 1:
                 _fade(c, min(0.95, 0.1 + 0.18 * k))
         out.append(c)
-        masks.append(fk.mask_disk(size, size, cx, cy, radius * 0.25 if f == 0 else radius * 0.55 if f == 1 else radius * (0.5 + 0.5 * (f - 1) / 3) if f < 5 else radius * 0.4))
+        masks.append(fk.mask_art(c, cx, cy, radius * 0.3 if f == 0 else radius * 0.6 if f == 1 else radius * (0.5 + 0.5 * (f - 1) / 3) + 3 if f < 5 else radius * 0.5))
     return fk.FxFrames(out, masks)
 
 
@@ -117,7 +117,7 @@ def earth_burst(tier, size, radius, seed=31):
         if f >= 8:
             _fade(c, min(0.95, 0.1 + 0.2 * (f - 7)))
         out.append(c)
-        masks.append(fk.mask_disk(size, size, cx, cy, radius * 0.85))
+        masks.append(fk.mask_art(c, cx, cy, radius * 0.95))
     return fk.FxFrames(out, masks)
 
 
@@ -208,5 +208,5 @@ def lightning_strike(tier, w, h, ground, radius, seed=51):
             if k >= 1:
                 _fade(c, min(0.95, 0.1 + 0.18 * k))
         out.append(c)
-        masks.append(fk.mask_disk(w, h, cx, ground, radius * 0.5 if 2 <= f <= 3 else 0))
+        masks.append(fk.mask_art(c, cx, ground, radius * 0.75 if 2 <= f <= 3 else 0))
     return fk.FxFrames(out, masks)

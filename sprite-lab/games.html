@@ -679,7 +679,9 @@ function skillPane(pane,s){
     const kind=fx.anims.some(a=>a.name.startsWith('slash_'))?'melee':fx.has('spin')?'orbit':s.params.cast_range?'cast':'self';
     const anim0=kind==='melee'?'slash_right':effectAnim(fx), hbz=hbAt(fx,anim0);
     const rz=hbz?(hbz.shape==='rect'?Math.max(hbz.half_w,hbz.half_h):hbz.radius)*2*lv.size*(fx.meta.px_scale||1):40;
-    Z=Math.max(1,Math.min(2,(H-24)/(2*rz+40))); VW=W/Z; VH=H/Z;
+    // fit the whole scene: the effect's size AND, for cast skills, the hero + cast range + target
+    const castW=kind==='cast'?Number(s.params.cast_range||0)+rz+120:2*rz+160;
+    Z=Math.max(0.5,Math.min(2,(H-24)/(2*rz+40),W/castW)); VW=W/Z; VH=H/Z;
     FEET={x:kind==='cast'?Math.max(40,VW/2-Number(s.params.cast_range||0)):VW*0.36,y:VH/2+24};
     const hb0=hero.meta.body, hc={x:FEET.x+(hb0?(hb0.center[0]-hero.anchor[0])*2:0),y:FEET.y+(hb0?(hb0.center[1]-hero.anchor[1])*2:-26)};
     const anim=kind==='melee'?'slash_right':effectAnim(fx), sc=2*lv.size, hb=hbAt(fx,anim);

@@ -31,6 +31,22 @@ def mask_disk(w, h, cx, cy, r):
     return m
 
 
+def mask_art(c, cx, cy, r, alpha=96):
+    """Hit mask cut from the art itself: the solid pixels of frame c within r of
+    (cx, cy). The main mass counts exactly as drawn; rays, sparks and debris flying
+    past r do not (user 2026-11-18: masks set by a ratio came out smaller than the art)."""
+    m = Canvas(c.width, c.height)
+    if r <= 0:
+        return m
+    src = c.img.load()
+    dst = m.img.load()
+    for y in range(max(0, int(cy - r)), min(c.height, int(cy + r) + 1)):
+        for x in range(max(0, int(cx - r)), min(c.width, int(cx + r) + 1)):
+            if (x - cx) ** 2 + (y - cy) ** 2 <= r * r and src[x, y][3] >= alpha:
+                dst[x, y] = (255, 255, 255, 255)
+    return m
+
+
 def layer(size_w, size_h=None):
     return Canvas(size_w, size_h or size_w)
 
