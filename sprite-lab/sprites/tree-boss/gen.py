@@ -2,8 +2,8 @@
 """Generator cho "tree-boss" (Mộc Yêu): boss vùng Rừng Âm U (Bách Ải 6A, design/bosses.md).
 
 Một cây cổ thụ còng lưng biết đi: tán lá rậm tối trên đầu, thân gỗ nứt có khuôn mặt (hốc mắt lục phát sáng,
-miệng khe), hai tay là cành khô, phần dưới là chùm rễ bò sát đất. Quay phải. Frame 48x48, neo giữa chân trên đất (24, 47).
-move 4 (lắc lư, chùm rễ trườn: từng cặp rễ vươn ra rồi co lại, không có chân), attack 3 (giơ cành → cắm xuống đất: rễ trồi), hurt 2, death 4 (gãy đổ, lá rụng).
+miệng khe), hai tay là cành khô, phần dưới là rễ bạnh vè to ở gốc, bò thấp sát đất. Quay phải. Frame 48x48, neo giữa chân trên đất (24, 47).
+move 4 (lắc lư; rễ bạnh vè bò sát đất lần lượt trượt đầu rễ tới trước, không nhấc lên, không có chân), attack 3 (giơ cành → cắm xuống đất: rễ trồi), hurt 2, death 4 (gãy đổ, lá rụng).
 Chạy: gamekit art run tree-boss
 """
 
@@ -40,32 +40,28 @@ def disk(c, x, y, r, col):
     c.ellipse(round(x - r), round(y - r), round(x + r), round(y + r), col, fill=True)
 
 
-# the root mass: (start x on the trunk flare, end x on the ground, bend up px); seven roots fan out
-ROOTS = [(15, 2, 4), (18, 8, 3), (21, 14, 2), (24, 24, 1), (27, 34, 2), (30, 40, 3), (33, 46, 4)]
+# buttress roots (user 2026-11-18: thin arched roots read as spider legs): wide wedges that grow out of
+# the trunk foot and run LOW along the ground, uneven lengths, tapering, a forked rootlet at the end.
+# (root x on the trunk, length, side -1 left / +1 right, wedge height at the trunk)
+ROOTS = [(16, 12, -1, 6), (20, 6, -1, 4), (24, 3, 1, 3), (28, 7, 1, 4), (32, 13, 1, 6)]
 
 
 def roots(c, base, phase):
-    """Crawling roots instead of legs (user 2026-11-18: the lower body must read as moving roots).
-    phase 0..3 sends a wave along the fan: one root pair reaches out and lifts, its neighbours pull in,
-    so the mass ripples like it drags itself forward."""
-    for k, (x0, x1, bend) in enumerate(ROOTS):
-        w = (k - phase) % 4            # 0 = reaching, 2 = pulled in
-        reach = {0: 2, 1: 1, 2: -1, 3: 0}[w] * (1 if x1 >= x0 else -1)
-        lift = 2 if w == 0 else 0
-        xe = x1 + reach
-        xm = (x0 + xe) / 2
-        ym = base - 2 - bend - lift
-        pts = [(x0, base - 8), (round(xm), round(ym)), (xe, base)]
-        col = ROOT if k % 2 == 0 else BARK_D   # darker than the trunk, so each root reads on its own
-        for o in (-1, 0, 1):   # 3 px thick where it leaves the trunk
-            c.line(pts[0][0], pts[0][1] + o, pts[1][0], pts[1][1] + o, col)
-        c.line(pts[1][0], pts[1][1], pts[2][0], pts[2][1], col)        # 2 px thick, ending on the floor row
-        c.line(pts[1][0], pts[1][1] - 1, pts[2][0], pts[2][1] - 1, col)
-        c.line(pts[0][0], pts[0][1] - 1, pts[1][0], pts[1][1] - 1, BARK_L)   # lit top edge
-        c.pixel(pts[2][0], pts[2][1], BARK_D)
-        if w == 0:                     # the reaching tip curls and kicks up a speck of earth
-            c.pixel(xe + (1 if xe >= 24 else -1), base, BARK)
-            c.pixel(xe + (2 if xe >= 24 else -2), base - 1, MOSS)
+    """Wedge-shaped buttress roots hugging the ground. Walking: the roots take turns sliding their tips
+    forward a pixel or two and back (the tree drags itself), never lifting off the ground."""
+    for k, (x0, length, side, hgt) in enumerate(ROOTS):
+        slide = (0, 1, 2, 1)[(k + phase) % 4] * side
+        tip = x0 + side * length + slide
+        # the wedge: from the trunk foot down to the tip on the floor
+        c.polygon([(x0, base - hgt), (x0 - side, base), (tip, base)], ROOT if k % 2 == 0 else BARK)
+        c.line(x0, base - hgt, tip, base, BARK_L)            # lit top edge along the root
+        c.line(x0, base - hgt + 1, x0 - side, base, OUTLINE)  # dark inner edge: a gap between roots
+        # a forked rootlet near the tip, flat on the ground
+        fx = x0 + side * (length * 2 // 3) + slide
+        c.line(fx, base, fx + side * 3, base, BARK_D)
+        c.pixel(fx + side * 2, base - 1, BARK_D)
+        if (k + phase) % 4 == 2:   # the tip that slid forward kicks up a speck of earth
+            c.pixel(tip + side, base - 1, MOSS)
 
 
 def tree(sway=0, arms=0, legs=0, dy=0, eyes=True, lean=0):
@@ -75,7 +71,7 @@ def tree(sway=0, arms=0, legs=0, dy=0, eyes=True, lean=0):
     # trunk (slightly wider at the bottom)
     top = 18 + dy
     # the trunk flares into the root mass at the bottom (no legs)
-    c.polygon([(16 + lean, top), (32 + lean, top), (33, base - 7), (34, base - 5), (14, base - 5), (15, base - 7)], BARK)
+    c.polygon([(16 + lean, top), (32 + lean, top), (33, base - 5), (32, base - 2), (16, base - 2), (15, base - 5)], BARK)
     c.line(18 + lean, top + 2, 14, base - 5, BARK_L)
     c.line(30 + lean, top + 4, 34, base - 6, BARK_D)
     c.line(24 + lean, top + 14, 23, base - 5, BARK_D)   # crack
