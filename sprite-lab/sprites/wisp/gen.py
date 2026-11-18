@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Generator cho "wisp" (Ma Trơi): quái bay zig-zag của vùng Rừng Âm U (Bách Ải, đợt 6A).
 
-Một đốm lửa ma xanh lục lam: lõi trắng nhạt, thân lửa xanh, ngọn lửa lay trên đỉnh, đuôi mảnh phía dưới,
+Một đốm lửa ma xanh lam lạnh (khác màu thạch nhầy): lõi trắng nhạt, thân lửa xanh, ngọn lửa lay trên đỉnh, đuôi mảnh phía dưới,
 hai mắt tối. Vật bay: frame 24x24, neo ở tâm thân (12, 12), ground=False.
 move 4 (ngọn lửa lay, thân nhấp nhô), attack 3 (bùng sáng, lao), hurt 2, death 4 (tan thành đốm sáng).
 Chạy: gamekit art run wisp
@@ -30,10 +30,10 @@ SIZE = 24
 ANCHOR = (12.0, 12.0)
 OUTLINE = "#0e1a22"
 PAL = {
-    "d": "#1f6a72",   # flame rim (deep teal)
-    "m": "#3ac0b0",   # flame body
-    "l": "#9af0d8",   # light
-    "w": "#eafff6",   # white core
+    "d": "#2a3a9a",   # flame rim (deep cold blue; not the slimes' teal)
+    "m": "#5a7aff",   # flame body
+    "l": "#b0c8ff",   # light
+    "w": "#f0f4ff",   # white core
     "e": "#0e1a22",   # eyes
 }
 
