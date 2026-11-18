@@ -565,14 +565,15 @@ function itemEffects(m){
       (sp.every?'Mỗi '+sp.every+' giây':sp.cooldown?'Kích hoạt, nghỉ '+sp.cooldown+' giây':
        sp.every_kills?'Mỗi '+sp.every_kills+' quái hạ':sp.threshold?'Khi máu dưới '+Math.round(sp.threshold*100)+'%':'Một lần mỗi trận');
     // the sprites run.gd actually draws for this special (see trigger_special / _ring_fx)
-    let auraInfo=buff?it.aura:null;
+    let auraInfo=buff?it.aura:null, auraBackInfo=buff?it.aura_back:null, auraFront=!(buff&&it.aura_layer==='back');
     if(!buff&&sp.buff){ const all=(game.items.buffs||[]).concat(game.items.special_buffs||[]);
-      const bi=all.find(x=>x.id===sp.buff); if(bi&&bi.aura) auraInfo=bi.aura; }
+      const bi=all.find(x=>x.id===sp.buff);
+      if(bi){ auraInfo=bi.aura||null; auraBackInfo=bi.aura_back||null; auraFront=(bi.aura_layer||'front')!=='back'; } }
     const ring=!buff&&['pulse','freeze_nova','retaliate'].includes(kind);
     const status=!buff?({chain_shock:'shock',burn_aura:'burn',freeze_nova:'freeze'}[kind]||null):null;
     const heroInfo=(game.heroes.find(h=>h.id===it.class)||game.heroes[0]||{}).sprite;
     const sh={};
-    [['hero',heroInfo],['dummy',dummy&&dummy.sprite],['aura',auraInfo],
+    [['hero',heroInfo],['dummy',dummy&&dummy.sprite],['aura',auraInfo],['auraBack',auraBackInfo],
      ['ring',ring?anySprite('stomp-i'):null],['status',status?anySprite('status-'+status):null],
      ['scorch',kind==='burn_aura'?anySprite('scorch'):null]]
       .forEach(([k,info])=>{ if(info) sheetOf(info).then(x=>{sh[k]=x;}); });
@@ -587,8 +588,10 @@ function itemEffects(m){
       drawGround(g,hx,hy,1,1e9,VW,VH);
       if(visual) drawHb(g,{shape:'circle',radius:R},hx,hy,1,on);
       if(sh.scorch) sh.scorch.draw(g,'loop',t,dx,hy,1);
-      if(sh.aura) sh.aura.draw(g,sh.aura.has('loop')?'loop':sh.aura.anims[0].name,t,hx,hy,2);
+      if(sh.auraBack) sh.auraBack.draw(g,'loop',t,hx,hy,2);
+      if(sh.aura&&!auraFront) sh.aura.draw(g,'loop',t,hx,hy,2);
       if(sh.hero) sh.hero.draw(g,'idle',t,hx,hy,2);
+      if(sh.aura&&auraFront) sh.aura.draw(g,'loop',t,hx,hy,2);
       if(sh.dummy){
         const dsc=Math.max(1.6,(dummy.stats&&dummy.stats.scale)||2);
         sh.dummy.draw(g,'move',t,dx,hy,dsc,true);

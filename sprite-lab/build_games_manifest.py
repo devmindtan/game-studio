@@ -448,6 +448,8 @@ def items_of(root, data, cfg, monsters):
                 if it.get("aura"):   # the aura drawn around the hero while this buff is on
                     e["aura"] = sprite_info(root, str(it["aura"]))
                     e["aura_layer"] = it.get("aura_layer", "back")
+                if it.get("aura_back"):   # far half of a horizontal 3D orbit
+                    e["aura_back"] = sprite_info(root, str(it["aura_back"]))
                 if it.get("special_only"):   # granted by equipment, never a ground pickup
                     out["special_buffs"].append(e)
                     continue
