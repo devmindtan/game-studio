@@ -178,9 +178,10 @@ Test của game (`gameplay_rules_test`) chặn sprite có `px_scale` mà sai chu
 - **Sinh vật không phải người thì di chuyển bằng bộ phận của chính nó** (người dùng 2026-11-18: boss cây có "chân"
   thay vì rễ): cây trườn bằng chùm rễ, rắn uốn thân, ma lơ lửng có đuôi, nhầy co giãn. Không gắn chân người vào
   thứ không có chân; phần di chuyển phải tương phản với thân (màu/viền riêng) để đọc được ở 1x. Rễ cây là
-  **nêm to ở gốc (bạnh vè), bò thấp sát đất, dài ngắn không đều**; nét mảnh cong vòng lên tỏa đều đọc thành chân nhện. Cách đọc ra rễ nhất: **gốc ngập trong gò đất, rễ
-  cắm xuống và trồi lên lặn lại vào đất** (rễ biến vào đất thì không thể là chân). Cành/tay chĩa xuống chạm
-  đất hai bên thân cũng đọc thành chân: tư thế nghỉ để cành ngang vai, vểnh lên.
+  **nhiều rễ riêng rẽ** (5–7, đặt tay từng chiếc): to ở gốc, thon dần, xoắn, có mấu/gai, **đầu rễ cong vểnh
+  lên**, dài ngắn và hướng không đều, mỗi rễ có viền tối riêng để tách nhau (người dùng 2026-11-18). Tránh:
+  nét mảnh tỏa đều (chân nhện), một khối nêm hoặc gò đất liền (không thấy từng rễ). Cành/tay chĩa xuống
+  chạm đất hai bên thân đọc thành chân: tư thế nghỉ để cành ngang vai, vểnh lên.
 
 ## Godot 4.7
 

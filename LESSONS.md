@@ -86,3 +86,4 @@ Cột "Chặn bằng" ưu tiên theo thứ tự: **công cụ / test tự kiểm
 - 2026-11-18: boss cây Mộc Yêu có 4 "chân" que thay vì rễ → vẽ theo khuôn người (thân + chân) cho sinh vật không có chân; chặn bằng rule trong skill pixel-sprite (sinh vật di chuyển bằng bộ phận của chính nó, tương phản với thân).
 - 2026-11-18: rễ Mộc Yêu vẽ lại vẫn thành "chân nhện" → nét mảnh, cong vòng lên, tỏa đều quanh thân; chặn bằng rule skill pixel-sprite: rễ là nêm bạnh vè to ở gốc, bò thấp sát đất, dài ngắn không đều.
 - 2026-11-18: lần 3 người dùng vẫn chưa thấy Mộc Yêu là rễ → gốc lỗi gồm cả hai cành tay chĩa xuống đất hai bên thân (đọc thành chân) và rễ đứng trên đất; sửa bằng gò đất ngập gốc, rễ cắm/lặn vào đất, cành nghỉ vểnh lên; chặn bằng rule skill pixel-sprite.
+- 2026-11-18: lần 4 Mộc Yêu: người dùng muốn "nhiều phần rễ cong lên, gai góc, không phải 1 khối" → gò đất/nêm là một khối; chặn bằng rule skill pixel-sprite (5–7 rễ riêng, đầu cong vểnh, gai, viền tách).
