@@ -40,6 +40,7 @@ cmd_help() {
 gamekit $VERSION — workspace: $WS
 
 Project
+  notify                       play the completion / approval chime (agents: after finishing a task)
   list                         games in games/, with version and engine
   new <slug> ["Title"]         new game from the framework template (+ Godot, gamekit addon, export presets)
   install <game>               (re)install the gamekit addon, presets, Makefile into a game
@@ -778,6 +779,13 @@ cmd_smoke_web() { local g; g="$(resolve_game "${1:-}")"; "$KIT/build/smoke_web.s
 sub="${1:-help}"; shift || true
 case "$sub" in
   help|-h|--help) cmd_help ;;
+  notify)  # completion / approval chime (user 2026-11-18)
+    wav="$KIT/assets/notify.wav"; [[ -f "$wav" ]] || die "missing $wav"
+    { command -v paplay >/dev/null 2>&1 && paplay "$wav" 2>/dev/null; } \
+      || { command -v aplay >/dev/null 2>&1 && aplay -q "$wav" 2>/dev/null; } \
+      || { command -v canberra-gtk-play >/dev/null 2>&1 && canberra-gtk-play -f "$wav" 2>/dev/null; } \
+      || echo "gamekit: no working audio player (paplay/aplay/canberra-gtk-play)" >&2
+    ;;
   list) cmd_list ;;
   doctor) cmd_doctor ;;
   new) cmd_new "$@" ;;

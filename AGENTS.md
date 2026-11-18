@@ -130,6 +130,11 @@ xuất kéo dài thì khuyên người dùng mở phiên mới ở đó.
 - **Truy vấn**: `graphify explain "<symbol>" --graph <khu-vực>/graphify-out/graph.json`, `graphify path "A" "B" --graph <khu-vực>/graphify-out/graph.json` (hoặc dùng đường dẫn mặc định nếu đang ở đúng khu vực).
 - **Quy ước**: `graphify-out/` là artifact sinh ra, **không commit**. Thay đổi rộng hoặc codebase lạ: cập nhật/đọc graph trước rồi mới sửa.
 
+## Âm thanh báo (người dùng 2026-11-18)
+- Chạy `gamekit notify` sau khi một task đã kiểm chứng xong (và ngay trước khi hỏi người dùng để xin chấp thuận/ý kiến).
+- File là `tools/gamekit/assets/notify.wav` — chuông hai nốt, tự sinh bằng code, ~0,58 s. `gamekit notify` thử `paplay` → `aplay` → `canberra-gtk-play`; không có player thì chỉ in cảnh báo, không dừng việc.
+- Mỗi lượt làm việc báo một lần, sau khi commit. Không dùng cho từng bước nhỏ.
+
 ## Sai một lần → sửa rule (bắt buộc, chỉ thị của người dùng từ 2026-11-16)
 
 Mỗi khi agent làm sai, hoặc người dùng chỉ ra lỗi, thì **sửa lỗi chưa phải là xong**. Trong cùng lượt đó:
