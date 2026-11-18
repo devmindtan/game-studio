@@ -607,7 +607,7 @@ function drawHb(g,hb,cx,cy,sc,on){ g.save(); g.globalAlpha=on?1:.4; g.lineWidth=
   g.restore();}
 function skills(m){
   m.appendChild(el('h2',{},'Kỹ năng'));
-  m.appendChild(el('p',{class:'lead'},'Mọi kỹ năng trong pool nâng cấp của class: demo ra chiêu đúng hitbox và nhịp frame của sprite, và bảng giá trị theo từng cấp (tính như PlayerStats của game).'));
+  m.appendChild(el('p',{class:'lead'},'Mọi kỹ năng trong pool nâng cấp của class: demo ra chiêu đúng hitbox và nhịp frame của sprite, và bảng giá trị theo từng cấp (tính như PlayerStats của game). Góc nhìn cố định ở mọi chiêu; dùng − / + để thu nhỏ / phóng to tầm nhìn.'));
   if(!game.skills.length){ m.appendChild(el('div',{class:'empty'},'Game chưa có kỹ năng.')); return; }
   // a deep link to a skill opens its class (two classes may share an id, e.g. dash: the current class wins)
   const hb=decodeURIComponent(location.hash.slice(1)).split('/');
@@ -650,14 +650,25 @@ function skillPane(pane,s){
   const hbBtn=el('button',{class:'btn on'},'Hitbox'); hbBtn.onclick=()=>{showHb=!showHb; hbBtn.classList.toggle('on',showHb);};
   const spSel=el('select',{class:'ctrl'},el('option',{value:'0.25'},'0.25×'),el('option',{value:'0.5'},'0.5×'),el('option',{value:'1',selected:''},'1×'),el('option',{value:'2'},'2×'));
   spSel.onchange=()=>{speed=Number(spSel.value);};
-  [el('span',{class:'muted'},'Xem:'),lvSel,playB,hitB,hbBtn,spSel].forEach(x=>ctl.appendChild(x));
+  const zoomOut=el('button',{class:'btn'},'−'); zoomOut.title='Thu nhỏ tầm nhìn';
+  zoomOut.onclick=()=>{zoomMul=Math.max(0.6,Math.round((zoomMul-0.2)*10)/10);};
+  const zoomIn=el('button',{class:'btn'},'+'); zoomIn.title='Phóng to tầm nhìn';
+  zoomIn.onclick=()=>{zoomMul=Math.min(2,Math.round((zoomMul+0.2)*10)/10);};
+  [el('span',{class:'muted'},'Xem:'),lvSel,playB,hitB,hbBtn,spSel,
+    el('span',{class:'muted'},'Tầm:'),zoomOut,zoomIn].forEach(x=>ctl.appendChild(x));
   card.appendChild(ctl);
   // Demo like the game: the real map tiles at game scale, one slime as a training
   // dummy placed in reach, the effect placed the way run.gd places it (body centre,
   // or cast_range towards the target), and the hit shown as in game: red flash,
   // damage number, hp bar; it never dies or fades, the loop simply repeats.
   const W=720,H=300;
-  let Z=2, VW=W/2, VH=H/2;         // zoom: 2x for small attacks, less for big ones so the whole area fits
+  // Rule (user 2026-11-18): one fixed, distant view for every skill. The old
+  // auto-zoom made small attacks fill the stage and clipped the edges of big
+  // ones; only the −/+ buttons below may change the view now.
+  const BASE_Z=0.7;     // fits a level-5 god hammer + pool on a 720x300 stage
+  let zoomMul=1;
+  let Z=BASE_Z, VW=W/Z, VH=H/Z;
+  const setView=()=>{ Z=BASE_Z*zoomMul; VW=W/Z; VH=H/Z; };
   let FEET={x:130,y:100};
   // the demo uses the hero of the skill's own class
   const heroInfo=(game.heroes.find(h=>h.id===s.class)||game.heroes[0]||{}).sprite;
@@ -672,17 +683,20 @@ function skillPane(pane,s){
     c.globalCompositeOperation='source-atop'; c.fillStyle=col; c.fillRect(0,0,tmp.width,tmp.height); c.globalCompositeOperation='source-over';
     g.drawImage(tmp,Math.round(x-(flip?w-sh.anchor[0]:sh.anchor[0])*sc),Math.round(y-sh.anchor[1]*sc)); }
   function scene(lv){
+    setView();
     const fx=sheets[lv.sprite], hero=heroInfo&&sheets[heroInfo.name], sl=dummy&&sheets[dummy.sprite.name];
     if(!fx||!hero||!sl) return null;
     const how=s.params.cast||'';
     if(how==='active'||how==='wave'||how==='projectile') return moveScene(lv,fx,hero,sl,how);
     const kind=fx.anims.some(a=>a.name.startsWith('slash_'))?'melee':fx.has('spin')?'orbit':s.params.cast_range?'cast':'self';
-    const anim0=kind==='melee'?'slash_right':effectAnim(fx), hbz=hbAt(fx,anim0);
-    const rz=hbz?(hbz.shape==='rect'?Math.max(hbz.half_w,hbz.half_h):hbz.radius)*2*lv.size*(fx.meta.px_scale||1):40;
-    // fit the whole scene: the effect's size AND, for cast skills, the hero + cast range + target
-    const castW=kind==='cast'?Number(s.params.cast_range||0)+rz+120:2*rz+160;
-    Z=Math.max(0.5,Math.min(2,(H-24)/(2*rz+40),W/castW)); VW=W/Z; VH=H/Z;
-    FEET={x:kind==='cast'?Math.max(40,VW/2-Number(s.params.cast_range||0)):VW*0.36,y:VH/2+24};
+    // tall effects (cột sáng, búa thần) draw far above their anchor: place the
+    // hero so the whole effect, including its pool below the anchor, fits the view
+    const fpx=fx.meta.px_scale||1, drawSc=2*lv.size*fpx;
+    const rise=(fx.anchor[1]||0)*drawSc, below=(fx.fs[1]-fx.anchor[1])*drawSc;
+    const off=kind==='cast'?26:0;   // the effect anchor sits at the hero's body centre
+    const lo=rise+off+16, hi=VH-24-below-16+off;
+    FEET={x:kind==='cast'?Math.max(40,VW/2-Number(s.params.cast_range||0)):VW*0.36,
+          y:Math.min(hi,Math.max(VH/2+24,lo))};
     const hb0=hero.meta.body, hc={x:FEET.x+(hb0?(hb0.center[0]-hero.anchor[0])*2:0),y:FEET.y+(hb0?(hb0.center[1]-hero.anchor[1])*2:-26)};
     const anim=kind==='melee'?'slash_right':effectAnim(fx), sc=2*lv.size, hb=hbAt(fx,anim);
     const hs=sc*(fx.meta.px_scale||1);   // hit geometry in sprite pixels (draw() applies px_scale itself)
@@ -707,7 +721,7 @@ function skillPane(pane,s){
     const dash=how==='active', shot=how==='projectile', time=Number(s.params.time||0.18), speed=Number(s.params.speed||300);
     const fly=shot?'fly_right':'sweep_right';
     const travel=dash?Number(s.params.distance||130):shot?Math.min(speed*Number(s.params.duration||1),260):speed*fx.duration(fly);
-    Z=Math.max(1,Math.min(2,(W-40)/(travel+160))); VW=W/Z; VH=H/Z;
+    setView();
     FEET={x:60,y:VH/2+24};
     const hb0=hero.meta.body, hc={x:FEET.x+(hb0?(hb0.center[0]-hero.anchor[0])*2:0),y:FEET.y+(hb0?(hb0.center[1]-hero.anchor[1])*2:-26)};
     const ssc=dummy.stats.scale||2, sb=sl.meta.body||{center:sl.anchor,radius:8};

@@ -101,6 +101,10 @@ trang tải), để xem và quyết định có áp dụng vào game không:
 | Vật phẩm | mọi vật phẩm trong `assets/data/items.json`: đồ nhặt trong ải (kèm số liệu) và trang bị |
 | Hiệu ứng | hiệu ứng trạng thái vẽ lên người (buff/debuff: chảy máu, bỏng, độc…, cho mọi nhân vật); trống khi game chưa có |
 
+**Rule góc nhìn skill demo** (người dùng 2026-11-18): mọi chiêu dùng một góc nhìn cố định (`BASE_Z` trong
+`games.html`), không tự phóng to theo kích thước sprite — chiêu nhỏ đừng phóng to, chiêu lớn vẫn thấy toàn bộ
+vùng. Chỉ nút `−` / `+` mới đổi tầm nhìn. Khi thêm hoặc sửa demo chiêu, giữ nguyên rule này.
+
 Trang chỉ để xem; đánh giá và quyết định trao đổi trực tiếp với agent. Script dựng manifest và server **chỉ đọc**
 repo game.
 
