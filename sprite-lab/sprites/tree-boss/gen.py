@@ -2,8 +2,8 @@
 """Generator cho "tree-boss" (Mộc Yêu): boss vùng Rừng Âm U (Bách Ải 6A, design/bosses.md).
 
 Một cây cổ thụ còng lưng biết đi: tán lá rậm tối trên đầu, thân gỗ nứt có khuôn mặt (hốc mắt lục phát sáng,
-miệng khe), hai tay là cành khô, gốc ngập trong một gò đất, rễ to cắm xuống đất. Quay phải. Frame 48x48, neo giữa chân trên đất (24, 47).
-move 4 (lắc lư; gốc ngập trong gò đất, rễ cắm xuống đất, vòng rễ trồi lên lặn xuống, đất văng phía sau), attack 3 (giơ cành → cắm xuống đất: rễ trồi), hurt 2, death 4 (gãy đổ, lá rụng).
+miệng khe), hai tay là cành khô, phần dưới là nhiều rễ riêng rẽ xoắn, có gai, đầu rễ cong vểnh lên. Quay phải. Frame 48x48, neo giữa chân trên đất (24, 47).
+move 4 (lắc lư; các rễ lần lượt cuộn đầu lên rồi duỗi, bám và kéo thân đi), attack 3 (giơ cành → cắm xuống đất: rễ trồi), hurt 2, death 4 (gãy đổ, lá rụng).
 Chạy: gamekit art run tree-boss
 """
 
@@ -48,45 +48,51 @@ SOIL_D, SOIL, SOIL_L = "#2e2014", "#4a3422", "#6a4c30"
 GRASS = "#4a7a32"
 
 
+# User 2026-11-18 (fourth try): the roots are MANY separate parts that curl up, gnarled and thorny, not
+# one mass. Each root is hand-placed: thick at the trunk, tapering, twisting, its tip hooking up; thorn
+# spurs and knots along it; lengths and directions uneven (an even fan of thin arcs reads as spider legs).
+# Points are (x, y above the floor) from the trunk foot to the tip; thorns are indexes of points with a spur.
+ROOT_PATHS = [
+    ([(16, 7), (11, 4), (6, 2), (3, 3), (1, 6), (2, 9)], (2,)),          # long left, hooks up
+    ([(19, 5), (16, 1), (12, 0), (10, 2), (10, 4)], (1,)),               # left, curls up
+    ([(22, 4), (21, 1), (20, 0)], ()),                                   # short stub
+    ([(27, 4), (29, 1), (31, 0), (33, 2)], ()),                          # short right
+    ([(30, 6), (34, 2), (38, 1), (41, 3), (41, 6)], (2,)),               # right, curls up
+    ([(32, 8), (37, 5), (42, 3), (45, 4), (46, 7), (44, 10)], (1, 3)),   # long right, hooks back
+]
+
+
 def roots(c, base, phase, front=False):
-    """Back pass (front=False): two thick roots from the trunk foot down the mound.
-    Front pass: the earth mound, root loops on it that rise out of the soil and dive back in (they ripple
-    with the walk), grass tufts and clods thrown behind."""
+    """Front pass only: every root drawn on its own with a dark rim, so the parts stay separate.
+    Walking: the roots take turns curling their tips up a pixel and straightening (they grip and drag)."""
     if not front:
         return
-    # the mound: a dome of earth 8 rows high, lit top edge
-    c.ellipse(3, base - 8, 45, base + 8, SOIL, fill=True)
-    c.ellipse(7, base - 8, 41, base + 2, SOIL_L, fill=True)
-    c.ellipse(8, base - 7, 40, base + 4, SOIL, fill=True)
-    for yy in range(base + 1, base + 9):   # cut at the floor row: the mound sits on the ground
+    for k, (path, thorns) in enumerate(ROOT_PATHS):
+        lift = 2 if (k + phase) % 3 == 0 else 0
+        pts = []
+        for n, (x, y) in enumerate(path):
+            tip = n >= len(path) - 2 and len(path) > 2
+            pts.append((x, base - y - (lift if tip else 0)))
+        n = len(pts) - 1
+        widths = [max(1, round(3.0 * (1 - t / max(1, n)))) for t in range(n)]
+        for (ax, ay), (bx, by), w in zip(pts, pts[1:], widths):   # dark rim first: keeps roots apart
+            c.line(ax, ay, bx, by, OUTLINE, w + 1)
+        for (ax, ay), (bx, by), w in zip(pts, pts[1:], widths):
+            c.line(ax, ay, bx, by, ROOT if k % 2 else BARK, w)
+        for (ax, ay), (bx, by), w in zip(pts, pts[1:], widths):   # lit upper edge
+            if w > 1:
+                c.line(ax, ay - 1, bx, by - 1, BARK_L)
+        for t in thorns:   # thorn spurs pointing up and out
+            x, y = pts[t]
+            out = 1 if x >= 24 else -1
+            c.pixel(x + out, y - 2, BARK_D)
+            c.pixel(x + 2 * out, y - 3, BARK_L)
+        if n >= 3:   # a knot on the longer roots
+            kx, ky = pts[1]
+            c.pixel(kx, ky - 1, BARK_L)
+            c.pixel(kx + 1, ky - 1, BARK_D)
+    for yy in range(base + 1, base + 4):   # thick strokes must not sink below the floor row
         c.line(0, yy, 47, yy, (0, 0, 0, 0))
-    c.line(4, base, 44, base, SOIL_D)
-    # thick roots from the trunk foot down the mound, diving in
-    for x0, x1, y1 in ((17, 10, base - 2), (31, 38, base - 2)):
-        for o in (0, 1, 2):
-            c.line(x0, base - 9 + o, x1, y1 + o // 2, BARK if o < 2 else OUTLINE)
-        c.line(x0, base - 10, x1, y1 - 1, BARK_L)
-    # loops breaking the surface and diving back in
-    for k, (lx, w) in enumerate(((5, 5), (19, 4), (26, 4), (39, 5))):
-        up = 3 + (1 if (k + phase) % 2 else 0)
-        y0 = base - 3 + (1 if lx in (5, 39) else -1)
-        pts = [(lx, y0), (lx + w // 2, y0 - up), (lx + w, y0)]
-        for (ax, ay), (bx, by) in zip(pts, pts[1:]):   # bark, lighter than the soil, with a dark underside
-            c.line(ax, ay + 1, bx, by + 1, OUTLINE)
-            c.line(ax, ay, bx, by, BARK, 2)
-        c.line(pts[0][0], pts[0][1] - 1, pts[1][0], pts[1][1] - 1, BARK_L)
-        c.line(pts[1][0], pts[1][1] - 1, pts[2][0], pts[2][1] - 1, BARK_L)
-        c.pixel(pts[0][0], pts[0][1] + 1, SOIL_D)   # the dark hole where it enters the soil
-        c.pixel(pts[2][0], pts[2][1] + 1, SOIL_D)
-    for gx in (9, 15, 33, 40):
-        c.pixel(gx, base - 7 + (2 if gx in (9, 40) else 0), GRASS)
-        c.pixel(gx + 1, base - 8 + (2 if gx in (9, 40) else 0), GRASS)
-    # clods thrown behind (to the left: it moves right), shifting with the walk
-    for k in range(3):
-        cx = 2 - ((k * 3 + phase * 2) % 6)
-        cy = base - 4 - ((k + phase) % 3) * 2
-        if cx >= 0:
-            c.rect(cx, cy, cx + 1, cy + 1, SOIL_L, fill=True)
 
 
 def tree(sway=0, arms=0, legs=0, dy=0, eyes=True, lean=0):
@@ -95,13 +101,12 @@ def tree(sway=0, arms=0, legs=0, dy=0, eyes=True, lean=0):
     base = 45
     # trunk (slightly wider at the bottom)
     top = 18 + dy
-    roots(c, base, legs)   # roots behind the mound
     # the trunk flares into the root mass at the bottom (no legs)
-    c.polygon([(16 + lean, top), (32 + lean, top), (33, base - 5), (32, base - 2), (16, base - 2), (15, base - 5)], BARK)
+    c.polygon([(16 + lean, top), (32 + lean, top), (33, base - 6), (31, base - 3), (17, base - 3), (15, base - 6)], BARK)
     c.line(18 + lean, top + 2, 14, base - 5, BARK_L)
     c.line(30 + lean, top + 4, 34, base - 6, BARK_D)
     c.line(24 + lean, top + 14, 23, base - 5, BARK_D)   # crack
-    roots(c, base, legs, front=True)   # the mound over the trunk foot and the root ends
+    roots(c, base, legs, front=True)   # many separate gnarled roots over the trunk foot
     # face
     fy = top + 7
     if eyes:
@@ -153,7 +158,7 @@ def fallen(k):
     c = Canvas(S, S)
     base = 45
     h = [22, 14, 7][k]
-    roots(c, base, k, front=True)   # the stump stays in its mound of earth
+    roots(c, base, k, front=True)   # the stump keeps its roots
     c.polygon([(15, base - h), (33, base - h + 3), (34, base), (14, base)], BARK)
     c.line(23, base - h, 25, base, BARK_D)
     for n in range(10 + 4 * k):
