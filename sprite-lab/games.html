@@ -532,6 +532,74 @@ function items(m){
   sec('Nhặt trong ải',game.items.pickups,'Chưa có.');
   sec('Buff (xuất hiện ngẫu nhiên, nhặt để kích hoạt)',game.items.buffs||[],'Chưa có buff.');
   sec('Trang bị ('+game.items.equipment.length+' món: thắng ải và rương rơi ra, mặc ở sảnh)',game.items.equipment,'Game chưa có trang bị.');
+  itemEffects(m);
+}
+
+/* ---------- item skills: legendary "special" effects + buff auras (user 2026-11-18) ------- */
+function itemEffects(m){
+  m.appendChild(el('h2',{},'Kỹ năng từ vật phẩm'));
+  m.appendChild(el('p',{class:'lead'},'Hiệu ứng đặc biệt của trang bị huyền thoại và hào quang của buff, vẽ bằng animation thật của game. Vòng đỏ là tầm ảnh hưởng; mỗi demo lặp theo nhịp của hiệu ứng.'));
+  const list=[
+    ...(game.items.buffs||[]).filter(x=>x.aura).map(x=>({it:x,buff:true})),
+    ...(game.items.equipment||[]).filter(x=>x.special).map(x=>({it:x,buff:false}))
+  ];
+  if(!list.length){ m.appendChild(el('div',{class:'card empty'},'Game chưa có vật phẩm nào có hiệu ứng hình ảnh.')); return; }
+  const dummy=game.monsters.find(x=>x.id==='slime')||game.monsters[0];
+  const grid=el('div',{class:'grid g3'});
+  list.forEach(({it,buff})=>{
+    const sp=buff?null:it.special, kind=buff?'aura':String(sp.kind||'');
+    const R=Math.max(30,Number(buff?60:(sp.radius||120)));
+    const title=buff?(it.name+' · hào quang'):(sp.name||it.name);
+    const cadence=buff?('Khi nhặt, giữ '+Number(it.duration||0)+' giây'):
+      (sp.every?'Mỗi '+sp.every+' giây':sp.cooldown?'Kích hoạt, nghỉ '+sp.cooldown+' giây':
+       sp.every_kills?'Mỗi '+sp.every_kills+' quái hạ':sp.threshold?'Khi máu dưới '+Math.round(sp.threshold*100)+'%':'Một lần mỗi trận');
+    // the sprites run.gd actually draws for this special (see trigger_special / _ring_fx)
+    let auraInfo=buff?it.aura:null;
+    if(!buff&&sp.buff){ const bi=(game.items.buffs||[]).find(x=>x.id===sp.buff); if(bi&&bi.aura) auraInfo=bi.aura; }
+    const ring=!buff&&['pulse','freeze_nova','retaliate'].includes(kind);
+    const status=!buff?({chain_shock:'shock',burn_aura:'burn',freeze_nova:'freeze'}[kind]||null):null;
+    const heroInfo=(game.heroes.find(h=>h.id===it.class)||game.heroes[0]||{}).sprite;
+    const sh={};
+    [['hero',heroInfo],['dummy',dummy&&dummy.sprite],['aura',auraInfo],
+     ['ring',ring?anySprite('stomp-i'):null],['status',status?anySprite('status-'+status):null],
+     ['scorch',kind==='burn_aura'?anySprite('scorch'):null]]
+      .forEach(([k,info])=>{ if(info) sheetOf(info).then(x=>{sh[k]=x;}); });
+    const W=280,H=170,Z=Math.min(1,118/R),VW=W/Z,VH=H/Z;
+    const hx=VW/2-30,hy=VH/2+16,dx=hx+Math.min(R*0.7,95);
+    const period=buff?2.4:Number(sp.every||sp.cooldown||3),lead=0.25,dur=0.7;
+    const visual=!!(auraInfo||ring||status||kind==='burn_aura');
+    const cv=liveCanvas(W,H,(g,t)=>{
+      const u=t%period,on=u>=lead&&u<lead+dur;
+      g.setTransform(1,0,0,1,0,0); g.clearRect(0,0,W,H);
+      g.setTransform(Z,0,0,Z,0,0);
+      drawGround(g,hx,hy,1,1e9,VW,VH);
+      if(visual) drawHb(g,{shape:'circle',radius:R},hx,hy,1,on);
+      if(sh.scorch) sh.scorch.draw(g,'loop',t,dx,hy,1);
+      if(sh.aura) sh.aura.draw(g,sh.aura.has('loop')?'loop':sh.aura.anims[0].name,t,hx,hy,2);
+      if(sh.hero) sh.hero.draw(g,'idle',t,hx,hy,2);
+      if(sh.dummy){
+        const dsc=Math.max(1.6,(dummy.stats&&dummy.stats.scale)||2);
+        sh.dummy.draw(g,'move',t,dx,hy,dsc,true);
+        if(sh.status&&on){
+          const b=sh.dummy.meta.body||{center:sh.dummy.anchor,radius:8};
+          sh.status.draw(g,'loop',t,dx+(b.center[0]-sh.dummy.anchor[0])*dsc,hy+(b.center[1]-sh.dummy.anchor[1])*dsc,b.radius*dsc/8);
+        }
+      }
+      if(sh.ring&&on){
+        const a=sh.ring.has('burst')?hbAt(sh.ring,'burst'):null;
+        const r1=(a&&a.radius?a.radius:25)*(sh.ring.meta.px_scale||1);
+        sh.ring.draw(g,'burst',u-lead,hx,hy,R/Math.max(1,r1));
+      }
+      if(!visual){ g.setTransform(1,0,0,1,0,0); g.fillStyle='#e9eef8'; g.font='12px system-ui';
+        g.textAlign='center'; g.fillText('Không có hiệu ứng hình ảnh riêng',W/2,H-12); }
+    });
+    const card=el('div',{class:'card'},el('div',{class:'row'},
+      el('b',{},title),el('span',{class:'muted small'},cadence)));
+    card.appendChild(el('div',{class:'stage',style:'margin-top:8px;padding:0'},cv));
+    card.appendChild(el('div',{class:'small muted',style:'margin-top:6px'},(sp&&sp.desc)||it.desc||''));
+    grid.appendChild(card);
+  });
+  m.appendChild(grid);
 }
 
 /* ---------- 5. monsters ---------- */

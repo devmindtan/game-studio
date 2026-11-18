@@ -443,6 +443,13 @@ def items_of(root, data, cfg, monsters):
                 e.setdefault("facts", []).append("Tầm hút %g px × chỉ số hút" % float(pick.get("radius", 0)))
             elif group == "buffs":
                 e["facts"] = buff_facts(it, bcfg)
+                e["duration"] = it.get("duration", 0)
+                if it.get("aura"):   # the aura drawn around the hero while this buff is on
+                    e["aura"] = sprite_info(root, str(it["aura"]))
+                    e["aura_layer"] = it.get("aura_layer", "back")
+            elif group == "equipment" and it.get("special"):
+                # a legendary item's "skill": what the game fires, how often, and its reach
+                e["special"] = it["special"]
             out[group].append(e)
     return out
 
