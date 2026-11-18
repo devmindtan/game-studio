@@ -12,10 +12,26 @@ chrome="$(command -v google-chrome || command -v chromium || command -v chromium
 [[ -n "$chrome" ]] || { echo "No Chrome/Chromium found - web build NOT verified." >&2; exit 1; }
 RUN=(); command -v limited >/dev/null 2>&1 && RUN=(limited)
 profile="$(mktemp -d)"; log="$(mktemp)"
-(cd builds/web && exec python3 -m http.server 8765 --bind 127.0.0.1 >/dev/null 2>&1) & http=$!
+# A free port, and proof the server serves THIS build: a fixed port (8765) collided
+# with the Sprite Lab viewer, the server died silently and Chrome smoke-tested the
+# viewer page instead, exit 0 (lesson 2026-11-18).
+port="$(python3 -c 'import socket; s=socket.socket(); s.bind(("127.0.0.1", 0)); print(s.getsockname()[1])')"
+(cd builds/web && exec python3 -m http.server "$port" --bind 127.0.0.1 >/dev/null 2>&1) & http=$!
+cdp="$(python3 -c 'import socket; s=socket.socket(); s.bind(("127.0.0.1", 0)); print(s.getsockname()[1])')"
+want="$(sha256sum builds/web/index.html | cut -d' ' -f1)"
+for _ in $(seq 1 50); do
+  got="$(curl -fsS "http://127.0.0.1:$port/index.html" 2>/dev/null | sha256sum | cut -d' ' -f1 || true)"
+  [[ "$got" == "$want" ]] && break
+  sleep 0.1
+done
+if [[ "$got" != "$want" ]]; then
+  kill $http 2>/dev/null || true
+  echo "smoke-web: http://127.0.0.1:$port does not serve builds/web/index.html (port taken?) - NOT verified" >&2
+  exit 1
+fi
 "${RUN[@]}" "$chrome" --headless=new --no-sandbox --user-data-dir="$profile" --use-angle=swiftshader \
-  --enable-unsafe-swiftshader --window-size=1280,720 --remote-debugging-port=9333 about:blank >/dev/null 2>&1 & browser=$!
+  --enable-unsafe-swiftshader --window-size=1280,720 --remote-debugging-port="$cdp" about:blank >/dev/null 2>&1 & browser=$!
 trap 'kill $browser $http 2>/dev/null; sleep 1; rm -rf "$profile" "$log"' EXIT
 sleep 2
-timeout $(( wait_ms / 1000 + 60 )) node "$kit/web_smoke_cdp.mjs" 9333 http://127.0.0.1:8765/index.html "$wait_ms" builds/web-smoke.png | tee "$log"
+timeout $(( wait_ms / 1000 + 60 )) node "$kit/web_smoke_cdp.mjs" "$cdp" "http://127.0.0.1:$port/index.html" "$wait_ms" builds/web-smoke.png | tee "$log"
 ! grep -q '^EXCEPTION' "$log"
