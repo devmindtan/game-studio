@@ -169,7 +169,7 @@ function liveCanvas(w,h,f){const c=el('canvas',{width:w,height:h}); const g=c.ge
   addPainter({c,f:t=>f(g,t,c)}); return c;}
 
 /* ---------- icons (the game's own ui-icons sprite) ---------- */
-let iconSheet=null;
+let iconSheet=null, gearIcons=null;   // ui-icons (16 px UI icons) and gear-icons (24 px item icons)
 function iconCanvas(name,sc){const c=el('canvas',{width:16*(sc||1),height:16*(sc||1)});
   if(iconSheet&&iconSheet.has(name)){const g=c.getContext('2d'); iconSheet.draw(g,name,0,8*(sc||1),8*(sc||1),sc||1);} return c;}
 function statRow(icon,label,value){return el('div',{class:'stat'},iconCanvas(icon,2),el('span',{class:'k'},label),el('span',{class:'v'},value));}
@@ -191,6 +191,7 @@ async function init(){
 async function selectGame(g){
   game=g; $('gameSel').value=g.slug; $('gameVer').textContent='v'+g.version;
   const ic=gameSprite('ui-icons'); iconSheet=ic?await sheetOf(ic):null;
+  const gi=gameSprite('gear-icons'); gearIcons=gi?await sheetOf(gi):null;
   renderTabs(); render();
 }
 function renderTabs(){
@@ -517,9 +518,12 @@ function items(m){
     const grid=el('div',{class:'grid g3'});
     const SLOT={head:'Đầu',chest:'Ngực',arms:'Tay',legs:'Chân',weapon:'Vũ khí'}, RAR={common:'Thường',rare:'Hiếm',epic:'Sử thi'};
     list.forEach(it=>{ const info=it.sprite; let sh=null; if(info) sheetOf(info).then(x=>{sh=x;});
-      const cv=liveCanvas(96,96,(g,t)=>{ g.clearRect(0,0,96,96); drawGround(g,48,48,1,1e9,96,96);
-        if(sh) sh.draw(g,sh.anims[0].name,t,48,48,Math.max(1,Math.floor(84/Math.max(sh.fs[0],sh.fs[1]))));   // fit the 96 px box
-        else if(it.icon&&iconSheet&&iconSheet.has(it.icon)) iconSheet.draw(g,it.icon,0,48,48,5); });   // equipment: its ui-icons frame
+      const cv=liveCanvas(96,96,(g,t)=>{ g.clearRect(0,0,96,96);
+        if(sh){ drawGround(g,48,48,1,1e9,96,96);   // a world item (pickup / buff): draw it on the ground
+          sh.draw(g,sh.anims[0].name,t,48,48,Math.max(1,Math.floor(84/Math.max(sh.fs[0],sh.fs[1])))); return; }
+        g.fillStyle='#1b2230'; g.fillRect(0,0,96,96);   // no world sprite: its icon
+        const ish=(it.icon&&gearIcons&&gearIcons.has(it.icon))?gearIcons:(it.icon&&iconSheet&&iconSheet.has(it.icon)?iconSheet:null);
+        if(ish) ish.draw(g,it.icon,0,48,48,Math.max(1,Math.floor(88/Math.max(ish.fs[0],ish.fs[1])))); });
       if(it.slot) it.facts=[(SLOT[it.slot]||it.slot)+' · '+(RAR[it.rarity]||it.rarity||'')+(it.class?' · chỉ '+((game.heroes.find(h=>h.id===it.class)||{}).name||it.class):'')].concat(it.facts||[]);
       grid.appendChild(el('div',{class:'itemCard'},el('div',{class:'stage',style:'padding:0;flex:0 0 96px'},cv),
         el('div',{},el('b',{},it.name),el('div',{class:'small muted',style:'margin:2px 0 4px'},it.desc),
