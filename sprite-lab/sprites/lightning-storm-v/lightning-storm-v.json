@@ -1,36 +1,50 @@
 {
-  "frames": 6,
+  "frames": 11,
   "frame_size": [
-    76,
-    76
+    152,
+    152
   ],
   "fps": 12.0,
   "loop": false,
   "anchor": [
-    38.0,
-    38.0
+    76.0,
+    76.0
   ],
   "anchor_source": "explicit",
   "animations": [
     {
       "name": "spell",
       "start": 0,
-      "frames": 6,
+      "frames": 11,
       "fps": 12.0,
       "loop": false,
+      "durations_ms": [
+        80.0,
+        80.0,
+        80.0,
+        60.0,
+        60.0,
+        60.0,
+        70.0,
+        100.0,
+        110.0,
+        120.0,
+        130.0
+      ],
       "hitbox": {
         "shape": "circle",
         "center": [
-          38.0,
-          38.0
+          76.0,
+          76.0
         ],
         "active": [
-          1,
-          4
+          3,
+          5
         ],
-        "radius": 33.0,
-        "inner": 1.0
+        "radius": 84.0,
+        "inner": 0.0
       }
     }
-  ]
+  ],
+  "px_scale": 0.5
 }

@@ -1,9 +1,13 @@
 #!/usr/bin/env python3
 """earthquake-rift-ii: bậc II của earthquake-rift (bậc I là sprite earthquake-rift). Kế thừa bậc trước và thêm một ý
-(lib/tierfx.py: II quầng sáng, III tia lửa, IV vỏ năng lượng, V tia sáng + lõi trắng). Chạy: gamekit art run earthquake-rift-ii
+
+Vẽ bằng sprite-lab/lib/stormfx.py (2026-11-18): mật độ điểm ảnh gấp đôi ("px_scale": 0.5, cùng cỡ trên màn hình),
+có pha mở đầu, trúng, đọng lại và tan. Bậc 2.  Chạy: gamekit art run earthquake-rift-ii
 """
+import json
 import sys
 from pathlib import Path
+
 
 def _ws():
     for p in Path(__file__).resolve().parents:
@@ -11,12 +15,24 @@ def _ws():
             return p
     raise SystemExit("no workspace")
 
+
 HERE = Path(__file__).resolve().parent
 sys.path.insert(0, str(_ws() / "tools/gamekit/pipeline"))
-sys.path.insert(0, str(HERE.parents[1] / "lib"))
-from tierfx import build
-from sheet import export
+sys.path.insert(0, str(Path(__file__).resolve().parents[2] / "lib"))
+import stormfx  # noqa: E402
+from sheet import export  # noqa: E402
+
+NAME = HERE.name
+SIZE = 152
+RADIUS = 66
+C = SIZE / 2
+ANIM = [("spell", stormfx.earthquake(2, SIZE, RADIUS), 12, False,
+         {"durations_ms": stormfx.QUAKE_MS, "hitbox": {"shape": "circle", "center": [C, C], "active": [2, 5], "radius": float(RADIUS), "inner": 0.0}})]
 
 if __name__ == "__main__":
-    build(HERE, "earthquake-rift", 2, "#ffe2a0", "#d08a3a", export, thin=True)
-    print("OK", HERE.name)
+    export(HERE, NAME, ANIM, anchor=(C, C), preview_scale=2, gif_scale=2)
+    meta = HERE / f"{NAME}.json"
+    m = json.loads(meta.read_text())
+    m["px_scale"] = 0.5
+    meta.write_text(json.dumps(m, indent=2) + "\n")
+    print("OK", NAME)

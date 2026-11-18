@@ -1,10 +1,13 @@
 #!/usr/bin/env python3
 """stomp-ii — Dậm đất bậc ii: sóng xung kích lan ra quanh người chơi (giữa để trống).
-Thiết kế chung ở lib/stomp.py; mỗi bậc kế thừa bậc trước. Neo = tâm = tâm thân nhân vật.
-Chạy: gamekit art run stomp-ii
+
+Vẽ bằng sprite-lab/lib/stormfx.py (2026-11-18): mật độ điểm ảnh gấp đôi ("px_scale": 0.5, cùng cỡ trên màn hình),
+có pha mở đầu, trúng, đọng lại và tan. Bậc 2.  Chạy: gamekit art run stomp-ii
 """
+import json
 import sys
 from pathlib import Path
+
 
 def _ws():
     for p in Path(__file__).resolve().parents:
@@ -12,12 +15,24 @@ def _ws():
             return p
     raise SystemExit("no workspace")
 
+
 HERE = Path(__file__).resolve().parent
 sys.path.insert(0, str(_ws() / "tools/gamekit/pipeline"))
-sys.path.insert(0, str(HERE.parents[1] / "lib"))
-from stomp import build
-from sheet import export
+sys.path.insert(0, str(Path(__file__).resolve().parents[2] / "lib"))
+import stormfx  # noqa: E402
+from sheet import export  # noqa: E402
+
+NAME = HERE.name
+SIZE = 128
+RADIUS = 58
+C = SIZE / 2
+ANIM = [("burst", stormfx.stomp(2, SIZE, RADIUS), 12, False,
+         {"durations_ms": stormfx.STOMP_MS, "hitbox": {"shape": "circle", "center": [C, C], "active": [1, 4], "radius": float(RADIUS), "inner": 0.0}})]
 
 if __name__ == "__main__":
-    build(HERE, HERE.name, 2, 64, export)
-    print("OK", HERE.name)
+    export(HERE, NAME, ANIM, anchor=(C, C), preview_scale=2, gif_scale=2)
+    meta = HERE / f"{NAME}.json"
+    m = json.loads(meta.read_text())
+    m["px_scale"] = 0.5
+    meta.write_text(json.dumps(m, indent=2) + "\n")
+    print("OK", NAME)
