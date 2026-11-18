@@ -132,6 +132,22 @@ def frame(spec, i, form=1.0):
                 continue
             px(c, x, y, pal["rim2"])
         (_runic_surface if motif == "runic" else _stone_surface)(c, cx, cy, rx, ry, i, pal)
+    elif motif == "stone":
+        # slabs erupt from the ground and close into the shell (user 2026-11-18)
+        for k in range(4):
+            a = k * TAU / 4 + 0.35
+            x = int(cx + math.cos(a) * rx * 0.80)
+            y0, y1 = cy + ry + 6, cy + math.sin(a) * ry
+            y = int(y0 + (y1 - y0) * min(1.0, form))
+            for dy in range(-2, 3):
+                for dx in range(-2, 3):
+                    if abs(dx) > 2 or (dy == -2 and abs(dx) > 1):
+                        continue
+                    col = pal["out"] if abs(dx) == 2 or dy == 2 else pal["rim2"]
+                    if dy < 0 and abs(dx) <= 1:
+                        col = pal["hot"]
+                    px(c, x + dx, y + dy, col)
+        _stone_surface(c, cx, cy, rx, ry, 0, pal)
     else:
         for k in range(6):
             a = k * TAU / 6 + 0.2
