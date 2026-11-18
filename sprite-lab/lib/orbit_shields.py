@@ -27,22 +27,37 @@ def _h01(x, y, salt):
     return ((h ^ (h >> 16)) & 0xFFFF) / 65536.0
 
 
-def _buckler(c, x, y, ang, scale, lit):
-    ca, sa = math.cos(ang), math.sin(ang)
-    for dy in range(-4, 5):
-        for dx in range(-4, 5):
-            wx, wy = x + dx, y + dy
-            u = (ca * dx + sa * dy) / scale
-            v = (-sa * dx + ca * dy) / scale
-            half = 3.2 if u <= 0 else max(1.0, 3.2 - (u - 0.5) * 0.8)
-            if abs(u) > 3.4 or abs(v) > half:
+# A heater shield, always upright: at 48 px a rotated 7x8 blob is unreadable.
+# Wide flat top, taper to a point, bright rim and a white boss in the middle.
+SHIELD_NEAR = [
+    ".ooooo.",
+    "orrrrro",
+    "orgggro",
+    "orgwgro",
+    "orgggro",
+    ".orgro.",
+    "..ogo..",
+    "...o...",
+]
+SHIELD_FAR = [
+    ".ooo.",
+    "orrro",
+    "ogwgo",
+    ".ogo.",
+    "..o..",
+]
+SHIELD_COLORS = {"o": OUT, "r": RIM, "g": GOLD, "w": HOT}
+
+
+def _buckler(c, x, y, scale, lit):
+    rows = SHIELD_NEAR if scale >= 1.0 else SHIELD_FAR
+    w = max(len(r) for r in rows)
+    for ry, row in enumerate(rows):
+        for rx, ch in enumerate(row):
+            if ch == ".":
                 continue
-            if abs(u) > 2.7 or abs(v) > half - 0.9:
-                px(c, wx, wy, OUT)
-            elif abs(u) < 1.0 and abs(v) < 1.0:
-                px(c, wx, wy, HOT if lit else RIM)
-            else:
-                px(c, wx, wy, RIM if v < -0.5 else GOLD)
+            col = HOT if (lit and ch == "r") else SHIELD_COLORS[ch]
+            px(c, x + rx - w // 2, y + ry - len(rows) // 2, col)
 
 
 def frame(side, i, form=1.0):
@@ -76,7 +91,7 @@ def frame(side, i, form=1.0):
             tx = CX + math.cos(b) * rx
             ty = CY + math.sin(b) * ry
             px(c, tx, ty, RIM if s == 1 else "#ffd96a40")
-        _buckler(c, x, y, a, scale, lit=(k == i % 3 and not far))
+        _buckler(c, x, y, scale, lit=(k == i % 3 and not far))
 
     if form < 1.0 and side == "front":
         px(c, CX, CY, HOT)
