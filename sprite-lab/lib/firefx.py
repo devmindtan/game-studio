@@ -95,17 +95,64 @@ def blast(tier, size, radius, seed=3):
 
 
 METEOR_MS = [90, 90, 60, 50, 50, 60, 70, 80, 110, 120, 120, 130, 140]
+LAVA = "#ff6a1a"
+HOT = "#fff4d0"
+
+
+def _rock(c, x, y, r, tier, rng_seed, outline="#1a0e0e"):
+    """An irregular faceted rock (lit facet up-left, shade down-right); lava veins from II,
+    a white-hot core from IV."""
+    import fxkit as fk
+    rng = random.Random(rng_seed)
+    pts = [(x + math.cos(k * math.tau / 9) * r * rng.uniform(0.75, 1.1), y + math.sin(k * math.tau / 9) * r * rng.uniform(0.75, 1.1)) for k in range(9)]
+    lay = Canvas(c.width, c.height)
+    lay.polygon([(int(px), int(py)) for px, py in pts], ROCK)
+    lay.polygon([(int(px), int(py)) for px, py in pts[4:8]] + [(int(x), int(y))], ASH)
+    lay.polygon([(int(px), int(py)) for px, py in pts[0:1] + pts[5:9]] + [(int(x - r * 0.1), int(y - r * 0.1))], ROCK_L)
+    if tier >= 2:   # glowing lava veins
+        for k in range(1 + tier // 2):
+            a = rng.uniform(0, math.tau)
+            lay.line(int(x), int(y), int(x + math.cos(a) * r * 0.8), int(y + math.sin(a) * r * 0.8), LAVA)
+    if tier >= 4:
+        _disk(lay, x, y, r * 0.3, YEL)
+        _disk(lay, x, y, r * 0.15, HOT)
+    fk.stack(c, lay, outline)
+
+
+def _flame(c, x, y, dx, dy, length, width, cols):
+    """A tapered flame trailing back from (x, y) along -(dx, dy): nested layers, outer first."""
+    d = math.hypot(dx, dy) or 1.0
+    ux, uy = dx / d, dy / d
+    px, py = -uy, ux
+    for k, col in enumerate(cols):
+        f = 1 - k / (len(cols) + 0.5)
+        L, W = length * f, width * f
+        tip = (x - ux * L, y - uy * L)
+        c.polygon([(int(x + px * W), int(y + py * W)), (int(x - px * W), int(y - py * W)), (int(tip[0]), int(tip[1]))], col)
+
+
+def _tongue(c, x, y, h, w, sway, cols):
+    """An upward flame tongue on the ground (fire pillars, burning crater)."""
+    for k, col in enumerate(cols):
+        f = 1 - k * 0.3
+        c.polygon([(int(x - w * f), int(y)), (int(x + w * f), int(y)), (int(x + sway), int(y - h * f))], col)
 
 
 def meteor(tier, w, h, ground, radius, seed=5):
-    """13 frames: warning, the outlined rock falls in a layered fire trail, a flash with
-    rays and outlined debris, the crater smoulders with rising embers, fade."""
+    """13 frames: warning -> the meteor(s) fall -> flash -> burst -> crater burns -> fade.
+    Each tier adds its own mark (table in design/gameplay-rules.md is the standard; the
+    tiers: I rock, II lava veins + fissures, III three meteors + shock ring + flame
+    tongues, IV white-hot core + fire pillars, V a comet with aura, two rings, a sea of fire)."""
     import fxkit as fk
     cx, cy = w / 2, ground
     rng = random.Random(seed)
     rocks = [(rng.uniform(0, math.tau), rng.uniform(0.4, 1.0)) for _ in range(8 + 2 * tier)]
-    embers = [(rng.uniform(0, math.tau), rng.uniform(0.2, 0.8)) for _ in range(8 + 2 * tier)]
-    rr = 7 + tier * 1.4   # a big rock, readable while it falls
+    embers = [(rng.uniform(0, math.tau), rng.uniform(0.2, 0.9)) for _ in range(8 + 3 * tier)]
+    fissures = [(rng.uniform(0, math.tau), rng.uniform(0.7, 1.15)) for _ in range(3 + tier)]
+    rr = 6 + tier * 1.5
+    trail_cols = [DRED, RED, ORA, YEL] + ([HOT] if tier >= 4 else [])
+    tw = rr * (1.0 + 0.15 * tier)
+    escorts = [(-24, -2, 0.55), (10, -26, 0.5)] if tier >= 3 else []   # flying beside, clear of the main rock
     out = []
     for f in range(13):
         c = Canvas(w, h)
@@ -115,46 +162,69 @@ def meteor(tier, w, h, ground, radius, seed=5):
             if f >= 2:
                 t = (f - 1) / 4
                 mx, my = cx + (1 - t) * w * 0.35, cy - (1 - t) * (h - 6) + rr
-                for b, col in enumerate([DRED, RED, ORA, YEL]):   # trail: all rims first, then hotter cores
-                    for k in range(8, 0, -1):
-                        if b < (4 if k <= 3 else 3 if k <= 6 else 2):
-                            _disk(c, mx + k * 3, my - k * 5, max(1.0, (rr * 1.7 - k * 0.8) * (1 - b * 0.24)), col)
-                lay = Canvas(w, h)
-                _disk(lay, mx, my, rr, ROCK)
-                _disk(lay, mx - rr * 0.3, my - rr * 0.3, rr * 0.55, ROCK_L)
-                _disk(lay, mx + rr * 0.35, my + rr * 0.35, rr * 0.4, ASH)
-                fk.stack(c, lay, "#1a0e0e")
-                _p(c, mx - rr * 0.5, my - rr * 0.6, YEL)
-        elif f == 5:   # the hit
-            fk.glow(c, cx, cy, radius * 0.7, [RED, ORA, YEL, WHITE], density=0.95)
-            fk.rays(c, cx, cy, radius * 0.4, radius * 1.1, 12 + 2 * tier, YEL, WHITE, rot=0.15, width=2)
+                if tier >= 5:   # comet aura
+                    fk.glow(c, mx, my, rr * 2.2, [DRED, RED, ORA], density=0.45)
+                for ex, ey, k in escorts:
+                    _flame(c, mx + ex, my + ey, -0.55, 1, rr * 5 * k, tw * k, trail_cols[:4])
+                    _rock(c, mx + ex, my + ey, rr * k, max(1, tier - 2), seed + ex)
+                _flame(c, mx, my, -0.55, 1, rr * (5.0 + 0.6 * tier), tw, trail_cols)
+                for k in range(3 + tier):
+                    fk.streak(c, mx + rng.uniform(2, 10) + k * 2, my - rng.uniform(4, 16) - k * 3, -0.55, 1, 3, YEL, ORA)
+                _rock(c, mx, my, rr, tier, seed)
+        elif f == 5:
+            fk.glow(c, cx, cy, radius * (0.6 + 0.06 * tier), [RED, ORA, YEL, HOT], density=0.95)
+            fk.rays(c, cx, cy, radius * 0.35, radius * (0.9 + 0.08 * tier), 10 + 3 * tier, YEL, HOT, rot=0.15, width=2)
+            if tier >= 5:
+                fk.ring_band(c, cx, cy, radius * 1.05, [HOT, YEL])
         elif f < 8:
             t = (f - 4) / 3
             r = radius * (0.6 + 0.4 * t)
+            if tier >= 2:   # lava fissures run out
+                for a, d in fissures:
+                    x1, y1 = cx + math.cos(a) * r * d, cy + math.sin(a) * r * d * 0.8
+                    c.line(int(cx), int(cy), int(x1), int(y1), DRED, 3)
+                    c.line(int(cx), int(cy), int(x1), int(y1), LAVA)
+            if tier >= 3:
+                fk.ring_band(c, cx, cy, r * 1.15, [DRED, ORA, YEL])
+            if tier >= 5:
+                fk.ring_band(c, cx, cy, r * 0.75, [ORA, YEL])
             lay = Canvas(w, h)
-            _blob(lay, cx, cy, r, DRED, wobble=3, seed=f)
-            _blob(lay, cx, cy, r * 0.8, RED, wobble=2, seed=f + 3)
-            _blob(lay, cx, cy, r * 0.55, ORA, wobble=2, seed=f + 5)
-            _blob(lay, cx, cy, r * 0.3, YEL, wobble=1, seed=f + 7)
+            _blob(lay, cx, cy, r * 0.85, DRED, wobble=3, seed=f)
+            _blob(lay, cx, cy, r * 0.68, RED, wobble=2, seed=f + 3)
+            _blob(lay, cx, cy, r * 0.48, ORA, wobble=2, seed=f + 5)
+            _blob(lay, cx, cy, r * 0.26, YEL, wobble=1, seed=f + 7)
             fk.stack(c, lay, "#3a0e0e")
+            if tier >= 4:   # fire pillars round the blast
+                for k in range(6):
+                    a = k * math.tau / 6 + 0.3
+                    _tongue(c, cx + math.cos(a) * r, cy + math.sin(a) * r * 0.8, 10 + 3 * tier, 3, (f % 2) * 2 - 1, [RED, ORA, YEL])
             lay = Canvas(w, h)
             for a, d in rocks:
                 fk.crystal(lay, cx + math.cos(a) * r * (0.9 + d * t), cy + math.sin(a) * r * (0.9 + d * t) - 4 * t, a,
-                           3 + tier * 0.5, 1.6, ROCK_L, ROCK, ASH, YEL)
+                           3 + tier * 0.6, 1.8, ROCK_L, ROCK, ASH, YEL)
             fk.stack(c, lay, "#1a0e0e")
-            if tier >= 4:
-                fk.ring_band(c, cx, cy, r + 3, [DRED, ORA, YEL])
         else:
             k = f - 8
-            _disk(c, cx, cy, radius * 0.7, ASH, density=0.5)
-            fk.ring_band(c, cx, cy, radius * 0.7, ["#1a0e0e", ROCK, ROCK_L])
-            _blob(c, cx, cy, radius * 0.35, RED, density=0.7 - 0.08 * k, wobble=2, seed=70 + k)
-            _blob(c, cx, cy, radius * 0.18, YEL if tier >= 5 else ORA, density=0.8, wobble=1, seed=80 + k)
+            _disk(c, cx, cy, radius * 0.72, ASH, density=0.55)
+            fk.ring_band(c, cx, cy, radius * 0.72, ["#1a0e0e", ROCK, ROCK_L])
+            if tier >= 2:
+                for a, d in fissures:
+                    c.line(int(cx), int(cy), int(cx + math.cos(a) * radius * d * 0.7), int(cy + math.sin(a) * radius * d * 0.55), LAVA)
+                pool = radius * (0.18 + 0.05 * tier)
+                fk.glow(c, cx, cy, pool, [DRED, LAVA, YEL], density=0.9)
+            else:
+                _blob(c, cx, cy, radius * 0.25, RED, density=0.7, wobble=1, seed=80 + k)
+            if tier >= 3:   # flame tongues flicker round the crater
+                n_t = 4 + 2 * (tier - 3) + (6 if tier >= 5 else 0)
+                for j in range(n_t):
+                    a = j * math.tau / n_t + 0.2
+                    hh = (6 + tier * 2) * (0.6 + 0.4 * ((j + k) % 2)) * (1 - 0.15 * k)
+                    _tongue(c, cx + math.cos(a) * radius * 0.55, cy + math.sin(a) * radius * 0.4, hh, 2.5, (j + k) % 3 - 1, [RED, ORA, YEL])
             for a, d in embers:
                 fk.streak(c, cx + math.cos(a) * radius * d, cy + math.sin(a) * radius * d * 0.6 - k * 3, 0, -1, 3, YEL, ORA)
             if k % 2 == 0:
-                fk.sparkle(c, int(cx - radius * 0.2), int(cy - 4 - k), 2, WHITE, YEL)
+                fk.sparkle(c, int(cx - radius * 0.2), int(cy - 4 - k), 2, HOT, YEL)
             if k >= 1:
-                _fade(c, min(0.95, 0.1 + 0.18 * k))
+                _fade(c, min(0.95, 0.08 + 0.17 * k))
         out.append(c)
     return out
