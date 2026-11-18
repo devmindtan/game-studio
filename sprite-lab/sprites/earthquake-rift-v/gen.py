@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""earthquake-rift-v: bậc V của earthquake-rift (bậc I là sprite earthquake-rift). Kế thừa bậc trước và thêm một ý
+"""earthquake-rift-v: bậc V. Giữ dung nham + các nhánh của bậc IV, thêm nhánh thứ tư dài nhất và nhiều mảnh đá nhất.
 
 Vẽ bằng sprite-lab/lib/stormfx.py (2026-11-18): mật độ điểm ảnh gấp đôi ("px_scale": 0.5, cùng cỡ trên màn hình),
 có pha mở đầu, trúng, đọng lại và tan. Bậc 5.  Chạy: gamekit art run earthquake-rift-v

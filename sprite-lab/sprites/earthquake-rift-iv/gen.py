@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""earthquake-rift-iv: bậc IV của earthquake-rift (bậc I là sprite earthquake-rift). Kế thừa bậc trước và thêm một ý
+"""earthquake-rift-iv: bậc IV. Giữ các nhánh của bậc III, thêm 1 nhánh nữa và dung nham rải trong vết nứt.
 
 Vẽ bằng sprite-lab/lib/stormfx.py (2026-11-18): mật độ điểm ảnh gấp đôi ("px_scale": 0.5, cùng cỡ trên màn hình),
 có pha mở đầu, trúng, đọng lại và tan. Bậc 4.  Chạy: gamekit art run earthquake-rift-iv

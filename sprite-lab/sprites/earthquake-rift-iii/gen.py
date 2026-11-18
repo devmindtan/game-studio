@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""earthquake-rift-iii: bậc III của earthquake-rift (bậc I là sprite earthquake-rift). Kế thừa bậc trước và thêm một ý
+"""earthquake-rift-iii: bậc III. Giữ vết nứt + mảnh đá của bậc II, thêm 2 vết nứt nhánh tách ra.
 
 Vẽ bằng sprite-lab/lib/stormfx.py (2026-11-18): mật độ điểm ảnh gấp đôi ("px_scale": 0.5, cùng cỡ trên màn hình),
 có pha mở đầu, trúng, đọng lại và tan. Bậc 3.  Chạy: gamekit art run earthquake-rift-iii

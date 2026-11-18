@@ -219,6 +219,20 @@ def earthquake(tier, size, radius, seed=17):
     rng = random.Random(seed)
     path = [(cx - radius + 2 * radius * k / 10, cy + rng.uniform(-radius * 0.25, radius * 0.25)) for k in range(11)]
     spikes = [path[k] for k in range(1, 10, 2)][: 2 + tier]
+    # late tiers split the ground further: III grows one branch, IV two (with
+    # lava in the cracks), V three. The main rift and all earlier tiers stay.
+    branches = []
+    if tier >= 3:
+        for j in range(tier - 1):         # III:2, IV:3, V:4 branches
+            sx, sy = path[3 + (j * 2) % 5]
+            a = (0.7 + j * 0.85) if j % 2 == 0 else -(0.7 + j * 0.85)
+            length = radius * (0.44 + 0.07 * j)
+            bp = [(sx, sy)]
+            for s in range(1, 5):
+                t = s / 4.0
+                bp.append((sx + math.cos(a) * length * t + rng.uniform(-1.5, 1.5),
+                           sy + math.sin(a) * length * t * 0.7 + rng.uniform(-1.5, 1.5)))
+            branches.append(bp)
     out = []
     masks = []   # hit masks: the damaging core (spritekit measures the hitbox from these)
     for f in range(12):
@@ -226,6 +240,8 @@ def earthquake(tier, size, radius, seed=17):
         open_ = [0.15, 0.3, 0.7, 1.0, 1.0, 1.0, 0.8, 0.5, 0.3, 0.2, 0.1, 0.05][f]
         _scuff(c, cx, cy, radius * 0.9, seed + f % 3, DIRT, 0.24 * min(1.0, f / 2 + 0.3))
         _rift(c, path, open_, tier, f, seed)
+        for j, bp in enumerate(branches):
+            _rift(c, bp, open_ * (0.80 if tier < 5 else 0.95), tier, f, seed + 70 + j)
         if 2 <= f <= 7:
             h = (7 + tier * 2) * (1.0 if f < 7 else 0.6)
             lay = Canvas(size, size)

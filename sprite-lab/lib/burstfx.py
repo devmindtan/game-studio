@@ -207,6 +207,9 @@ def _holy_shaft(c, cx, ground, hw0, ramp, level, phase, y_top=0.0, hscale=1.0,
         w = hw0 * (0.94 + 0.06 * t)
         if t > 0.84:                                  # the foot of the pillar spreads
             w *= 1.0 + 0.26 * ((t - 0.84) / 0.16) ** 1.5
+        foot = max(0.0, (t - 0.92) / 0.08)            # then gathers back into the impact
+        if foot > 0:
+            w *= 1.0 - 0.60 * foot ** 1.4
         w = w * hscale + 0.8 * math.sin(y * 0.037 + phase)
         off = off_extra + 1.2 * math.sin(y * 0.047 + phase * 0.7)
         # near the top of the sprite the light narrows, cools and stops: a visible end
@@ -220,6 +223,13 @@ def _holy_shaft(c, cx, ground, hw0, ramp, level, phase, y_top=0.0, hscale=1.0,
         for x in range(int(math.floor(cx + off - w * 1.9)),
                        int(math.ceil(cx + off + w * 1.9)) + 1):
             d = abs(x + 0.5 - cx - off)
+            if foot > 0:
+                # the rim ends higher than the middle, with a ragged edge: the
+                # pillar flows into the sigil instead of ending on a flat line
+                edge = d / max(0.1, w)
+                end = ground - edge * edge * 9 * foot - 2.5 * _h01(x, 29, 31) * edge * foot
+                if y >= end:
+                    continue
             if d <= w * 0.26:
                 band = 5
             elif d <= w * 0.52:
@@ -298,6 +308,8 @@ def holy_column(tier, w, h, ground, radius, seed=41):
                 fx = (i - (2 + tier // 2) / 2.0) / max(1.0, 2 + tier // 2) * 1.5
                 top = 0.0
                 for y in range(int(top), int(ground) - 4):
+                    if y > ground - 5 - 9 * max(0.0, (y / ground - 0.92) / 0.08):
+                        continue
                     x = cx + fx * hw0 * (0.9 + 0.1 * math.sin(y * 0.05 + i))
                     x += math.sin(y * 0.09 + phase + i * 2.1) * 1.2
                     if _h01(int(x), y, 41 + i) < 0.16 + 0.34 * level * (y / ground):
@@ -308,6 +320,13 @@ def holy_column(tier, w, h, ground, radius, seed=41):
                     a = k * math.tau / 6 + f * 0.14
                     fk.sparkle(c, int(cx + math.cos(a) * gx * 1.05),
                                int(ground + math.sin(a) * gy * 1.05), 1, ramp[5], ramp[3])
+            if f >= 7:
+                # as the shaft lifts it gathers into a bright knot at the impact:
+                # the ending reads as light being absorbed by the ground, not a cut
+                k = (f - 7) / 4.0
+                kr = max(2, int(radius * (0.22 - 0.10 * k)))
+                _disk(c, cx, ground, kr, ramp[2], density=0.75 - 0.40 * k)
+                _disk(c, cx, ground, max(1, kr // 2), ramp[4], density=0.80 - 0.35 * k)
 
         # impact: a ring of light runs out over the floor, rays flare, sparks fly
         if 2 <= f <= 6:
