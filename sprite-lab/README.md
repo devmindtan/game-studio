@@ -109,6 +109,11 @@ vùng. Chỉ nút `−` / `+` mới đổi tầm nhìn. Khi thêm hoặc sửa d
 Giữ tỉ lệ game khi vừa, tự co lại theo kích thước frame khi là boss to; tuyệt đối không cụt đầu/cụt chân.
 Đồng thời header dashboard hiện mốc `Dữ liệu web` (thời điểm rebuild manifest) để biết trang đang tải dữ liệu mới.
 
+**Rule hiệu ứng từ tâm** (người dùng 2026-11-19): chiêu triển khai ngay tại tâm nhân vật (`under_hero` trong
+`upgrades_*.json`, ví dụ Đậm đất / Lốc xoáy) phải vẽ hiệu ứng **trước** nhân vật để nhân vật không bị đè.
+Ngược lại, hiệu ứng nào to hơn khung demo thì tự co lại (`fitView`) cho thấy toàn bộ; chiêu nhỏ vẫn giữ một
+góc nhìn cố định, không tự phóng to.
+
 Trang chỉ để xem; đánh giá và quyết định trao đổi trực tiếp với agent. Script dựng manifest và server **chỉ đọc**
 repo game.
 
