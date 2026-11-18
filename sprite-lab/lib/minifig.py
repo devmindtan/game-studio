@@ -242,7 +242,7 @@ def draw_layers(char, p):
         up = char.get("hem_up", 0)
         if up:   # trousers between the hem and the boots (legs slot, Quần)
             for foot, layer, key in ((g["foot_back"], "legs_back", "pants_d"), (f, "legs_front", "pants")):
-                rect(L[layer], foot[0] - 1, foot[1] - 2 - up, foot[0] + 1, foot[1] - 2, pal[key])
+                rect(L[layer], foot[0], foot[1] - 2 - up, foot[0] + 1, foot[1] - 2, pal[key])   # 2 px: the legs stay apart
         robe(L["chest"], g, p, pal, up)
     if char.get("neck"):     # collar / scarf knot: part of the chest slot, above the legs
         char["neck"](L["chest"], p, g)
