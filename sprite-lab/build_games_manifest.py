@@ -315,7 +315,7 @@ def reach_of(hb):
     return float(hb.get("radius", 0))
 
 
-def check_sprite(meta, lim, scale, size_max, has_duration):
+def check_sprite(meta, lim, scale, size_max, has_duration, telegraph=False):
     """Rule results that depend on the sprite only: hitbox, snappy, directional,
     small, and the reach part of screen. Returns ({rule: [status, why]}, reach px)."""
     out = {}
@@ -335,11 +335,13 @@ def check_sprite(meta, lim, scale, size_max, has_duration):
         # same rule as the game's gameplay_rules_test: hits end within oneshot_max, then an
         # ending (linger / fade) of at most outro_max (user 2026-11-18)
         end = t[min(len(t) - 1, hb.get("active", [0, len(t) - 2])[1] + 1)]
-        if end > lim["oneshot_max"]:
+        start = t[min(len(t) - 1, hb.get("active", [0])[0])]
+        if end - (start if telegraph else 0.0) > lim["oneshot_max"]:
             slow.append("%s trúng tới %.2fs" % (a["name"], end))
         if t[-1] - end > lim.get("outro_max", 0.0) + 1e-6:
             slow.append("%s pha kết thúc %.2fs" % (a["name"], t[-1] - end))
-        if hb.get("active") and t[hb["active"][0]] > lim["active_start_max"]:
+        first_max = lim.get("telegraph_max", lim["active_start_max"]) if telegraph else lim["active_start_max"]
+        if hb.get("active") and t[hb["active"][0]] > first_max:
             slow.append("%s trúng lúc %.2fs" % (a["name"], t[hb["active"][0]]))
     out["snappy"] = ["fail", "; ".join(slow)] if slow else ["pass", "ra đòn nhanh"]
     names = set(anims)
@@ -396,7 +398,7 @@ def check_skill(skill, cls, rules_doc, sprite_meta, scale):
     if not all(metas):
         res["hitbox"] = ["fail", "thiếu sprite: " + ", ".join(t for t, m in zip(skill["tiers"], metas) if not m)]
         return grade(res, rules)
-    per = [check_sprite(m, lim, scale, last["size"], "duration" in p) for m in metas]
+    per = [check_sprite(m, lim, scale, last["size"], "duration" in p, bool(p.get("telegraph"))) for m in metas]
     flies = any(r[2] for r in per)
     for key in ("hitbox", "snappy", "directional", "small"):
         bad = [r[0][key] for r in per if r[0][key][0] == "fail"]

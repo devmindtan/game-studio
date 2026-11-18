@@ -161,8 +161,14 @@ def lightning_strike(tier, w, h, ground, radius, seed=51):
             dark_cloud(c, cx, cloud_y, cs, flash=f in (2, 4))
             r2 = random.Random(seed + f)
             thin_bolt(c, cx + r2.uniform(-2, 2), cloud_y + cs * 0.8, cx, ground, r2, tier)
-            fk.glow(c, cx, ground, radius * (0.7 if f == 2 else 0.5), ["#2a6ab0", "#9ad0ff", "#fff8c0", "#ffffff"], density=0.85)
-            fk.rays(c, cx, ground, radius * 0.3, radius, 8 + tier, "#fff8c0", "#ffffff", rot=f * 0.4)
+            # the hit at the ground grows with the tier: a small spark at I, a burst with rays from III
+            # (user 2026-11-18: early levels need no explosion)
+            gk = (0.22 + 0.11 * tier) * (1.0 if f == 2 else 0.75)
+            fk.glow(c, cx, ground, radius * gk, ["#2a6ab0", "#9ad0ff", "#fff8c0", "#ffffff"][-(2 + min(2, tier // 2)):], density=0.85)
+            if tier >= 3:
+                fk.rays(c, cx, ground, radius * 0.25, radius * (0.4 + 0.12 * tier), 4 + 2 * tier, "#fff8c0", "#ffffff", rot=f * 0.4)
+            else:
+                fk.sparkle(c, int(cx), int(ground), 2 + tier, "#ffffff", "#9ad0ff")
         else:
             k = f - 6
             if k < 3:

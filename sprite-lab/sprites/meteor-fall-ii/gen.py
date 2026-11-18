@@ -28,7 +28,7 @@ GROUND = 116.0
 RADIUS = 50
 ANCHOR = (W / 2, GROUND)
 ANIM = [("strike", firefx.meteor(2, W, H, GROUND, RADIUS), 12, False,
-         {"durations_ms": firefx.METEOR_MS, "hitbox": {"shape": "circle", "center": [W / 2, GROUND], "active": [5, 7], "radius": float(RADIUS), "inner": 0.0}})]
+         {"durations_ms": firefx.METEOR_MS, "hitbox": {"shape": "circle", "center": [W / 2, GROUND], "active": [8, 10], "radius": float(RADIUS), "inner": 0.0}})]
 
 if __name__ == "__main__":
     export(HERE, NAME, ANIM, anchor=ANCHOR, preview_scale=2, gif_scale=2)

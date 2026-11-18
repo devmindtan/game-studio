@@ -97,7 +97,9 @@ def blast(tier, size, radius, seed=3):
     return fk.FxFrames(out, masks)
 
 
-METEOR_MS = [90, 90, 60, 50, 50, 60, 70, 80, 110, 120, 120, 130, 140]
+# 16 frames (user 2026-11-18: slower, a warning first, then the rock falls slowly):
+# 0-3 warning ring pulses, 4-7 the fall, 8 flash (the hit), 9-10 burst, 11-15 smoulder and fade
+METEOR_MS = [130, 130, 130, 130, 100, 100, 100, 100, 60, 70, 80, 110, 120, 120, 130, 140]
 LAVA = "#ff6a1a"
 HOT = "#fff4d0"
 
@@ -157,7 +159,7 @@ def meteor(tier, w, h, ground, radius, seed=5):
     tw = rr * (1.0 + 0.15 * tier)
     # (land frame, ground offset x, y, scale): the main rock lands on frame 5 (the hit);
     # escorts land at their own moments, one before and one after (user 2026-11-18)
-    falls = [(5, 0, 0, 1.0)] + ([(4, -26, 8, 0.5), (7, 22, -6, 0.45)] if tier >= 3 else [])
+    falls = [(8, 0, 0, 1.0)] + ([(7, -26, 8, 0.5), (10, 22, -6, 0.45)] if tier >= 3 else [])
     out = []
     masks = []   # hit masks: the damaging core (spritekit measures the hitbox from these)
 
@@ -183,19 +185,21 @@ def meteor(tier, w, h, ground, radius, seed=5):
                 if f == land:
                     fk.rays(c, ex, ey, rr * 0.6, rr * 2.2, 8, YEL, HOT)
 
-    for f in range(13):
+    for f in range(16):
         c = Canvas(w, h)
-        if f < 5:
-            mark = radius * (0.5 + 0.12 * f)
-            fk.ring_band(c, cx, cy, mark, [DRED, RED] if f % 2 else [RED, ORA])
+        if f < 8:   # the warning ring pulses for the whole wind-up; the rock comes in on 4-7
+            mark = radius * (0.55 + 0.06 * min(f, 6))
+            fk.ring_band(c, cx, cy, mark, [DRED, RED] if f % 2 else [RED, ORA, YEL])
+            if f < 4:
+                _disk(c, cx, cy, mark * 0.9, RED, density=0.03 + 0.015 * f)
             falling(c, f)
-        elif f == 5:
+        elif f == 8:
             fk.glow(c, cx, cy, radius * (0.6 + 0.06 * tier), [RED, ORA, YEL, HOT], density=0.95)
             fk.rays(c, cx, cy, radius * 0.35, radius * (0.9 + 0.08 * tier), 10 + 3 * tier, YEL, HOT, rot=0.15, width=2)
             if tier >= 5:
                 fk.ring_band(c, cx, cy, radius * 1.05, [HOT, YEL])
-        elif f < 8:
-            t = (f - 4) / 3
+        elif f < 11:
+            t = (f - 7) / 3
             r = radius * (0.6 + 0.4 * t)
             if tier >= 2:   # lava fissures run out
                 for a, d in fissures:
@@ -222,7 +226,7 @@ def meteor(tier, w, h, ground, radius, seed=5):
                            3 + tier * 0.6, 1.8, ROCK_L, ROCK, ASH, YEL)
             fk.stack(c, lay, "#1a0e0e")
         else:
-            k = f - 8
+            k = f - 11
             _disk(c, cx, cy, radius * 0.72, ASH, density=0.55)
             fk.ring_band(c, cx, cy, radius * 0.72, ["#1a0e0e", ROCK, ROCK_L])
             if tier >= 2:
@@ -244,8 +248,36 @@ def meteor(tier, w, h, ground, radius, seed=5):
                 fk.sparkle(c, int(cx - radius * 0.2), int(cy - 4 - k), 2, HOT, YEL)
             if k >= 1:
                 _fade(c, min(0.95, 0.08 + 0.17 * k))
-        if 5 <= f <= 8:
+        if 8 <= f <= 11:
             falling(c, f)
         out.append(c)
-        masks.append(fk.mask_art(c, cx, cy, radius * 0.75 if f == 5 else radius * (0.6 + 0.4 * (f - 4) / 3) * (1.18 if tier >= 3 else 0.9) + 3 if f in (6, 7) else 0))
+        masks.append(fk.mask_art(c, cx, cy, radius * 0.75 if f == 8 else radius * (0.6 + 0.4 * (f - 7) / 3) * (1.18 if tier >= 3 else 0.9) + 3 if f in (9, 10) else 0))
     return fk.FxFrames(out, masks)
+
+
+def scorch(size, tier=1, n=6, seed=9):
+    """A looping burning-ground decal for a burn zone (meteor craters): cracks glowing
+    with lava, small flames flickering, embers. Drawn under the monsters by the run."""
+    import fxkit as fk
+    cx = cy = size / 2
+    r = size / 2 - 3
+    rng = random.Random(seed)
+    cracks = [(rng.uniform(0, math.tau), rng.uniform(0.5, 0.95)) for _ in range(6 + tier)]
+    flames = [(rng.uniform(0, math.tau), rng.uniform(0.2, 0.8)) for _ in range(4 + tier)]
+    out = []
+    for f in range(n):
+        c = Canvas(size, size)
+        _disk(c, cx, cy, r, ASH, density=0.35)
+        for a, d in cracks:
+            x1, y1 = cx + math.cos(a) * r * d, cy + math.sin(a) * r * d * 0.7
+            c.line(int(cx), int(cy), int(x1), int(y1), DRED, 2)
+            c.line(int(cx), int(cy), int(x1), int(y1), LAVA if (f + int(a * 3)) % 3 else YEL)
+        fk.glow(c, cx, cy, r * 0.25, [DRED, LAVA, YEL], density=0.8)
+        for j, (a, d) in enumerate(flames):
+            hh = (5 + tier) * (0.6 + 0.4 * ((j + f) % 3) / 2)
+            _tongue(c, cx + math.cos(a) * r * d, cy + math.sin(a) * r * d * 0.6, hh, 2, (j + f) % 3 - 1, [RED, ORA, YEL])
+        for j in range(3 + tier):
+            a = j * 2.1 + f * 0.6
+            fk.streak(c, cx + math.cos(a) * r * 0.6, cy + math.sin(a) * r * 0.4 - (f * 2 + j) % 8, 0, -1, 2, YEL, ORA)
+        out.append(c)
+    return out
