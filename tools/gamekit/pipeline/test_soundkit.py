@@ -60,7 +60,16 @@ class SoundkitTest(unittest.TestCase):
             with wave.open(str(g / "assets/audio/sfx/blip.wav")) as w:
                 self.assertEqual((w.getnchannels(), w.getframerate(), w.getsampwidth()), (1, sk.RATE, 2))
             self.assertFalse(stale.exists())
+            self.assertIsNone(sk.wav_loop(g / "assets/audio/sfx/blip.wav"))
             self.assertTrue((g / "production/audio/review.png").exists())
+
+    def test_music_wav_carries_a_loop(self):
+        with tempfile.TemporaryDirectory() as d:
+            f = Path(d) / "m.wav"
+            sk.write_wav(f, [0.1] * 1000, loop=True)
+            self.assertEqual(sk.wav_loop(f), (0, 999))
+            with wave.open(str(f)) as w:   # still a valid WAV
+                self.assertEqual(w.getnframes(), 1000)
 
     def test_bad_spec_is_an_audio_error(self):
         with self.assertRaises(sk.AudioError):

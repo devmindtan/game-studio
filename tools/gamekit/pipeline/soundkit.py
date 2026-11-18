@@ -43,6 +43,7 @@ import argparse
 import json
 import math
 import random
+import struct
 import subprocess
 import sys
 import wave
@@ -294,7 +295,9 @@ def render_song(song):
 
 # ---------------------------------------------------------------- files
 
-def write_wav(path, samples):
+def write_wav(path, samples, loop=False):
+    """16-bit mono WAV. loop=True adds a "smpl" chunk (forward loop over the whole
+    file), which Godot's WAV importer reads as the loop (import "Detect From WAV")."""
     path.parent.mkdir(parents=True, exist_ok=True)
     data = array("h", (int(max(-1.0, min(1.0, v)) * 32767) for v in samples))
     if sys.byteorder == "big":
@@ -304,6 +307,25 @@ def write_wav(path, samples):
         w.setsampwidth(2)
         w.setframerate(RATE)
         w.writeframes(data.tobytes())
+    if loop:
+        smpl = struct.pack("<9I", 0, 0, 1_000_000_000 // RATE, 60, 0, 0, 0, 1, 0)
+        smpl += struct.pack("<6I", 0, 0, 0, max(0, len(samples) - 1), 0, 0)
+        raw = bytearray(path.read_bytes())
+        raw += b"smpl" + struct.pack("<I", len(smpl)) + smpl
+        raw[4:8] = struct.pack("<I", len(raw) - 8)
+        path.write_bytes(bytes(raw))
+
+
+def wav_loop(path):
+    """(start, end) of the first smpl loop in a WAV, or None."""
+    raw = Path(path).read_bytes()
+    i = 12
+    while i + 8 <= len(raw):
+        cid, size = raw[i:i + 4], struct.unpack("<I", raw[i + 4:i + 8])[0]
+        if cid == b"smpl" and size >= 60:
+            return struct.unpack("<2I", raw[i + 8 + 44:i + 8 + 52])
+        i += 8 + size + (size & 1)
+    return None
 
 
 def stats(samples):
@@ -371,7 +393,7 @@ def build(game, only=None):
             except (KeyError, TypeError, ValueError) as e:
                 raise AudioError(f"{kind} {sid}: bad spec ({e})") from None
             st = check(kind, sid, samples)
-            write_wav(game / "assets" / "audio" / sub / f"{sid}.wav", samples)
+            write_wav(game / "assets" / "audio" / sub / f"{sid}.wav", samples, loop=kind == "music")
             rows.append((f"{kind}/{sid}", samples, st))
             lines.append(f"{kind}/{sid}\t{st['seconds']}s\tpeak {st['peak']}\trms {st['rms']}")
     if not only:
@@ -424,5 +446,5 @@ if __name__ == "__main__":
     sys.exit(main())
 
 
-__all__ = ["render_layer", "render_sfx", "render_song", "note_freq", "write_wav", "stats", "check",
+__all__ = ["render_layer", "render_sfx", "render_song", "note_freq", "write_wav", "wav_loop", "stats", "check",
            "build", "AudioError", "RATE"]
