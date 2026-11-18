@@ -143,7 +143,7 @@ def frost_nova(tier, size, radius, seed=1):
             phase = f - 8
             fading = max(0, phase - 3) / 4.0 if f >= 12 else 0.0
             rr = radius * 0.95
-            _disk(c, cx, cy, rr, FROST, density=0.14)
+            _disk(c, cx, cy, rr * 0.7, FROST, density=0.08)   # a light frost, not a carpet (user 2026-11-18)
             _ring(c, cx, cy, rr, ICE_D)
             for a, length in cracks:
                 c.line(int(cx), int(cy), int(round(cx + math.cos(a) * rr * length)),
@@ -153,7 +153,7 @@ def frost_nova(tier, size, radius, seed=1):
                 for (x0, y0), (x1, y1) in zip(pts, pts[1:]):
                     c.line(int(x0), int(y0), int(x1), int(y1), ICE_M)
             if tier >= 5:
-                _snowflake(c, cx, cy, rr * 0.45, 0.2 + f * 0.05, ICE, CORE)
+                _snowflake(c, cx, cy, rr * 0.4, 0.2 + f * 0.05, ICE_M, CORE)
             if f < 12:
                 if tier >= 3:   # standing spikes round the edge
                     for k in range(spikes):

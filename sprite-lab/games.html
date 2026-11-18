@@ -143,6 +143,7 @@ class Sheet{
     if(a.loop!==false) ms=((ms%total)+total)%total; else ms=Math.min(ms,total-0.001);
     for(let i=0;i<a.frames;i++){const f=this.ms(a,i); if(ms<f) return (a.start||0)+i; ms-=f;} return (a.start||0)+a.frames-1;}
   drawIndex(g,idx,x,y,sc,flip,alpha,src){const [w,h]=this.fs; const ax=flip?w-this.anchor[0]:this.anchor[0];
+    sc*=this.meta.px_scale||1;   // double-density sprites (icefx) draw at the same size as in the game
     g.save(); if(alpha!=null) g.globalAlpha=alpha; g.imageSmoothingEnabled=false;
     const dx=Math.round(x-ax*sc), dy=Math.round(y-this.anchor[1]*sc);
     if(flip){g.translate(dx+w*sc,dy); g.scale(-1,1); g.drawImage(src||this.img,idx*w,0,w,h,0,0,w*sc,h*sc);}
@@ -673,12 +674,13 @@ function skillPane(pane,s){
     if(how==='active'||how==='wave'||how==='projectile') return moveScene(lv,fx,hero,sl,how);
     const kind=fx.anims.some(a=>a.name.startsWith('slash_'))?'melee':fx.has('spin')?'orbit':s.params.cast_range?'cast':'self';
     const anim0=kind==='melee'?'slash_right':effectAnim(fx), hbz=hbAt(fx,anim0);
-    const rz=hbz?(hbz.shape==='rect'?Math.max(hbz.half_w,hbz.half_h):hbz.radius)*2*lv.size:40;
+    const rz=hbz?(hbz.shape==='rect'?Math.max(hbz.half_w,hbz.half_h):hbz.radius)*2*lv.size*(fx.meta.px_scale||1):40;
     Z=Math.max(1,Math.min(2,(H-24)/(2*rz+40))); VW=W/Z; VH=H/Z;
     FEET={x:kind==='cast'?Math.max(40,VW/2-Number(s.params.cast_range||0)):VW*0.36,y:VH/2+24};
     const hb0=hero.meta.body, hc={x:FEET.x+(hb0?(hb0.center[0]-hero.anchor[0])*2:0),y:FEET.y+(hb0?(hb0.center[1]-hero.anchor[1])*2:-26)};
     const anim=kind==='melee'?'slash_right':effectAnim(fx), sc=2*lv.size, hb=hbAt(fx,anim);
-    const reach=hb?(hb.shape==='rect'?Math.max(hb.half_w,hb.half_h):hb.radius)*sc:40;
+    const hs=sc*(fx.meta.px_scale||1);   // hit geometry in sprite pixels (draw() applies px_scale itself)
+    const reach=hb?(hb.shape==='rect'?Math.max(hb.half_w,hb.half_h):hb.radius)*hs:40;
     const cast=Number(s.params.cast_range||0);
     const ssc=dummy.stats.scale||2, sb=sl.meta.body||{center:sl.anchor,radius:8};
     // the dummy stands at the edge of the hit area (its body still overlaps it), not on the hero
@@ -688,10 +690,10 @@ function skillPane(pane,s){
     const lead=0.3, dur=kind==='orbit'?Number(s.params.duration||fx.duration(anim)):fx.duration(anim);
     const [a0,a1]=hbTimes(fx,anim,hb);
     const ticks=kind==='orbit'?Math.max(1,Number(s.params.ticks||1)):1;
-    const hcx=fxAt.x+((hb&&hb.center?hb.center[0]:fx.anchor[0])-fx.anchor[0])*sc, hcy=fxAt.y+((hb&&hb.center?hb.center[1]:fx.anchor[1])-fx.anchor[1])*sc;
-    const lands=hb&&hitTest(hb,hcx,hcy,target.x,target.y,sc,sb.radius*ssc);
+    const hcx=fxAt.x+((hb&&hb.center?hb.center[0]:fx.anchor[0])-fx.anchor[0])*hs, hcy=fxAt.y+((hb&&hb.center?hb.center[1]:fx.anchor[1])-fx.anchor[1])*hs;
+    const lands=hb&&hitTest(hb,hcx,hcy,target.x,target.y,hs,sb.radius*ssc);
     const hits=lands?Array.from({length:ticks},(_,k)=>lead+(kind==='orbit'?k*dur/ticks:a0)):[];
-    return {fx,hero,sl,kind,anim,sc,hb,lead,dur,a0,a1,hits,fxAt,hcx,hcy,slFeet,target,ssc,sb,hc,period:lead+dur+0.8};
+    return {fx,hero,sl,kind,anim,sc,hs,hb,lead,dur,a0,a1,hits,fxAt,hcx,hcy,slFeet,target,ssc,sb,hc,period:lead+dur+0.8};
   }
   // wave: the effect flies right at its speed and hits the dummy on the way;
   // active (dash): the hero dashes right with its dash animation and slashes the dummy
@@ -745,7 +747,7 @@ function skillPane(pane,s){
       else if(sc.fx.has('impact')) sc.fx.draw(g,'impact',et-sc.a0,sc.target.x,sc.target.y,sc.sc); }         // hit
     else if(sc.kind!=='dash'&&sc.kind!=='shot'&&et>=0&&et<sc.dur){ const at=sc.kind==='orbit'?et%sc.fx.duration(sc.anim):et; sc.fx.draw(g,sc.anim,at,sc.fxAt.x,sc.fxAt.y,sc.sc);
       const active=sc.kind==='orbit'||(et>=sc.a0&&et<sc.a1);
-      if(showHb&&sc.hb) drawHb(g,sc.hb,sc.hcx,sc.hcy,sc.sc,true);
+      if(showHb&&sc.hb) drawHb(g,sc.hb,sc.hcx,sc.hcy,sc.hs||sc.sc,true);
       if(showHb){ g.strokeStyle='rgba(110,255,140,.8)'; g.lineWidth=1.5; g.beginPath(); g.arc(sc.target.x,sc.target.y,sc.sb.radius*sc.ssc,0,Math.PI*2); g.stroke(); } }
     // damage numbers like the game: rise and fade over 0.7 s
     done.forEach((h,i)=>{ const k=(u-h)/0.7; if(k<0||k>1) return; g.save();

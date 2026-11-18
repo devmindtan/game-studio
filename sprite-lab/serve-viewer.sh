@@ -18,7 +18,7 @@ elif command -v open >/dev/null 2>&1; then (sleep 0.5; open "$URL" >/dev/null 2>
 # Serve with "no-store": sprites are re-rendered all the time and a cached PNG/GIF
 # would show the previous art (lesson 2026-11-16: the redrawn mage did not appear).
 exec python3 -c '
-import http.server, os, sys, urllib.parse
+import http.server, importlib, os, sys, urllib.parse
 LAB = os.getcwd()
 ROOT = os.path.dirname(LAB)
 sys.path.insert(0, LAB)
@@ -36,8 +36,8 @@ class Studio(http.server.SimpleHTTPRequestHandler):
         if self.path in ("/", "/index.html"):
             self.send_response(302); self.send_header("Location", "/sprite-lab/viewer.html"); self.end_headers(); return
         if urllib.parse.urlparse(self.path).path == "/sprite-lab/games-manifest.json":
-            try:
-                build_games_manifest.build()
+            try:   # reload: an edited builder takes effect without restarting the server (lesson 2026-11-18)
+                importlib.reload(build_games_manifest).build()
             except Exception as e:  # serve the last good manifest, report why
                 sys.stderr.write("games manifest: %s\n" % e)
         super().do_GET()

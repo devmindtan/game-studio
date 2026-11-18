@@ -329,9 +329,14 @@ def check_sprite(meta, lim, scale, size_max, has_duration):
             if not has_duration:
                 slow.append(a["name"] + " lặp nhưng data không có duration")
             continue
-        if t[-1] > lim["oneshot_max"]:
-            slow.append("%s dài %.2fs" % (a["name"], t[-1]))
         hb = a.get("hitbox") or {}
+        # same rule as the game's gameplay_rules_test: hits end within oneshot_max, then an
+        # ending (linger / fade) of at most outro_max (user 2026-11-18)
+        end = t[min(len(t) - 1, hb.get("active", [0, len(t) - 2])[1] + 1)]
+        if end > lim["oneshot_max"]:
+            slow.append("%s trúng tới %.2fs" % (a["name"], end))
+        if t[-1] - end > lim.get("outro_max", 0.0) + 1e-6:
+            slow.append("%s pha kết thúc %.2fs" % (a["name"], t[-1] - end))
         if hb.get("active") and t[hb["active"][0]] > lim["active_start_max"]:
             slow.append("%s trúng lúc %.2fs" % (a["name"], t[hb["active"][0]]))
     out["snappy"] = ["fail", "; ".join(slow)] if slow else ["pass", "ra đòn nhanh"]
@@ -343,8 +348,10 @@ def check_sprite(meta, lim, scale, size_max, has_duration):
     else:
         out["directional"] = ["na", "không phải đòn định hướng"]
     fs = meta.get("frame_size", [0, 0])
-    out["small"] = ["pass", "%dx%d" % tuple(fs)] if max(fs) <= lim["frame_max"] else ["fail", "khung %dx%d > %d" % (fs[0], fs[1], lim["frame_max"])]
-    reach = max([reach_of(a.get("hitbox")) for a in play] or [0.0]) * scale * size_max
+    px = float(meta.get("px_scale", 1.0))   # double-density sprites (icefx): the logical size counts
+    ok = max(fs) * px <= lim["frame_max"] and max(fs) <= lim.get("frame_max_dense", lim["frame_max"])
+    out["small"] = ["pass", "%dx%d" % tuple(fs) + (" (×%g)" % px if px != 1 else "")] if ok else ["fail", "khung %dx%d > %d" % (fs[0], fs[1], lim["frame_max"])]
+    reach = max([reach_of(a.get("hitbox")) for a in play] or [0.0]) * scale * size_max * px
     flies = any(a.get("name") == "fly" for a in play)
     return out, reach, flies
 
