@@ -121,6 +121,10 @@ def earth_burst(tier, size, radius, seed=31):
     return fk.FxFrames(out, masks)
 
 
+# the floor pool + sigil reach about 1.7x the shaft radius; the hit mask must
+# cover the light the player sees, not just the narrow pillar (user 2026-11-18)
+HOLY_HIT_MUL = 1.7
+
 HOLY_MS = [70, 60, 50, 45, 50, 55, 70, 80, 95, 110, 125, 140]
 GOLD = ("#c08a2a", "#e8b23a", "#ffd96a", "#fff0b4", "#fffbe6", "#ffffff")
 # per frame: strength of the light, how wide the ground flare is.  f0-1 a thread falls
@@ -344,7 +348,7 @@ def holy_column(tier, w, h, ground, radius, seed=41):
                               2 + i % 2, ramp[3], ramp[2])
 
         out.append(c)
-        masks.append(fk.mask_art(c, cx, ground, radius))
+        masks.append(fk.mask_art(c, cx, ground, radius * HOLY_HIT_MUL))
     return fk.FxFrames(out, masks)
 
 

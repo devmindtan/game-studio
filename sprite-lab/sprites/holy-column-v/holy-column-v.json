@@ -36,14 +36,14 @@
         "shape": "rect",
         "center": [
           96.5,
-          214.5
+          196.0
         ],
         "active": [
           3,
           6
         ],
-        "half_w": 53.5,
-        "half_h": 41.5
+        "half_w": 90.5,
+        "half_h": 60.0
       },
       "hit_mask": true
     }
