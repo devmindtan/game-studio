@@ -177,7 +177,8 @@ Test của game (`gameplay_rules_test`) chặn sprite có `px_scale` mà sai chu
 - Nền trong suốt (`RGBA`), không viền quanh cả canvas.
 - **Sinh vật không phải người thì di chuyển bằng bộ phận của chính nó** (người dùng 2026-11-18: boss cây có "chân"
   thay vì rễ): cây trườn bằng chùm rễ, rắn uốn thân, ma lơ lửng có đuôi, nhầy co giãn. Không gắn chân người vào
-  thứ không có chân; phần di chuyển phải tương phản với thân (màu/viền riêng) để đọc được ở 1x.
+  thứ không có chân; phần di chuyển phải tương phản với thân (màu/viền riêng) để đọc được ở 1x. Rễ cây là
+  **nêm to ở gốc (bạnh vè), bò thấp sát đất, dài ngắn không đều**; nét mảnh cong vòng lên tỏa đều đọc thành chân nhện.
 
 ## Godot 4.7
 
