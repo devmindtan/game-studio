@@ -1,5 +1,5 @@
 {
-  "frames": 62,
+  "frames": 64,
   "frame_size": [
     16,
     16
@@ -442,6 +442,20 @@
     {
       "name": "head_start",
       "start": 61,
+      "frames": 1,
+      "fps": 1.0,
+      "loop": false
+    },
+    {
+      "name": "essence",
+      "start": 62,
+      "frames": 1,
+      "fps": 1.0,
+      "loop": false
+    },
+    {
+      "name": "pill",
+      "start": 63,
       "frames": 1,
       "fps": 1.0,
       "loop": false

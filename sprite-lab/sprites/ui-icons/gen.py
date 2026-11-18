@@ -782,6 +782,33 @@ ICONS = {
         "yy..yy......",
         "o...o.......",
     ]),
+    # Tinh hoa (skill-tree material, elites / bosses drop it): a violet soul flame
+    "essence": ({"o": "#3a1446", "d": "#8a2e9e", "m": "#d74fd6", "l": "#ff9cf0", "w": "#ffffff"}, [
+        "....o.......",
+        "...odo......",
+        "...odmo.....",
+        "..odmmo.....",
+        "..odmlmo....",
+        ".odmllmmo...",
+        ".odmlwlmo...",
+        ".odmlllmo...",
+        "..odmlmdo...",
+        "...odmdo....",
+        "....ooo.....",
+    ]),
+    # Tẩy Tủy Đan (skill-tree reset, won in challenges): a red pill in a gold ring
+    "pill": ({"r": "#c4202f", "l": "#ff6a6a", "w": "#ffffff", "d": "#7a1020", "y": "#f2c14e", "o": "#a8661f"}, [
+        "...yyyyy...",
+        "..yrrrrry..",
+        ".yrlwrrrry.",
+        "yrlwlrrrrdy",
+        "yrllrrrrrdy",
+        "yrrrrrrrrdy",
+        "yrrrrrrrddy",
+        ".yrrrrrddy.",
+        "..ydddddy..",
+        "...ooooo...",
+    ]),
 }
 
 
