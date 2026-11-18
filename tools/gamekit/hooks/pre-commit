@@ -16,4 +16,18 @@ if grep -qE '^sprite-lab/(sprites|lib)/' <<<"$staged"; then
     exit 1
   fi
 fi
+# The dashboard is one HTML file of plain JS: a syntax error blanks every tab
+# (lesson 2026-11-18: a second "const st" in one scope left it on "Đang tải…").
+if grep -qE '^sprite-lab/games\.html$' <<<"$staged" && command -v node >/dev/null; then
+  js="$(mktemp --suffix=.js)"
+  git show :sprite-lab/games.html | python3 -c 'import re,sys; print("\n".join(re.findall(r"<script>(.*?)</script>", sys.stdin.read(), re.S)))' > "$js"
+  if ! err="$(node --check "$js" 2>&1)"; then
+    echo "pre-commit: sprite-lab/games.html has a JavaScript syntax error:" >&2
+    grep -E "SyntaxError|^\s+\^|:[0-9]+$" <<<"$err" | head -4 >&2
+    rm -f "$js"
+    echo "pre-commit: refused - the dashboard would not load" >&2
+    exit 1
+  fi
+  rm -f "$js"
+fi
 exit 0
