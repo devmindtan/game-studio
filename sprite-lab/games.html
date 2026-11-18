@@ -541,7 +541,8 @@ function items(m){
 const ITEM_ICON={shield:'item_shield',low_hp_buff:'item_low_hp',hit_buff:'item_hit_buff',
   kill_proc:'item_kill_proc',retaliate:'item_retaliate',pulse:'item_pulse',chain_shock:'item_chain_shock',
   revive:'item_revive',burn_aura:'item_burn_aura',freeze_nova:'item_freeze_nova',reset_cd:'item_reset_cd',
-  haste_rune:'haste',power_orb:'arcane_power',heal_bloom:'regen',magnetic_shield:'shield'};
+  haste_rune:'haste',power_orb:'arcane_power',heal_bloom:'regen',magnetic_shield:'shield',
+  phantom_ward:'item_shield',stone_ward:'item_low_hp'};
 function itemEffects(m){
   const sec=el('section',{style:'margin-top:22px;border-top:1px solid var(--border);padding-top:16px'});
   sec.appendChild(el('h3',{},'Kỹ năng từ trang bị'));
@@ -562,7 +563,8 @@ function itemEffects(m){
        sp.every_kills?'Mỗi '+sp.every_kills+' quái hạ':sp.threshold?'Khi máu dưới '+Math.round(sp.threshold*100)+'%':'Một lần mỗi trận');
     // the sprites run.gd actually draws for this special (see trigger_special / _ring_fx)
     let auraInfo=buff?it.aura:null;
-    if(!buff&&sp.buff){ const bi=(game.items.buffs||[]).find(x=>x.id===sp.buff); if(bi&&bi.aura) auraInfo=bi.aura; }
+    if(!buff&&sp.buff){ const all=(game.items.buffs||[]).concat(game.items.special_buffs||[]);
+      const bi=all.find(x=>x.id===sp.buff); if(bi&&bi.aura) auraInfo=bi.aura; }
     const ring=!buff&&['pulse','freeze_nova','retaliate'].includes(kind);
     const status=!buff?({chain_shock:'shock',burn_aura:'burn',freeze_nova:'freeze'}[kind]||null):null;
     const heroInfo=(game.heroes.find(h=>h.id===it.class)||game.heroes[0]||{}).sprite;

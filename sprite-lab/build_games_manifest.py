@@ -428,7 +428,7 @@ def items_of(root, data, cfg, monsters):
     """assets/data/items.json with each item's sprite and the numbers behind it."""
     items = load(os.path.join(data, "items.json"))
     pick = cfg.get("pickups", {})
-    out = {"pickups": [], "buffs": [], "equipment": []}
+    out = {"pickups": [], "buffs": [], "equipment": [], "special_buffs": []}
     bcfg = cfg.get("buffs", {})
     for group in out:
         for iid, it in clean(items.get(group, {})).items():
@@ -447,6 +447,9 @@ def items_of(root, data, cfg, monsters):
                 if it.get("aura"):   # the aura drawn around the hero while this buff is on
                     e["aura"] = sprite_info(root, str(it["aura"]))
                     e["aura_layer"] = it.get("aura_layer", "back")
+                if it.get("special_only"):   # granted by equipment, never a ground pickup
+                    out["special_buffs"].append(e)
+                    continue
             elif group == "equipment" and it.get("special"):
                 # a legendary item's "skill": what the game fires, how often, and its reach
                 e["special"] = it["special"]
