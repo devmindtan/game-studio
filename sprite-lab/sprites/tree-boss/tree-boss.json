@@ -27,14 +27,14 @@
       "hitbox": {
         "shape": "rect",
         "center": [
-          24.0,
+          23.5,
           24.0
         ],
         "active": [
           0,
           3
         ],
-        "half_w": 24.0,
+        "half_w": 23.5,
         "half_h": 23.0
       }
     },
@@ -52,14 +52,14 @@
       "hitbox": {
         "shape": "rect",
         "center": [
-          25.0,
+          24.0,
           24.5
         ],
         "active": [
           2,
           2
         ],
-        "half_w": 22.0,
+        "half_w": 23.0,
         "half_h": 22.5
       }
     },
@@ -76,14 +76,14 @@
       "hitbox": {
         "shape": "rect",
         "center": [
-          25.0,
+          23.5,
           24.0
         ],
         "active": [
           0,
           1
         ],
-        "half_w": 23.0,
+        "half_w": 23.5,
         "half_h": 23.0
       }
     },
@@ -102,14 +102,14 @@
       "hitbox": {
         "shape": "rect",
         "center": [
-          25.0,
+          23.5,
           24.5
         ],
         "active": [
           0,
           3
         ],
-        "half_w": 22.0,
+        "half_w": 23.5,
         "half_h": 22.5
       }
     }
@@ -121,6 +121,6 @@
       24.5,
       27.0
     ],
-    "radius": 20.5
+    "radius": 21.0
   }
 }
