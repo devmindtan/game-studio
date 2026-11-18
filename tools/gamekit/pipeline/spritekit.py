@@ -271,6 +271,7 @@ def write_anim_meta(path, animations, anchor=None, ground=False, body=None):
     import json
 
     flat = []
+    masks = []        # hit masks (anim "hit_mask": canvases): the drawn damage area of each frame
     entries = []
     for anim in animations:
         frames = anim.get("frames") or []
@@ -293,10 +294,18 @@ def write_anim_meta(path, animations, anchor=None, ground=False, body=None):
             entries[-1]["durations_ms"] = [float(value) for value in durations]
         if anim.get("airborne"):
             entries[-1]["airborne"] = True
+        hm = anim.get("hit_mask")
+        if hm is not None and len(hm) != len(frames):
+            raise ValueError(f"animation {anim.get('name')!r}: hit_mask needs one canvas per frame")
         if anim.get("hitbox"):
             # measured from the pixels of this animation's active frames, so the
-            # hit area always matches the art (lesson 2026-11-16)
-            entries[-1]["hitbox"] = fit_hitbox(frames, anim["hitbox"])
+            # hit area always matches the art (lesson 2026-11-16); with a hit_mask,
+            # from the mask's pixels: the damaging core, not rays and debris
+            # (lesson 2026-11-18: hit areas came out bigger than the effect)
+            entries[-1]["hitbox"] = fit_hitbox(hm if hm is not None else frames, anim["hitbox"])
+            if hm is not None:
+                entries[-1]["hit_mask"] = True
+        masks.extend(hm if hm is not None else [Canvas(f.width, f.height) for f in frames])
         flat.extend(frames)
     if not flat:
         raise ValueError("no animations")
@@ -326,7 +335,11 @@ def write_anim_meta(path, animations, anchor=None, ground=False, body=None):
         problems = check_ground(meta, sheet)
         if problems:
             raise ValueError("; ".join(problems))
-    problems = check_hitbox(meta, strip(flat).img) + check_body(meta, strip(flat).img)
+    mask_img = None
+    if any(e.get("hit_mask") for e in entries):
+        mask_img = strip(masks).img
+        mask_img.save(Path(path).with_name(Path(path).stem + "_hitmask.png"))
+    problems = check_hitbox(meta, strip(flat).img, mask_img) + check_body(meta, strip(flat).img)
     if problems:
         raise ValueError("; ".join(problems))
     Path(path).write_text(json.dumps(meta, indent=2) + "\n", encoding="utf-8")
@@ -478,7 +491,7 @@ def fit_hitbox(frames, spec):
     return box
 
 
-def check_hitbox(meta, strip_img):
+def check_hitbox(meta, strip_img, mask_img=None):
     """Problems where an animation's "hitbox" does not match its pixels.
 
     The hitbox must be what fit_hitbox measures from the active frames (within
@@ -498,7 +511,13 @@ def check_hitbox(meta, strip_img):
         if not (0 <= first <= last < anim["frames"]):
             problems.append(f"{name}: hitbox active {box.get('active')} outside 0..{anim['frames'] - 1}")
             continue
-        frames = [strip_img.crop(((anim["start"] + i) * w, 0, (anim["start"] + i + 1) * w, h))
+        src = strip_img
+        if anim.get("hit_mask"):
+            if mask_img is None:
+                problems.append(f"{name}: hit_mask set but no <name>_hitmask.png to measure")
+                continue
+            src = mask_img
+        frames = [src.crop(((anim["start"] + i) * w, 0, (anim["start"] + i + 1) * w, h))
                   for i in range(anim["frames"])]
         try:
             fit = fit_hitbox(frames, box)

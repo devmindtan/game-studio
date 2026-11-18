@@ -32,7 +32,8 @@ def export(here: Path, name: str, animations, anchor, ground=False, preview_scal
     for anim, frames, fps, _, _ in animations:
         gif(frames, here / f"{anim}.gif", fps=fps, scale=gif_scale or max(1, 96 // max(w, h)))
     write_anim_meta(here / f"{name}.json",
-                    [{"name": n, "frames": f, "fps": fps, "loop": loop, **extra}
+                    [{"name": n, "frames": f, "fps": fps, "loop": loop, **extra,
+                      **({"hit_mask": f.hit_masks} if getattr(f, "hit_masks", None) else {})}
                      for n, f, fps, loop, extra in animations],
                     anchor=anchor, ground=ground, body=body)
     return here / f"{name}_strip.png"

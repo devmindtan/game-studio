@@ -33,18 +33,19 @@
         130.0
       ],
       "hitbox": {
-        "shape": "rect",
+        "shape": "circle",
         "center": [
-          60.5,
-          78.0
+          60.0,
+          116.0
         ],
         "active": [
           2,
-          5
+          3
         ],
-        "half_w": 39.5,
-        "half_h": 78.0
-      }
+        "radius": 20.0,
+        "inner": 0.0
+      },
+      "hit_mask": true
     }
   ],
   "px_scale": 0.5

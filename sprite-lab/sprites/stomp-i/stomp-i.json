@@ -42,9 +42,10 @@
           1,
           4
         ],
-        "radius": 47.0,
+        "radius": 45.0,
         "inner": 0.0
-      }
+      },
+      "hit_mask": true
     }
   ],
   "px_scale": 0.5

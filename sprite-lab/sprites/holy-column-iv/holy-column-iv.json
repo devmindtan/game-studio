@@ -35,16 +35,17 @@
       "hitbox": {
         "shape": "rect",
         "center": [
-          62.5,
-          80.0
+          60.5,
+          116.5
         ],
         "active": [
           3,
           6
         ],
-        "half_w": 42.5,
-        "half_h": 80.0
-      }
+        "half_w": 36.5,
+        "half_h": 36.5
+      },
+      "hit_mask": true
     }
   ],
   "px_scale": 0.5

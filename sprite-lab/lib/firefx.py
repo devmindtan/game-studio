@@ -14,6 +14,7 @@ import math
 import random
 
 from spritekit import Canvas
+import fxkit as fk
 from icefx import BAYER, _disk, _fade, _p, _ring
 
 WHITE = "#fff8e0"
@@ -56,6 +57,7 @@ def blast(tier, size, radius, seed=3):
     rng = random.Random(seed)
     embers = [(rng.uniform(0, math.tau), rng.uniform(0.5, 1.1), rng.uniform(0.6, 1.4)) for _ in range(12 + 4 * tier)]
     out = []
+    masks = []   # hit masks: the damaging core (spritekit measures the hitbox from these)
     for f in range(12):
         c = Canvas(size, size)
         if f == 0:   # the fireball's core flares before it bursts
@@ -91,7 +93,8 @@ def blast(tier, size, radius, seed=3):
             if f >= 8:
                 _fade(c, min(0.95, 0.1 + 0.2 * (f - 7)))
         out.append(c)
-    return out
+        masks.append(fk.mask_disk(size, size, cx, cy, radius * 0.3 if f == 0 else radius * 0.6 if f == 1 else radius * (0.55 + 0.45 * (f - 1) / 3) * 0.85 if f <= 4 else radius * 0.5))
+    return fk.FxFrames(out, masks)
 
 
 METEOR_MS = [90, 90, 60, 50, 50, 60, 70, 80, 110, 120, 120, 130, 140]
@@ -152,25 +155,40 @@ def meteor(tier, w, h, ground, radius, seed=5):
     rr = 6 + tier * 1.5
     trail_cols = [DRED, RED, ORA, YEL] + ([HOT] if tier >= 4 else [])
     tw = rr * (1.0 + 0.15 * tier)
-    escorts = [(-24, -2, 0.55), (10, -26, 0.5)] if tier >= 3 else []   # flying beside, clear of the main rock
+    # (land frame, ground offset x, y, scale): the main rock lands on frame 5 (the hit);
+    # escorts land at their own moments, one before and one after (user 2026-11-18)
+    falls = [(5, 0, 0, 1.0)] + ([(4, -26, 8, 0.5), (7, 22, -6, 0.45)] if tier >= 3 else [])
     out = []
+    masks = []   # hit masks: the damaging core (spritekit measures the hitbox from these)
+
+    def falling(c, f):
+        for land, ox, oy, k in falls:
+            t = (f - (land - 4)) / 4.0   # 0 at the top of the frame .. 1 on landing
+            ex, ey = cx + ox, cy + oy
+            if 0.0 < t < 1.0:
+                sx, sy = min(w - rr * k - 2, ex + w * 0.42), rr * k + 2
+                mx, my = sx + (ex - sx) * t, sy + (ey - sy) * t
+                dx, dy = ex - sx, ey - sy                   # the trail streams back along the real path
+                flick = 0.85 + 0.15 * math.sin(f * 2.3 + land)
+                if tier >= 5 and k == 1.0:
+                    fk.glow(c, mx, my, rr * 2.2, [DRED, RED, ORA], density=0.45)
+                _flame(c, mx, my, dx, dy, rr * k * (5.0 + 0.6 * tier) * flick, tw * k * (0.9 + 0.2 * flick), trail_cols)
+                d = math.hypot(dx, dy)
+                for e in range(3 + tier):   # embers shed behind it
+                    back = (e + 1) * 4 + (f * 3 + e * 5) % 6
+                    fk.streak(c, mx - dx / d * back + ((e * 7) % 5 - 2), my - dy / d * back, dx, dy, 3, YEL, ORA)
+                _rock(c, mx, my, rr * k, tier if k == 1.0 else max(1, tier - 2), seed + land)
+            elif k < 1.0 and land <= f <= land + 1:   # an escort's own small impact
+                fk.glow(c, ex, ey, rr * 1.6 * (1.2 if f == land else 0.8), [DRED, RED, ORA, YEL])
+                if f == land:
+                    fk.rays(c, ex, ey, rr * 0.6, rr * 2.2, 8, YEL, HOT)
+
     for f in range(13):
         c = Canvas(w, h)
         if f < 5:
             mark = radius * (0.5 + 0.12 * f)
             fk.ring_band(c, cx, cy, mark, [DRED, RED] if f % 2 else [RED, ORA])
-            if f >= 2:
-                t = (f - 1) / 4
-                mx, my = cx + (1 - t) * w * 0.35, cy - (1 - t) * (h - 6) + rr
-                if tier >= 5:   # comet aura
-                    fk.glow(c, mx, my, rr * 2.2, [DRED, RED, ORA], density=0.45)
-                for ex, ey, k in escorts:
-                    _flame(c, mx + ex, my + ey, -0.55, 1, rr * 5 * k, tw * k, trail_cols[:4])
-                    _rock(c, mx + ex, my + ey, rr * k, max(1, tier - 2), seed + ex)
-                _flame(c, mx, my, -0.55, 1, rr * (5.0 + 0.6 * tier), tw, trail_cols)
-                for k in range(3 + tier):
-                    fk.streak(c, mx + rng.uniform(2, 10) + k * 2, my - rng.uniform(4, 16) - k * 3, -0.55, 1, 3, YEL, ORA)
-                _rock(c, mx, my, rr, tier, seed)
+            falling(c, f)
         elif f == 5:
             fk.glow(c, cx, cy, radius * (0.6 + 0.06 * tier), [RED, ORA, YEL, HOT], density=0.95)
             fk.rays(c, cx, cy, radius * 0.35, radius * (0.9 + 0.08 * tier), 10 + 3 * tier, YEL, HOT, rot=0.15, width=2)
@@ -226,5 +244,8 @@ def meteor(tier, w, h, ground, radius, seed=5):
                 fk.sparkle(c, int(cx - radius * 0.2), int(cy - 4 - k), 2, HOT, YEL)
             if k >= 1:
                 _fade(c, min(0.95, 0.08 + 0.17 * k))
+        if 5 <= f <= 8:
+            falling(c, f)
         out.append(c)
-    return out
+        masks.append(fk.mask_disk(w, h, cx, cy, radius * 0.6 if f == 5 else radius * (0.6 + 0.4 * (f - 4) / 3) * 0.85 if f in (6, 7) else 0))
+    return fk.FxFrames(out, masks)

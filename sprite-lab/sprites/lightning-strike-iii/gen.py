@@ -28,7 +28,7 @@ GROUND = 116.0
 RADIUS = 39
 ANCHOR = (W / 2, GROUND)
 ANIM = [("strike", burstfx.lightning_strike(3, W, H, GROUND, RADIUS), 12, False,
-         {"durations_ms": burstfx.BOLT_MS, "hitbox": {"shape": "rect", "center": [W / 2, GROUND - 48.0], "half_w": 39.0, "half_h": 62.0, "active": [2, 5]}})]
+         {"durations_ms": burstfx.BOLT_MS, "hitbox": {"shape": "circle", "center": [W / 2, GROUND], "active": [2, 3]}})]  # only where the bolt lands, only while it lands
 
 if __name__ == "__main__":
     export(HERE, NAME, ANIM, anchor=ANCHOR, preview_scale=2, gif_scale=2)

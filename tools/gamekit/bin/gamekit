@@ -557,7 +557,9 @@ check_meta(m, Image.open(sys.argv[2]).size)
 ground = check_ground(m, Image.open(sys.argv[2]).convert("RGBA"))
 if ground:
     sys.exit("ground: " + "; ".join(ground))
-hit = check_hitbox(m, Image.open(sys.argv[2]).convert("RGBA")) + check_body(m, Image.open(sys.argv[2]).convert("RGBA"))
+mask = sys.argv[2].replace("_strip.png", "_hitmask.png")
+mask = Image.open(mask).convert("RGBA") if os.path.exists(mask) else None
+hit = check_hitbox(m, Image.open(sys.argv[2]).convert("RGBA"), mask) + check_body(m, Image.open(sys.argv[2]).convert("RGBA"))
 hit += check_layers(m, Image.open(sys.argv[2]).convert("RGBA"), os.path.join(os.path.dirname(sys.argv[1]), "layers"))
 if hit:
     sys.exit("hitbox: " + "; ".join(hit))

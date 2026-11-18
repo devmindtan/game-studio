@@ -14,6 +14,23 @@ from spritekit import Canvas
 from icefx import BAYER, _p
 
 
+class FxFrames(list):
+    """Frames plus hit_masks (one canvas each): the damaging core drawn as solid pixels.
+    sheet.export passes them to write_anim_meta, which measures the hitbox from the
+    masks instead of the art (rays, debris and bolts never inflate the hit area)."""
+
+    def __init__(self, frames, masks):
+        super().__init__(frames)
+        self.hit_masks = masks
+
+
+def mask_disk(w, h, cx, cy, r):
+    m = Canvas(w, h)
+    if r > 0:
+        m.ellipse(int(cx - r), int(cy - r), int(cx + r), int(cy + r), "#ffffff", fill=True)
+    return m
+
+
 def layer(size_w, size_h=None):
     return Canvas(size_w, size_h or size_w)
 

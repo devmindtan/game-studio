@@ -13,6 +13,7 @@ import math
 import random
 
 from spritekit import Canvas
+import fxkit as fk
 from icefx import _disk, _fade, _p, _ring
 
 CLOUD = "#3a3a5a"
@@ -40,6 +41,15 @@ def _bolt(c, x0, y0, x1, y1, rng, col, glow, segs=7):
         c.line(int(a), int(b), int(cx), int(cy), col, 2)
 
 
+def _spots_mask(size, spots, r):
+    """Hit mask of a storm frame: disks where the bolts land (none between strikes)."""
+    m = Canvas(size, size)
+    for x, y in spots:
+        if r > 0:
+            m.ellipse(int(x - r), int(y - r), int(x + r), int(y + r), "#ffffff", fill=True)
+    return m
+
+
 STORM_MS = [80, 80, 80, 55, 55, 55, 55, 80, 100, 110, 120, 130]
 STONE_D = "#4a4038"
 
@@ -54,6 +64,7 @@ def storm(tier, size, radius, seed=11):
     spots = [(cx + math.cos(a) * radius * d, cy + math.sin(a) * radius * d * 0.8)
              for a, d in ((rng.uniform(0, math.tau), rng.uniform(0.1, 0.8)) for _ in range(n))]
     out = []
+    masks = []   # hit masks: the damaging core (spritekit measures the hitbox from these)
     for f in range(12):
         c = Canvas(size, size)
         if f < 3:
@@ -91,7 +102,8 @@ def storm(tier, size, radius, seed=11):
             if k >= 1:
                 _fade(c, min(0.95, 0.1 + 0.2 * k))
         out.append(c)
-    return out
+        masks.append(_spots_mask(size, spots, 6 + tier if 3 <= f < 7 else 0))
+    return fk.FxFrames(out, masks)
 
 
 STOMP_MS = [60, 45, 50, 55, 55, 60, 80, 90, 100, 110, 120, 130]
@@ -107,6 +119,7 @@ def stomp(tier, size, radius, seed=13):
     cracks = [(rng.uniform(0, math.tau), rng.uniform(0.5, 0.95)) for _ in range(5 + tier)]
     rocks = [(rng.uniform(0, math.tau), rng.uniform(0.4, 1.0)) for _ in range(6 + 2 * tier)]
     out = []
+    masks = []   # hit masks: the damaging core (spritekit measures the hitbox from these)
     for f in range(12):
         c = Canvas(size, size)
         if f == 0:
@@ -139,7 +152,8 @@ def stomp(tier, size, radius, seed=13):
             if k >= 1:
                 _fade(c, min(0.95, 0.1 + 0.18 * k))
         out.append(c)
-    return out
+        masks.append(fk.mask_disk(size, size, cx, cy, radius * 0.3 if f == 0 else radius * (0.3 + 0.7 * f / 5) if f < 6 else radius * 0.9))
+    return fk.FxFrames(out, masks)
 
 
 QUAKE_MS = [70, 70, 60, 60, 60, 60, 70, 90, 100, 110, 120, 130]
@@ -154,6 +168,7 @@ def earthquake(tier, size, radius, seed=17):
     path = [(cx - radius + 2 * radius * k / 10, cy + rng.uniform(-radius * 0.25, radius * 0.25)) for k in range(11)]
     spikes = [path[k] for k in range(1, 10, 2)][: 2 + tier]
     out = []
+    masks = []   # hit masks: the damaging core (spritekit measures the hitbox from these)
     for f in range(12):
         c = Canvas(size, size)
         open_ = [0.15, 0.3, 0.7, 1.0, 1.0, 1.0, 0.8, 0.5, 0.3, 0.2, 0.1, 0.05][f]
@@ -176,4 +191,5 @@ def earthquake(tier, size, radius, seed=17):
         if f >= 8:
             _fade(c, min(0.95, 0.15 + 0.2 * (f - 7)))
         out.append(c)
-    return out
+        masks.append(fk.mask_disk(size, size, cx, cy, radius * 0.9))
+    return fk.FxFrames(out, masks)

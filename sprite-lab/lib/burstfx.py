@@ -36,6 +36,7 @@ def impact_burst(tier, size, radius, pal, seed=21):
     shards = [(rng.uniform(0, math.tau), rng.uniform(0.6, 1.0)) for _ in range(6 + 2 * tier)]
     sparks = [(rng.uniform(0, math.tau), rng.uniform(0.5, 1.1)) for _ in range(10 + 3 * tier)]
     out = []
+    masks = []   # hit masks: the damaging core (spritekit measures the hitbox from these)
     for f in range(12):
         c = Canvas(size, size)
         if f == 0:
@@ -71,7 +72,8 @@ def impact_burst(tier, size, radius, pal, seed=21):
             if k >= 1:
                 _fade(c, min(0.95, 0.1 + 0.18 * k))
         out.append(c)
-    return out
+        masks.append(fk.mask_disk(size, size, cx, cy, radius * 0.25 if f == 0 else radius * 0.55 if f == 1 else radius * (0.5 + 0.5 * (f - 1) / 3) if f < 5 else radius * 0.4))
+    return fk.FxFrames(out, masks)
 
 
 STONE = ("#b8b0a0", "#8a8070", "#4a4038", "#e8e0d0")
@@ -89,6 +91,7 @@ def earth_burst(tier, size, radius, seed=31):
     cracks = [(rng.uniform(0, math.tau), rng.uniform(0.6, 1.0)) for _ in range(6 + tier)]
     pillars = [(k * math.tau / (5 + tier) + rng.uniform(-0.2, 0.2), rng.uniform(0.35, 0.8)) for k in range(5 + tier)]
     out = []
+    masks = []   # hit masks: the damaging core (spritekit measures the hitbox from these)
     for f in range(12):
         c = Canvas(size, size)
         grow = min(1.0, (f + 1) / 3)
@@ -114,7 +117,8 @@ def earth_burst(tier, size, radius, seed=31):
         if f >= 8:
             _fade(c, min(0.95, 0.1 + 0.2 * (f - 7)))
         out.append(c)
-    return out
+        masks.append(fk.mask_disk(size, size, cx, cy, radius * 0.85))
+    return fk.FxFrames(out, masks)
 
 
 HOLY_MS = [80, 70, 60, 50, 55, 60, 80, 90, 100, 110, 120, 130]
@@ -126,6 +130,7 @@ def holy_column(tier, w, h, ground, radius, seed=41):
     rng = random.Random(seed)
     motes = [(rng.uniform(-1, 1), rng.uniform(0, 1)) for _ in range(10 + 3 * tier)]
     out = []
+    masks = []   # hit masks: the damaging core (spritekit measures the hitbox from these)
     bw = radius * 0.55
     for f in range(12):
         c = Canvas(w, h)
@@ -157,7 +162,8 @@ def holy_column(tier, w, h, ground, radius, seed=41):
             fk.glow(c, cx, ground, radius * 0.4, [GOLD[1], GOLD[2]], density=0.4)
             _fade(c, min(0.95, 0.15 + 0.2 * k))
         out.append(c)
-    return out
+        masks.append(fk.mask_disk(w, h, cx, ground, radius * 0.9))
+    return fk.FxFrames(out, masks)
 
 
 BOLT_MS = [70, 70, 50, 50, 55, 60, 80, 90, 100, 110, 120, 130]
@@ -167,6 +173,7 @@ def lightning_strike(tier, w, h, ground, radius, seed=51):
     cx = w / 2
     rng = random.Random(seed)
     out = []
+    masks = []   # hit masks: the damaging core (spritekit measures the hitbox from these)
     for f in range(12):
         c = Canvas(w, h)
         if f < 2:   # a crackling spark gathers at the top, a mark on the ground
@@ -201,4 +208,5 @@ def lightning_strike(tier, w, h, ground, radius, seed=51):
             if k >= 1:
                 _fade(c, min(0.95, 0.1 + 0.18 * k))
         out.append(c)
-    return out
+        masks.append(fk.mask_disk(w, h, cx, ground, radius * 0.5 if 2 <= f <= 3 else 0))
+    return fk.FxFrames(out, masks)
