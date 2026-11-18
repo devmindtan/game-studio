@@ -13,8 +13,7 @@ import math
 import random
 
 from spritekit import Canvas
-import fxkit as fk
-from icefx import _disk, _fade, _p, _ring
+from icefx import _disk, _fade, _p
 
 CLOUD = "#3a3a5a"
 CLOUD_L = "#5a5a80"
@@ -166,9 +165,55 @@ def stomp(tier, size, radius, seed=13):
 QUAKE_MS = [70, 70, 60, 60, 60, 60, 70, 90, 100, 110, 120, 130]
 
 
+def _qnoise(x, y, salt=0):
+    """A stable 0..1 scatter value (burstfx._h01 idea, kept local to stormfx)."""
+    h = (int(x) * 374761393 + int(y) * 668265263 + int(salt) * 1103515245) & 0xFFFFFFFF
+    h = ((h ^ (h >> 13)) * 1274126177) & 0xFFFFFFFF
+    return ((h ^ (h >> 16)) & 0xFFFF) / 65536.0
+
+
+def _scuff(c, cx, cy, r, seed, col=DIRT, density=0.6):
+    """Churned earth: an uneven blot with a ragged edge, not a filled disc."""
+    ri = int(math.ceil(r))
+    for y in range(-ri, ri + 1):
+        for x in range(-ri, ri + 1):
+            dd = math.hypot(x, y) / max(1.0, r)
+            a = math.atan2(y, x)
+            wob = 0.87 + 0.11 * math.sin(a * 4 + seed) + 0.05 * math.sin(a * 9 - seed)
+            if dd > wob:
+                continue
+            px, py = int(cx + x), int(cy + y)
+            if _qnoise(px, py, seed + 7) < density * (1.05 - 0.85 * dd * dd):
+                _p(c, px, py, col)
+
+
+def _rift(c, path, open_, tier, f, seed):
+    """A widening fissure: jagged, crumbling lips, a dark core and a heart that
+    flickers instead of a solid stripe (user 2026-11-18: the old line was rigid)."""
+    n = len(path)
+    for i in range(n - 1):
+        x0, y0 = path[i]
+        x1, y1 = path[i + 1]
+        taper = math.sin(math.pi * i / (n - 1)) ** 0.6   # narrow at the ends
+        w = max(0.6, (0.9 + 3.2 * open_ + tier * 0.3 * open_) * taper)
+        steps = max(3, int(math.hypot(x1 - x0, y1 - y0)))
+        for s in range(steps + 1):
+            t = s / steps
+            jx = (_qnoise(i * 17 + s, f, 3) - 0.5) * 1.2 * open_
+            jy = (_qnoise(i * 19 + s, f, 5) - 0.5) * 1.4 * open_
+            px = int(round(x0 + (x1 - x0) * t + jx))
+            py = int(round(y0 + (y1 - y0) * t + jy))
+            for q in range(-int(math.ceil(w)), int(math.ceil(w)) + 1):
+                if _qnoise(px + q, py, seed + 11) < 0.82 - 0.22 * abs(q) / max(1.0, w):
+                    _p(c, px + q, py, DIRT_D)
+            _p(c, px, py, "#1a1008")                     # the deep crack
+            if open_ > 0.5 and _qnoise(px, py, seed + f * 3) < 0.20 + 0.35 * open_:
+                _p(c, px, py - 1, "#ff8a2a" if tier >= 4 else "#2a1a10")
+
+
 def earthquake(tier, size, radius, seed=17):
-    """12 frames: tremor cracks, the rift tears open with outlined rock spikes and
-    thrown dust (lava glow from IV), it closes, fade."""
+    """12 frames: tremor cracks, the rift tears open with rock spikes and thrown
+    dust (lava glow from IV), it closes, fade. Tier ideas and timing unchanged."""
     import fxkit as fk
     cx = cy = size / 2
     rng = random.Random(seed)
@@ -179,22 +224,27 @@ def earthquake(tier, size, radius, seed=17):
     for f in range(12):
         c = Canvas(size, size)
         open_ = [0.15, 0.3, 0.7, 1.0, 1.0, 1.0, 0.8, 0.5, 0.3, 0.2, 0.1, 0.05][f]
-        _disk(c, cx, cy, radius * 0.9, DIRT, density=0.14 * min(1.0, f / 2 + 0.3))
-        w = max(1, round(1 + 3 * open_ + tier * 0.3 * open_))
-        for (x0, y0), (x1, y1) in zip(path, path[1:]):
-            c.line(int(x0), int(y0), int(x1), int(y1), DIRT_D, w + 1)
-            if open_ > 0.6:
-                c.line(int(x0), int(y0), int(x1), int(y1), "#ff8a2a" if tier >= 4 else "#2a1a10", max(1, w - 1))
+        _scuff(c, cx, cy, radius * 0.9, seed + f % 3, DIRT, 0.24 * min(1.0, f / 2 + 0.3))
+        _rift(c, path, open_, tier, f, seed)
         if 2 <= f <= 7:
             h = (7 + tier * 2) * (1.0 if f < 7 else 0.6)
             lay = Canvas(size, size)
             for x, y in spikes:
                 fk.crystal(lay, x, y, -math.pi / 2 + rng.uniform(-0.3, 0.3), h, 3, STONE_L, STONE, STONE_D, "#e8e0d0")
             fk.stack(c, lay, DIRT_D)
+            for x, y in spikes:   # crumbs at the foot of each upthrust shard
+                for _ in range(4):
+                    px, py = int(x + rng.uniform(-4, 4)), int(y + rng.uniform(-1, 3))
+                    if _qnoise(px, py, f + 41) < 0.8:
+                        _p(c, px, py, DIRT_D)
         if 2 <= f <= 6:
             for k in range(10 + tier):
                 x, y = path[k % len(path)]
-                fk.streak(c, x + rng.uniform(-3, 3), y - rng.uniform(2, 12), 0, -1, 3, DUST_L, DUST)
+                dx, dy = rng.uniform(-4, 4), -rng.uniform(2, 10) * (1 - 0.09 * (f - 2))
+                for s in range(2):   # a little drifting puff, not a rigid dash
+                    px, py = int(x + dx + rng.uniform(-1, 1)), int(y + dy + s)
+                    if _qnoise(px, py, f + 31) < 0.75:
+                        _p(c, px, py, DUST_L if s == 0 else DUST)
         if f >= 8:
             _fade(c, min(0.95, 0.15 + 0.2 * (f - 7)))
         out.append(c)
