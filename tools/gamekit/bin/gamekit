@@ -76,6 +76,8 @@ Sprite Lab (sprite-lab/: make + test sprites here, then promote into a game)
   art promote <name> <game>         copy strip + json into games/<g>/assets/sprites/custom/<name>/
   art ase|open <name>               .ase for editing by hand in LibreSprite
 
+  hires <game> [names]         x4 Scale2x copies of skill sprites (drawn big): denser pixels, same size
+
 Audio (sounds are code: assets/source/audio/sfx.json + music.json)
   audio <game> [--only a,b] [--play id]  render .wav into assets/audio/, review sheet, import; --play listens
   audio test                   unit tests of the synth
@@ -472,6 +474,26 @@ cmd_audio() {
   echo "review: $g/production/audio/review.png (waveforms) + review.txt"
 }
 
+# hires <game> [names]: denser x4 copies (Scale2x twice) of sprites drawn big; default: every
+# skill sprite in assets/data/upgrades_*.json (sprite + tier_sprites)
+cmd_hires() {
+  local g; g="$(resolve_game "${1:-}")"; shift || true
+  local names=("$@")
+  if [[ ${#names[@]} -eq 0 ]]; then
+    mapfile -t names < <(python3 -c 'import json,glob,sys
+seen=set()
+for f in glob.glob(sys.argv[1]+"/assets/data/upgrades_*.json"):
+    for s in json.load(open(f)).get("skills",{}).values():
+        for n in [s.get("sprite")]+list(s.get("tier_sprites",[])):
+            if n and n not in seen: seen.add(n); print(n)' "$g")
+  fi
+  local dirs=() n
+  for n in "${names[@]}"; do [[ -d "$g/assets/sprites/custom/$n" ]] && dirs+=("$g/assets/sprites/custom/$n"); done
+  [[ ${#dirs[@]} -gt 0 ]] || die "hires: no sprite folders found"
+  "${RUN[@]}" python3 "$KIT/pipeline/hires.py" "${dirs[@]}" | sed "s#$g/##"
+  godot_import "$g"
+}
+
 cmd_sample_sprite() {
   local g; g="$(resolve_game "${1:-}")"
   python3 "$KIT/pipeline/lpc_sample_compose.py" --generator "$LPC_DIR" --name sample_hero \
@@ -766,6 +788,7 @@ case "$sub" in
   lpc) cmd_lpc ;;
   sprites) cmd_sprites "$@" ;;
   audio) cmd_audio "$@" ;;
+  hires) cmd_hires "$@" ;;
   sample-sprite) cmd_sample_sprite "$@" ;;
   preview) cmd_preview "$@" ;;
   art) cmd_art "$@" ;;

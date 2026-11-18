@@ -18,6 +18,8 @@ const DEFAULT_ANIM := "default"
 var name := ""
 var dir := ""                  # folder it was loaded from (layers/ lives there)
 var texture: Texture2D
+var hires_texture: Texture2D      # <name>_strip_x<k>.png (gamekit hires): denser copy for big draws
+var hires := 1                    # its factor k (json "hires"); 1 = none
 var meta: Dictionary = {}
 var frame_size := Vector2.ZERO
 var anchor := Vector2.ZERO
@@ -39,6 +41,12 @@ static func load_dir(dir: String, sprite_name: String) -> SpriteSheet:
 	var sheet := from_meta(sprite_name, parsed)
 	sheet.dir = dir
 	sheet.texture = load(strip_path)
+	sheet.hires = int(parsed.get("hires", 1))
+	var hires_path := dir.path_join("%s_strip_x%d.png" % [sprite_name, sheet.hires])
+	if sheet.hires > 1 and ResourceLoader.exists(hires_path):
+		sheet.hires_texture = load(hires_path)
+	else:
+		sheet.hires = 1
 	return sheet
 
 
@@ -147,6 +155,10 @@ func draw_index(canvas: CanvasItem, index: int, point: Vector2, scale: float,
 		return
 	var dest := SpriteAnchor.dest_rect(point, frame_size, anchor, scale, flip_h)
 	dest.position = dest.position.round()
+	if hires_texture != null and scale >= 2.0:   # drawn big: the denser copy, same size on screen
+		var r := src_rect(index)
+		canvas.draw_texture_rect_region(hires_texture, dest, Rect2(r.position * hires, r.size * hires), tint)
+		return
 	canvas.draw_texture_rect_region(texture, dest, src_rect(index), tint)
 
 

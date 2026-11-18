@@ -143,6 +143,13 @@ gamekit audio test                   # unit test của bộ tổng hợp
 - Soát: `production/audio/review.png` (dạng sóng từng tiếng) + `review.txt` (giây, đỉnh, rms). Agent không nghe
   được: xem dạng sóng và rms (tiếng phát liên tục như trúng đòn phải nhỏ), còn nghe là việc của người dùng.
 
+## Hiệu ứng vẽ to: `gamekit hires`
+
+`gamekit hires <game> [tên…]` tạo `<tên>_strip_x4.png` (Scale2x/EPX hai lần, từng khung một; dải quá dài thì ×2)
+cho mọi sprite chiêu trong `upgrades_*.json` và ghi `"hires": k` vào json. `SpriteSheet` vẽ bản dày này khi tỉ lệ ≥ 2,
+cùng kích thước trên màn: hiệu ứng phóng ×5 không còn khối 5 px. Hitbox, neo giữ đơn vị gốc. Chạy lại sau khi
+`art promote` một sprite chiêu (promote ghi đè json).
+
 ## Xuất game
 
 ```bash
