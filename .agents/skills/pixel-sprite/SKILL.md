@@ -175,6 +175,10 @@ Test của game (`gameplay_rules_test`) chặn sprite có `px_scale` mà sai chu
 - Silhouette phải đọc được ở 1x; outline tối 1px hoặc selective outline.
 - Animation: 4–8 frame cho idle/loop, 6–10 cho walk/run; đổi 1–2 pixel mỗi frame; neo cố định qua mọi frame.
 - Nền trong suốt (`RGBA`), không viền quanh cả canvas.
+- **Quái nhảy phải có animation nhảy** (người dùng 2026-11-18): `crouch` (lấy đà, nén) và `jump` (bật → đỉnh →
+  rơi → đáp), mọi tư thế đặt chân ở hàng đất trong khung; game nâng sprite theo `hop_height` và giữ bóng.
+  Test `data_consistency_test.gd` của Bách Ải chặn quái nhảy thiếu hai animation này. Vẽ sinh vật nhỏ
+  (≤ 32 px) thì vẽ tay từng tư thế (ASCII); hình học (ellipse) chỉ ổn từ khoảng 48 px trở lên.
 - **Sinh vật không phải người thì di chuyển bằng bộ phận của chính nó** (người dùng 2026-11-18: boss cây có "chân"
   thay vì rễ): cây trườn bằng chùm rễ, rắn uốn thân, ma lơ lửng có đuôi, nhầy co giãn. Không gắn chân người vào
   thứ không có chân; phần di chuyển phải tương phản với thân (màu/viền riêng) để đọc được ở 1x. Rễ cây là
