@@ -638,15 +638,6 @@ function monsters(m){
     [['heart','Máu',s.hp],['sword','Sát thương chạm',s.damage],['boot','Tốc độ',s.speed],['gem','Kinh nghiệm rơi',s.xp]]
       .forEach(([ic,l,v])=>st.appendChild(el('div',{class:'statCell'},iconCanvas(ic,2),el('div',{},el('b',{},String(v)),el('div',{class:'small muted'},l)))));
     card.appendChild(st);
-    const PARAM={wobble:'lượn ngang (px/s)',charge_range:'tầm lao (px)',windup:'lấy đà (s)',dash_speed:'tốc độ lao (px/s)',
-      dash_time:'thời gian lao (s)',charge_cooldown:'hồi lao (s)',jump_every:'nhảy mỗi (s)',jump_time:'thời gian nhảy (s)',
-      slam_damage:'sát thương dậm',slam_reach:'tầm dậm (× thân)',split_at:'tách khi máu còn',split_into:'tách thành',
-      split_count:'số con tách',keep_range:'giữ khoảng cách (px)',shoot_range:'tầm bắn (px)',shoot_every:'bắn mỗi (s)',
-      bolt_sprite:'đạn',bolt_speed:'tốc độ đạn',bolt_damage:'sát thương đạn',bolt_range:'tầm đạn',bolt_radius:'bán kính đạn'};
-    // only plain values: a dict (e.g. explode) would print as [object Object]
-    const extra=Object.entries(s).filter(([k,v])=>!['sprite','behaviour','hp','damage','speed','xp','scale','name','boss'].includes(k)
-      && (typeof v==='number'||typeof v==='string'));
-    if(extra.length) card.appendChild(el('div',{class:'small muted',style:'margin-top:6px'},extra.map(([k,v])=>(PARAM[k]||k)+' '+v).join(' · ')));
     grid.appendChild(card);
   });
   m.appendChild(grid);
