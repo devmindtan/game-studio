@@ -54,6 +54,12 @@ def make(sprite_dir: Path) -> Path:
         raise SystemExit(f"hires: {sprite_dir} has no {name}_strip.png / {name}.json")
     img = Image.open(strip).convert("RGBA")
     data = json.loads(meta.read_text())
+    if data.get("layers"):   # a layered hero is composed at run time (worn items): no baked copy
+        for old in sprite_dir.glob(f"{name}_strip_x*.png"):
+            old.unlink()
+        data.pop("hires", None)
+        meta.write_text(json.dumps(data, indent=2) + "\n")
+        return sprite_dir / f"{name}: layered, skipped"
     fw = int(data.get("frame_size", [img.width, img.height])[0])
     factor = FACTOR
     while factor > 1 and img.width * factor > MAX_TEXTURE:

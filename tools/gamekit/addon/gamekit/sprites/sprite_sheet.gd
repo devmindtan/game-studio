@@ -171,6 +171,19 @@ func draw_index(canvas: CanvasItem, index: int, point: Vector2, scale: float,
 # nothing is swapped.
 
 
+## Layer overrides for worn items: for each item id, every layer it has under
+## <dir>/gear/<item>/<layer>_strip.png (sprite-lab hero-gear). Pass the result to
+## compose_layers(). Later items win where two draw the same layer.
+func gear_overrides(items: Array) -> Dictionary:
+	var out := {}
+	for item: Variant in items:
+		for n in layer_names():
+			var path := dir.path_join("gear").path_join(String(item)).path_join(n + "_strip.png")
+			if ResourceLoader.exists(path):
+				out[n] = load(path)
+	return out
+
+
 ## Layer names in z order (empty for a sprite that is not layered).
 func layer_names() -> PackedStringArray:
 	var out := PackedStringArray()
@@ -205,6 +218,8 @@ func compose_layers(overrides := {}) -> void:
 		return
 	var outline := Color.html(String(meta.get("outline", "#1b1726")))
 	texture = ImageTexture.create_from_image(outline_frames(stacked, int(frame_size.x), int(frame_size.y), outline))
+	hires_texture = null   # a hires copy was made from the bare strip: it would hide the worn layers
+	hires = 1
 
 
 ## 1 px outline around the opaque pixels of every [param fw] x [param fh] frame

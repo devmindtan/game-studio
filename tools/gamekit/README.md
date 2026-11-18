@@ -150,6 +150,13 @@ cho mọi sprite chiêu trong `upgrades_*.json` và ghi `"hires": k` vào json. 
 cùng kích thước trên màn: hiệu ứng phóng ×5 không còn khối 5 px. Hitbox, neo giữ đơn vị gốc. Chạy lại sau khi
 `art promote` một sprite chiêu (promote ghi đè json).
 
+## Đồ mặc trên nhân vật
+
+Nhân vật vẽ theo lớp (`sprite-lab/lib/minifig.py` → `SLOTS`: head, chest, legs, feet, arms, weapon).
+`sprite-lab/sprites/hero-gear/gen.py` vẽ lại nhân vật với từng món (cùng tư thế) và ghi
+`sprite-lab/sprites/<hero>/gear/<id món>/<lớp>_strip.png`; `art promote <hero>` chép cả `gear/`. Trong game:
+`sheet.compose_layers(sheet.gear_overrides(worn_ids))`. `compose_layers` bỏ bản hires (bản đó vẽ từ nhân vật trần).
+
 ## Xuất game
 
 ```bash

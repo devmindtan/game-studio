@@ -161,10 +161,11 @@ def tunic(c, g, pal):
     c.pixel(bx + 1, hip[1] - 2, pal["buckle"])
 
 
-def robe(c, g, p, pal):
-    """Long robe from shoulders to just above the floor; the hem flares and sways."""
+def robe(c, g, p, pal, hem_up=0):
+    """Long robe from shoulders to just above the floor; the hem flares and sways.
+    hem_up lifts the hem so trousers show above the boots."""
     hip, top = g["hip"], g["top"]
-    hem_y = SOLE - 2
+    hem_y = SOLE - 2 - hem_up
     sway = round(math.sin(p["phase"]) * 1.5 * (0.4 + p["speed"]))
     for y in range(top[1], hem_y + 1):
         t = (y - top[1]) / max(1, hem_y - top[1])
@@ -202,14 +203,15 @@ def eyes(c, x, y, kind, pal):
 
 # Z order, back to front. BASE is the bare figure under everything (not a slot);
 # the equipment slots group the rest (see SLOTS).
-LAYERS = ["chest_back", "legs_back", "arms_back", "weapon_back", "chest", "legs_front",
-          "body", "head", "weapon", "arms_front", "front"]
+LAYERS = ["chest_back", "legs_back", "feet_back", "arms_back", "weapon_back", "chest", "legs_front",
+          "feet_front", "body", "head", "weapon", "arms_front", "front"]
 BASE = ["body"]                               # the bare figure (face, eyes, skin): never replaced
 SLOTS = {
     "head": ["head"],                         # hair / helmet
     "chest": ["chest_back", "chest"],         # cape or scarf tail behind; tunic, robe, collar
     "arms": ["arms_back", "arms_front"],      # sleeves and hands (gloves, gauntlets)
-    "legs": ["legs_back", "legs_front"],      # trousers and boots (greaves)
+    "legs": ["legs_back", "legs_front"],      # trousers / greaves (Quần)
+    "feet": ["feet_back", "feet_front"],      # boots / shoes (Giày), split from the legs 2026-11-18
     "weapon": ["weapon_back", "weapon"],      # held behind the body / in front
 }
 
@@ -224,20 +226,24 @@ def draw_layers(char, p):
     if char.get("behind"):
         char["behind"](L["chest_back"], p, g)
     if tunic_body:
-        leg(L["legs_back"], g["hip"], g["foot_back"], pal, back=True)
+        leg(L["legs_back"], g["hip"], g["foot_back"], pal, back=True, boot_c=L["feet_back"])
     else:  # robe: only boots show under the hem
         b = g["foot_back"]
-        rect(L["legs_back"], b[0] - 1, b[1] - 1, b[0] + 2, b[1], pal["boot_d"])
+        rect(L["feet_back"], b[0] - 1, b[1] - 1, b[0] + 2, b[1], pal["boot_d"])
     arm(L["arms_back"], g["sh_back"], g["hand_back"], pal, back=True)
     if char.get("held_back"):
         char["held_back"](L["weapon_back"], p, g)
     if tunic_body:
         tunic(L["chest"], g, pal)
-        leg(L["legs_front"], g["hip"], g["foot_front"], pal, back=False)
+        leg(L["legs_front"], g["hip"], g["foot_front"], pal, back=False, boot_c=L["feet_front"])
     else:
         f = g["foot_front"]   # under the robe: with the back boot, below the chest
-        rect(L["legs_back"], f[0] - 1, f[1] - 1, f[0] + 2, f[1], pal["boot"])
-        robe(L["chest"], g, p, pal)
+        rect(L["feet_back"], f[0] - 1, f[1] - 1, f[0] + 2, f[1], pal["boot"])
+        up = char.get("hem_up", 0)
+        if up:   # trousers between the hem and the boots (legs slot, Quần)
+            for foot, layer, key in ((g["foot_back"], "legs_back", "pants_d"), (f, "legs_front", "pants")):
+                rect(L[layer], foot[0] - 1, foot[1] - 2 - up, foot[0] + 1, foot[1] - 2, pal[key])
+        robe(L["chest"], g, p, pal, up)
     if char.get("neck"):     # collar / scarf knot: part of the chest slot, above the legs
         char["neck"](L["chest"], p, g)
     char["head"](L["body"], p, g)

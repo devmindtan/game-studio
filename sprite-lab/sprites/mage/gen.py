@@ -52,7 +52,7 @@ PAL = {
     "beard": "#eceaf5", "beard_d": "#b8b5cf",
     "wood": "#8a5a2e", "wood_d": "#563418",
     "boot": "#4a3157", "boot_d": "#2b1a33",
-    "pants": "#241630", "pants_d": "#241630",
+    "pants": "#3a2a4a", "pants_d": "#241630",
     "magic": "#7ef0ff", "magic_mid": "#37b9e8", "magic_deep": "#8b5cf6", "core": "#ffffff",
     "eye": "#140d20",
 }
@@ -141,7 +141,7 @@ def staff(c, p, g):
         put(c, ox + dx, oy + dy, PAL["magic_deep"])
 
 
-CHAR = {"pal": PAL, "body": "robe", "head": head, "hair": hat, "held": staff}
+CHAR = {"pal": PAL, "body": "robe", "head": head, "hair": hat, "held": staff, "hem_up": 2}   # trousers show (Quần slot)
 
 
 def frame(**kw):

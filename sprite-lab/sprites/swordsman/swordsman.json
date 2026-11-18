@@ -150,10 +150,12 @@
   "layers": [
     "chest_back",
     "legs_back",
+    "feet_back",
     "arms_back",
     "weapon_back",
     "chest",
     "legs_front",
+    "feet_front",
     "body",
     "head",
     "weapon",
@@ -175,6 +177,10 @@
     "legs": [
       "legs_back",
       "legs_front"
+    ],
+    "feet": [
+      "feet_back",
+      "feet_front"
     ],
     "weapon": [
       "weapon_back",

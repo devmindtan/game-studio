@@ -145,12 +145,14 @@
       26.0,
       29.5
     ],
-    "radius": 12.0
+    "radius": 11.5
   },
   "layers": [
     "legs_back",
+    "feet_back",
     "arms_back",
     "chest",
+    "legs_front",
     "body",
     "head",
     "weapon",
@@ -169,7 +171,11 @@
       "arms_front"
     ],
     "legs": [
-      "legs_back"
+      "legs_back",
+      "legs_front"
+    ],
+    "feet": [
+      "feet_back"
     ],
     "weapon": [
       "weapon"

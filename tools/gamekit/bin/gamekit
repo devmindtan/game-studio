@@ -730,6 +730,11 @@ cmd_art() {
         mkdir -p "$dest/layers"
         cp "$LAB/sprites/$n/layers/"*_strip.png "$dest/layers/"
       fi
+      # equipment drawn on the hero (sprite-lab/sprites/hero-gear): gear/<item>/<layer>_strip.png
+      rm -rf "$dest/gear"
+      if [[ -d "$LAB/sprites/$n/gear" ]]; then
+        cp -r "$LAB/sprites/$n/gear" "$dest/gear"
+      fi
       # The copy records where it came from; the source stays in the lab only.
       python3 -c 'import json,sys; m=json.load(open(sys.argv[1])); m["source"]="sprite-lab/sprites/"+sys.argv[3]; open(sys.argv[2],"w").write(json.dumps(m, indent=2)+"\n")' \
         "$LAB/sprites/$n/$n.json" "$dest/$n.json" "$n"
