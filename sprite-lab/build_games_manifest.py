@@ -450,6 +450,8 @@ def items_of(root, data, cfg, monsters):
                     e["aura_layer"] = it.get("aura_layer", "back")
                 if it.get("aura_back"):   # far half of a horizontal 3D orbit
                     e["aura_back"] = sprite_info(root, str(it["aura_back"]))
+                if it.get("break_sprite"):   # one-shot when the ward spends its hit
+                    e["break_sprite"] = sprite_info(root, str(it["break_sprite"]))
                 if it.get("special_only"):   # granted by equipment, never a ground pickup
                     out["special_buffs"].append(e)
                     continue
