@@ -76,6 +76,10 @@ Sprite Lab (sprite-lab/: make + test sprites here, then promote into a game)
   art promote <name> <game>         copy strip + json into games/<g>/assets/sprites/custom/<name>/
   art ase|open <name>               .ase for editing by hand in LibreSprite
 
+Audio (sounds are code: assets/source/audio/sfx.json + music.json)
+  audio <game> [--only a,b] [--play id]  render .wav into assets/audio/, review sheet, import; --play listens
+  audio test                   unit tests of the synth
+
 Release
   templates                    install Godot export templates (once per Godot version)
   export <game> [preset...]    tests, then Linux/Windows/Web -> <game>/builds/dist/*.zip
@@ -452,6 +456,22 @@ cmd_sprites() {
   return "${PIPESTATUS[0]}"
 }
 
+# --- Audio ------------------------------------------------------------------------
+# Sounds are source code: assets/source/audio/{sfx,music}.json -> assets/audio/**.wav
+# (pipeline/soundkit.py, sfxr-style synth + tiny tracker, stdlib only, deterministic).
+cmd_audio() {
+  if [[ "${1:-}" == test ]]; then
+    python3 -m unittest discover -s "$KIT/pipeline" -p 'test_soundkit.py' 2>&1 | tail -3
+    return "${PIPESTATUS[0]}"
+  fi
+  local g; g="$(resolve_game "${1:-}")"; shift || true
+  say "render assets/source/audio -> assets/audio"
+  "${RUN[@]}" python3 "$KIT/pipeline/soundkit.py" "$g" "$@" || return 1
+  say "import"
+  godot_import "$g"
+  echo "review: $g/production/audio/review.png (waveforms) + review.txt"
+}
+
 cmd_sample_sprite() {
   local g; g="$(resolve_game "${1:-}")"
   python3 "$KIT/pipeline/lpc_sample_compose.py" --generator "$LPC_DIR" --name sample_hero \
@@ -745,6 +765,7 @@ case "$sub" in
   ui-shots) cmd_ui_shots "$@" ;;
   lpc) cmd_lpc ;;
   sprites) cmd_sprites "$@" ;;
+  audio) cmd_audio "$@" ;;
   sample-sprite) cmd_sample_sprite "$@" ;;
   preview) cmd_preview "$@" ;;
   art) cmd_art "$@" ;;

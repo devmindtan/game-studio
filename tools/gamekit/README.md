@@ -124,6 +124,25 @@ gamekit art ase|open <tên>            # .ase cho LibreSprite
   (ghi `<tên>.json`), `check_meta`, `.ase` qua LibreSprite.
 - Export preset gói `assets/sprites/*.json` để game đọc được metadata.
 
+## Âm thanh: `gamekit audio`
+
+Âm thanh cũng là mã nguồn như sprite: không tải file, không lo giấy phép, chạy lại luôn ra đúng tiếng cũ.
+
+```sh
+gamekit audio <game>                 # assets/source/audio/{sfx,music}.json -> assets/audio/{sfx,music}/*.wav + import
+gamekit audio <game> --only hit,gem  # chỉ dựng lại vài tiếng
+gamekit audio <game> --play level_up # dựng rồi phát thử (pw-play / paplay / aplay)
+gamekit audio test                   # unit test của bộ tổng hợp
+```
+
+- `pipeline/soundkit.py` (Python thuần + Pillow): hiệu ứng kiểu sfxr (dạng sóng square/saw/triangle/sine/noise,
+  trượt cao độ, attack/sustain/decay/punch, arpeggio, vibrato, lọc thấp/cao, nhiều lớp có `delay`) và nhạc dạng
+  tracker (nốt theo bước, `-` giữ nốt, `.` nghỉ, trống `k`/`s`/`h`). Tham số ghi ở docstring đầu file.
+- WAV mono 16-bit 22050 Hz, chuẩn hoá theo đỉnh (`volume`). Lệnh **từ chối** tiếng vỡ (đỉnh > 0,98), tiếng gần như
+  câm, hiệu ứng dài quá 2,5 giây; xoá `.wav` không còn trong JSON.
+- Soát: `production/audio/review.png` (dạng sóng từng tiếng) + `review.txt` (giây, đỉnh, rms). Agent không nghe
+  được: xem dạng sóng và rms (tiếng phát liên tục như trúng đòn phải nhỏ), còn nghe là việc của người dùng.
+
 ## Xuất game
 
 ```bash
