@@ -30,6 +30,7 @@ import json
 import os
 import re
 import sys
+import time
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.dirname(HERE)
@@ -625,7 +626,9 @@ def build():
             if os.path.isfile(os.path.join(GAMES, slug, "project.godot")):
                 games.append(build_game(slug))
     with open(OUT, "w", encoding="utf-8") as f:
-        json.dump({"games": games}, f, ensure_ascii=False, indent=1)
+        # a visible build stamp lets anyone confirm the web is showing fresh data
+        json.dump({"games": games, "built": time.strftime("%Y-%m-%d %H:%M")}, f,
+                  ensure_ascii=False, indent=1)
     return len(games), sum(len(g["skills"]) for g in games)
 
 

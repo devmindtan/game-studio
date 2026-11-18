@@ -105,6 +105,10 @@ trang tải), để xem và quyết định có áp dụng vào game không:
 `games.html`), không tự phóng to theo kích thước sprite — chiêu nhỏ đừng phóng to, chiêu lớn vẫn thấy toàn bộ
 vùng. Chỉ nút `−` / `+` mới đổi tầm nhìn. Khi thêm hoặc sửa demo chiêu, giữ nguyên rule này.
 
+**Rule khung quái vật** (người dùng 2026-11-18): quái trong tab Quái vật luôn nằm gọn toàn bộ trong card.
+Giữ tỉ lệ game khi vừa, tự co lại theo kích thước frame khi là boss to; tuyệt đối không cụt đầu/cụt chân.
+Đồng thời header dashboard hiện mốc `Dữ liệu web` (thời điểm rebuild manifest) để biết trang đang tải dữ liệu mới.
+
 Trang chỉ để xem; đánh giá và quyết định trao đổi trực tiếp với agent. Script dựng manifest và server **chỉ đọc**
 repo game.
 

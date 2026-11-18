@@ -105,6 +105,7 @@ td.cell{text-align:center}
   <a class="navLink active" href="games.html">Game</a>
   <select id="gameSel" class="ctrl"></select>
   <span id="gameVer" class="pill"></span>
+  <span id="dataBuilt" class="muted small" style="margin-left:auto"></span>
   </header>
 <div class="layout">
   <nav id="tabs"></nav>
@@ -125,7 +126,7 @@ const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&g
 const md=s=>esc(s).replace(/\*\*(.+?)\*\*/g,'<b>$1</b>').replace(/`(.+?)`/g,'<code>$1</code>');
 const mmss=s=>String(Math.floor(s/60)).padStart(2,'0')+':'+String(Math.floor(s%60)).padStart(2,'0');
 
-let games=[],game=null,labSprites=[],tab='overview';
+let games=[],game=null,labSprites=[],tab='overview',dataBuilt='';
 const TABS=[
   ['overview','Tổng quan'],['rules','Luật gameplay'],['ui','Giao diện'],['map','Bản đồ & ải'],['meta','Nhiệm vụ & Gacha'],
   ['heroes','Nhân vật'],['monsters','Quái vật'],['skills','Kỹ năng'],['items','Vật phẩm'],['effects','Hiệu ứng'],['scenario','Kịch bản']];
@@ -181,8 +182,10 @@ function statRow(icon,label,value){return el('div',{class:'stat'},iconCanvas(ico
 async function init(){
   try{
     const [gm,sm]=await Promise.all([fetch('games-manifest.json',{cache:'no-store'}),fetch('sprites-manifest.json',{cache:'no-store'})]);
-    games=(await gm.json()).games||[]; labSprites=sm.ok?((await sm.json()).sprites||[]):[];
+    const manifest=await gm.json(); games=manifest.games||[]; dataBuilt=manifest.built||'';
+    labSprites=sm.ok?((await sm.json()).sprites||[]):[];
   }catch(e){ $('main').innerHTML='<div class="empty err">Không tải được dữ liệu: '+esc(e.message)+'<br>Chạy <code>sprite-lab/serve-viewer.sh</code> rồi mở <code>http://localhost:8765/sprite-lab/games.html</code>.</div>'; return; }
+  $('dataBuilt').textContent=dataBuilt?('Dữ liệu web: '+dataBuilt):'';
   const sel=$('gameSel'); sel.innerHTML='';
   games.forEach(g=>sel.appendChild(el('option',{value:g.slug},g.name)));
   const [slug,t]=decodeURIComponent(location.hash.slice(1)).split('/');
@@ -618,19 +621,26 @@ function itemEffects(m){
 const BEHAVIOUR={chase:'đuổi thẳng',swarm:'bầy lượn',charge:'lấy đà rồi lao'};
 function monsters(m){
   m.appendChild(el('h2',{},'Quái vật'));
-  m.appendChild(el('p',{class:'lead'},'Mỗi quái chạy animation thật, cùng tỉ lệ với nhau như trong game; vòng xanh = thân (đo từ pixel). Bấm tên animation để xem.'));
+  m.appendChild(el('p',{class:'lead'},'Mỗi quái chạy animation thật; vòng xanh = thân (đo từ pixel). Rule: quái luôn nằm gọn trong khung — boss to tự co lại thay vì bị cụt. Bấm tên animation để xem.'));
   const grid=el('div',{class:'grid g3'});
   game.monsters.forEach(mo=>{
     const s=mo.stats, info=mo.sprite; const card=el('div',{class:'card'});
     card.appendChild(el('div',{class:'row'},el('h3',{style:'margin:0'},mo.id),el('span',{class:'muted small'},BEHAVIOUR[s.behaviour]||s.behaviour)));
     let sheet=null, anim='move', showBody=true;
     if(info) sheetOf(info).then(x=>{sheet=x;});
-    const sc=(s.scale||2)*1.5;   // game scale for every monster, so sizes compare like in game
-    const cv=liveCanvas(260,170,(g,t)=>{g.clearRect(0,0,260,170); g.fillStyle='#2f4a2c'; g.fillRect(0,0,260,170);
-      if(!sheet) return; const ground=info.meta.ground; const y=ground?150:90;
-      sheet.draw(g,anim,t,130,y,sc);
+    // Rule (user 2026-11-18): keep the game scale only while the whole sprite
+    // fits. A boss is shrunk to the card instead of being cut off at the edge.
+    const CW=260,CH=170,PAD=14;
+    const cv=liveCanvas(CW,CH,(g,t)=>{ g.clearRect(0,0,CW,CH); g.fillStyle='#2f4a2c'; g.fillRect(0,0,CW,CH);
+      if(!sheet) return;
+      const fw=sheet.fs[0],fh=sheet.fs[1],ax=sheet.anchor[0],ay=sheet.anchor[1];
+      const fit=Math.min((CW-2*PAD)/fw,(CH-2*PAD)/fh);
+      const sc=Math.min((s.scale||2)*1.5,fit);
+      const x=Math.min(CW-PAD-(fw-ax)*sc,Math.max(PAD+ax*sc,CW/2));
+      const y=CH-PAD-(fh-ay)*sc;
+      sheet.draw(g,anim,t,x,y,sc);
       const b=info.meta.body; if(showBody&&b){ g.strokeStyle='rgba(110,255,140,.9)'; g.lineWidth=1.5; g.beginPath();
-        g.arc(130+(b.center[0]-sheet.anchor[0])*sc,y+(b.center[1]-sheet.anchor[1])*sc,b.radius*sc,0,Math.PI*2); g.stroke(); }});
+        g.arc(x+(b.center[0]-ax)*sc,y+(b.center[1]-ay)*sc,b.radius*sc,0,Math.PI*2); g.stroke(); }});
     card.appendChild(el('div',{class:'stage',style:'margin-top:8px'},cv));
     const bar=el('div',{class:'row',style:'margin-top:6px'});
     (info?info.meta.animations:[]).forEach(a=>{const b=el('button',{class:'btn'+(a.name===anim?' on':'')},a.name);
