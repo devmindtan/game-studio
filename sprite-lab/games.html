@@ -344,6 +344,16 @@ function progression(m,pr){
       el('td',{class:'num'},a.hp.toFixed(2)+' → '+b.hp.toFixed(2)),el('td',{class:'num'},a.gold+' → '+b.gold))); });
   m.appendChild(t);
   m.appendChild(el('p',{class:'muted small'},'Thắng ải n: vàng '+(rw.gold_base||0)+' + '+(rw.gold_per_stage||0)+'·n (cộng vàng nhặt trong trận); đá lần đầu '+(rw.gems_first||0)+' (ải boss '+(rw.gems_boss_first||0)+'), các lần sau '+(rw.gems_repeat||0)+'. Thua: giữ vàng đã nhặt.'));
+  // challenge mode (design/challenge.md)
+  const ch=game.challenges||{};
+  if((ch.challenges||[]).length){
+    m.appendChild(el('h3',{style:'margin-top:18px'},'Chế độ Thử thách'));
+    m.appendChild(el('p',{class:'muted small'},'Luật riêng, cày lại được; thắng nhận Tẩy Tủy Đan (lần đầu '+(ch.pills_first||2)+', sau đó '+(ch.pills||1)+') để đặt lại cây kỹ năng, kèm vàng của ải gốc. Không tính vào tiến độ ải.'));
+    const tt=el('table',{});
+    tt.appendChild(el('tr',{},el('th',{},'Thử thách'),el('th',{},'Mở khi'),el('th',{},'Dựa trên'),el('th',{class:'num'},'Thời gian'),el('th',{},'Luật')));
+    ch.challenges.forEach(c=>tt.appendChild(el('tr',{},el('td',{},el('b',{},c.name)),el('td',{},'vượt ải '+c.unlock),el('td',{},'ải '+c.base),el('td',{class:'num'},mmss(c.duration)),el('td',{},c.desc))));
+    m.appendChild(tt);
+  }
   // milestone rewards
   m.appendChild(el('h3',{style:'margin-top:18px'},'Phần thưởng mốc cấp (trong trận)'));
   m.appendChild(el('p',{class:'muted small'},'Lên cấp 10, 20, 30 trong một trận → chọn 1 trong 3 (chiêu độc nhất của class mình + nội tại + luật), chỉ có tác dụng tới hết trận đó. Chiêu độc nhất vào ở cấp 1 rồi lên cấp bằng thẻ.'));
@@ -465,6 +475,16 @@ function heroes(m){
     if(h.role) right.appendChild(el('div',{class:'small',style:'color:'+(h.color||'#c9a65a')+';margin:-4px 0 8px'},h.role));
     if(h.passive&&h.passive.name) right.appendChild(el('div',{class:'card',style:'margin-bottom:10px;border-color:'+(h.color||'#c9a65a')},
       el('b',{},'Nội tại: '+h.passive.name),el('div',{class:'small muted',style:'margin-top:4px'},h.passive.desc||'')));
+    // long-term skill tree of the class (design/skill-tree.md): 3 branches x 3 tiers, Tinh hoa costs
+    const stree=game.skill_tree||{}, brs=((stree.classes||{})[h.id])||[];
+    if(brs.length){ const tc=stree.tier_cost||[5,10,20];
+      const tw=el('div',{class:'card',style:'margin-bottom:10px'},el('b',{},'Cây kỹ năng'),
+        el('div',{class:'small muted',style:'margin:2px 0 8px'},'Mua bằng Tinh hoa (tinh anh rơi 1, boss rơi 10); tầng sau cần tầng trước; đặt lại bằng 1 Tẩy Tủy Đan + vàng, hoàn đủ.'));
+      const g=el('div',{class:'grid g3'});
+      brs.forEach(b=>{ const c=el('div',{},el('b',{},b.name),el('span',{class:'muted small'},' · '+(b.role||'')));
+        (b.nodes||[]).forEach((n,i)=>c.appendChild(el('div',{class:'small',style:'margin-top:4px'},'Tầng '+(i+1)+' ('+tc[i]+' Tinh hoa): '+n.desc)));
+        g.appendChild(c); });
+      tw.appendChild(g); right.appendChild(tw); }
     if(info.meta.slots){
       const CROP=[8,10,32,36];
       const lw=el('div',{class:'slots'});

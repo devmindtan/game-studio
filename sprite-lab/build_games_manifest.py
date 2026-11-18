@@ -543,7 +543,8 @@ def build_game(slug):
         "slug": slug, "name": info.get("name") or slug, "version": info.get("version", ""),
         "brief": brief_pitch(root), "decisions": decisions(root), "ui": ui_set(root),
         "world": cfg.get("world", {}), "xp": cfg.get("xp", {}), "pickups": cfg.get("pickups", {}),
-        "stages": stages, "progression": progression_of(data, classes), "heroes": heroes, "monsters": mons, "skills": skills, "stat_ups": stat_ups,
+        "stages": stages, "progression": progression_of(data, classes), "heroes": heroes,
+        "skill_tree": load(os.path.join(data, "skill_tree.json")), "challenges": load(os.path.join(data, "challenges.json")), "monsters": mons, "skills": skills, "stat_ups": stat_ups,
         "sprites": sprites,
         "rules": rules_doc, "rule_doc": rel(os.path.join(root, "design", "gameplay-rules.md")),
         "statuses": statuses_of(root, data),   # buff/debuff effects drawn on characters
