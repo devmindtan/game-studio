@@ -1,0 +1,125 @@
+{
+  "frames": 13,
+  "frame_size": [
+    24,
+    24
+  ],
+  "fps": 8.0,
+  "loop": true,
+  "anchor": [
+    12.0,
+    12.0
+  ],
+  "anchor_source": "explicit",
+  "animations": [
+    {
+      "name": "move",
+      "start": 0,
+      "frames": 4,
+      "fps": 8.0,
+      "loop": true,
+      "durations_ms": [
+        140.0,
+        140.0,
+        140.0,
+        140.0
+      ],
+      "hitbox": {
+        "shape": "rect",
+        "center": [
+          12.0,
+          10.5
+        ],
+        "active": [
+          0,
+          3
+        ],
+        "half_w": 10.0,
+        "half_h": 8.5
+      }
+    },
+    {
+      "name": "attack",
+      "start": 4,
+      "frames": 3,
+      "fps": 8.0,
+      "loop": false,
+      "durations_ms": [
+        160.0,
+        200.0,
+        220.0
+      ],
+      "hitbox": {
+        "shape": "rect",
+        "center": [
+          12.5,
+          9.5
+        ],
+        "active": [
+          0,
+          2
+        ],
+        "half_w": 10.5,
+        "half_h": 9.5
+      }
+    },
+    {
+      "name": "hurt",
+      "start": 7,
+      "frames": 2,
+      "fps": 12.0,
+      "loop": false,
+      "durations_ms": [
+        80.0,
+        120.0
+      ],
+      "hitbox": {
+        "shape": "rect",
+        "center": [
+          11.5,
+          11.0
+        ],
+        "active": [
+          0,
+          1
+        ],
+        "half_w": 9.5,
+        "half_h": 8.0
+      }
+    },
+    {
+      "name": "death",
+      "start": 9,
+      "frames": 4,
+      "fps": 8.0,
+      "loop": false,
+      "durations_ms": [
+        100.0,
+        140.0,
+        160.0,
+        240.0
+      ],
+      "hitbox": {
+        "shape": "rect",
+        "center": [
+          12.5,
+          11.0
+        ],
+        "active": [
+          0,
+          3
+        ],
+        "half_w": 10.5,
+        "half_h": 8.0
+      }
+    }
+  ],
+  "body": {
+    "anim": "move",
+    "center": [
+      11.5,
+      11.0
+    ],
+    "radius": 8.0
+  }
+}
