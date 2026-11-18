@@ -125,8 +125,8 @@ const mmss=s=>String(Math.floor(s/60)).padStart(2,'0')+':'+String(Math.floor(s%6
 
 let games=[],game=null,labSprites=[],tab='overview';
 const TABS=[
-  ['overview','Tổng quan'],['rules','Luật gameplay'],['ui','Giao diện'],['map','Bản đồ & ải'],['heroes','Nhân vật'],
-  ['monsters','Quái vật'],['skills','Kỹ năng'],['items','Vật phẩm'],['effects','Hiệu ứng'],['scenario','Kịch bản']];
+  ['overview','Tổng quan'],['rules','Luật gameplay'],['ui','Giao diện'],['map','Bản đồ & ải'],['meta','Nhiệm vụ & Gacha'],
+  ['heroes','Nhân vật'],['monsters','Quái vật'],['skills','Kỹ năng'],['items','Vật phẩm'],['effects','Hiệu ứng'],['scenario','Kịch bản']];
 
 /* ---------- sprites: load a strip + meta, draw an animation at time t ---------- */
 const imgCache={};
@@ -193,8 +193,10 @@ async function selectGame(g){
   renderTabs(); render();
 }
 function renderTabs(){
-  const n={overview:'',rules:(game.rules&&game.rules.rules||[]).length,ui:game.ui.shots.length,map:(game.progression&&game.progression.count)||game.stages.length,heroes:game.heroes.length,
-    monsters:game.monsters.length,skills:game.skills.length,items:(game.items.pickups.length+(game.items.buffs||[]).length+game.items.equipment.length),effects:(game.statuses||[]).length};
+  const n={overview:'',rules:(game.rules&&game.rules.rules||[]).length,ui:game.ui.shots.length,map:(game.progression&&game.progression.count)||game.stages.length,
+    meta:((game.missions||{}).pool||[]).length,heroes:game.heroes.length,
+    monsters:game.monsters.length,skills:game.skills.length,items:(game.items.pickups.length+(game.items.buffs||[]).length+game.items.equipment.length),effects:(game.statuses||[]).length,
+    scenario:(game.docs||[]).length};
   const nav=$('tabs'); nav.innerHTML='';
   TABS.forEach(([id,label])=>{const b=el('button',{class:'tab'+(tab===id?' active':'')},label,n[id]!==''?el('span',{class:'n'},n[id]):null);
     b.onclick=()=>{tab=id; renderTabs(); render();}; nav.appendChild(b);});
@@ -202,7 +204,7 @@ function renderTabs(){
 function render(){
   const keep=decodeURIComponent(location.hash.slice(1)).split('/').slice(2).join('/');
   history.replaceState(null,'','#'+game.slug+'/'+tab+(tab==='skills'&&keep?'/'+keep:'')); painters=[];
-  const m=$('main'); m.innerHTML=''; ({overview,rules,ui,map,heroes,monsters,skills,items,effects,scenario})[tab](m);
+  const m=$('main'); m.innerHTML=''; ({overview,rules,ui,map,meta,heroes,monsters,skills,items,effects,scenario})[tab](m);
   wrapTables(m);
 }
 
@@ -553,10 +555,15 @@ function monsters(m){
     [['heart','Máu',s.hp],['sword','Sát thương chạm',s.damage],['boot','Tốc độ',s.speed],['gem','Kinh nghiệm rơi',s.xp]]
       .forEach(([ic,l,v])=>st.appendChild(el('div',{class:'statCell'},iconCanvas(ic,2),el('div',{},el('b',{},String(v)),el('div',{class:'small muted'},l)))));
     card.appendChild(st);
-    const PARAM={wobble:'lượn ngang (px/s)',charge_range:'tầm lao (px)',windup:'lấy đà (s)',dash_speed:'tốc độ lao (px/s)',dash_time:'thời gian lao (s)',charge_cooldown:'hồi lao (s)'};
-    const extra=Object.entries(s).filter(([k])=>!['sprite','behaviour','hp','damage','speed','xp','scale'].includes(k));
+    const PARAM={wobble:'lượn ngang (px/s)',charge_range:'tầm lao (px)',windup:'lấy đà (s)',dash_speed:'tốc độ lao (px/s)',
+      dash_time:'thời gian lao (s)',charge_cooldown:'hồi lao (s)',jump_every:'nhảy mỗi (s)',jump_time:'thời gian nhảy (s)',
+      slam_damage:'sát thương dậm',slam_reach:'tầm dậm (× thân)',split_at:'tách khi máu còn',split_into:'tách thành',
+      split_count:'số con tách',keep_range:'giữ khoảng cách (px)',shoot_range:'tầm bắn (px)',shoot_every:'bắn mỗi (s)',
+      bolt_sprite:'đạn',bolt_speed:'tốc độ đạn',bolt_damage:'sát thương đạn',bolt_range:'tầm đạn',bolt_radius:'bán kính đạn'};
+    // only plain values: a dict (e.g. explode) would print as [object Object]
+    const extra=Object.entries(s).filter(([k,v])=>!['sprite','behaviour','hp','damage','speed','xp','scale','name','boss'].includes(k)
+      && (typeof v==='number'||typeof v==='string'));
     if(extra.length) card.appendChild(el('div',{class:'small muted',style:'margin-top:6px'},extra.map(([k,v])=>(PARAM[k]||k)+' '+v).join(' · ')));
-    card.appendChild(el('div',{class:'small muted',style:'margin-top:6px'},mo.appears.length?mo.appears.map(a=>'Ải '+a.stage+': từ '+mmss(a.from)+', ~'+a.expected+' con').join(' · '):'Chưa xuất hiện ở ải nào'));
     grid.appendChild(card);
   });
   m.appendChild(grid);
@@ -819,37 +826,70 @@ function effects(m){
 }
 
 
-/* ---------- Kịch bản: danh sách tài liệu thiết kế, hiển thị nội dung ---------- */
-const SCENARIO_FILES = [
-  ["design/master.md","Tổng quan","Sơ đồ hệ thống, trụ cột, người chơi thấy gì, ràng buộc"],
-  ["design/skill-tree.md","Cây kỹ năng (Đợt 4)","Nguồn điểm, 3 nhánh/class, giao diện, kiểm thử"],
-  ["design/gacha.md","Gacha (Đợt 5)","Banner vũ khí/giáp, tỉ lệ, pity, đá gacha, kiểm thử"],
-  ["design/equipment.md","Trang bị","Ô trang bị, rarity, drop rates, thay đổi so với bản đầu"],
-  ["design/buffs.md","Buff tạm thời","Bốn buff, rarity, cân bằng số liệu"],
-  ["design/progression.md","Tiến trình / slot / mốc","30 ải, công thức độ khó, slot nhân vật, mốc 10/20/30"],
-  ["design/gameplay-rules.md","Luật gameplay","Trụ cột (tự đánh, đọc được, phản hồi nhanh), luật kiểm tra được"],
-  ["design/classes.md","Class và nội tại","Bất khuất / Cộng hưởng nguyên tố, hiển thị nội tại"],
-  ["design/monsters.md","Quái vật","Slime / dơi / goblin, tinh anh, boss"],
-  ["design/statuses.md","Trạng thái","Làm chậm, choáng, băng, chảy máu, bỏng, điện giật"],
-  ["design/data-schemas.md","Data schemas","Config / classes / upgrades / monsters / waves / items"],
-  ["design/game-brief.md","Game brief","Pitch, vòng lặp, mục tiêu, người chơi"],
-  ["design/ux/ui-style.md","UI style","Phong cách chung, thành phần, navigation, màn hình"],
-  ["design/ux/front-end.md","Tiêu đề / chọn nhân vật / sảnh","Luồng màn, layout chi tiết"],
-  ["design/ux/equipment.md","Màn trang bị","Búp bê giấy, túi đồ, so sánh đồ đang mặc"],
-  ["design/ux/stage-select.md","Chọn ải","Lưới 3 vùng × 10 ải, chế độ chơi"],
-];
+/* ---------- Nhiệm vụ & Gacha: the long-term loops (missions.json, gacha.json) ---------- */
+const STAT_VI={runs:'Số trận đã chơi',stage_wins:'Ải thắng',kills:'Quái hạ',elite_kills:'Tinh anh/boss hạ',
+  essence:'Tinh hoa nhặt',gacha_pulls:'Lượt quay gacha',enhances:'Lần cường hoá đồ',challenge_wins:'Thử thách thắng'};
+function meta(m){
+  m.appendChild(el('h2',{},'Nhiệm vụ & Gacha'));
+  m.appendChild(el('p',{class:'lead'},'Hai vòng lặp dài hạn: việc hằng ngày cho đá, rồi quay gacha tiêu đá để lấy trang bị. Số liệu đọc từ missions.json và gacha.json.'));
+  const ms=game.missions||{}, ga=game.gacha||{};
+  /* daily missions (design/missions.md) */
+  const mc=el('div',{class:'card'});
+  mc.appendChild(el('h3',{},'Nhiệm vụ ngày'));
+  mc.appendChild(el('p',{class:'muted small'},'Mỗi ngày mỗi slot nhận '+(ms.per_day||0)+' nhiệm vụ chọn theo ngày + id slot (hai slot không trùng nhau), cố định cả ngày, đổi lúc 0 giờ. Xong cả '+(ms.per_day||0)+' thì thưởng thêm '+(ms.bonus_gems||0)+' đá.'));
+  const pool=ms.pool||[];
+  if(pool.length){
+    const t=el('table',{});
+    t.appendChild(el('tr',{},el('th',{},'Nhiệm vụ'),el('th',{},'Việc phải làm'),el('th',{},'Đếm'),el('th',{class:'num'},'Mục tiêu'),el('th',{class:'num'},'Đá')));
+    pool.forEach(q=>t.appendChild(el('tr',{},el('td',{},el('b',{},q.name)),el('td',{},q.desc),el('td',{},STAT_VI[q.stat]||q.stat),
+      el('td',{class:'num'},q.target),el('td',{class:'num'},q.gems))));
+    mc.appendChild(t);
+  } else mc.appendChild(el('div',{class:'empty small'},'Game chưa có dữ liệu nhiệm vụ.'));
+  m.appendChild(mc);
+  /* gacha (design/gacha.md) */
+  const gc=el('div',{class:'card',style:'margin-top:12px'});
+  gc.appendChild(el('h3',{},'Gacha'));
+  gc.appendChild(el('p',{class:'muted small'},'Chỉ tiêu đá gacha, không mua vàng. '+(ga.cost_per_pull||0)+' đá/lượt; lượt thứ '+
+    (ga.pity_at||0)+' kể từ món huyền thoại gần nhất chắc chắn ra huyền thoại (mỗi banner đếm riêng). Món trùng đổi thành vàng.'));
+  const rates=ga.rates||{};
+  const RATE_VI={common:'Thường',rare:'Hiếm',epic:'Sử thi',legendary:'Huyền thoại'};
+  const SLOT_VI={weapon:'vũ khí',head:'mũ',chest:'áo',legs:'quần',arms:'tay',feet:'giày'};
+  const rc=el('div',{class:'grid g2'});
+  const rt=el('table',{});
+  rt.appendChild(el('tr',{},el('th',{},'Độ hiếm'),el('th',{class:'num'},'Tỉ lệ')));
+  Object.entries(rates).forEach(([k,v])=>rt.appendChild(el('tr',{},el('td',{},RATE_VI[k]||k),el('td',{class:'num'},(v*100).toFixed(0)+'%'))));
+  rc.appendChild(el('div',{},el('b',{},'Tỉ lệ'),rt));
+  const dup=ga.dup_gold||{};
+  const dt=el('table',{});
+  dt.appendChild(el('tr',{},el('th',{},'Món trùng'),el('th',{class:'num'},'Vàng')));
+  Object.entries(dup).forEach(([k,v])=>dt.appendChild(el('tr',{},el('td',{},RATE_VI[k]||k),el('td',{class:'num'},v))));
+  rc.appendChild(el('div',{},el('b',{},'Trùng → vàng'),dt));
+  gc.appendChild(rc);
+  const banners=ga.banners||[];
+  if(banners.length){
+    const bt=el('table',{style:'margin-top:10px'});
+    bt.appendChild(el('tr',{},el('th',{},'Banner'),el('th',{},'Nội dung'),el('th',{},'Ô đồ')));
+    banners.forEach(b=>bt.appendChild(el('tr',{},el('td',{},el('b',{},b.name)),el('td',{},b.desc||''),el('td',{},(b.slots||[]).map(x=>SLOT_VI[x]||x).join(', ')))));
+    gc.appendChild(bt);
+  }
+  m.appendChild(gc);
+}
+
+/* ---------- Kịch bản: mọi tài liệu design/*.md của game (manifest "docs") ---------- */
 function scenario(m){
+  const docs=game.docs||[];
   m.appendChild(el('h2',{},'Kịch bản thiết kế'));
-  m.appendChild(el('p',{class:'lead'},'Các tài liệu thiết kế trong thư mục design/ của game. Nhấn vào mỗi tài liệu để xem nội dung bên dưới; nhấn lần nữa để thu gọn. Mỗi tài liệu phản ánh đúng trạng thái hiện tại của game.'));
+  m.appendChild(el('p',{class:'lead'},'Các tài liệu trong design/ của game; danh sách đọc thẳng từ thư mục nên tài liệu mới tự hiện. Nhấn vào một tài liệu để xem nội dung; nhấn lần nữa để thu gọn.'));
+  if(!docs.length){ m.appendChild(el('div',{class:'card empty'},'Game chưa có tài liệu thiết kế nào trong design/.')); return; }
   const wrap=el('div',{class:'card'});
-  SCENARIO_FILES.forEach(([path,title,desc])=>{
+  docs.forEach(({path,title,group})=>{
     const body=el('pre',{class:'small',style:'white-space:pre-wrap;max-height:0;overflow:auto;margin:0;padding:0'});
     const btn=el('button',{class:'listItem',style:'display:flex;justify-content:space-between;align-items:center;width:100%;text-align:left'},
-      el('span',{},el('b',{},title),el('div',{class:'small muted'},desc)),
-      el('span',{class:'pill'},path.split('/').pop()));
+      el('span',{},el('b',{},title),el('div',{class:'small muted'},group||'')),
+      el('span',{class:'pill'},path.replace(/^design\//,'')));   // ux/... vs ...: the file name alone repeats
     btn.onclick=async ()=>{
       const open=body.style.maxHeight!=='0px' && body.style.maxHeight!=='0';
-      if(open){ body.style.maxHeight='0'; body.style.padding='0'; return; }
+      if(open){ body.style.maxHeight='0'; body.style.padding='0'; btn.classList.remove('active'); return; }
       btn.classList.add('active');
       body.style.maxHeight='60vh'; body.style.padding='10px 12px';
       if(!body.dataset.loaded){
@@ -857,7 +897,7 @@ function scenario(m){
         catch(e){ body.textContent='Lỗi tải '+path+': '+String(e); }
       }
     };
-    wrap.appendChild(el('div',{class:'split'},btn,body));
+    wrap.appendChild(el('div',{},btn,body));   // full width: a 260px list column cut long titles
   });
   m.appendChild(wrap);
 }

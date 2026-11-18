@@ -18,6 +18,8 @@ Per game:
   stat_ups    the stat upgrades with their per-level values
   sprites     every sprite folder the game ships (assets/sprites/custom)
   statuses    buff/debuff effects drawn on characters (the aura of each items.json buff)
+  docs        design/*.md (title + group), the "Kịch bản" tab
+  missions    daily missions (missions.json) and gacha (gacha.json)
 
 Paths are relative to sprite-lab/ (the page lives there; the server is rooted
 at the workspace, see serve-viewer.sh). Image URLs carry ?v=<mtime>.
@@ -77,6 +79,33 @@ def brief_pitch(root):
         if m:
             out[key] = m.group(1).strip()
     return out
+
+
+def docs_of(root):
+    """Every design/*.md the game documents itself with: title from the first "# "
+    line, group from the folder. The dashboard's "Kịch bản" tab reads this, so a
+    new document shows up with no page edit (lesson: a hardcoded list goes stale)."""
+    docs = []
+    for dirpath, _dirs, files in os.walk(os.path.join(root, "design")):
+        for name in files:
+            if not name.endswith(".md") or name in ("CLAUDE.md", "README.md"):
+                continue
+            path = os.path.join(dirpath, name)
+            try:
+                text = open(path, encoding="utf-8").read()
+            except OSError:
+                continue
+            title = ""
+            for line in text.splitlines():
+                if line.strip().startswith("# "):
+                    title = re.sub(r"[*`]+", "", line.strip()[2:]).strip()
+                    break
+            relp = os.path.relpath(path, root).replace(os.sep, "/")
+            docs.append({"path": relp, "title": title or name[:-3],
+                         "group": "Màn hình" if "/ux/" in relp else "Hệ thống"})
+    # master first, then the system docs, then the screen (ux) docs; alphabetical within a group
+    docs.sort(key=lambda d: (0 if d["path"] == "design/master.md" else 2 if "/ux/" in d["path"] else 1, d["path"]))
+    return docs
 
 
 def decisions(root):
@@ -512,14 +541,8 @@ def build_game(slug):
                                  "max_level": int(u.get("max_level", 1)), "weight": u.get("weight", 1),
                                  "levels": [level_values(u, lv) for lv in range(1, int(u.get("max_level", 1)) + 1)]})
 
-    mons = []
-    for mid, m in monsters.items():
-        appears = []
-        for st in stages:
-            ts = [float(w.get("t_from", 0)) for w in st["waves"] if w.get("monster") == mid]
-            if ts:
-                appears.append({"stage": st["number"], "from": min(ts), "expected": st["expected_spawns"].get(mid, 0)})
-        mons.append({"id": mid, "stats": m, "sprite": sprite_info(root, str(m.get("sprite", mid))), "appears": appears})
+    mons = [{"id": mid, "stats": m, "sprite": sprite_info(root, str(m.get("sprite", mid)))}
+            for mid, m in monsters.items()]
 
     rules_doc = load(os.path.join(data, "gameplay_rules.json"))
     scale = float(cfg.get("world", {}).get("sprite_scale", 2))
@@ -549,6 +572,9 @@ def build_game(slug):
         "rules": rules_doc, "rule_doc": rel(os.path.join(root, "design", "gameplay-rules.md")),
         "statuses": statuses_of(root, data),   # buff/debuff effects drawn on characters
         "items": items_of(root, data, cfg, monsters),
+        "docs": docs_of(root),   # design/*.md the "Kịch bản" tab lists
+        "missions": clean(load(os.path.join(data, "missions.json"))),
+        "gacha": clean(load(os.path.join(data, "gacha.json"))),
     }
 
 
