@@ -102,74 +102,97 @@ def _snowflake(c, cx, cy, r, rot, col, tip):
 
 # --- frost nova -----------------------------------------------------------------
 
-FROST_MS = [70, 70, 70, 70, 55, 55, 55, 55, 110, 110, 110, 110, 90, 90, 100, 120]
+FROST_MS = [70, 70, 70, 70, 50, 55, 60, 65, 110, 110, 110, 110, 90, 90, 100, 120]
+OUT = "#0c1830"   # dark outline of solid ice
 
 
 def frost_nova(tier, size, radius, seed=1):
-    """16 frames of a frost nova on a size x size frame; radius = the hit radius (px)."""
+    """16 frames: gather -> flash and crystal burst -> crystal crown lingers -> shatters.
+    Built from fxkit pieces so it reads as a strong blast (user 2026-11-18)."""
+    import fxkit as fk
     cx = cy = size / 2
     rng = random.Random(seed)
-    cracks = [(rng.uniform(0, math.tau), rng.uniform(0.5, 0.95)) for _ in range(5 + tier * 2)]
-    n_shards = 10 + 2 * tier
-    spikes = 6 + tier
+    n_cr = 8 + 2 * tier
+    crowns = [(k * math.tau / n_cr + rng.uniform(-0.08, 0.08), rng.uniform(0.85, 1.15)) for k in range(n_cr)]
+    inner = [(k * math.tau / (n_cr // 2) + 0.3, rng.uniform(0.8, 1.1)) for k in range(n_cr // 2)]
+    motes = [(rng.uniform(0, math.tau), rng.uniform(0.6, 1.0)) for _ in range(14 + 3 * tier)]
+    flings = [(rng.uniform(0, math.tau), rng.uniform(0.8, 1.25)) for _ in range(16 + 4 * tier)]
+    cracks = [(rng.uniform(0, math.tau), rng.uniform(0.45, 0.9)) for _ in range(6 + tier)]
+    cl = 5 + tier * 1.6          # crystal length
+    cw = 2 + tier * 0.35         # crystal half width
+    radius = min(radius, size / 2 - cl * 0.7 - 6)   # the ring and its crystals stay inside the frame
     out = []
+
+    def crown(c, r, scale, solid=True):
+        lay = fk.layer(size)
+        for a, k in crowns:
+            fk.crystal(lay, cx + math.cos(a) * r, cy + math.sin(a) * r, a, cl * k * scale, cw * scale, ICE, ICE_M, ICE_D, CORE)
+        if tier >= 3:
+            for a, k in inner:
+                fk.crystal(lay, cx + math.cos(a) * r * 0.55, cy + math.sin(a) * r * 0.55, a, cl * 0.7 * k * scale,
+                           cw * 0.8 * scale, ICE, ICE_M, DEEP, CORE)
+        fk.stack(c, lay, OUT if solid else None)
+
     for f in range(16):
         c = Canvas(size, size)
-        if f < 4:   # gather: motes spiral in, the core grows
+        if f < 4:   # gather: motes stream in, the core charges
             t = (f + 1) / 4
-            for k in range(8 + 2 * tier):
-                a = k * math.tau / (8 + 2 * tier) + t * 1.6
-                r = radius * 0.9 * (1 - t * 0.75)
-                _p(c, cx + math.cos(a) * r, cy + math.sin(a) * r, ICE if k % 2 else SNOW)
-                _p(c, cx + math.cos(a - 0.12) * (r + 2), cy + math.sin(a - 0.12) * (r + 2), ICE_M)
-            _disk(c, cx, cy, 2 + 4 * t + tier * 0.6, ICE_M)
-            _disk(c, cx, cy, 1 + 2.5 * t + tier * 0.4, CORE)
-        elif f < 8:  # burst: the ring runs out, shards ride it
-            t = (f - 3) / 4
-            rr = radius * (0.35 + 0.65 * t)
-            _disk(c, cx, cy, rr * 0.9, FROST, density=0.12 + 0.12 * (1 - t))
-            _disk(c, cx, cy, max(1.5, (1 - t) * 7), CORE)
-            if tier >= 2:   # petals
-                for k in range(6):
-                    a = k * math.pi / 3 + 0.3
-                    _shard(c, cx, cy, a, rr * 0.2, rr * 0.22, ICE_M, CORE)
-            _ring(c, cx, cy, rr, DEEP, 2)
-            _ring(c, cx, cy, rr - 2, ICE_D)
-            _ring(c, cx, cy, rr - 3, ICE_M)
-            for k in range(n_shards):
-                a = k * math.tau / n_shards + (0.08 if f % 2 else -0.08)
-                _shard(c, cx, cy, a, rr - 1, 3 + tier * 0.6, ICE if k % 2 else SNOW, CORE)
-        else:        # frozen ground lingers, then shatters
-            phase = f - 8
-            fading = max(0, phase - 3) / 4.0 if f >= 12 else 0.0
-            rr = radius * 0.95
-            _disk(c, cx, cy, rr * 0.7, FROST, density=0.08)   # a light frost, not a carpet (user 2026-11-18)
-            _ring(c, cx, cy, rr, ICE_D)
-            for a, length in cracks:
-                c.line(int(cx), int(cy), int(round(cx + math.cos(a) * rr * length)),
-                       int(round(cy + math.sin(a) * rr * length)), DEEP)
-            if tier >= 4:   # runes on the floor
-                pts = [(cx + math.cos(k * math.pi / 3) * rr * 0.55, cy + math.sin(k * math.pi / 3) * rr * 0.55) for k in range(7)]
-                for (x0, y0), (x1, y1) in zip(pts, pts[1:]):
-                    c.line(int(x0), int(y0), int(x1), int(y1), ICE_M)
+            for a, d in motes:
+                r = radius * d * (1.05 - 0.8 * t)
+                aa = a + t * 1.8
+                x, y = cx + math.cos(aa) * r, cy + math.sin(aa) * r
+                fk.streak(c, x, y, -math.sin(aa), math.cos(aa), 3 + tier * 0.5, CORE, ICE_M)
+            fk.glow(c, cx, cy, 4 + 6 * t + tier, [DEEP, ICE_D, ICE_M, ICE, CORE])
+            if f == 3:
+                fk.sparkle(c, int(cx), int(cy), 4 + tier, CORE, ICE)
+        elif f == 4:   # flash
+            fk.glow(c, cx, cy, radius * 0.55, [ICE_M, ICE, CORE], density=0.9)
+            fk.rays(c, cx, cy, radius * 0.4, radius * 1.05, 12 + 2 * tier, ICE, CORE, rot=0.1, width=2)
+            fk.sparkle(c, int(cx), int(cy), 7 + tier, CORE, CORE)
+        elif f < 8:    # burst: shock ring, crystals ride it, snow flung out
+            t = (f - 4) / 3
+            rr = radius * (0.55 + 0.45 * t)
+            fk.glow(c, cx, cy, rr * 0.95, [ICE_D, ICE_M], density=0.14 - 0.05 * t)
+            fk.rays(c, cx, cy, rr * 0.2, rr * 0.8, 10 + tier, ICE_M, None, rot=0.25 * f)
+            fk.ring_band(c, cx, cy, rr + 2, [OUT, ICE_D, ICE_M, ICE, CORE])
+            crown(c, rr * 0.82, 0.7 + 0.3 * t)
+            for a, d in flings:
+                r = rr * d + t * 6
+                fk.streak(c, cx + math.cos(a) * r, cy + math.sin(a) * r, math.cos(a), math.sin(a), 4, CORE, ICE)
             if tier >= 5:
-                _snowflake(c, cx, cy, rr * 0.4, 0.2 + f * 0.05, ICE_M, CORE)
-            if f < 12:
-                if tier >= 3:   # standing spikes round the edge
-                    for k in range(spikes):
-                        a = k * math.tau / spikes
-                        _spike(c, cx + math.cos(a) * rr * 0.82, cy + math.sin(a) * rr * 0.82, 5 + tier, 2)
-                for k in range(6):   # shimmer
-                    a = (k * 1.7 + f * 0.9) % math.tau
-                    _p(c, cx + math.cos(a) * rr * (0.3 + 0.1 * k), cy + math.sin(a) * rr * (0.3 + 0.1 * k), CORE)
-            else:   # shatter: flakes fly out and up
-                k2 = f - 11
-                for k in range(n_shards):
-                    a = k * math.tau / n_shards + 0.2
-                    r = rr * 0.82 + k2 * 4
-                    _p(c, cx + math.cos(a) * r, cy + math.sin(a) * r - k2 * 3, SNOW if k % 2 else ICE)
-                    _p(c, cx + math.cos(a) * r + 1, cy + math.sin(a) * r - k2 * 3, ICE_M)
-                _fade(c, min(0.95, 0.2 + 0.22 * k2))
+                _snowflake(c, cx, cy, rr * 0.35, f * 0.2, CORE, CORE)
+        elif f < 12:   # the crystal crown stands, frost cracks glint
+            rr = radius * 0.92
+            fk.glow(c, cx, cy, rr, [ICE_D, ICE_M], density=0.06)
+            for a, d in cracks:
+                x1, y1 = cx + math.cos(a) * rr * d, cy + math.sin(a) * rr * d
+                c.line(int(cx), int(cy), int(x1), int(y1), ICE_D, 2)
+                c.line(int(cx), int(cy), int(x1), int(y1), ICE_M)
+            if tier >= 4:   # rune circle
+                fk.ring_band(c, cx, cy, rr * 0.5, [ICE_D, ICE_M])
+                for k in range(6):
+                    a = k * math.pi / 3 + f * 0.05
+                    fk.sparkle(c, int(cx + math.cos(a) * rr * 0.5), int(cy + math.sin(a) * rr * 0.5), 2, CORE, ICE_M)
+            crown(c, rr * 0.82, 1.0)
+            if tier >= 5:
+                lay = fk.layer(size)
+                fk.crystal(lay, cx, cy + 6, -math.pi / 2, 14 + tier * 2, 5, ICE, ICE_M, ICE_D, CORE)
+                fk.crystal(lay, cx - 4, cy + 6, -math.pi / 2 - 0.4, 10, 3, ICE, ICE_M, DEEP, CORE)
+                fk.crystal(lay, cx + 4, cy + 6, -math.pi / 2 + 0.4, 10, 3, ICE, ICE_M, DEEP, CORE)
+                fk.stack(c, lay, OUT)
+            for k in range(5 + tier):   # twinkles
+                a = k * 2.399 + f * 0.7
+                d = 0.25 + (k * 0.137 % 0.6)
+                if (k + f) % 3 == 0:
+                    fk.sparkle(c, int(cx + math.cos(a) * rr * d), int(cy + math.sin(a) * rr * d), 2, CORE, ICE)
+        else:          # shatter: shards fly out, everything thins away
+            k2 = f - 11
+            rr = radius * 0.92
+            crown(c, rr * (0.82 + 0.06 * k2), max(0.3, 1.0 - 0.2 * k2), solid=k2 < 3)
+            for a, d in flings:   # broken shards fly out with trails
+                r = rr * (0.75 + 0.1 * k2) * d
+                fk.streak(c, cx + math.cos(a) * r, cy + math.sin(a) * r - k2 * 2, math.cos(a), math.sin(a), 5, CORE, ICE)
+            _fade(c, min(0.9, 0.05 + 0.2 * k2))
         out.append(c)
     return out
 
