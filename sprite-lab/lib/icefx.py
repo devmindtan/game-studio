@@ -203,43 +203,51 @@ BLIZZ_MS = [80, 80, 80, 80] + [70] * 10 + [100, 100, 110, 130]
 
 
 def blizzard(tier, size, radius, seed=7):
-    """18 frames of a blizzard vortex on a size x size frame (radius = hit radius)."""
+    """18 frames: form -> swirl -> dissipate, with fxkit solids (user 2026-11-18): outlined
+    spiral arms, orbiting faceted ice shards, streaking flakes, a glowing eye, twinkles."""
+    import fxkit as fk
     cx = cy = size / 2
+    radius = min(radius, size / 2 - 6)
     rng = random.Random(seed)
     arms = 2 + tier // 2
-    flakes = [(rng.uniform(0.15, 1.0), rng.uniform(0, math.tau), rng.choice([SNOW, ICE, CORE])) for _ in range(20 + 6 * tier)]
+    flakes = [(rng.uniform(0.2, 1.0), rng.uniform(0, math.tau)) for _ in range(18 + 6 * tier)]
+    n_sh = 3 + tier
     out = []
     for f in range(18):
         c = Canvas(size, size)
         grow = min(1.0, (f + 1) / 4)
         rot = f * 0.38
         scatter = max(0, f - 13) / 4.0
-        rr = radius * (0.35 + 0.65 * grow) * (1 + 0.25 * scatter)
-        _disk(c, cx, cy, rr, NIGHT, density=0.18 * (1 - scatter))
-        _ring(c, cx, cy, rr, DEEP)
-        for a_i in range(arms):   # spiral arms
+        rr = radius * (0.35 + 0.65 * grow) * (1 + 0.2 * scatter)
+        fk.glow(c, cx, cy, rr, [NIGHT, DEEP], density=0.16 * (1 - scatter))
+        lay = Canvas(size, size)   # spiral arms, outlined so they read over the fight
+        for a_i in range(arms):
             base = rot + a_i * math.tau / arms
             prev = None
-            steps = 26
-            for s in range(steps + 1):
-                u = s / steps
+            for s_ in range(27):
+                u = s_ / 26
                 r = rr * (0.12 + 0.86 * u)
                 a = base + u * 2.6
                 pt = (int(round(cx + math.cos(a) * r)), int(round(cy + math.sin(a) * r)))
                 if prev:
-                    c.line(prev[0], prev[1], pt[0], pt[1], SNOW if u > 0.5 else ICE_M, 2 if u < 0.7 else 1)
+                    lay.line(prev[0], prev[1], pt[0], pt[1], SNOW if u > 0.45 else ICE_M, 3 if u < 0.5 else 2)
                 prev = pt
-        for r_u, a0, col in flakes:   # orbiting flakes, faster near the eye
+        fk.stack(c, lay, OUT if f < 15 else None)
+        for r_u, a0 in flakes:   # flakes streak along the swirl
             a = a0 + rot * (1.6 - r_u)
             r = rr * r_u * (1 + scatter * 0.8)
-            _p(c, cx + math.cos(a) * r, cy + math.sin(a) * r, col)
-        if tier >= 3:   # orbiting ice shards
-            for k in range(tier):
-                a = -rot * 1.3 + k * math.tau / tier
-                _shard(c, cx, cy, a, rr * 0.6, 3 + tier * 0.5, ICE, CORE)
-        _disk(c, cx, cy, 2 + tier * 0.5, ICE_M)
-        _disk(c, cx, cy, 1 + tier * 0.3, CORE)
+            x, y = cx + math.cos(a) * r, cy + math.sin(a) * r
+            fk.streak(c, x, y, -math.sin(a), math.cos(a), 3, CORE, ICE)
+        lay = Canvas(size, size)   # faceted shards orbiting
+        for k in range(n_sh):
+            a = -rot * 1.3 + k * math.tau / n_sh
+            r = rr * (0.55 + 0.1 * (k % 2))
+            fk.crystal(lay, cx + math.cos(a) * r, cy + math.sin(a) * r, a + 1.4, 4 + tier, 2, ICE, ICE_M, ICE_D, CORE)
+        fk.stack(c, lay, OUT if f < 15 else None)
+        fk.glow(c, cx, cy, 4 + tier, [ICE_D, ICE_M, ICE, CORE])
+        if f % 3 == 0:
+            fk.sparkle(c, int(cx + math.cos(rot * 2) * rr * 0.4), int(cy + math.sin(rot * 2) * rr * 0.4), 2 + tier // 2, CORE, ICE)
         if f >= 14:
-            _fade(c, min(0.95, 0.15 + 0.22 * (f - 13)))
+            _fade(c, min(0.95, 0.15 + 0.2 * (f - 13)))
         out.append(c)
     return out
