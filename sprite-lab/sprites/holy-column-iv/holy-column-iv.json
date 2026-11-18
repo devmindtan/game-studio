@@ -1,14 +1,14 @@
 {
   "frames": 12,
   "frame_size": [
-    120,
-    164
+    192,
+    256
   ],
   "fps": 12.0,
   "loop": false,
   "anchor": [
-    60.0,
-    116.0
+    96.0,
+    226.0
   ],
   "anchor_source": "explicit",
   "animations": [
@@ -19,31 +19,31 @@
       "fps": 12.0,
       "loop": false,
       "durations_ms": [
-        80.0,
         70.0,
         60.0,
         50.0,
+        45.0,
+        50.0,
         55.0,
-        60.0,
+        70.0,
         80.0,
-        90.0,
-        100.0,
+        95.0,
         110.0,
-        120.0,
-        130.0
+        125.0,
+        140.0
       ],
       "hitbox": {
         "shape": "rect",
         "center": [
-          60.5,
-          116.5
+          96.5,
+          221.0
         ],
         "active": [
           3,
           6
         ],
-        "half_w": 36.5,
-        "half_h": 36.5
+        "half_w": 40.5,
+        "half_h": 35.0
       },
       "hit_mask": true
     }

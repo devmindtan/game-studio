@@ -23,15 +23,15 @@ import burstfx  # noqa: E402
 from sheet import export  # noqa: E402
 
 NAME = HERE.name
-W, H = 96, 145
-GROUND = 104.0
+W, H = 170, 256
+GROUND = 226.0
 RADIUS = 33
 ANCHOR = (W / 2, GROUND)
 ANIM = [("descend", burstfx.holy_column(1, W, H, GROUND, RADIUS), 12, False,
          {"durations_ms": burstfx.HOLY_MS, "hitbox": {"shape": "rect", "center": [W / 2, GROUND - 48.0], "half_w": 33.0, "half_h": 56.0, "active": [3, 6]}})]
 
 if __name__ == "__main__":
-    export(HERE, NAME, ANIM, anchor=ANCHOR, preview_scale=2, gif_scale=2)
+    export(HERE, NAME, ANIM, anchor=ANCHOR, preview_scale=1, gif_scale=1)
     meta = HERE / f"{NAME}.json"
     m = json.loads(meta.read_text())
     m["px_scale"] = 0.5
