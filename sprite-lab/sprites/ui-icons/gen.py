@@ -810,62 +810,64 @@ ICONS = {
         "...ooooo...",
     ]),
     # Item skills (user 2026-11-18): one icon per legendary "special" kind.
-    # Gold frame + one readable silhouette; 16x16 like every other UI icon.
+    # Rebuilt after review: dense outlined silhouettes, not sparse specks that
+    # turned into blobs once `outline()` filled the gaps.
     "item_shield": ({"y": "#f2c14e", "b": "#6fc3ff", "w": "#ffffff"}, [
-        "...yyyyyyy...", "..ybbbbbbby..", ".ybbwwwwwbby.", ".ybbwwwwwbby.",
-        "ybbbbbwbbbbby", "ybbbbbwbbbbby", ".ybbbbwbbby..", "..ybbwbbby...",
-        "...ybwby.....", "....yb.......",
+        "..yyyyyyyyyy..", ".ybbbbbbbbbby.", "ybbbbbbbbbbbby", "ybbwbbbbbbwbby",
+        "ybbwbbbbbbwbby", "ybbbbbbbbbbbby", "ybbbwwwwwwbbby", "ybbbbbbbbbbbby",
+        ".ybbbwwwwbbbby.", "..ybbbbbbbby..", "...ybbbbbby...", "....ybbbby....",
+        ".....ybby.....", "......yy......",
     ]),
     "item_retaliate": ({"y": "#f2c14e", "w": "#fff8e0"}, [
-        ".....yyy.....", "...yy.y.yy...", "..y...y...y..", ".yy...y...yy.",
-        "y.....y.....y", ".yy...y...yy.", "..y...y...y..", "...yy.y.yy...",
-        ".....www.....",
+        ".....yyyyyy.....", "...yy......yy...", "..y..........y..", ".y...yyyyyy...y.",
+        "y...yy....yy...y", "y..y...ww...y..y", "y..y...ww...y..y", "y...yy....yy...y",
+        ".y...yyyyyy...y.", "..y..........y..", "...yy......yy...", ".....yyyyyy.....",
     ]),
-    "item_pulse": ({"y": "#f2c14e", "w": "#fff8e0"}, [
-        "......w......", ".....wyw.....", "....wyyyw....", "...wyywyyw...",
-        "..y..yyy..y..", ".y...yyy...y.", "y..yyyyyyy..y", ".y...yyy...y.",
-        "..y..yyy..y..", "...wyywyyw...", "....wyyyw....", ".....wyw.....",
-        "......w......",
+    "item_pulse": ({"y": "#f2c14e", "w": "#fff8e0", "s": "#c9d6e8"}, [
+        ".......ww.......", "......wssw......", "......wssw......", "......wssw......",
+        "......wssw......", "..yy..wssw..yy..", ".ywwy.wssw.ywwy.", "..yy..wssw..yy..",
+        "......wssw......", "......wssw......", ".......ww.......",
     ]),
     "item_chain_shock": ({"y": "#f2c14e", "w": "#fff8e0"}, [
-        "......y......", ".....yy......", "....yy.......", "...yyyy......",
-        "..yywyy......", ".yy..yy......", "yy...yy......", "...yyyy......",
-        "....yy.......", ".....yy......",
+        "..y.............", ".yyy.....yy.....", "..y.....ywy.....", ".......ywy......",
+        "......ywy.......", ".....ywy........", "....ywy.........", "...ywwy.........",
+        "......ywy.......", ".......ywy......", "........yy......",
     ]),
-    "item_burn_aura": ({"r": "#d94a2a", "u": "#ff8a2a", "y": "#f2c14e", "o": "#f2c14e"}, [
-        ".....r.......", "....rur......", "...ruour.....", "..ruo.our....",
-        ".ruo...our...", "ruo.....our..", ".ruo...our...", "..ruo.our....",
-        "...ruour.....", "....rur......", ".....r.......",
+    "item_burn_aura": ({"r": "#d94a2a", "o": "#ff8a2a", "y": "#f2c14e"}, [
+        "......rr........", ".....ror........", "....royor.......", "...roy..yor.....",
+        "..roy....yor....", "..ro.oooo.or....", "..ro.oooo.or....", "..roy....yor....",
+        "...roy..yor.....", "....royor.......", ".....ror........", "......rr........",
     ]),
     "item_freeze_nova": ({"b": "#6fc3ff", "w": "#ffffff"}, [
-        ".....b.......", "..b..b..b....", "...b.b.b.....", "....bbb......",
-        "b..bbwbb..b..", ".bb.bwb.b....", "..bbwbwbb....", "...bbwbb.....",
-        "....bbb......", "...b.b.b.....", "..b..b..b....", ".....b.......",
+        "......ww........", "..b...ww...b....", "...b..ww..b.....", "....bwwwwb......",
+        "bbbbwwwwwwbbbb.", "....bwwwwb......", "...b..ww..b.....", "..b...ww...b....",
+        "......ww........",
     ]),
     "item_revive": ({"y": "#f2c14e", "r": "#d94a2a", "w": "#ffd0d0"}, [
-        "...y...y.....", "..yyy.yyy....", ".yrrryyrry...", "yrrwrrrrwry..",
-        "yrrwrrrrwry..", ".yrrrrrrry...", "..yrrrrry....", "...yrrry.....",
-        "....yry......", ".....y.......",
+        "...y......y.....", "..yyy....yyy....", ".yrrryyyyrry....", "yrrrrrwrrrrry...",
+        "yrrrrrwrrrrry...", "yrrrrrrrrrrry...", ".yrrrrrrrrry....", "..yrrrrrrry.....",
+        "...yrrrrry......", "....yrrry.......", ".....yry........", "......y.........",
     ]),
     "item_reset_cd": ({"y": "#f2c14e", "b": "#6fc3ff", "w": "#ffffff"}, [
-        ".....y.......", "...yyyyy.....", "..ybbbbby....", ".yb..b..by...",
-        "yb...b...by..", "yb...bww.by..", "yb....ww.by..", ".yb..b..by...",
-        "..ybbbbby....", "...yyyyy.....", ".....y.......",
+        ".....yyyyyy.....", "...yy......yy...", "..y..bbbbbb..y..", ".y..bb....bb..y.",
+        "y..bb..ww..bb..y", "y..bb..ww..bb..y", "y..bb......bb..y", ".y..bb....bb..y.",
+        "..y..bbbbbb..y..", "...yy......yy...", ".....yyyyyy.....",
     ]),
-    "item_hit_buff": ({"b": "#6fc3ff", "y": "#f2c14e", "o": "#a8661f"}, [
-        "......bbb....", ".....bbbb....", "....bbb......", "...bbb.......",
-        "..yyyyyyy....", "..yyoooyy....", "..yyyyyyy....", "..yyyyyyy....",
-        "...yyyyy.....", "....yyy......", ".....y.......",
+    "item_hit_buff": ({"b": "#6fc3ff", "y": "#f2c14e", "w": "#fff8e0", "o": "#a8661f"}, [
+        "..bbbb..........", ".bb.............", "bbb....bbb......", ".......bbb......",
+        "..yyyyyy........", "..ywwyyy........", "..ywwyyy........", "..ywwyyy........",
+        "..yyyyyy........", "...yyyy.........", "....oooo........",
     ]),
     "item_kill_proc": ({"y": "#f2c14e", "r": "#d94a2a", "w": "#fff8e0"}, [
-        ".....y.......", "....yyy......", "...yryy......", "..yrrry......",
-        ".yrrrrry.....", "yrrwrrry.....", "yrrrrrrry....", ".yrrrrry.....",
-        "..yrrry......", "...yyy.......",
+        "...........w....", "..........wyw...", ".........www....", "....yyy...w.....",
+        "...yrrry........", "..yrrrrry.......", ".yrrwrrry.......", ".yrrwrrry.......",
+        "..yrrrrry.......", "...yrrry........", "....yyy.........",
     ]),
     "item_low_hp": ({"y": "#f2c14e", "b": "#6fc3ff", "k": "#1b1726"}, [
-        "...yyyyyyy...", "..ybbbbbbby..", ".ybbbbkbbby..", ".ybbbbkbbby..",
-        "ybbbbbkbbbby.", "ybbbbbbbkbby.", ".ybbbkbbbbby.", "..ybbkbbby...",
-        "...ybkby.....", "....yk.......",
+        "..yyyyyyyyyy..", ".ybbbbbbbbbby.", "ybbbbbkkbbbbby", "ybbbbbkbbbbbby",
+        "ybbbbbkbbbbbby", "ybbbbbbkbbbbby", "ybbbbbbkbbbbby", "ybbbbbbbkbbbby",
+        "ybbbbbbbkbbbby", ".ybbbbbbkbbby.", "..ybbbbkbby...", "...ybbkbbby....",
+        "....ybbbby.....", ".....yby.......",
     ]),
 }
 

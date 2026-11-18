@@ -5,10 +5,12 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Game Dashboard</title>
 <style>
-:root{--bg:#0e1014;--panel:#161a22;--panel2:#1d2330;--panel3:#242c3b;--text:#e9eef8;--muted:#93a0b8;--accent:#7ef0ff;--accent2:#b06cff;--border:#283142;--good:#6ee06e;--warn:#ffd36b;--bad:#ff8a8a;--gold:#c9a65a}
+:root{color-scheme:dark;--bg:#0e1014;--panel:#161a22;--panel2:#1d2330;--panel3:#242c3b;--text:#e9eef8;--muted:#93a0b8;--accent:#7ef0ff;--accent2:#b06cff;--border:#283142;--good:#6ee06e;--warn:#ffd36b;--bad:#ff8a8a;--gold:#c9a65a}
 *{box-sizing:border-box} html,body{height:100%} body{margin:0;font:13px/1.45 system-ui,-apple-system,Segoe UI,Roboto,sans-serif;background:var(--bg);color:var(--text)}
 button,input,select,textarea{font:inherit;color:var(--text)}
 a{color:var(--accent)}
+:where(button,.tab,.listItem,select):focus-visible{outline:2px solid var(--accent2);outline-offset:2px}
+@media (prefers-reduced-motion: reduce){.tab,.btn,button{transition:none}}
 header{min-height:48px;flex-wrap:wrap;padding:6px 14px;border-bottom:1px solid var(--border);display:flex;gap:12px;align-items:center;background:#0e1014f5;position:sticky;top:0;z-index:20}
 header h1{font-size:14px;margin:0;font-weight:700}
 .navLink{color:var(--muted);text-decoration:none;padding:5px 12px;border-radius:7px;font-weight:600;font-size:12px;border:1px solid transparent}
@@ -161,8 +163,9 @@ function anySprite(name){ return gameSprite(name)||labSprite(name); }
 
 /* ---------- one animation loop for every live canvas on the page ---------- */
 let painters=[],t0=performance.now();
+const reduceMotion=window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 function addPainter(f){painters.push(f);}
-function loop(){ const t=(performance.now()-t0)/1000; painters=painters.filter(p=>p.c.isConnected);
+function loop(){ const t=reduceMotion?0:(performance.now()-t0)/1000; painters=painters.filter(p=>p.c.isConnected);
   for(const p of painters){ try{ p.f(t); }catch(e){ console.error(e); } } requestAnimationFrame(loop);}
 requestAnimationFrame(loop);
 function liveCanvas(w,h,f){const c=el('canvas',{width:w,height:h}); const g=c.getContext('2d'); g.imageSmoothingEnabled=false;
@@ -540,13 +543,14 @@ const ITEM_ICON={shield:'item_shield',low_hp_buff:'item_low_hp',hit_buff:'item_h
   revive:'item_revive',burn_aura:'item_burn_aura',freeze_nova:'item_freeze_nova',reset_cd:'item_reset_cd',
   haste_rune:'haste',power_orb:'arcane_power',heal_bloom:'regen',magnetic_shield:'shield'};
 function itemEffects(m){
-  m.appendChild(el('h2',{},'Kỹ năng từ vật phẩm'));
-  m.appendChild(el('p',{class:'lead'},'Hiệu ứng đặc biệt của trang bị huyền thoại và hào quang của buff, vẽ bằng animation thật của game. Vòng đỏ là tầm ảnh hưởng; mỗi demo lặp theo nhịp của hiệu ứng.'));
+  const sec=el('section',{style:'margin-top:22px;border-top:1px solid var(--border);padding-top:16px'});
+  sec.appendChild(el('h3',{},'Kỹ năng từ trang bị'));
+  sec.appendChild(el('p',{class:'lead'},'Hiệu ứng đặc biệt của trang bị huyền thoại và hào quang của buff, vẽ bằng animation thật của game. Vòng đỏ là tầm ảnh hưởng; mỗi demo lặp theo nhịp của hiệu ứng.'));
   const list=[
     ...(game.items.buffs||[]).filter(x=>x.aura).map(x=>({it:x,buff:true})),
     ...(game.items.equipment||[]).filter(x=>x.special).map(x=>({it:x,buff:false}))
   ];
-  if(!list.length){ m.appendChild(el('div',{class:'card empty'},'Game chưa có vật phẩm nào có hiệu ứng hình ảnh.')); return; }
+  if(!list.length){ sec.appendChild(el('div',{class:'card empty'},'Game chưa có trang bị nào có hiệu ứng hình ảnh.')); m.appendChild(sec); return; }
   const dummy=game.monsters.find(x=>x.id==='slime')||game.monsters[0];
   const grid=el('div',{class:'grid g3'});
   list.forEach(({it,buff})=>{
@@ -597,13 +601,15 @@ function itemEffects(m){
         g.textAlign='center'; g.fillText('Không có hiệu ứng hình ảnh riêng',W/2,H-12); }
     });
     const iconName=ITEM_ICON[buff?it.id:sp.kind]||'gear';
-    const card=el('div',{class:'card'},el('div',{class:'iconRow'},iconCanvas(iconName,2),
+    const ic=iconCanvas(iconName,2); ic.setAttribute('aria-hidden','true');   // the title names the skill
+    cv.setAttribute('role','img'); cv.setAttribute('aria-label','Demo hiệu ứng '+title+', vòng đỏ là tầm ảnh hưởng');
+    const card=el('div',{class:'card'},el('div',{class:'iconRow'},ic,
       el('div',{},el('b',{},title),el('div',{class:'muted small'},cadence))));
     card.appendChild(el('div',{class:'stage',style:'margin-top:8px;padding:0'},cv));
     card.appendChild(el('div',{class:'small muted',style:'margin-top:6px'},(sp&&sp.desc)||it.desc||''));
     grid.appendChild(card);
   });
-  m.appendChild(grid);
+  sec.appendChild(grid); m.appendChild(sec);
 }
 
 /* ---------- 5. monsters ---------- */
@@ -679,15 +685,17 @@ function drawHb(g,hb,cx,cy,sc,on){ g.save(); g.globalAlpha=on?1:.4; g.lineWidth=
   g.restore();}
 function skills(m){
   m.appendChild(el('h2',{},'Kỹ năng'));
-  m.appendChild(el('p',{class:'lead'},'Mọi kỹ năng trong pool nâng cấp của class: demo ra chiêu đúng hitbox và nhịp frame của sprite, và bảng giá trị theo từng cấp (tính như PlayerStats của game). Góc nhìn cố định ở mọi chiêu; dùng − / + để thu nhỏ / phóng to tầm nhìn.'));
+  m.appendChild(el('p',{class:'lead'},'Chiêu của nhân vật và hiệu ứng từ trang bị được tách thành hai phần riêng. Mỗi demo dùng đúng hitbox và nhịp frame của sprite; dùng − / + để đổi tầm nhìn.'));
   if(!game.skills.length){ m.appendChild(el('div',{class:'empty'},'Game chưa có kỹ năng.')); return; }
   // a deep link to a skill opens its class (two classes may share an id, e.g. dash: the current class wins)
   const hb=decodeURIComponent(location.hash.slice(1)).split('/');
   if(hb[2]&&!game.skills.some(x=>x.id===hb[2]&&x.class===classOf())){ const f=game.skills.find(x=>x.id===hb[2]); if(f) curClass=f.class; }
-  classBar(m,()=>{painters=[];history.replaceState(null,'','#'+game.slug+'/skills');render();});
+  const charSec=el('section',{},el('h3',{},'Kỹ năng nhân vật'));
+  m.appendChild(charSec);
+  classBar(charSec,()=>{painters=[];history.replaceState(null,'','#'+game.slug+'/skills');render();});
   const mine=game.skills.filter(s=>s.class===classOf());
   const split=el('div',{class:'split'}); const list=el('div',{}); const pane=el('div',{});
-  split.appendChild(list); split.appendChild(pane); m.appendChild(split);
+  split.appendChild(list); split.appendChild(pane); charSec.appendChild(split);
   if(mine.some(x=>x.id===hb[2])) curSkillId=hb[2];
   if(!mine.some(s=>s.id===curSkillId)) curSkillId=(mine[0]||{}).id;
   const show=()=>{ list.innerHTML='';
@@ -705,7 +713,7 @@ function skills(m){
   ups.forEach(u=>{const cells=Array.from({length:maxL},(_,i)=>{const lv=u.levels[i]; if(!lv) return el('td',{});
       return el('td',{class:'num small'},effText(lv));});
     t.appendChild(el('tr',{},el('td',{},el('div',{class:'iconRow'},iconCanvas(u.icon||u.id,2),el('b',{},u.name))),el('td',{class:'small muted'},u.desc),...cells));});
-  su.appendChild(t); m.appendChild(su);
+  su.appendChild(t); charSec.appendChild(su);
   itemEffects(m);
 }
 function skillPane(pane,s){
