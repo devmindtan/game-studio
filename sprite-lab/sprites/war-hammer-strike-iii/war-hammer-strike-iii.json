@@ -1,120 +1,157 @@
 {
-  "frames": 16,
+  "frames": 48,
   "frame_size": [
-    52,
-    52
+    96,
+    160
   ],
   "fps": 13.0,
   "loop": false,
   "anchor": [
-    24.0,
-    26.0
+    48.0,
+    110.0
   ],
   "anchor_source": "explicit",
   "animations": [
     {
       "name": "strike_right",
       "start": 0,
-      "frames": 4,
+      "frames": 12,
       "fps": 13.0,
       "loop": false,
       "durations_ms": [
-        75.0,
-        65.0,
-        60.0,
-        50.0
+        70.0,
+        55.0,
+        45.0,
+        45.0,
+        50.0,
+        55.0,
+        70.0,
+        80.0,
+        95.0,
+        110.0,
+        125.0,
+        140.0
       ],
       "hitbox": {
         "shape": "rect",
         "center": [
-          39.5,
-          26.5
+          48.5,
+          110.5
         ],
         "active": [
-          1,
-          2
+          3,
+          5
         ],
-        "half_w": 9.5,
-        "half_h": 18.5
-      }
+        "half_w": 25.5,
+        "half_h": 25.5
+      },
+      "hit_mask": true
     },
     {
       "name": "strike_left",
-      "start": 4,
-      "frames": 4,
+      "start": 12,
+      "frames": 12,
       "fps": 13.0,
       "loop": false,
       "durations_ms": [
-        75.0,
-        65.0,
-        60.0,
-        50.0
+        70.0,
+        55.0,
+        45.0,
+        45.0,
+        50.0,
+        55.0,
+        70.0,
+        80.0,
+        95.0,
+        110.0,
+        125.0,
+        140.0
       ],
       "hitbox": {
         "shape": "rect",
         "center": [
-          14.5,
-          26.5
+          48.5,
+          110.5
         ],
         "active": [
-          1,
-          2
+          3,
+          5
         ],
-        "half_w": 9.5,
-        "half_h": 18.5
-      }
+        "half_w": 25.5,
+        "half_h": 25.5
+      },
+      "hit_mask": true
     },
     {
       "name": "strike_up",
-      "start": 8,
-      "frames": 4,
+      "start": 24,
+      "frames": 12,
       "fps": 13.0,
       "loop": false,
       "durations_ms": [
-        75.0,
-        65.0,
-        60.0,
-        50.0
+        70.0,
+        55.0,
+        45.0,
+        45.0,
+        50.0,
+        55.0,
+        70.0,
+        80.0,
+        95.0,
+        110.0,
+        125.0,
+        140.0
       ],
       "hitbox": {
         "shape": "rect",
         "center": [
-          28.0,
-          14.0
+          48.5,
+          110.5
         ],
         "active": [
-          1,
-          2
+          3,
+          5
         ],
-        "half_w": 18.0,
-        "half_h": 9.0
-      }
+        "half_w": 25.5,
+        "half_h": 25.5
+      },
+      "hit_mask": true
     },
     {
       "name": "strike_down",
-      "start": 12,
-      "frames": 4,
+      "start": 36,
+      "frames": 12,
       "fps": 13.0,
       "loop": false,
       "durations_ms": [
-        75.0,
-        65.0,
-        60.0,
-        50.0
+        70.0,
+        55.0,
+        45.0,
+        45.0,
+        50.0,
+        55.0,
+        70.0,
+        80.0,
+        95.0,
+        110.0,
+        125.0,
+        140.0
       ],
       "hitbox": {
         "shape": "rect",
         "center": [
-          28.0,
-          39.0
+          48.5,
+          110.5
         ],
         "active": [
-          1,
-          2
+          3,
+          5
         ],
-        "half_w": 18.0,
-        "half_h": 9.0
-      }
+        "half_w": 25.5,
+        "half_h": 25.5
+      },
+      "hit_mask": true
     }
-  ]
+  ],
+  "px_scale": 0.5
 }
