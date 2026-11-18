@@ -237,32 +237,36 @@ def earthquake(tier, size, radius, seed=17):
     masks = []   # hit masks: the damaging core (spritekit measures the hitbox from these)
     for f in range(12):
         c = Canvas(size, size)
+        mk = Canvas(size, size)   # damage mask: the rift, not the dust around it
         open_ = [0.15, 0.3, 0.7, 1.0, 1.0, 1.0, 0.8, 0.5, 0.3, 0.2, 0.1, 0.05][f]
-        _scuff(c, cx, cy, radius * 0.9, seed + f % 3, DIRT, 0.24 * min(1.0, f / 2 + 0.3))
+        _scuff(c, cx, cy, radius * 0.9, seed + f % 3, DIRT, 0.13 * min(1.0, f / 2 + 0.3))
         _rift(c, path, open_, tier, f, seed)
+        _rift(mk, path, open_, tier, f, seed)
         for j, bp in enumerate(branches):
-            _rift(c, bp, open_ * (0.80 if tier < 5 else 0.95), tier, f, seed + 70 + j)
+            strength = open_ * (0.80 if tier < 5 else 0.95)
+            _rift(c, bp, strength, tier, f, seed + 70 + j)
+            _rift(mk, bp, strength, tier, f, seed + 70 + j)
         if 2 <= f <= 7:
             h = (7 + tier * 2) * (1.0 if f < 7 else 0.6)
             lay = Canvas(size, size)
             for x, y in spikes:
                 fk.crystal(lay, x, y, -math.pi / 2 + rng.uniform(-0.3, 0.3), h, 3, STONE_L, STONE, STONE_D, "#e8e0d0")
             fk.stack(c, lay, DIRT_D)
-            for x, y in spikes:   # crumbs at the foot of each upthrust shard
-                for _ in range(4):
+            for x, y in spikes:   # a couple of crumbs at the foot of each shard
+                for _ in range(2):
                     px, py = int(x + rng.uniform(-4, 4)), int(y + rng.uniform(-1, 3))
-                    if _qnoise(px, py, f + 41) < 0.8:
+                    if _qnoise(px, py, f + 41) < 0.7:
                         _p(c, px, py, DIRT_D)
         if 2 <= f <= 6:
-            for k in range(10 + tier):
+            # the rift is the story: only a few motes of dust, not a cloud
+            for k in range(5 + tier // 2):
                 x, y = path[k % len(path)]
-                dx, dy = rng.uniform(-4, 4), -rng.uniform(2, 10) * (1 - 0.09 * (f - 2))
-                for s in range(2):   # a little drifting puff, not a rigid dash
-                    px, py = int(x + dx + rng.uniform(-1, 1)), int(y + dy + s)
-                    if _qnoise(px, py, f + 31) < 0.75:
-                        _p(c, px, py, DUST_L if s == 0 else DUST)
+                dx, dy = rng.uniform(-4, 4), -rng.uniform(2, 9) * (1 - 0.09 * (f - 2))
+                px, py = int(x + dx), int(y + dy)
+                if _qnoise(px, py, f + 31) < 0.6:
+                    _p(c, px, py, DUST_L)
         if f >= 8:
             _fade(c, min(0.95, 0.15 + 0.2 * (f - 7)))
         out.append(c)
-        masks.append(fk.mask_art(c, cx, cy, radius + 2))
+        masks.append(mk)   # a flat horizontal hit area along the fissure
     return fk.FxFrames(out, masks)

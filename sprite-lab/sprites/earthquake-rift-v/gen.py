@@ -27,7 +27,7 @@ SIZE = 152
 RADIUS = 72
 C = SIZE / 2
 ANIM = [("spell", stormfx.earthquake(5, SIZE, RADIUS), 12, False,
-         {"durations_ms": stormfx.QUAKE_MS, "hitbox": {"shape": "circle", "center": [C, C], "active": [2, 5], "radius": float(RADIUS), "inner": 0.0}})]
+         {"durations_ms": stormfx.QUAKE_MS, "hitbox": {"shape": "rect", "center": [C, C], "active": [2, 5], "half_w": float(RADIUS), "half_h": float(RADIUS) * 0.4}})]
 
 if __name__ == "__main__":
     export(HERE, NAME, ANIM, anchor=(C, C), preview_scale=2, gif_scale=2)

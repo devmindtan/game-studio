@@ -1,5 +1,5 @@
 {
-  "frames": 64,
+  "frames": 75,
   "frame_size": [
     16,
     16
@@ -456,6 +456,83 @@
     {
       "name": "pill",
       "start": 63,
+      "frames": 1,
+      "fps": 1.0,
+      "loop": false
+    },
+    {
+      "name": "item_shield",
+      "start": 64,
+      "frames": 1,
+      "fps": 1.0,
+      "loop": false
+    },
+    {
+      "name": "item_retaliate",
+      "start": 65,
+      "frames": 1,
+      "fps": 1.0,
+      "loop": false
+    },
+    {
+      "name": "item_pulse",
+      "start": 66,
+      "frames": 1,
+      "fps": 1.0,
+      "loop": false
+    },
+    {
+      "name": "item_chain_shock",
+      "start": 67,
+      "frames": 1,
+      "fps": 1.0,
+      "loop": false
+    },
+    {
+      "name": "item_burn_aura",
+      "start": 68,
+      "frames": 1,
+      "fps": 1.0,
+      "loop": false
+    },
+    {
+      "name": "item_freeze_nova",
+      "start": 69,
+      "frames": 1,
+      "fps": 1.0,
+      "loop": false
+    },
+    {
+      "name": "item_revive",
+      "start": 70,
+      "frames": 1,
+      "fps": 1.0,
+      "loop": false
+    },
+    {
+      "name": "item_reset_cd",
+      "start": 71,
+      "frames": 1,
+      "fps": 1.0,
+      "loop": false
+    },
+    {
+      "name": "item_hit_buff",
+      "start": 72,
+      "frames": 1,
+      "fps": 1.0,
+      "loop": false
+    },
+    {
+      "name": "item_kill_proc",
+      "start": 73,
+      "frames": 1,
+      "fps": 1.0,
+      "loop": false
+    },
+    {
+      "name": "item_low_hp",
+      "start": 74,
       "frames": 1,
       "fps": 1.0,
       "loop": false

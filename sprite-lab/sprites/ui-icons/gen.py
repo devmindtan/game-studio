@@ -809,11 +809,71 @@ ICONS = {
         "..ydddddy..",
         "...ooooo...",
     ]),
+    # Item skills (user 2026-11-18): one icon per legendary "special" kind.
+    # Gold frame + one readable silhouette; 16x16 like every other UI icon.
+    "item_shield": ({"y": "#f2c14e", "b": "#6fc3ff", "w": "#ffffff"}, [
+        "...yyyyyyy...", "..ybbbbbbby..", ".ybbwwwwwbby.", ".ybbwwwwwbby.",
+        "ybbbbbwbbbbby", "ybbbbbwbbbbby", ".ybbbbwbbby..", "..ybbwbbby...",
+        "...ybwby.....", "....yb.......",
+    ]),
+    "item_retaliate": ({"y": "#f2c14e", "w": "#fff8e0"}, [
+        ".....yyy.....", "...yy.y.yy...", "..y...y...y..", ".yy...y...yy.",
+        "y.....y.....y", ".yy...y...yy.", "..y...y...y..", "...yy.y.yy...",
+        ".....www.....",
+    ]),
+    "item_pulse": ({"y": "#f2c14e", "w": "#fff8e0"}, [
+        "......w......", ".....wyw.....", "....wyyyw....", "...wyywyyw...",
+        "..y..yyy..y..", ".y...yyy...y.", "y..yyyyyyy..y", ".y...yyy...y.",
+        "..y..yyy..y..", "...wyywyyw...", "....wyyyw....", ".....wyw.....",
+        "......w......",
+    ]),
+    "item_chain_shock": ({"y": "#f2c14e", "w": "#fff8e0"}, [
+        "......y......", ".....yy......", "....yy.......", "...yyyy......",
+        "..yywyy......", ".yy..yy......", "yy...yy......", "...yyyy......",
+        "....yy.......", ".....yy......",
+    ]),
+    "item_burn_aura": ({"r": "#d94a2a", "u": "#ff8a2a", "y": "#f2c14e", "o": "#f2c14e"}, [
+        ".....r.......", "....rur......", "...ruour.....", "..ruo.our....",
+        ".ruo...our...", "ruo.....our..", ".ruo...our...", "..ruo.our....",
+        "...ruour.....", "....rur......", ".....r.......",
+    ]),
+    "item_freeze_nova": ({"b": "#6fc3ff", "w": "#ffffff"}, [
+        ".....b.......", "..b..b..b....", "...b.b.b.....", "....bbb......",
+        "b..bbwbb..b..", ".bb.bwb.b....", "..bbwbwbb....", "...bbwbb.....",
+        "....bbb......", "...b.b.b.....", "..b..b..b....", ".....b.......",
+    ]),
+    "item_revive": ({"y": "#f2c14e", "r": "#d94a2a", "w": "#ffd0d0"}, [
+        "...y...y.....", "..yyy.yyy....", ".yrrryyrry...", "yrrwrrrrwry..",
+        "yrrwrrrrwry..", ".yrrrrrrry...", "..yrrrrry....", "...yrrry.....",
+        "....yry......", ".....y.......",
+    ]),
+    "item_reset_cd": ({"y": "#f2c14e", "b": "#6fc3ff", "w": "#ffffff"}, [
+        ".....y.......", "...yyyyy.....", "..ybbbbby....", ".yb..b..by...",
+        "yb...b...by..", "yb...bww.by..", "yb....ww.by..", ".yb..b..by...",
+        "..ybbbbby....", "...yyyyy.....", ".....y.......",
+    ]),
+    "item_hit_buff": ({"b": "#6fc3ff", "y": "#f2c14e", "o": "#a8661f"}, [
+        "......bbb....", ".....bbbb....", "....bbb......", "...bbb.......",
+        "..yyyyyyy....", "..yyoooyy....", "..yyyyyyy....", "..yyyyyyy....",
+        "...yyyyy.....", "....yyy......", ".....y.......",
+    ]),
+    "item_kill_proc": ({"y": "#f2c14e", "r": "#d94a2a", "w": "#fff8e0"}, [
+        ".....y.......", "....yyy......", "...yryy......", "..yrrry......",
+        ".yrrrrry.....", "yrrwrrry.....", "yrrrrrrry....", ".yrrrrry.....",
+        "..yrrry......", "...yyy.......",
+    ]),
+    "item_low_hp": ({"y": "#f2c14e", "b": "#6fc3ff", "k": "#1b1726"}, [
+        "...yyyyyyy...", "..ybbbbbbby..", ".ybbbbkbbby..", ".ybbbbkbbby..",
+        "ybbbbbkbbbby.", "ybbbbbbbkbby.", ".ybbbkbbbbby.", "..ybbkbbby...",
+        "...ybkby.....", "....yk.......",
+    ]),
 }
 
 
 def icon(name):
     pal, rows = ICONS[name]
+    width = max(len(r) for r in rows)
+    rows = [r.center(width, '.') for r in rows]   # short rows stay symmetric
     art = from_rows(rows, pal)
     c = Canvas(SIZE, SIZE)
     c.paste(art, (SIZE - art.width) // 2, (SIZE - art.height) // 2)

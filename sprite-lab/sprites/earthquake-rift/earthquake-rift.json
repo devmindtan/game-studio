@@ -33,7 +33,7 @@
         130.0
       ],
       "hitbox": {
-        "shape": "circle",
+        "shape": "rect",
         "center": [
           64.0,
           64.0
@@ -42,8 +42,8 @@
           2,
           5
         ],
-        "radius": 65.0,
-        "inner": 0.0
+        "half_w": 64.0,
+        "half_h": 16.0
       },
       "hit_mask": true
     }

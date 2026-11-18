@@ -532,10 +532,13 @@ function items(m){
   sec('Nhặt trong ải',game.items.pickups,'Chưa có.');
   sec('Buff (xuất hiện ngẫu nhiên, nhặt để kích hoạt)',game.items.buffs||[],'Chưa có buff.');
   sec('Trang bị ('+game.items.equipment.length+' món: thắng ải và rương rơi ra, mặc ở sảnh)',game.items.equipment,'Game chưa có trang bị.');
-  itemEffects(m);
 }
 
 /* ---------- item skills: legendary "special" effects + buff auras (user 2026-11-18) ------- */
+const ITEM_ICON={shield:'item_shield',low_hp_buff:'item_low_hp',hit_buff:'item_hit_buff',
+  kill_proc:'item_kill_proc',retaliate:'item_retaliate',pulse:'item_pulse',chain_shock:'item_chain_shock',
+  revive:'item_revive',burn_aura:'item_burn_aura',freeze_nova:'item_freeze_nova',reset_cd:'item_reset_cd',
+  haste_rune:'haste',power_orb:'arcane_power',heal_bloom:'regen',magnetic_shield:'shield'};
 function itemEffects(m){
   m.appendChild(el('h2',{},'Kỹ năng từ vật phẩm'));
   m.appendChild(el('p',{class:'lead'},'Hiệu ứng đặc biệt của trang bị huyền thoại và hào quang của buff, vẽ bằng animation thật của game. Vòng đỏ là tầm ảnh hưởng; mỗi demo lặp theo nhịp của hiệu ứng.'));
@@ -593,8 +596,9 @@ function itemEffects(m){
       if(!visual){ g.setTransform(1,0,0,1,0,0); g.fillStyle='#e9eef8'; g.font='12px system-ui';
         g.textAlign='center'; g.fillText('Không có hiệu ứng hình ảnh riêng',W/2,H-12); }
     });
-    const card=el('div',{class:'card'},el('div',{class:'row'},
-      el('b',{},title),el('span',{class:'muted small'},cadence)));
+    const iconName=ITEM_ICON[buff?it.id:sp.kind]||'gear';
+    const card=el('div',{class:'card'},el('div',{class:'iconRow'},iconCanvas(iconName,2),
+      el('div',{},el('b',{},title),el('div',{class:'muted small'},cadence))));
     card.appendChild(el('div',{class:'stage',style:'margin-top:8px;padding:0'},cv));
     card.appendChild(el('div',{class:'small muted',style:'margin-top:6px'},(sp&&sp.desc)||it.desc||''));
     grid.appendChild(card);
@@ -702,6 +706,7 @@ function skills(m){
       return el('td',{class:'num small'},effText(lv));});
     t.appendChild(el('tr',{},el('td',{},el('div',{class:'iconRow'},iconCanvas(u.icon||u.id,2),el('b',{},u.name))),el('td',{class:'small muted'},u.desc),...cells));});
   su.appendChild(t); m.appendChild(su);
+  itemEffects(m);
 }
 function skillPane(pane,s){
   pane.innerHTML='';
