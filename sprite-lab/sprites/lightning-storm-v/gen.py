@@ -27,7 +27,7 @@ SIZE = 152
 RADIUS = 66
 C = SIZE / 2
 ANIM = [("spell", stormfx.storm(5, SIZE, RADIUS), 12, False,
-         {"durations_ms": stormfx.STORM_MS, "hitbox": {"shape": "circle", "center": [C, C], "active": [3, 5], "radius": float(RADIUS), "inner": 0.0}})]
+         {"durations_ms": stormfx.STORM_MS, "hitbox": {"shape": "circle", "center": [C, C], "active": [3, 6], "radius": float(RADIUS), "inner": 0.0}})]
 
 if __name__ == "__main__":
     export(HERE, NAME, ANIM, anchor=(C, C), preview_scale=2, gif_scale=2)

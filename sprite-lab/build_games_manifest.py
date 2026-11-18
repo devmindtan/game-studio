@@ -350,6 +350,23 @@ def check_sprite(meta, lim, scale, size_max, has_duration):
     fs = meta.get("frame_size", [0, 0])
     px = float(meta.get("px_scale", 1.0))   # double-density sprites (icefx): the logical size counts
     ok = max(fs) * px <= lim["frame_max"] and max(fs) <= lim.get("frame_max_dense", lim["frame_max"])
+    # fx_craft (should; must in the game's test once a sprite is redrawn with px_scale)
+    craft = []
+    for a in play:
+        n = a.get("name", "")
+        if n.startswith("fly") or n.startswith("slash") or a.get("loop", True):
+            continue
+        t = anim_times(a)
+        act = (a.get("hitbox") or {}).get("active", [0, 0])
+        if a.get("frames", 0) < lim.get("fx_frames_min", 0):
+            craft.append("%s %d frame" % (n, a.get("frames", 0)))
+        if act[0] < lim.get("fx_lead_frames", 0):
+            craft.append("%s không có pha mở đầu" % n)
+        if t[-1] - t[min(len(t) - 1, act[1] + 1)] < lim.get("fx_outro_min", 0) - 1e-6:
+            craft.append("%s thiếu pha kết thúc" % n)
+    if meta.get("px_scale") != lim.get("fx_px_scale", meta.get("px_scale")):
+        craft.append("chưa vẽ mật độ gấp đôi")
+    out["fx_craft"] = ["fail", "; ".join(craft)] if craft else ["pass", "đủ pha, mật độ gấp đôi"]
     out["small"] = ["pass", "%dx%d" % tuple(fs) + (" (×%g)" % px if px != 1 else "")] if ok else ["fail", "khung %dx%d > %d" % (fs[0], fs[1], lim["frame_max"])]
     reach = max([reach_of(a.get("hitbox")) for a in play] or [0.0]) * scale * size_max * px
     flies = any(a.get("name") == "fly" for a in play)

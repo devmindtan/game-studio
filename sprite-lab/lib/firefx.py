@@ -45,43 +45,51 @@ def _blob(c, cx, cy, r, col, density=1.0, wobble=0.0, seed=0):
                     _p(c, px, py, col)
 
 
-BLAST_MS = [50, 60, 60, 70, 70, 90, 100, 110, 110, 120]
+BLAST_MS = [60, 50, 55, 60, 70, 80, 90, 100, 100, 110, 110, 120]
 
 
 def blast(tier, size, radius, seed=3):
-    """10 frames: a fireball blast centred in a size x size frame."""
+    """12 frames: charge, flash with rays, fireball swells, smoke and embers, fade."""
+    import fxkit as fk
     cx = cy = size / 2
+    radius = min(radius, size / 2 - 4)
     rng = random.Random(seed)
-    embers = [(rng.uniform(0, math.tau), rng.uniform(0.4, 1.0), rng.uniform(0.6, 1.4)) for _ in range(10 + 4 * tier)]
+    embers = [(rng.uniform(0, math.tau), rng.uniform(0.5, 1.1), rng.uniform(0.6, 1.4)) for _ in range(12 + 4 * tier)]
     out = []
-    for f in range(10):
+    for f in range(12):
         c = Canvas(size, size)
-        if f == 0:   # flash
-            _disk(c, cx, cy, radius * 0.35, YEL)
-            _disk(c, cx, cy, radius * 0.22, WHITE)
+        if f == 0:   # the fireball's core flares before it bursts
+            fk.glow(c, cx, cy, radius * 0.3, [RED, ORA, YEL, WHITE])
+            fk.sparkle(c, int(cx), int(cy), 3 + tier, WHITE, YEL)
+        elif f == 1:   # flash
+            fk.glow(c, cx, cy, radius * 0.6, [ORA, YEL, WHITE], density=0.9)
+            fk.rays(c, cx, cy, radius * 0.4, radius, 10 + 2 * tier, YEL, WHITE, rot=0.2, width=2)
         elif f <= 4:   # swell
-            t = f / 4
-            r = radius * (0.45 + 0.55 * t)
-            _blob(c, cx, cy, r, DRED, wobble=2 + tier * 0.4, seed=f)
-            _blob(c, cx, cy, r * 0.85, RED, wobble=2, seed=f + 9)
-            _blob(c, cx, cy, r * 0.62, ORA, wobble=1.5, seed=f + 17)
-            _blob(c, cx, cy, r * 0.38 * (1.2 - t * 0.5), YEL, wobble=1, seed=f + 23)
-            _disk(c, cx, cy, max(1, r * 0.16 * (1.3 - t)), WHITE)
+            t = (f - 1) / 3
+            r = radius * (0.55 + 0.45 * t)
+            lay = Canvas(size, size)
+            _blob(lay, cx, cy, r, DRED, wobble=2 + tier * 0.4, seed=f)
+            _blob(lay, cx, cy, r * 0.85, RED, wobble=2, seed=f + 9)
+            _blob(lay, cx, cy, r * 0.62, ORA, wobble=1.5, seed=f + 17)
+            _blob(lay, cx, cy, r * 0.38 * (1.2 - t * 0.5), YEL, wobble=1, seed=f + 23)
+            _disk(lay, cx - r * 0.2, cy - r * 0.25, max(1, r * 0.14), WHITE)   # hot highlight up-left
+            fk.stack(c, lay, "#3a0e0e")
+            for a, d, sp in embers:
+                rr = r * d
+                fk.streak(c, cx + math.cos(a) * rr, cy + math.sin(a) * rr, math.cos(a), math.sin(a), 4, YEL, ORA)
             if tier >= 4:
-                _ring(c, cx, cy, r + 3 + f, ORA)
-            if tier >= 5:
-                _ring(c, cx, cy, r * 0.5, WHITE)
-        else:          # smoke and embers, then fade
+                fk.ring_band(c, cx, cy, r + 3, [DRED, ORA, YEL])
+        else:          # smoke rises, embers drift, then fade
             k = f - 4
-            r = radius * (0.9 + 0.05 * k)
-            _blob(c, cx, cy - k, r * (0.8 - 0.05 * k), SMOKE, density=0.55 - 0.05 * k, wobble=3, seed=40 + k)
-            _blob(c, cx, cy - k, r * (0.55 - 0.05 * k), SMOKE_L, density=0.35, wobble=2, seed=50 + k)
-            _blob(c, cx, cy, max(1, r * (0.35 - 0.06 * k)), ORA, wobble=1.5, seed=60 + k)
-            for a, d, s in embers:
-                rr = radius * d * (1 + 0.12 * k)
-                _p(c, cx + math.cos(a) * rr, cy + math.sin(a) * rr - k * s * 2, YEL if (k + int(a * 3)) % 2 else ORA)
-            if f >= 7:
-                _fade(c, min(0.95, 0.15 + 0.25 * (f - 6)))
+            r = radius * (0.9 + 0.04 * k)
+            _blob(c, cx, cy - k * 1.5, r * (0.8 - 0.05 * k), SMOKE, density=0.5 - 0.04 * k, wobble=3, seed=40 + k)
+            _blob(c, cx, cy - k * 1.5, r * (0.55 - 0.05 * k), SMOKE_L, density=0.35, wobble=2, seed=50 + k)
+            _blob(c, cx, cy, max(1, r * (0.35 - 0.04 * k)), ORA, wobble=1.5, seed=60 + k)
+            for a, d, sp in embers:
+                rr = radius * d * (1 + 0.1 * k)
+                fk.streak(c, cx + math.cos(a) * rr, cy + math.sin(a) * rr - k * sp * 2, 0, -1, 3, YEL if (k + int(a * 3)) % 2 else ORA, RED)
+            if f >= 8:
+                _fade(c, min(0.95, 0.1 + 0.2 * (f - 7)))
         out.append(c)
     return out
 

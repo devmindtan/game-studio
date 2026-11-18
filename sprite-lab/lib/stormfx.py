@@ -40,120 +40,140 @@ def _bolt(c, x0, y0, x1, y1, rng, col, glow, segs=7):
         c.line(int(a), int(b), int(cx), int(cy), col, 2)
 
 
-STORM_MS = [80, 80, 80, 60, 60, 60, 70, 100, 110, 120, 130]
+STORM_MS = [80, 80, 80, 55, 55, 55, 55, 80, 100, 110, 120, 130]
+STONE_D = "#4a4038"
 
 
 def storm(tier, size, radius, seed=11):
-    """11 frames: the cloud, three strike frames, sparks, fade (centre = ground target)."""
+    """12 frames: cloud gathers, four strike frames (outlined bolts, flash, sparkles),
+    sparks crawl, fade."""
+    import fxkit as fk
     cx = cy = size / 2
     rng = random.Random(seed)
     n = 2 + (tier + 1) // 2
     spots = [(cx + math.cos(a) * radius * d, cy + math.sin(a) * radius * d * 0.8)
              for a, d in ((rng.uniform(0, math.tau), rng.uniform(0.1, 0.8)) for _ in range(n))]
     out = []
-    for f in range(11):
+    for f in range(12):
         c = Canvas(size, size)
-        if f < 3:   # cloud gathers, shadow on the ground
+        if f < 3:
             t = (f + 1) / 3
-            _disk(c, cx, cy, radius * 0.9 * t, CLOUD, density=0.25)
+            _disk(c, cx, cy, radius * 0.9 * t, CLOUD, density=0.2)
+            lay = Canvas(size, size)
             for k in range(5 + tier):
                 a = k * math.tau / (5 + tier) + f * 0.4
-                _disk(c, cx + math.cos(a) * radius * 0.5 * t, cy + math.sin(a) * radius * 0.35 * t - 6, 3 + 2 * t, CLOUD_L, density=0.6)
+                fk.glow(lay, cx + math.cos(a) * radius * 0.5 * t, cy + math.sin(a) * radius * 0.35 * t - 6, 4 + 2 * t, [CLOUD, CLOUD_L])
+            fk.stack(c, lay, "#1a1a2e")
             if f == 2:
-                _p(c, cx, cy - 4, BOLT)
-        elif f < 6:   # strikes: each frame a different set of bolts
-            _disk(c, cx, cy, radius * 0.9, CLOUD, density=0.2)
+                fk.sparkle(c, int(cx), int(cy - 6), 3, BOLT, GLOW)
+        elif f < 7:
+            _disk(c, cx, cy, radius * 0.9, CLOUD, density=0.15)
+            lay = Canvas(size, size)
             for i, (x, y) in enumerate(spots):
                 if (i + f) % 2 == 0 or f == 4:
-                    _bolt(c, x + rng.uniform(-3, 3), 0, x, y, rng, BOLT, GLOW)
-                    _disk(c, x, y, 6 + tier, GLOW, density=0.5)
-                    _disk(c, x, y, 3 + tier * 0.5, BOLT_M)
-                    _disk(c, x, y, 1.5, BOLT)
+                    _bolt(lay, x + rng.uniform(-3, 3), 0, x, y, rng, BOLT, GLOW)
+            fk.stack(c, lay, "#1a1a3a")
+            for i, (x, y) in enumerate(spots):
+                if (i + f) % 2 == 0 or f == 4:
+                    fk.glow(c, x, y, 6 + tier, [GLOW, BOLT_M, BOLT], density=0.8)
+                    fk.rays(c, x, y, 3, 8 + tier, 6, BOLT_M, BOLT, rot=f)
             if tier >= 4:
-                _ring(c, cx, cy, radius * (0.6 + 0.1 * (f - 3)), GLOW)
-        else:          # sparks crawl, then fade
-            k = f - 6
+                fk.ring_band(c, cx, cy, radius * (0.6 + 0.08 * (f - 3)), [GLOW, SPARK])
+        else:
+            k = f - 7
             for x, y in spots:
-                for s in range(4 + tier):
-                    a = s * 1.7 + k
-                    r = 2 + k * 2 + (s % 3)
-                    _p(c, x + math.cos(a) * r, y + math.sin(a) * r, SPARK if s % 2 else BOLT_M)
-                _disk(c, x, y, max(1, 3 - k), GLOW, density=0.5)
+                for s_ in range(4 + tier):
+                    a = s_ * 1.7 + k
+                    r = 2 + k * 2 + (s_ % 3)
+                    fk.streak(c, x + math.cos(a) * r, y + math.sin(a) * r, math.cos(a), math.sin(a), 3, SPARK, GLOW)
+                if k < 2:
+                    fk.sparkle(c, int(x), int(y), 2, BOLT, GLOW)
             if k >= 1:
-                _fade(c, min(0.95, 0.1 + 0.22 * k))
+                _fade(c, min(0.95, 0.1 + 0.2 * k))
         out.append(c)
     return out
 
 
-STOMP_MS = [50, 50, 55, 55, 60, 90, 100, 110, 120, 130]
+STOMP_MS = [60, 45, 50, 55, 55, 60, 80, 90, 100, 110, 120, 130]
 
 
 def stomp(tier, size, radius, seed=13):
-    """10 frames: a dust shock ring with cracks and stones, dust settles, fade."""
+    """12 frames: the foot lands (impact flash), a dust shock ring with cracks and
+    outlined flying rocks, the dust settles, fade."""
+    import fxkit as fk
     cx = cy = size / 2
+    radius = min(radius, size / 2 - 5)
     rng = random.Random(seed)
-    cracks = [(rng.uniform(0, math.tau), rng.uniform(0.5, 0.9)) for _ in range(5 + tier)]
-    stones = [(rng.uniform(0, math.tau), rng.uniform(0.4, 1.0)) for _ in range(6 + 2 * tier)]
+    cracks = [(rng.uniform(0, math.tau), rng.uniform(0.5, 0.95)) for _ in range(5 + tier)]
+    rocks = [(rng.uniform(0, math.tau), rng.uniform(0.4, 1.0)) for _ in range(6 + 2 * tier)]
     out = []
-    for f in range(10):
+    for f in range(12):
         c = Canvas(size, size)
-        if f < 5:
-            t = (f + 1) / 5
+        if f == 0:
+            fk.glow(c, cx, cy, radius * 0.3, [DUST, DUST_L, "#fff2d0"])
+            fk.rays(c, cx, cy, radius * 0.25, radius * 0.6, 8, DUST_L, None)
+        elif f < 6:
+            t = f / 5
             rr = radius * (0.3 + 0.7 * t)
             for a, d in cracks:
-                c.line(int(cx), int(cy), int(cx + math.cos(a) * rr * d), int(cy + math.sin(a) * rr * d * 0.8), DIRT_D)
-            _ring(c, cx, cy, rr, DUST, 2)
-            _ring(c, cx, cy, rr - 2, DUST_L)
+                x1, y1 = cx + math.cos(a) * rr * d, cy + math.sin(a) * rr * d * 0.8
+                c.line(int(cx), int(cy), int(x1), int(y1), DIRT_D, 2)
+                c.line(int(cx), int(cy), int(x1), int(y1), DIRT)
+            fk.ring_band(c, cx, cy, rr, [DIRT_D, DUST, DUST_L, "#fff2d0"])
+            lay = Canvas(size, size)
             for k in range(10 + 2 * tier):
                 a = k * math.tau / (10 + 2 * tier)
-                _disk(c, cx + math.cos(a) * rr, cy + math.sin(a) * rr, 2 + tier * 0.3, DUST_L if k % 2 else DUST, density=0.8)
-            for a, d in stones:
+                fk.glow(lay, cx + math.cos(a) * rr, cy + math.sin(a) * rr, 2.5 + tier * 0.3, [DUST, DUST_L])
+            for a, d in rocks:
                 r = rr * d
-                _p(c, cx + math.cos(a) * r, cy + math.sin(a) * r - 6 * math.sin(t * math.pi), STONE_L)
-                _p(c, cx + math.cos(a) * r + 1, cy + math.sin(a) * r - 6 * math.sin(t * math.pi), STONE)
-            if tier >= 4:
-                _ring(c, cx, cy, rr * 0.55, DUST)
+                fk.crystal(lay, cx + math.cos(a) * r, cy + math.sin(a) * r - 7 * math.sin(t * math.pi), a - 1.2,
+                           3 + tier * 0.6, 1.6, STONE_L, STONE, STONE_D, "#e8e0d0")
+            fk.stack(c, lay, DIRT_D)
         else:
-            k = f - 5
+            k = f - 6
             for a, d in cracks:
                 c.line(int(cx), int(cy), int(cx + math.cos(a) * radius * d), int(cy + math.sin(a) * radius * d * 0.8), DIRT)
-            _disk(c, cx, cy, radius * (0.9 + 0.05 * k), DUST, density=0.3 - 0.05 * k)
-            for a, d in stones:
+            _disk(c, cx, cy - k, radius * (0.9 + 0.05 * k), DUST, density=0.28 - 0.04 * k)
+            for a, d in rocks:
                 _p(c, cx + math.cos(a) * radius * d, cy + math.sin(a) * radius * d, STONE)
-            _fade(c, min(0.95, 0.1 + 0.2 * k))
+            if k >= 1:
+                _fade(c, min(0.95, 0.1 + 0.18 * k))
         out.append(c)
     return out
 
 
-QUAKE_MS = [70, 70, 60, 60, 60, 70, 100, 110, 120, 130, 140]
+QUAKE_MS = [70, 70, 60, 60, 60, 60, 70, 90, 100, 110, 120, 130]
 
 
 def earthquake(tier, size, radius, seed=17):
-    """11 frames: a rift opens across the target, rock spikes rise, it closes, fade."""
+    """12 frames: tremor cracks, the rift tears open with outlined rock spikes and
+    thrown dust (lava glow from IV), it closes, fade."""
+    import fxkit as fk
     cx = cy = size / 2
     rng = random.Random(seed)
     path = [(cx - radius + 2 * radius * k / 10, cy + rng.uniform(-radius * 0.25, radius * 0.25)) for k in range(11)]
     spikes = [path[k] for k in range(1, 10, 2)][: 2 + tier]
     out = []
-    for f in range(11):
+    for f in range(12):
         c = Canvas(size, size)
-        open_ = [0.2, 0.5, 1.0, 1.0, 1.0, 0.8, 0.5, 0.3, 0.2, 0.1, 0.05][f]
-        _disk(c, cx, cy, radius * 0.9, DIRT, density=0.18 * min(1.0, f / 2 + 0.3))
+        open_ = [0.15, 0.3, 0.7, 1.0, 1.0, 1.0, 0.8, 0.5, 0.3, 0.2, 0.1, 0.05][f]
+        _disk(c, cx, cy, radius * 0.9, DIRT, density=0.14 * min(1.0, f / 2 + 0.3))
         w = max(1, round(1 + 3 * open_ + tier * 0.3 * open_))
         for (x0, y0), (x1, y1) in zip(path, path[1:]):
-            c.line(int(x0), int(y0), int(x1), int(y1), DIRT_D, w)
+            c.line(int(x0), int(y0), int(x1), int(y1), DIRT_D, w + 1)
             if open_ > 0.6:
-                c.line(int(x0), int(y0) - w, int(x1), int(y1) - w, "#ff8a2a" if tier >= 4 else DIRT)
-        if 2 <= f <= 6:   # rock spikes
-            h = (6 + tier * 2) * (1.0 if f < 6 else 0.5)
+                c.line(int(x0), int(y0), int(x1), int(y1), "#ff8a2a" if tier >= 4 else "#2a1a10", max(1, w - 1))
+        if 2 <= f <= 7:
+            h = (7 + tier * 2) * (1.0 if f < 7 else 0.6)
+            lay = Canvas(size, size)
             for x, y in spikes:
-                c.polygon([(int(x - 3), int(y)), (int(x + 3), int(y)), (int(x), int(y - h))], STONE)
-                c.line(int(x), int(y), int(x - 1), int(y - h + 1), STONE_L)
-        if 2 <= f <= 5:   # dust thrown up
-            for k in range(8 + tier):
+                fk.crystal(lay, x, y, -math.pi / 2 + rng.uniform(-0.3, 0.3), h, 3, STONE_L, STONE, STONE_D, "#e8e0d0")
+            fk.stack(c, lay, DIRT_D)
+        if 2 <= f <= 6:
+            for k in range(10 + tier):
                 x, y = path[k % len(path)]
-                _p(c, x + rng.uniform(-3, 3), y - rng.uniform(2, 10), DUST_L)
-        if f >= 7:
-            _fade(c, min(0.95, 0.15 + 0.2 * (f - 6)))
+                fk.streak(c, x + rng.uniform(-3, 3), y - rng.uniform(2, 12), 0, -1, 3, DUST_L, DUST)
+        if f >= 8:
+            _fade(c, min(0.95, 0.15 + 0.2 * (f - 7)))
         out.append(c)
     return out

@@ -121,6 +121,15 @@ Không báo "xong" khi chưa xem `preview.png`, ảnh `sheet` và ảnh `move`.
   **cùng tư thế** của nhân vật; game ghép bằng `SpriteSheet.compose_layers({lớp: texture})` (viền sau khi ghép).
 - Xem **phóng to từng frame** của mỗi animation mới (preview cả sheet quá nhỏ để thấy lỗi tay/vũ khí).
 
+## Hiệu ứng chiêu (luật `fx_craft`, người dùng 2026-11-18)
+
+Hiệu ứng vùng của chiêu (nổ, bão, dậm đất…) vẽ theo chuẩn trong `games/<g>/design/gameplay-rules.md` mục
+"Chuẩn vẽ hiệu ứng chiêu": khung gấp đôi + `"px_scale": 0.5`, ≥ 12 frame, có pha mở đầu → trúng (chớp + tia)
+→ đọng lại → tan (dither), pha kết thúc 0,3–1,0 s, khối có mặt sáng/tối và viền tối bằng
+`sprite-lab/lib/fxkit.py` (mẫu: `lib/icefx.py` `frost_nova`). Không vẽ hiệu ứng bằng vòng tròn / chấm một màu:
+người dùng chê "đơn giản, không thể hiện sức mạnh". Không phóng to bằng thuật toán (Scale2x đã bị bỏ).
+Test của game (`gameplay_rules_test`) chặn sprite có `px_scale` mà sai chuẩn; dashboard cảnh báo sprite cũ.
+
 ## Quy tắc pixel art
 
 - **Hình đặc trưng vẽ bằng bản đồ pixel tay** (`from_rows` hoặc danh sách chuỗi): nón, mũ, đầu vũ khí, khuôn
