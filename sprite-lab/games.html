@@ -576,12 +576,14 @@ function itemEffects(m){
     const sh={};
     [['hero',heroInfo],['dummy',dummy&&dummy.sprite],['aura',auraInfo],['auraBack',auraBackInfo],
      ['wardBreak',breakInfo],
-     ['ring',ring?anySprite('stomp-i'):null],['status',status?anySprite('status-'+status):null],
+     ['ring',ring?anySprite((sp&&sp.fx)||'stomp-i'):null],['status',status?anySprite('status-'+status):null],
      ['scorch',kind==='burn_aura'?anySprite('scorch'):null]]
       .forEach(([k,info])=>{ if(info) sheetOf(info).then(x=>{sh[k]=x;}); });
     const W=280,H=170,Z=Math.min(1,118/R),VW=W/Z,VH=H/Z;
     const hx=VW/2-30,hy=VH/2+16,dx=hx+Math.min(R*0.7,95);
-    const period=breakInfo?2.4:(buff?2.4:Number(sp.every||sp.cooldown||3)),lead=0.25,dur=0.7;
+    const slowRing=!!(ring&&sp&&sp.fx);
+    const period=breakInfo||slowRing?2.4:(buff?2.4:Number(sp.every||sp.cooldown||3));
+    const lead=0.25,dur=slowRing?1.55:0.7;
     const visual=!!(auraInfo||ring||status||kind==='burn_aura');
     const cv=liveCanvas(W,H,(g,t)=>{
       const u=t%period,on=u>=lead&&u<lead+dur;
@@ -608,9 +610,10 @@ function itemEffects(m){
         }
       }
       if(sh.ring&&on){
-        const a=sh.ring.has('burst')?hbAt(sh.ring,'burst'):null;
+        const ra=sh.ring.has('shock')?'shock':'burst';
+        const a=sh.ring.has(ra)?hbAt(sh.ring,ra):null;
         const r1=(a&&a.radius?a.radius:25)*(sh.ring.meta.px_scale||1);
-        sh.ring.draw(g,'burst',u-lead,hx,hy,R/Math.max(1,r1));
+        sh.ring.draw(g,ra,u-lead,hx,hy,R/Math.max(1,r1));
       }
       if(!visual){ g.setTransform(1,0,0,1,0,0); g.fillStyle='#e9eef8'; g.font='12px system-ui';
         g.textAlign='center'; g.fillText('Không có hiệu ứng hình ảnh riêng',W/2,H-12); }
