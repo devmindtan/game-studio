@@ -556,7 +556,7 @@ function itemEffects(m){
   ];
   if(!list.length){ sec.appendChild(el('div',{class:'card empty'},'Game chưa có trang bị nào có hiệu ứng hình ảnh.')); m.appendChild(sec); return; }
   const dummy=game.monsters.find(x=>x.id==='slime')||game.monsters[0];
-  const grid=el('div',{class:'grid g3'});
+  const grid=el('div',{class:'grid g2'});   // wider cards so true-scale waves stay readable
   list.forEach(({it,buff})=>{
     const sp=buff?null:it.special, kind=buff?'aura':String(sp.kind||'');
     const R=Math.max(30,Number(buff?60:(sp.radius||120)));
@@ -571,16 +571,30 @@ function itemEffects(m){
       if(bi){ auraInfo=bi.aura||null; auraBackInfo=bi.aura_back||null; auraFront=(bi.aura_layer||'front')!=='back';
         breakInfo=bi.break_sprite||null; } }
     const ring=!buff&&['pulse','freeze_nova','retaliate'].includes(kind);
+    const ringSprite=ring?anySprite((sp&&sp.fx)||'stomp-i'):null;
+    let ringScale=0;   // world px per art px - the sprite's TRUE scale, never shrunk
     const status=!buff?({chain_shock:'shock',burn_aura:'burn',freeze_nova:'freeze'}[kind]||null):null;
     const heroInfo=(game.heroes.find(h=>h.id===it.class)||game.heroes[0]||{}).sprite;
     const sh={};
     [['hero',heroInfo],['dummy',dummy&&dummy.sprite],['aura',auraInfo],['auraBack',auraBackInfo],
      ['wardBreak',breakInfo],
-     ['ring',ring?anySprite((sp&&sp.fx)||'stomp-i'):null],['status',status?anySprite('status-'+status):null],
+     ['ring',ringSprite],['status',status?anySprite('status-'+status):null],
      ['scorch',kind==='burn_aura'?anySprite('scorch'):null]]
       .forEach(([k,info])=>{ if(info) sheetOf(info).then(x=>{sh[k]=x;}); });
-    const W=280,H=170,Z=Math.min(1,118/R),VW=W/Z,VH=H/Z;
-    const hx=VW/2-30,hy=VH/2+16,dx=hx+Math.min(R*0.7,95);
+    // Rule (user 2026-11-19): scale the VIEW, not the effect. The ring keeps its
+    // real scale (reach / its own hitbox); zoom the camera out until its whole
+    // frame fits the card, so hero, wave and reach stay in proportion.
+    const W=520,H=360;
+    let Z=Math.min(1,150/R);
+    if(ringSprite){
+      const rh=ringSprite.meta.animations[0]&&ringSprite.meta.animations[0].hitbox;
+      const r1=(rh&&rh.radius?rh.radius:25)*(ringSprite.meta.px_scale||1);
+      ringScale=R/Math.max(1,r1);
+      Z=Math.min(Z,(W-24)/Math.max(1,ringSprite.meta.frame_size[0]*ringScale),
+                    (H-24)/Math.max(1,ringSprite.meta.frame_size[1]*ringScale));
+    }
+    const VW=W/Z,VH=H/Z;
+    const hx=VW/2-40,hy=VH/2+20,dx=hx+Math.min(R*0.7,160);
     // Demo loops every 2.4 s (the card's text gives the real trigger interval):
     // a 6-15 s cooldown would leave the effect invisible most of the time.
     const period=2.4,lead=0.25,dur=ring?1.55:(breakInfo?0.95:1.0);
@@ -591,7 +605,7 @@ function itemEffects(m){
       g.setTransform(1,0,0,1,0,0); g.clearRect(0,0,W,H);
       g.setTransform(Z,0,0,Z,0,0);
       drawGround(g,hx,hy,1,1e9,VW,VH);
-      if(visual&&!ring) drawHb(g,{shape:'circle',radius:R},hx,hy,1,active);
+      if(visual) drawHb(g,{shape:'circle',radius:R},hx,hy,1,active);
       if(sh.scorch) sh.scorch.draw(g,'loop',t,dx,hy,1);
       if(sh.auraBack) sh.auraBack.draw(g,'loop',t,hx,hy,2);
       if(sh.aura&&!auraFront) sh.aura.draw(g,'loop',t,hx,hy,2);
@@ -609,17 +623,9 @@ function itemEffects(m){
           sh.status.draw(g,'loop',t,dx+(b.center[0]-sh.dummy.anchor[0])*dsc,hy+(b.center[1]-sh.dummy.anchor[1])*dsc,b.radius*dsc/8);
         }
       }
-      if(sh.ring&&on){
+      if(sh.ring&&on&&ringScale>0){
         const ra=sh.ring.has('shock')?'shock':'burst';
-        const a=sh.ring.has(ra)?hbAt(sh.ring,ra):null;
-        const r1=(a&&a.radius?a.radius:25)*(sh.ring.meta.px_scale||1);
-        // Rule: show the WHOLE effect. Scaling a small hitbox sprite up to the
-        // item's reach made a 112 px frame cover 600+ px and drown the card.
-        const want=R/Math.max(1,r1);
-        const fitS=Math.min((W-24)/Math.max(1,sh.ring.fs[0]*Z),(H-24)/Math.max(1,sh.ring.fs[1]*Z));
-        const drawS=Math.min(want,fitS);
-        sh.ring.draw(g,ra,u-lead,hx,hy,drawS);
-        drawHb(g,{shape:'circle',radius:r1*drawS},hx,hy,1,true);
+        sh.ring.draw(g,ra,u-lead,hx,hy,ringScale);   // true scale; the view is what shrank
       }
       if(!visual){ g.setTransform(1,0,0,1,0,0); g.fillStyle='#e9eef8'; g.font='12px system-ui';
         g.textAlign='center'; g.fillText('Không có hiệu ứng hình ảnh riêng',W/2,H-12); }
