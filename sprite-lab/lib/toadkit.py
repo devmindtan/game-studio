@@ -137,10 +137,20 @@ def draw_toad(c, pose, s=1.0, ox=0, oy=0, pal=PAL, king=False):
     else:
         c.line(ex - er + 1, ey, ex + er - 1, ey, pal["pupil"])
     c.line(ex - er, ey - er, ex + er - 1, ey - er - 1, pal["brow"])     # brow ridge
-    # wide mouth from the snout back under the eye
+    # wide mouth from the snout back under the eye; "mouth" > 0 opens it (spitting)
     m0 = _sc(_on_body(body, 0.98, 0.05), s, ox, oy)
     m1 = _sc(_on_body(body, 0.45, 0.15), s, ox, oy)
-    c.line(m0[0], m0[1], m1[0], m1[1], pal["mouth"])
+    mo = pose.get("mouth", 0)
+    if mo > 0.2:
+        m2 = _sc(_on_body(body, 0.95, 0.05 + 0.5 * mo), s, ox, oy)
+        c.polygon([m1, m0, m2], "#5a1a20")
+        c.line(m1[0], m1[1], m2[0], m2[1], "#c85060")      # tongue / pink inside
+        if mo > 0.7:   # poison glob leaving the mouth
+            gx, gy = m0[0] + round(2 * s), (m0[1] + m2[1]) // 2
+            c.ellipse(gx, gy - round(s), gx + round(2 * s), gy + round(s), "#8ad040", fill=True)
+            c.pixel(gx + 1, gy - 1, "#c8ff7a")
+    else:
+        c.line(m0[0], m0[1], m1[0], m1[1], pal["mouth"])
     # raised poison warts along the spine
     if king:
         for u, v in MOTTLE:   # darker mottling so the back is not flat
@@ -174,6 +184,23 @@ def _crown(c, body, s, ox, oy, pose):
         c.ellipse(bx - rr, by - hh - rr, bx + rr, by - hh, CAP, fill=True)
         c.pixel(bx - rr // 2, by - hh - rr + 1, CAP_L)
         c.pixel(bx + rr // 2, by - hh - rr // 2, CAP_L)
+
+
+def lerp_pose(a, b, t):
+    """In-between of poses a and b (t 0..1): numbers, tuples and point lists blend; other keys come
+    from the nearer pose. Gives the extra frames a smooth motion needs (creature-v1)."""
+    out = {}
+    for k in set(a) | set(b):
+        va, vb = a.get(k, b.get(k)), b.get(k, a.get(k))
+        if isinstance(va, (int, float)) and isinstance(vb, (int, float)) and not isinstance(va, bool):
+            out[k] = va + (vb - va) * t
+        elif isinstance(va, tuple) and isinstance(vb, tuple) and len(va) == len(vb):
+            out[k] = tuple(x + (y - x) * t for x, y in zip(va, vb))
+        elif isinstance(va, list) and isinstance(vb, list) and len(va) == len(vb):
+            out[k] = [tuple(x + (y - x) * t for x, y in zip(p, q)) for p, q in zip(va, vb)]
+        else:
+            out[k] = va if t < 0.5 else vb
+    return out
 
 
 # Poses at scale 1 (32x24 frame, floor y = 22). Toes and hands on y = 22 when grounded.

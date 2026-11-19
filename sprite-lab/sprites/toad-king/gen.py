@@ -26,7 +26,7 @@ sys.path.insert(0, str(HERE.parents[1] / "lib"))
 
 from spritekit import Canvas  # noqa: E402
 from sheet import export  # noqa: E402
-from toadkit import POSES, PAL, draw_toad, CAP, CAP_L, STEM  # noqa: E402
+from toadkit import POSES, PAL, draw_toad, lerp_pose, CAP, CAP_L, STEM  # noqa: E402
 
 NAME = "toad-king"
 W, H = 56, 44
@@ -49,7 +49,7 @@ def to_floor(c, floor=41):
 
 def frame(pose, **extra):
     c = Canvas(W, H)
-    p = {**POSES[pose], **extra}
+    p = {**(POSES[pose] if isinstance(pose, str) else pose), **extra}
     draw_toad(c, p, S, 0, 2, KPAL, king=True)
     return to_floor(c).outline(OUTLINE)
 
@@ -80,19 +80,41 @@ def melt(k):
     return to_floor(c).outline(OUTLINE)
 
 
+P = POSES
+
+
+def mid(a, b, t=0.5, **extra):
+    return {**lerp_pose(P[a], P[b], t), **extra}
+
+
+SPIT_BACK = {**P["sit"], "body": (16, 15, 9.5, 5.8, -18), "puff": 3}
+
 HB = {"shape": "rect", "center": [28.0, 43.0]}
 ANIMATIONS = [
-    ("move", [frame("sit"), frame("sit_puff"), frame("sit_low"), frame("sit_puff")], 6, True,
-     {"durations_ms": [260, 200, 240, 200], "hitbox": {**HB, "active": [0, 3]}}),
-    ("crouch", [frame("crouch", drool=True), frame("crouch_deep", drool=True)], 6, False,
-     {"durations_ms": [300, 600], "hitbox": {**HB, "active": [0, 1]}}),
-    ("jump", [frame("takeoff"), frame("apex"), frame("fall"), frame("land")], 6, False,
-     {"durations_ms": [150, 230, 180, 140], "hitbox": {**HB, "active": [0, 3]}}),
-    ("attack", [frame("crouch_deep", drool=True), frame("apex"), frame("land")], 6, False,
-     {"durations_ms": [300, 200, 240], "hitbox": {**HB, "active": [1, 2]}}),
-    ("hurt", [flash(frame("sit")), frame("sit_low")], 12, False, {"durations_ms": [80, 140], "hitbox": {**HB, "active": [0, 1]}}),
-    ("death", [flash(frame("flat"), 0.4), melt(0), melt(1), melt(2)], 6, False,
-     {"durations_ms": [160, 220, 260, 400], "hitbox": {**HB, "active": [0, 3]}}),
+    # move 8: sitting, throat sac breathing in and out, body bobbing, a slow blink
+    ("move", [frame("sit"), frame(mid("sit", "sit_low", 0.3), puff=1), frame("sit_puff"), frame(mid("sit", "sit_puff", 0.5), puff=3),
+              frame("sit_puff"), frame(mid("sit", "sit_low", 0.6), puff=1, eyes="shut"), frame("sit_low"), frame(mid("sit_low", "sit", 0.5))], 8, True,
+     {"durations_ms": [180, 140, 140, 200, 140, 120, 160, 140], "hitbox": {**HB, "active": [0, 7]}}),
+    # crouch 4: sinks, thighs load, poison drool lengthens (the leap is coming)
+    ("crouch", [frame(mid("sit", "crouch", 0.5), drool=True), frame("crouch", drool=True),
+                frame(mid("crouch", "crouch_deep", 0.5), drool=True), frame("crouch_deep", drool=True)], 6, False,
+     {"durations_ms": [150, 200, 250, 400], "hitbox": {**HB, "active": [0, 3]}}),
+    # jump 8: push, takeoff, rising, apex stretched, turning down, falling legs forward, landing squash, settle
+    ("jump", [frame(mid("crouch_deep", "takeoff", 0.4)), frame("takeoff"), frame(mid("takeoff", "apex", 0.5)), frame("apex"),
+              frame(mid("apex", "fall", 0.5)), frame("fall"), frame("land"), frame(mid("land", "sit", 0.5))], 8, False,
+     {"durations_ms": [80, 90, 100, 120, 100, 90, 90, 100], "hitbox": {**HB, "active": [0, 7]}}),
+    # attack 8 (poison spit): rears back, throat swells, mouth opens, spits, a second glob, closes, settles
+    ("attack", [frame(lerp_pose(P["sit"], SPIT_BACK, 0.5), puff=2), frame(lerp_pose(P["sit"], SPIT_BACK, 0.8), puff=3), frame(SPIT_BACK, drool=True),
+                frame(mid("sit", "land", 0.3), mouth=0.6), frame(mid("sit", "land", 0.4), mouth=1.0),
+                frame(mid("sit", "land", 0.3), mouth=0.9), frame("sit", mouth=0.4), frame("sit")], 8, False,
+     {"durations_ms": [140, 160, 220, 80, 120, 100, 120, 140], "hitbox": {**HB, "active": [3, 5]}}),
+    # hurt 4: flash, recoil (tips back), wobble, recover
+    ("hurt", [flash(frame("sit")), frame(SPIT_BACK, eyes="shut"), frame("sit_low", eyes="shut"), frame("sit")], 12, False,
+     {"durations_ms": [70, 100, 100, 120], "hitbox": {**HB, "active": [0, 3]}}),
+    # death 8: struck (flash), rears up, topples, flops flat, small bounce, still, melts into poison
+    ("death", [flash(frame("sit"), 0.5), frame("takeoff", eyes="shut"), frame(mid("takeoff", "flat", 0.5)), frame("flat"),
+               frame(mid("flat", "land", 0.3), eyes="shut"), frame("flat"), melt(0), melt(1)], 6, False,
+     {"durations_ms": [120, 160, 120, 120, 100, 300, 260, 400], "hitbox": {**HB, "active": [0, 7]}}),
 ]
 
 if __name__ == "__main__":
