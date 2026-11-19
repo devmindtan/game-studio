@@ -95,7 +95,7 @@ def roots(c, base, phase, front=False):
         c.line(0, yy, 47, yy, (0, 0, 0, 0))
 
 
-def tree(sway=0, arms=0, legs=0, dy=0, eyes=True, lean=0):
+def tree(sway=0, arms=0, legs=0, dy=0, eyes=True, lean=0, glow=False, leaf=-1, mouth=0):
     """sway: canopy offset; arms 0 down, 1 raised, 2 slammed; legs 0/1 shuffle."""
     c = Canvas(S, S)
     base = 45
@@ -113,16 +113,31 @@ def tree(sway=0, arms=0, legs=0, dy=0, eyes=True, lean=0):
         for ex in (20, 27):
             c.rect(ex + lean, fy, ex + 2 + lean, fy + 1, EYE, fill=True)
             c.pixel(ex + 1 + lean, fy, EYE_L)
+            if glow:   # rage: the eyes blaze and slant into a scowl
+                c.pixel(ex - 1 + lean, fy - 1, BARK_D)
+                c.pixel(ex + 3 + lean, fy - 1, BARK_D)
+                c.rect(ex + lean, fy - 1, ex + 2 + lean, fy - 1, EYE, fill=True)
     else:
         for ex in (20, 27):
             c.rect(ex + lean, fy, ex + 2 + lean, fy + 1, BARK_D, fill=True)
-    c.line(21 + lean, fy + 5, 28 + lean, fy + 5, BARK_D)
-    c.pixel(29 + lean, fy + 6, BARK_D)
+    if mouth:   # a split in the bark roars open
+        c.rect(21 + lean, fy + 4, 28 + lean, fy + 4 + mouth, "#1a0e08", fill=True)
+        for tx in range(22, 28, 2):
+            c.pixel(tx + lean, fy + 4, BARK_L)
+    else:
+        c.line(21 + lean, fy + 5, 28 + lean, fy + 5, BARK_D)
+        c.pixel(29 + lean, fy + 6, BARK_D)
     # branch arms
     if arms == 0:
         # resting branches stay at the shoulders and bend up: branches reaching the ground read as legs
         c.line(16, top + 6, 10, top + 9, BARK, 2); c.line(10, top + 9, 7, top + 5, BARK_D); c.pixel(6, top + 4, LEAF)
         c.line(32, top + 6, 38, top + 9, BARK, 2); c.line(38, top + 9, 41, top + 5, BARK_D); c.pixel(42, top + 4, LEAF)
+    elif arms == 0.5:
+        c.line(16, top + 6, 9, top + 2, BARK, 2); c.line(9, top + 2, 6, top - 2, BARK_D)
+        c.line(32, top + 6, 39, top + 2, BARK, 2); c.line(39, top + 2, 42, top - 2, BARK_D)
+    elif arms == 1.5:
+        c.line(16, top + 6, 8, top + 12, BARK, 2); c.line(8, top + 12, 6, top + 16, BARK_D)
+        c.line(32, top + 6, 40, top + 12, BARK, 2); c.line(40, top + 12, 42, top + 16, BARK_D)
     elif arms == 1:
         c.line(16, top + 5, 8, top - 4, BARK, 2); c.line(8, top - 4, 6, top - 8, BARK_D)
         c.line(32, top + 5, 41, top - 4, BARK, 2); c.line(41, top - 4, 43, top - 8, BARK_D)
@@ -139,6 +154,11 @@ def tree(sway=0, arms=0, legs=0, dy=0, eyes=True, lean=0):
     for dx, ddy in ((-10, 6), (0, 7), (9, 6), (-3, 5)):
         disk(c, cx + dx, cy + ddy, 2, LEAF_D)
     c.pixel(17 + lean, top + 1, MOSS); c.pixel(30 + lean, top + 2, MOSS)
+    if leaf >= 0:   # a leaf drifting down from the canopy (secondary motion)
+        lx = 10 + (leaf * 5) % 30 + (1 if leaf % 2 else -1)
+        ly = top + 2 + leaf * 3
+        c.pixel(lx, ly, LEAF_L)
+        c.pixel(lx + 1, ly, LEAF)
     return c.outline(OUTLINE)
 
 
@@ -153,11 +173,12 @@ def flash(c, amount=0.7):
     return c
 
 
-def fallen(k):
-    """Crumbles: the trunk sinks and splits, leaves scatter, then a stump and leaves."""
+def fallen(k, h=None):
+    """Crumbles: the trunk sinks and splits, leaves scatter, then a stump and leaves. h overrides the height."""
     c = Canvas(S, S)
     base = 45
-    h = [22, 14, 7][k]
+    k = min(k, 2)
+    h = h if h is not None else [22, 14, 7][k]
     roots(c, base, k, front=True)   # the stump keeps its roots
     c.polygon([(15, base - h), (33, base - h + 3), (34, base), (14, base)], BARK)
     c.line(23, base - h, 25, base, BARK_D)
@@ -170,13 +191,22 @@ def fallen(k):
 
 HB = {"shape": "rect", "center": [24.0, 47.0]}
 ANIMATIONS = [
-    ("move", [tree(0, 0, 0), tree(1, 0, 1, 1), tree(0, 0, 2), tree(-1, 0, 3, 1)], 6, True,
-     {"durations_ms": [180, 180, 180, 180], "hitbox": {**HB, "active": [0, 3]}}),
-    ("attack", [tree(0, 1, 0, -1), tree(0, 1, 0, -2), tree(1, 2, 0, 1, lean=1)], 8, False,
-     {"durations_ms": [260, 220, 300], "hitbox": {**HB, "active": [2, 2]}}),
-    ("hurt", [flash(tree(1, 0, 0)), tree(-1, 0, 1)], 12, False, {"durations_ms": [80, 140], "hitbox": {**HB, "active": [0, 1]}}),
-    ("death", [flash(tree(0, 2, 0, 1, eyes=False), 0.4), fallen(0), fallen(1), fallen(2)], 6, False,
-     {"durations_ms": [160, 220, 260, 400], "hitbox": {**HB, "active": [0, 3]}}),
+    # move 8: canopy sways and lags the trunk, roots curl in turn, trunk bobs, a leaf drifts down
+    ("move", [tree(0, 0, 0, 0, leaf=0), tree(1, 0, 1, 1, leaf=1), tree(2, 0, 2, 0, leaf=2), tree(1, 0, 3, 1, leaf=3),
+              tree(0, 0, 4, 0, leaf=4), tree(-1, 0, 5, 1, leaf=5), tree(-2, 0, 6, 0, leaf=6), tree(-1, 0, 7, 1)], 6, True,
+     {"durations_ms": [170, 160, 160, 180, 170, 160, 160, 180], "hitbox": {**HB, "active": [0, 7]}}),
+    # attack 8: eyes blaze, branches rise, roars, rears up high, slams the branches into the ground, impact, recovers
+    ("attack", [tree(0, 0.5, 0, 0, glow=True), tree(0, 1, 0, -1, glow=True), tree(-1, 1, 1, -2, glow=True, mouth=2),
+                tree(-1, 1, 1, -3, glow=True, mouth=3), tree(1, 1.5, 2, -1, glow=True, mouth=2, lean=1),
+                tree(2, 2, 2, 1, glow=True, lean=1), tree(1, 2, 3, 1, glow=True), tree(0, 0.5, 0, 0)], 8, False,
+     {"durations_ms": [160, 180, 200, 260, 80, 160, 160, 160], "hitbox": {**HB, "active": [5, 6]}}),
+    # hurt 4: flash, canopy whips back, groan, settles
+    ("hurt", [flash(tree(1, 0, 0)), tree(-2, 0.5, 1, 0, eyes=False, mouth=1), tree(-1, 0, 2, 1, mouth=1), tree(0, 0, 3)], 12, False,
+     {"durations_ms": [70, 110, 110, 130], "hitbox": {**HB, "active": [0, 3]}}),
+    # death 8: struck, roars, branches drop, the trunk cracks and sinks, splits, leaves scatter, a stump remains
+    ("death", [flash(tree(0, 1, 0, -1, glow=True, mouth=3), 0.4), tree(-1, 1, 1, -1, mouth=3), tree(1, 2, 2, 1, eyes=False),
+               fallen(0, 26), fallen(0), fallen(1, 18), fallen(1), fallen(2)], 6, False,
+     {"durations_ms": [140, 180, 180, 160, 200, 200, 240, 400], "hitbox": {**HB, "active": [0, 7]}}),
 ]
 
 if __name__ == "__main__":

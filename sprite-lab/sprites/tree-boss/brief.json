@@ -1,0 +1,10 @@
+{
+  "standard": "creature-v1",
+  "size": "boss",
+  "frames": {
+    "move": ["đứng, lá bắt đầu rơi", "tán nghiêng phải, rễ trái cuộn, thân nhún", "tán nghiêng phải (trễ nhịp so với thân), rễ kế cuộn", "tán nghiêng xa nhất, thân trở lại", "tán về giữa, rễ khác cuộn", "tán nghiêng trái, thân nhún", "tán nghiêng trái, lá rơi gần đất", "tán nghiêng trái xa nhất, về khung đầu"],
+    "attack": ["mắt rực, cành nâng nửa chừng", "giơ cao cành, thân vươn lên", "gầm: thân tách miệng, vươn cao hơn", "giữ thế cao nhất, miệng gầm to (cho người chơi né)", "cành quật xuống, thân ngả tới", "cành cắm xuống đất: rễ trồi", "giữ cành dưới đất, rễ cuộn", "rút cành về, thôi gầm"],
+    "hurt": ["chớp trắng", "tán bật ra sau, nhắm mắt, rên", "nhún xuống", "đứng lại"],
+    "death": ["trúng đòn chí mạng: chớp, gầm", "gầm lần cuối, cành giơ", "cành rủ xuống, mắt tắt", "thân nứt, bắt đầu sụp", "gãy, thân thấp hẳn", "sụp thêm, lá văng", "còn gốc, lá rơi đầy", "gốc cụt giữa chùm rễ"]
+  }
+}
