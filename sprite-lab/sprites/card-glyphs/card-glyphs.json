@@ -1,0 +1,93 @@
+{
+  "frames": 11,
+  "frame_size": [
+    12,
+    12
+  ],
+  "fps": 1.0,
+  "loop": true,
+  "anchor": [
+    6.0,
+    6.0
+  ],
+  "anchor_source": "explicit",
+  "animations": [
+    {
+      "name": "damage",
+      "start": 0,
+      "frames": 1,
+      "fps": 1.0,
+      "loop": true
+    },
+    {
+      "name": "area",
+      "start": 1,
+      "frames": 1,
+      "fps": 1.0,
+      "loop": true
+    },
+    {
+      "name": "cooldown",
+      "start": 2,
+      "frames": 1,
+      "fps": 1.0,
+      "loop": true
+    },
+    {
+      "name": "count",
+      "start": 3,
+      "frames": 1,
+      "fps": 1.0,
+      "loop": true
+    },
+    {
+      "name": "bleed",
+      "start": 4,
+      "frames": 1,
+      "fps": 1.0,
+      "loop": true
+    },
+    {
+      "name": "burn",
+      "start": 5,
+      "frames": 1,
+      "fps": 1.0,
+      "loop": true
+    },
+    {
+      "name": "shock",
+      "start": 6,
+      "frames": 1,
+      "fps": 1.0,
+      "loop": true
+    },
+    {
+      "name": "stun",
+      "start": 7,
+      "frames": 1,
+      "fps": 1.0,
+      "loop": true
+    },
+    {
+      "name": "slow",
+      "start": 8,
+      "frames": 1,
+      "fps": 1.0,
+      "loop": true
+    },
+    {
+      "name": "freeze",
+      "start": 9,
+      "frames": 1,
+      "fps": 1.0,
+      "loop": true
+    },
+    {
+      "name": "shard",
+      "start": 10,
+      "frames": 1,
+      "fps": 1.0,
+      "loop": true
+    }
+  ]
+}
