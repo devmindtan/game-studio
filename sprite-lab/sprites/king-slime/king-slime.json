@@ -1,136 +1,187 @@
 {
-  "frames": 15,
+  "frames": 40,
   "frame_size": [
-    32,
-    32
+    48,
+    40
   ],
-  "fps": 6.0,
+  "fps": 8.0,
   "loop": true,
   "anchor": [
-    16.0,
-    31.0
+    24.0,
+    39.0
   ],
   "anchor_source": "explicit",
   "animations": [
     {
       "name": "move",
       "start": 0,
-      "frames": 4,
-      "fps": 6.0,
-      "loop": true,
-      "durations_ms": [
-        160.0,
-        130.0,
-        180.0,
-        160.0
-      ],
-      "hitbox": {
-        "shape": "rect",
-        "center": [
-          15.5,
-          23.0
-        ],
-        "active": [
-          0,
-          3
-        ],
-        "half_w": 10.5,
-        "half_h": 8.0
-      }
-    },
-    {
-      "name": "windup",
-      "start": 4,
-      "frames": 3,
-      "fps": 6.0,
-      "loop": false,
-      "durations_ms": [
-        300.0,
-        300.0,
-        300.0
-      ],
-      "hitbox": {
-        "shape": "rect",
-        "center": [
-          15.5,
-          24.5
-        ],
-        "active": [
-          0,
-          2
-        ],
-        "half_w": 11.5,
-        "half_h": 6.5
-      }
-    },
-    {
-      "name": "jump",
-      "start": 7,
-      "frames": 2,
+      "frames": 8,
       "fps": 8.0,
       "loop": true,
-      "hitbox": {
-        "shape": "rect",
-        "center": [
-          16.0,
-          22.5
-        ],
-        "active": [
-          0,
-          1
-        ],
-        "half_w": 7.0,
-        "half_h": 8.5
-      }
-    },
-    {
-      "name": "hurt",
-      "start": 9,
-      "frames": 2,
-      "fps": 12.0,
-      "loop": false,
       "durations_ms": [
-        80.0,
+        140.0,
+        120.0,
+        140.0,
+        120.0,
+        140.0,
+        120.0,
+        140.0,
         120.0
       ],
       "hitbox": {
         "shape": "rect",
         "center": [
-          15.5,
-          23.5
+          25.0,
+          25.0
         ],
         "active": [
           0,
-          1
+          7
         ],
-        "half_w": 10.5,
-        "half_h": 7.5
+        "half_w": 21.0,
+        "half_h": 14.0
       }
     },
     {
-      "name": "death",
-      "start": 11,
+      "name": "crouch",
+      "start": 8,
       "frames": 4,
       "fps": 6.0,
       "loop": false,
       "durations_ms": [
-        160.0,
+        150.0,
         200.0,
-        300.0,
-        500.0
+        250.0,
+        400.0
       ],
       "hitbox": {
         "shape": "rect",
         "center": [
-          15.5,
-          24.5
+          25.0,
+          27.5
         ],
         "active": [
           0,
           3
         ],
-        "half_w": 11.5,
-        "half_h": 6.5
+        "half_w": 23.0,
+        "half_h": 11.5
+      }
+    },
+    {
+      "name": "jump",
+      "start": 12,
+      "frames": 8,
+      "fps": 8.0,
+      "loop": false,
+      "durations_ms": [
+        70.0,
+        90.0,
+        100.0,
+        120.0,
+        100.0,
+        90.0,
+        110.0,
+        120.0
+      ],
+      "hitbox": {
+        "shape": "rect",
+        "center": [
+          24.0,
+          24.5
+        ],
+        "active": [
+          0,
+          7
+        ],
+        "half_w": 24.0,
+        "half_h": 14.5
+      }
+    },
+    {
+      "name": "attack",
+      "start": 20,
+      "frames": 8,
+      "fps": 8.0,
+      "loop": false,
+      "durations_ms": [
+        130.0,
+        150.0,
+        220.0,
+        80.0,
+        120.0,
+        100.0,
+        120.0,
+        140.0
+      ],
+      "hitbox": {
+        "shape": "rect",
+        "center": [
+          24.0,
+          26.0
+        ],
+        "active": [
+          3,
+          5
+        ],
+        "half_w": 18.0,
+        "half_h": 13.0
+      }
+    },
+    {
+      "name": "hurt",
+      "start": 28,
+      "frames": 4,
+      "fps": 12.0,
+      "loop": false,
+      "durations_ms": [
+        70.0,
+        100.0,
+        100.0,
+        120.0
+      ],
+      "hitbox": {
+        "shape": "rect",
+        "center": [
+          24.5,
+          25.0
+        ],
+        "active": [
+          0,
+          3
+        ],
+        "half_w": 21.5,
+        "half_h": 14.0
+      }
+    },
+    {
+      "name": "death",
+      "start": 32,
+      "frames": 8,
+      "fps": 6.0,
+      "loop": false,
+      "durations_ms": [
+        120.0,
+        140.0,
+        140.0,
+        160.0,
+        180.0,
+        240.0,
+        280.0,
+        400.0
+      ],
+      "hitbox": {
+        "shape": "rect",
+        "center": [
+          24.0,
+          23.5
+        ],
+        "active": [
+          0,
+          7
+        ],
+        "half_w": 24.0,
+        "half_h": 15.5
       }
     }
   ],
@@ -138,9 +189,9 @@
   "body": {
     "anim": "move",
     "center": [
-      16.0,
-      24.5
+      24.5,
+      29.0
     ],
-    "radius": 8.5
+    "radius": 14.5
   }
 }

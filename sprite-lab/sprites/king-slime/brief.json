@@ -1,0 +1,12 @@
+{
+  "standard": "creature-v1",
+  "size": "boss",
+  "frames": {
+    "move": ["tròn đều", "bè ra, bề mặt gợn, vương miện nghiêng phải", "bè nhất, vương miện xóc lên (trễ nhịp)", "thu lại, vương miện rơi về", "vươn cao, vương miện nghiêng trái", "cao nhất, vương miện tụt xuống (trễ nhịp)", "hạ dần, bọt khí trôi lên", "về tròn"],
+    "crouch": ["nén, mắt cau", "nén thêm, vương miện bị đẩy xuống", "bè rộng, bề mặt rung mạnh", "nén sâu nhất, giữ để người chơi né"],
+    "jump": ["bật: vươn cao, vương miện bị tụt", "vọt dài nhất", "đang lên, thu bớt", "đỉnh: tròn lại, vương miện bay lên", "chúc xuống", "rơi: dài ra, vương miện lơ lửng", "đáp: bẹp bè, mắt nhắm", "nảy lại"],
+    "attack": ["mắt cau, má phồng", "phồng thêm", "phồng căng nhất (cho người chơi né)", "há miệng", "phun cục nhầy", "phun tiếp", "khép miệng", "về dáng thường"],
+    "hurt": ["chớp trắng, nhắm mắt, bẹp", "giật vươn lên, vương miện bật", "rung lắc", "đứng lại"],
+    "death": ["trúng đòn chí mạng: chớp", "run rẩy, vương miện bật lên", "rung mạnh, vương miện bay cao", "xẹp xuống, vương miện lệch", "bẹp, vương miện văng", "chảy thành vũng, vương miện rơi", "vũng loang, vương miện lăn", "vũng nằm yên cạnh vương miện"]
+  }
+}
