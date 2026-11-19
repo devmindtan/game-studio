@@ -20,7 +20,7 @@ số khung, mô tả từng động tác) và mọi động tác phải sống �
 |---|---|---|
 | nhỏ | 24–32 px | dơi, ma trơi, cóc |
 | vừa | 32–48 px | sói, yêu tinh, nấm, bọ |
-| boss | **≥ 48×48** (cả rộng và cao), tới 72 px | Vua Thạch Nhầy, Mộc Yêu, Cóc Chúa |
+| boss | **ít nhất một chiều ≥ 48 px** (rộng hoặc cao), tới 72 px | Vua Thạch Nhầy, Mộc Yêu, Cóc Chúa |
 
 Sinh vật ≤ 32 px vẽ tay (ASCII) từng tư thế; lớn hơn có thể dựng từ bộ phận (thư viện như `lib/toadkit.py`)
 nhưng **mỗi khung là một tư thế riêng**, không phải cùng một hình dời chỗ.

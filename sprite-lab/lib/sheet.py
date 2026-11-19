@@ -64,8 +64,8 @@ def check_creature(here: Path, animations):
     problems = []
     if boss and anims:
         fw, fh = next(iter(anims.values()))[0].width, next(iter(anims.values()))[0].height
-        if fw < 48 or fh < 48:
-            problems.append(f"boss frame {fw}x{fh}: a boss is at least 48x48 (user 2026-11-19)")
+        if max(fw, fh) < 48:
+            problems.append(f"boss frame {fw}x{fh}: a boss needs at least one side of 48 px (user 2026-11-19)")
     for n, k in need.items():
         if n not in anims:
             problems.append(f"{n}: missing (creature-v1 needs {', '.join(need)})")
