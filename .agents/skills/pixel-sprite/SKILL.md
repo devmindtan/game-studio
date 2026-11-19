@@ -142,7 +142,9 @@ Test của game (`gameplay_rules_test`) chặn sprite có `px_scale` mà sai chu
 4. **Dữ dằn nhưng vẫn đúng loài** (người dùng 2026-11-19: sói gắn gai lưng, lông tím, sẹo đỏ "giống con quái
    vật"): giữ dấu hiệu nhận dạng của loài thật (sói: tai nhọn to, mõm dài, bờm cổ, đuôi xù, lông xám/nâu);
    vẻ dữ đến từ tư thế (đầu hạ, nhe nanh, mắt lóe khi gồng, lông dựng **đúng chỗ**), không gắn gai lạ.
-5. `gamekit art run` **từ chối** sprite có brief mà thiếu động tác/khung, mô tả không khớp số khung, hoặc thân trên
+5. **Nâng cấp, không vẽ lại** sprite người dùng đã quen/duyệt (người dùng 2026-11-19, Vua Thạch Nhầy): giữ phong
+   cách, hình khối và màu gốc; thêm khung chuyển tiếp và chi tiết trên nền đó. Muốn đổi phong cách thì hỏi trước.
+6. `gamekit art run` **từ chối** sprite có brief mà thiếu động tác/khung, mô tả không khớp số khung, hoặc thân trên
    đổi < 4 % giữa các khung `move` (chỉ chân động).
 
 ## Quy tắc pixel art
