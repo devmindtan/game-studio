@@ -5,7 +5,7 @@ Frame 32x32, neo (16, 31) giữa đáy (ground=True).
 Animation: move 4 (nảy), windup 3 (lấy đà: bẹt dần, vương miện rung), jump 2 (vươn cao), hurt 2, death 4.
 Chạy: gamekit art run king-slime
 """
-import math
+import importlib.util
 import sys
 from pathlib import Path
 
@@ -27,65 +27,85 @@ ANCHOR = (24.0, 47.0)
 FLOOR = 45                      # lowest body row; the outline adds 46
 OUTLINE = "#1b1726"
 PAL = {"m": "#3fae6e", "d": "#1f6b45", "l": "#9ff0b8", "w": "#ffffff", "e": "#1b1726", "p": "#ffffff", "t": "#1f5a3a"}
+# rage (user 2026-11-19): below rage_at the body turns red; king-slime-rage renders these frames with RAGE_PAL
+RAGE_PAL = {"m": "#d8483a", "d": "#8a1e1e", "l": "#ffb0a0", "w": "#ffffff", "e": "#1b1726", "p": "#ffe070", "t": "#6a1414"}
 CROWN = ["g...g...g...g", "gg.ggg.ggg.gg", "ggggggrgggggg", "sgggggggggggs", "GGGGGGGGGGGGG"]
 CROWN_PAL = {"g": "#ffd04a", "G": "#b8862a", "r": "#e8364a", "s": "#fff2a0"}
-GLOB = ["...mmm...", ".mmllmm..", "mmmmmmmd.", ".mmmmmd..", "..mmd...."]
-# the old king's shapes, as squash/stretch of the same dome (old: 18 px wide, here x1.9)
-FORMS = {"normal": (1.0, 1.0), "squash": (1.12, 0.82), "stretch": (0.86, 1.22), "flat": (1.25, 0.42), "puddle": (1.3, 0.16)}
+S = 1.9   # the old 18x11 king outline, traced and redrawn smooth at boss size (user: keep the old proportions)
+_spec = importlib.util.spec_from_file_location("slime_gen", HERE.parent / "slime" / "gen.py")
+slime = importlib.util.module_from_spec(_spec)
+_spec.loader.exec_module(slime)
 
 
-def dome(c, cx, base, rx, ry, col):
-    pts = [(round(cx + math.cos(math.pi * k / 40) * rx), round(base - 2 - math.sin(math.pi * k / 40) * ry)) for k in range(41)]
-    pts += [(round(cx - rx + 2), base), (round(cx + rx - 2), base)][::-1]
-    c.polygon(pts, col)
+def _outline_poly(rows, ox, oy):
+    """A smooth polygon through the old shape's row extents, scaled by S (same proportions, no blocky upscale)."""
+    spans = [(r.find(next(ch for ch in r if ch != ".")), len(r.rstrip(".")) - 1, y) for y, r in enumerate(rows) if r.strip(".")]
+    left = [(ox + x0 * S, oy + (y + 0.5) * S) for x0, _, y in spans]
+    right = [(ox + (x1 + 1) * S, oy + (y + 0.5) * S) for _, x1, y in spans]
+    top = [(ox + spans[0][0] * S + S * 0.5, oy), (ox + (spans[0][1] + 1) * S - S * 0.5, oy)]
+    bot = [(ox + (spans[-1][1] + 1) * S - S, oy + len(rows) * S), (ox + spans[-1][0] * S + S, oy + len(rows) * S)]
+    pts = top + right + bot + left[::-1]
+    return [(round(x), round(y)) for x, y in pts]
 
 
-def shape(name, dx=0, eyes="open", crown_dy=0, crown=True, crown_at=None, glob=None, bubble=-1, sparkle=False):
-    """The old king's look (user 2026-11-19 prefers it) drawn at boss size: a flat-coloured dome, a dark
-    crescent at the bottom, a big highlight with two white glints at the top left, one tall eye with a
-    white glint, no mouth, a pixel crown. crown_dy lets the crown lag the body; crown_at puts a fallen
-    crown on the ground; glob=x draws a spat glob of slime; bubble drifts a bubble inside."""
-    sx, sy = FORMS[name]
+def _cells(rows, chars):
+    return [(x, y) for y, r in enumerate(rows) for x, ch in enumerate(r) if ch in chars]
+
+
+def shape(name, dx=0, eyes="open", crown_dy=0, crown=True, crown_at=None, bubble=-1, sparkle=False, pal=None):
+    """The old king (user 2026-11-19 prefers it): the plain slime's shapes traced at boss size, a pixel crown.
+    crown_dy lets the crown lag the body; crown_at=(x, y) puts a fallen crown on the ground; pal=RAGE_PAL
+    draws the red enraged body."""
+    P = pal or PAL
+    rows = slime.SHAPES[name]
+    w = max(len(r) for r in rows)
+    ox = round((SIZE - w * S) / 2) + dx
+    oy = FLOOR + 1 - round(len(rows) * S)
     c = Canvas(SIZE, SIZE)
-    rx, ry = 17 * sx, 12 * sy          # wider than tall, as the old king (18 x 11)
-    cx, base = 24 + dx, FLOOR
-    # a round bulb sitting on the floor (an ellipse cut flat by the ground), as the old king
-    cy = base - ry * 0.82
-    c.ellipse(round(cx - rx), round(cy - ry), round(cx + rx), round(cy + ry), PAL["d"], fill=True)
-    sh = max(1, round(2.5 * sy))                                          # the dark crescent, bottom left
-    c.ellipse(round(cx - rx + 2), round(cy - ry), round(cx + rx), round(cy + ry - sh), PAL["m"], fill=True)
-    if ry > 6:
-        hx, hy = cx - rx * 0.4, cy - ry * 0.55
-        c.ellipse(round(hx - 4 * sx), round(hy - 2 * sy), round(hx + 4 * sx), round(hy + 2 * sy), PAL["l"], fill=True)
-        c.rect(round(hx - 1), round(hy - 1), round(hx), round(hy), PAL["w"], fill=True)   # glints
-        c.pixel(round(hx + 2), round(hy - 1), PAL["w"])
-    if bubble >= 0 and ry > 8:
-        for k in range(2):
-            by = round(cy + ry * 0.4) - ((bubble * 2 + k * 5) % max(3, round(ry * 0.9)))
-            c.pixel(round(cx - 4 + k * 7), by, PAL["l"])
-    if ry > 5:   # one tall eye on the right, as the old king
-        ex, ey = round(cx + rx * 0.42), round(cy - ry * 0.35)
-        eh = max(2, round(6 * sy))
+    body = _outline_poly(rows, ox, oy)
+    c.polygon(body, P["d"])
+    # the lit body: the same outline lifted and nudged right, clipped to the body -> the old dark crescent below
+    lit = Canvas(SIZE, SIZE)
+    lit.polygon([(x + 1, y - max(2, round(S * 1.4))) for x, y in body], P["m"])
+    mask = Canvas(SIZE, SIZE)
+    mask.polygon(body, "#ffffff")
+    lp, mp = lit.img.load(), mask.img.load()
+    for yy in range(SIZE):
+        for xx in range(SIZE):
+            if lp[xx, yy][3] and mp[xx, yy][3]:
+                c.pixel(xx, yy, P["m"])
+    for x, y in _cells(rows, "l"):   # the old highlight, and its white glints
+        c.rect(round(ox + x * S), round(oy + y * S), round(ox + (x + 1) * S) - 1, round(oy + (y + 1) * S) - 1, P["l"], fill=True)
+    for x, y in _cells(rows, "w"):
+        c.rect(round(ox + x * S), round(oy + y * S), round(ox + x * S) + 1, round(oy + y * S) + 1, P["w"], fill=True)
+    eye = _cells(rows, "e")   # the dark eye only: the white "p" glint sits inside/at its edge
+    if eye:
+        ex0, ey0 = min(x for x, _ in eye), min(y for _, y in eye)
+        ex1, ey1 = max(x for x, _ in eye), max(y for _, y in eye)
+        X0, Y0 = round(ox + ex0 * S), round(oy + ey0 * S)
+        X1, Y1 = round(ox + (ex1 + 1) * S) - 1, round(oy + (ey1 + 1) * S) - 1
         if eyes == "closed":
-            c.line(ex - 1, ey + eh // 2, ex + 3, ey + eh // 2, PAL["e"])
+            c.line(X0, (Y0 + Y1) // 2, X1, (Y0 + Y1) // 2, P["e"])
         else:
-            c.rect(ex, ey, ex + 3, ey + eh - 1, PAL["e"], fill=True)
-            c.rect(ex + 2, ey + eh // 2 - 1, ex + 3, ey + eh // 2, PAL["p"], fill=True)
+            c.rect(X0, Y0, X1, Y1, P["e"], fill=True)
+            px_, py_ = _cells(rows, "p")[0] if _cells(rows, "p") else (ex1, (ey0 + ey1) // 2)
+            gx = min(round(ox + px_ * S), X1) - 1                      # glint inside the eye, right edge
+            c.rect(gx, round(oy + py_ * S), gx + 1, round(oy + py_ * S) + 1, P["p"], fill=True)
             if eyes == "angry":
-                c.line(ex - 2, ey - 2, ex + 4, ey, PAL["e"])
+                c.line(X0 - 2, Y0 - 2, X1 + 1, Y0, P["e"])
+    if bubble >= 0 and len(rows) > 6:
+        for k in range(2):
+            by = FLOOR - 4 - ((bubble * 2 + k * 5) % max(3, round(len(rows) * S * 0.6)))
+            c.pixel(round(SIZE / 2 - 5 + k * 7 + dx), by, P["l"])
     cr = from_rows(CROWN, CROWN_PAL)
-    top = round(cy - ry)
     if crown:
-        cx0, cy0 = round(cx - cr.width / 2) + 1, top - cr.height + 2 + crown_dy
+        cx0, cy0 = round(SIZE / 2 - cr.width / 2) + dx, oy - cr.height + 2 + crown_dy
         c.paste(cr, cx0, cy0)
         if sparkle:
             c.pixel(cx0 + 6, cy0 + 1, "#ffffff")
             c.pixel(cx0 + 6, cy0 - 1, "#fff2a0")
     if crown_at:
         c.paste(cr, crown_at[0], crown_at[1])
-    if glob is not None:
-        gl = from_rows(GLOB, PAL)
-        c.paste(gl, glob, round(cy))
     for yy in range(FLOOR + 1, SIZE):
         c.line(0, yy, SIZE - 1, yy, (0, 0, 0, 0))
     return c.outline(OUTLINE)
@@ -103,7 +123,9 @@ def flash(c, amount=0.7):
 
 
 HB = {"shape": "rect", "center": [16.0, 31.0]}
-ANIMATIONS = [
+def build():
+    """All animations with the current PAL (king-slime-rage sets PAL = RAGE_PAL and calls this)."""
+    return [
     ("move", [shape("normal", bubble=0, sparkle=True), shape("squash", crown_dy=1, bubble=1), shape("squash", crown_dy=2, bubble=2),
               shape("normal", crown_dy=1, bubble=3), shape("stretch", bubble=4), shape("stretch", crown_dy=-1, bubble=5, sparkle=True),
               shape("normal", crown_dy=-1, bubble=6), shape("normal", crown_dy=1, dx=1, bubble=7)], 8, True,
@@ -113,10 +135,11 @@ ANIMATIONS = [
     ("jump", [shape("stretch", crown_dy=2), shape("stretch", crown_dy=3), shape("stretch", crown_dy=1), shape("normal", crown_dy=-2),
               shape("normal", crown_dy=-3), shape("stretch", crown_dy=-1), shape("flat", eyes="closed", crown_dy=2), shape("squash", crown_dy=1)], 8, False,
      {"durations_ms": [70, 90, 100, 120, 100, 90, 110, 120], "hitbox": {**HB, "active": [0, 7]}}),
-    ("attack", [shape("squash", crown_dy=2, eyes="angry"), shape("squash", crown_dy=3, eyes="angry"), shape("flat", crown_dy=2),
-                shape("stretch", crown_dy=-1, eyes="angry"), shape("normal", glob=38, eyes="angry"), shape("normal", glob=40, crown_dy=1),
-                shape("squash", crown_dy=1), shape("normal", sparkle=True)], 8, False,
-     {"durations_ms": [140, 160, 220, 80, 120, 100, 120, 140], "hitbox": {**HB, "active": [3, 5]}}),
+    # attack 8 = the stomp (user 2026-11-19: it only jumps and slams, no spitting)
+    ("attack", [shape("squash", crown_dy=2, eyes="angry"), shape("flat", crown_dy=2, eyes="angry"), shape("stretch", crown_dy=3),
+                shape("stretch", crown_dy=1), shape("normal", crown_dy=-3), shape("stretch", crown_dy=-1),
+                shape("flat", eyes="closed", crown_dy=2), shape("squash", crown_dy=1, sparkle=True)], 8, False,
+     {"durations_ms": [160, 220, 80, 100, 120, 90, 160, 140], "hitbox": {**HB, "active": [6, 7]}}),
     ("hurt", [flash(shape("squash", eyes="closed")), shape("stretch", eyes="closed", crown_dy=-2),
               shape("squash", crown_dy=1), shape("normal")], 12, False,
      {"durations_ms": [70, 100, 100, 120], "hitbox": {**HB, "active": [0, 3]}}),
@@ -125,7 +148,10 @@ ANIMATIONS = [
                shape("flat", crown=False, crown_at=(31, 36)), shape("puddle", crown=False, crown_at=(32, 40)),
                shape("puddle", crown=False, crown_at=(33, 40)), shape("puddle", crown=False, crown_at=(33, 40))], 6, False,
      {"durations_ms": [120, 140, 160, 160, 160, 220, 280, 400], "hitbox": {**HB, "active": [0, 7]}}),
-]
+    ]
+
+
+ANIMATIONS = build()
 
 if __name__ == "__main__":
     export(HERE, NAME, ANIMATIONS, anchor=ANCHOR, ground=True, body="move", preview_scale=5, gif_scale=3)

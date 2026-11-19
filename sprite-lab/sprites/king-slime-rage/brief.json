@@ -1,0 +1,58 @@
+{
+  "standard": "creature-v1",
+  "size": "boss",
+  "frames": {
+    "move": [
+      "tròn",
+      "bẹp, vương miện tụt (trễ nhịp)",
+      "bẹp, vương miện tụt sâu",
+      "về tròn, vương miện nảy lên",
+      "vươn cao",
+      "vươn cao, vương miện bay lên (trễ nhịp)",
+      "về tròn, vương miện còn cao",
+      "tròn, vương miện rơi về, lệch nhẹ"
+    ],
+    "crouch": [
+      "bẹp, vương miện tụt",
+      "bẹp sâu hơn",
+      "dẹt",
+      "dẹt sâu nhất, giữ để người chơi né"
+    ],
+    "jump": [
+      "bật: vươn cao, vương miện bị tụt",
+      "vươn dài nhất",
+      "đang lên",
+      "đỉnh: tròn, vương miện bay lên",
+      "vương miện bay cao nhất",
+      "rơi: vươn dài",
+      "đáp: dẹt, nhắm mắt",
+      "nảy lại"
+    ],
+    "attack": [
+      "mắt cau, bẹp lấy đà",
+      "dẹt hết cỡ (cho người chơi né)",
+      "bật vươn lên, vương miện tụt",
+      "đang lên",
+      "đỉnh: tròn, vương miện bay lên",
+      "rơi: vươn dài",
+      "dậm: dẹt, nhắm mắt",
+      "nảy lại, viên ngọc lấp lánh"
+    ],
+    "hurt": [
+      "chớp trắng, bẹp, nhắm mắt",
+      "giật vươn lên, vương miện bật",
+      "rung bẹp xuống",
+      "đứng lại"
+    ],
+    "death": [
+      "trúng đòn chí mạng: chớp",
+      "run vươn lên, vương miện bật",
+      "bẹp, vương miện bay cao",
+      "dẹt, vương miện rơi xuống cạnh",
+      "vương miện chạm đất",
+      "chảy thành vũng, vương miện lăn",
+      "vũng loang",
+      "vũng nằm yên cạnh vương miện"
+    ]
+  }
+}
