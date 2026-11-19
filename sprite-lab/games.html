@@ -643,41 +643,94 @@ function itemEffects(m){
 }
 
 /* ---------- 5. monsters ---------- */
-const BEHAVIOUR={chase:'đuổi thẳng',swarm:'bầy lượn',charge:'lấy đà rồi lao'};
+const BEHAVIOUR={chase:'đuổi thẳng',swarm:'bầy lượn',charge:'lấy đà rồi lao',boss_slime:'nhảy/dậm',boss_tree:'rễ & triệu hồi',
+  shoot:'bắn từ xa',zigzag:'lượn ziczac',hop:'nhảy có vũng',support:'hồi máu đồng minh',flee:'bỏ chạy'};
+
+const abilityLines=s=>{
+  const out=[];
+  if(s.jump_every) out.push('Nhảy mỗi '+s.jump_every+' s · giựt '+(s.windup||0)+' s · dậm '+(s.slam_damage||0)+' sát thương');
+  if(s.slam_reach) out.push('Tầm dậm '+s.slam_reach+'× thân');
+  if(s.split_at) out.push('Tách '+s.split_at.map(x=>Math.round(x*100)+'%').join(' / ')+' máu → '+s.split_count+' '+s.split_into);
+  if(s.volley) out.push('Bắn '+s.volley.count+' đạn mỗi '+s.volley.every+' s · góc '+s.volley.spread_deg+'°');
+  if(s.root_every) out.push('Rễ mỗi '+s.root_every+' s ('+s.root_count+' cái · '+s.root_damage+' sát thương)');
+  if(s.summon_every) out.push('Triệu hồi mỗi '+s.summon_every+' s: '+(s.summon||[]).join(', '));
+  if(s.shoot_every) out.push('Bắn mỗi '+s.shoot_every+' s · đạn '+s.bolt_damage+' sát thương · tầm '+s.bolt_range);
+  if(s.explode) out.push('Nổ khi chết sau '+s.explode.delay+' s · bán kính '+s.explode.radius+' · '+s.explode.damage+' sát thương');
+  if(s.heal_every) out.push('Hồi đồng minh mỗi '+s.heal_every+' s ('+Math.round((s.heal_pct||0)*100)+'%)');
+  if(s.charge_range) out.push('Lấy đà '+s.windup+' s rồi lao '+s.dash_speed+' px/s');
+  if(s.hop_every) out.push('Nhảy mỗi '+s.hop_every+' s · vũng bùn '+s.pool.time+' s ('+s.pool.damage+' sát thương)');
+  if(s.flee_time) out.push('Bỏ chạy '+s.flee_time+' s · rơi '+s.gold_drop+' vàng + rương');
+  if(s.zig_time) out.push('Lượn ziczac '+s.zig_angle+'° mỗi '+s.zig_time+' s');
+  return out;
+};
+const rageLines=s=>{
+  const out=[];
+  if(s.rage_at!=null) out.push('pha 2 khi máu ≤ '+Math.round(s.rage_at*100)+'%');
+  if(s.rage_jump_every) out.push('nhảy mỗi '+s.rage_jump_every+' s');
+  if(s.rage_windup) out.push('giựt ngắn '+s.rage_windup+' s');
+  if(s.rage_root_every) out.push('rễ mỗi '+s.rage_root_every+' s ('+s.rage_root_count+' cái)');
+  if(s.shockwave) out.push('sóng xung kích '+s.shockwave.speed+' px/s · tầm '+s.shockwave.max+' · '+s.shockwave.damage+' sát thương');
+  return out;
+};
+function monsterCard(mo){
+  const s=mo.stats, info=mo.sprite, boss=!!s.boss;
+  const card=el('div',{class:'card'});
+  card.appendChild(el('div',{class:'row'},el('h3',{style:'margin:0'},mo.id),
+    el('span',{class:'pill'+(boss?' used':'')},boss?'BOSS':(BEHAVIOUR[s.behaviour]||s.behaviour)),
+    boss?el('span',{class:'small muted'},BEHAVIOUR[s.behaviour]||''):null));
+  let normalSheet=null, rageSheet=null, useRage=false, anim='move';
+  if(info) sheetOf(info).then(x=>{normalSheet=x;});
+  if(s.rage_sprite){ const ri=anySprite(s.rage_sprite); if(ri) sheetOf(ri).then(x=>{rageSheet=x;}); }
+  // Rule: a monster (boss included) is never cut off - shrink only when needed.
+  const CW=260,CH=170,PAD=14;
+  const cv=liveCanvas(CW,CH,(g,t)=>{
+    g.clearRect(0,0,CW,CH); g.fillStyle='#2f4a2c'; g.fillRect(0,0,CW,CH);
+    const sh=useRage&&rageSheet?rageSheet:normalSheet;
+    if(!sh) return;
+    const a=sh.anim(anim), fw=sh.fs[0],fh=sh.fs[1],ax=sh.anchor[0],ay=sh.anchor[1];
+    const fit=Math.min((CW-2*PAD)/fw,(CH-2*PAD)/fh);
+    const sc=Math.min((s.scale||2)*1.5,fit);
+    const x=Math.min(CW-PAD-(fw-ax)*sc,Math.max(PAD+ax*sc,CW/2));
+    const y=CH-PAD-(fh-ay)*sc;
+    sh.draw(g,anim,t,x,y,sc);
+    const b=info&&info.meta.body;
+    if(b){ g.strokeStyle='rgba(110,255,140,.9)'; g.lineWidth=1.5; g.beginPath();
+      g.arc(x+(b.center[0]-ax)*sc,y+(b.center[1]-ay)*sc,b.radius*sc,0,Math.PI*2); g.stroke(); }
+    if(useRage){ g.setTransform(1,0,0,1,0,0); g.font='11px system-ui'; g.fillStyle='#ffe0a0';
+      g.textAlign='right'; g.fillText('RAGE',CW-8,16); }
+    return a;
+  });
+  cv.setAttribute('role','img'); cv.setAttribute('aria-label','Animation của '+mo.id);
+  card.appendChild(el('div',{class:'stage',style:'margin-top:8px;padding:0'},cv));
+  const sel=el('select',{class:'ctrl','aria-label':'Animation của '+mo.id});
+  (info?info.meta.animations:[]).forEach(a=>sel.appendChild(el('option',{value:'n:'+a.name},'• '+a.name)));
+  if(s.rage_sprite){
+    const ri=anySprite(s.rage_sprite);
+    if(ri) (ri.meta.animations||[]).forEach(a=>sel.appendChild(el('option',{value:'r:'+a.name},'Rage · '+a.name)));
+  }
+  sel.onchange=()=>{ useRage=sel.value.startsWith('r:'); anim=sel.value.slice(2); t0=performance.now(); };
+  card.appendChild(el('div',{class:'row',style:'margin-top:6px'},el('span',{class:'muted small'},'Animation'),sel));
+  const st=el('div',{class:'row',style:'gap:6px;margin-top:8px;flex-wrap:wrap'});
+  [['Máu',s.hp],['Chạm',s.damage],['Tốc độ',s.speed],['XP',s.xp]]
+    .forEach(([l,v])=>st.appendChild(el('span',{class:'pill'},l+' '+v)));
+  card.appendChild(st);
+  const lines=abilityLines(s), rl=rageLines(s);
+  if(lines.length) card.appendChild(el('div',{class:'small muted',style:'margin-top:8px'},el('b',{},'Kỹ năng: '),lines.join(' · ')));
+  if(rl.length) card.appendChild(el('div',{class:'small',style:'margin-top:5px;color:#ffb08a'},el('b',{},'Pha rage: '),rl.join(' · ')));
+  return card;
+}
 function monsters(m){
   m.appendChild(el('h2',{},'Quái vật'));
-  m.appendChild(el('p',{class:'lead'},'Mỗi quái chạy animation thật; vòng xanh = thân (đo từ pixel). Rule: quái luôn nằm gọn trong khung — boss to tự co lại thay vì bị cụt. Bấm tên animation để xem.'));
-  const grid=el('div',{class:'grid g3'});
-  game.monsters.forEach(mo=>{
-    const s=mo.stats, info=mo.sprite; const card=el('div',{class:'card'});
-    card.appendChild(el('div',{class:'row'},el('h3',{style:'margin:0'},mo.id),el('span',{class:'muted small'},BEHAVIOUR[s.behaviour]||s.behaviour)));
-    let sheet=null, anim='move', showBody=true;
-    if(info) sheetOf(info).then(x=>{sheet=x;});
-    // Rule (user 2026-11-18): keep the game scale only while the whole sprite
-    // fits. A boss is shrunk to the card instead of being cut off at the edge.
-    const CW=260,CH=170,PAD=14;
-    const cv=liveCanvas(CW,CH,(g,t)=>{ g.clearRect(0,0,CW,CH); g.fillStyle='#2f4a2c'; g.fillRect(0,0,CW,CH);
-      if(!sheet) return;
-      const fw=sheet.fs[0],fh=sheet.fs[1],ax=sheet.anchor[0],ay=sheet.anchor[1];
-      const fit=Math.min((CW-2*PAD)/fw,(CH-2*PAD)/fh);
-      const sc=Math.min((s.scale||2)*1.5,fit);
-      const x=Math.min(CW-PAD-(fw-ax)*sc,Math.max(PAD+ax*sc,CW/2));
-      const y=CH-PAD-(fh-ay)*sc;
-      sheet.draw(g,anim,t,x,y,sc);
-      const b=info.meta.body; if(showBody&&b){ g.strokeStyle='rgba(110,255,140,.9)'; g.lineWidth=1.5; g.beginPath();
-        g.arc(x+(b.center[0]-ax)*sc,y+(b.center[1]-ay)*sc,b.radius*sc,0,Math.PI*2); g.stroke(); }});
-    card.appendChild(el('div',{class:'stage',style:'margin-top:8px'},cv));
-    const bar=el('div',{class:'row',style:'margin-top:6px'});
-    (info?info.meta.animations:[]).forEach(a=>{const b=el('button',{class:'btn'+(a.name===anim?' on':'')},a.name);
-      b.onclick=()=>{anim=a.name; bar.querySelectorAll('.btn').forEach(x=>x.classList.toggle('on',x===b)); t0=performance.now();}; bar.appendChild(b);});
-    card.appendChild(bar);
-    const st=el('div',{class:'stats',style:'grid-template-columns:repeat(2,minmax(0,1fr));margin-top:8px'});
-    [['heart','Máu',s.hp],['sword','Sát thương chạm',s.damage],['boot','Tốc độ',s.speed],['gem','Kinh nghiệm rơi',s.xp]]
-      .forEach(([ic,l,v])=>st.appendChild(el('div',{class:'statCell'},iconCanvas(ic,2),el('div',{},el('b',{},String(v)),el('div',{class:'small muted'},l)))));
-    card.appendChild(st);
-    grid.appendChild(card);
-  });
-  m.appendChild(grid);
+  m.appendChild(el('p',{class:'lead'},'Animation thật từ sprite, vòng xanh = thân đo từ pixel. Boss và quái thường tách riêng; boss có thêm dòng pha rage (≤50% máu) và có thể xem hoạt ảnh rage. Rule: quái luôn nằm gọn trong khung, kể cả boss to.'));
+  const sec=(title,list)=>{
+    const box=el('section',{style:'margin-bottom:18px'},el('h3',{},title+' ('+list.length+')'));
+    if(!list.length){ box.appendChild(el('div',{class:'card empty'},'Chưa có.')); m.appendChild(box); return; }
+    const grid=el('div',{class:'grid g3'});
+    list.forEach(mo=>grid.appendChild(monsterCard(mo)));
+    box.appendChild(grid); m.appendChild(box);
+  };
+  sec('Boss',game.monsters.filter(x=>x.stats.boss));
+  sec('Quái thường',game.monsters.filter(x=>!x.stats.boss));
 }
 
 /* ---------- 6. skills (levels + demo) ---------- */

@@ -109,6 +109,10 @@ vùng. Chỉ nút `−` / `+` mới đổi tầm nhìn. Khi thêm hoặc sửa d
 Giữ tỉ lệ game khi vừa, tự co lại theo kích thước frame khi là boss to; tuyệt đối không cụt đầu/cụt chân.
 Đồng thời header dashboard hiện mốc `Dữ liệu web` (thời điểm rebuild manifest) để biết trang đang tải dữ liệu mới.
 
+Tab Quái vật tách **Boss** và **Quái thường** thành hai phần riêng; card gọn với chỉ số dạng pill và các dòng kỹ năng
+đã dịch. Boss có thêm dòng **Pha rage** (ngưỡng `rage_at`, nhịp mới, sóng xung kích) và chọn được animation rage
+từ `rage_sprite` — không được bỏ sót trạng thái này khi thêm boss mới.
+
 **Rule hiệu ứng từ tâm** (người dùng 2026-11-19): chiêu triển khai ngay tại tâm nhân vật (`under_hero` trong
 `upgrades_*.json`, ví dụ Đậm đất / Lốc xoáy) phải vẽ hiệu ứng **trước** nhân vật để nhân vật không bị đè.
 Ngược lại, hiệu ứng nào to hơn khung demo thì tự co lại (`fitView`) cho thấy toàn bộ; chiêu nhỏ vẫn giữ một
