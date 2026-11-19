@@ -19,6 +19,7 @@ from spritekit import Canvas, check_layers, gif, preview, strip, write_anim_meta
 
 
 CREATURE_MIN = {"move": 6, "attack": 6, "hurt": 3, "death": 6}
+BOSS_MIN = {"move": 8, "attack": 8, "hurt": 4, "death": 8}   # user 2026-11-19: bosses get 8 frames
 UPPER_CHANGE_MOVE = 0.04
 UPPER_CHANGE_WINDUP = 0.08
 
@@ -56,9 +57,10 @@ def check_creature(here: Path, animations):
         return []
     anims = {n: frames for n, frames, _, _, _ in animations}
     desc = brief.get("frames", {})
-    need = dict(CREATURE_MIN)
+    boss = brief.get("size") == "boss"
+    need = dict(BOSS_MIN if boss else CREATURE_MIN)
     if "jump" in anims or "crouch" in anims:
-        need.update({"crouch": 2, "jump": 4})
+        need.update({"crouch": 4, "jump": 8} if boss else {"crouch": 2, "jump": 4})
     problems = []
     for n, k in need.items():
         if n not in anims:

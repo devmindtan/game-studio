@@ -35,6 +35,9 @@ nhưng **mỗi khung là một tư thế riêng**, không phải cùng một hì
 | `death` | 6 | ngã/vỡ có trọng lượng (nảy nhẹ khi chạm đất), rồi tan/mờ dần |
 | quái nhảy: `crouch` + `jump` | 2 + 4 | nén → bật → đỉnh → rơi → đáp (luật 2026-11-18) |
 
+**Boss** (`"size": "boss"` trong brief, người dùng 2026-11-19): `move` 8, `attack` 8, `hurt` 4, `death` 8; boss nhảy
+thêm `crouch` 4 + `jump` 8.
+
 ## Kiểm tra tự động (`brief.json` cạnh `gen.py`)
 
 ```json
