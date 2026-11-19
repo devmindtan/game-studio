@@ -31,6 +31,32 @@ PAL = {"m": "#3fae6e", "d": "#1f6b45", "l": "#9ff0b8", "w": "#ffffff", "e": "#1b
 RAGE_PAL = {"m": "#d8483a", "d": "#8a1e1e", "l": "#ffb0a0", "w": "#ffffff", "e": "#1b1726", "p": "#ffe070", "t": "#6a1414"}
 CROWN = ["g...g...g...g", "gg.ggg.ggg.gg", "ggggggrgggggg", "sgggggggggggs", "GGGGGGGGGGGGG"]
 CROWN_PAL = {"g": "#ffd04a", "G": "#b8862a", "r": "#e8364a", "s": "#fff2a0"}
+RAGE = False   # king-slime-rage sets it: always angry eyes and the anger mark (user 2026-11-19)
+# the anger mark (as the user's picture): four curled red brackets, big and small to pulse
+ANGER = {   # as the user's picture: two bent strokes on top, an arch below; 2 px strokes, pulsing big/small
+    "big": [
+        "....rr...rr....",
+        "....rr...rr....",
+        "....rr...rr....",
+        ".rrrrr...rrrrr.",
+        ".rrrr.....rrrr.",
+        "...............",
+        ".....rrrrr.....",
+        "....rr...rr....",
+        "...rr.....rr...",
+        "..rr.......rr..",
+    ],
+    "small": [
+        "...rr.rr...",
+        "...rr.rr...",
+        ".rrrr.rrrr.",
+        "...........",
+        "....rrr....",
+        "...rr.rr...",
+        "..rr...rr..",
+    ],
+}
+ANGER_PAL = {"r": "#ff1a1a"}
 S = 1.9   # the old 18x11 king outline, traced and redrawn smooth at boss size (user: keep the old proportions)
 _spec = importlib.util.spec_from_file_location("slime_gen", HERE.parent / "slime" / "gen.py")
 slime = importlib.util.module_from_spec(_spec)
@@ -57,6 +83,8 @@ def shape(name, dx=0, eyes="open", crown_dy=0, crown=True, crown_at=None, bubble
     crown_dy lets the crown lag the body; crown_at=(x, y) puts a fallen crown on the ground; pal=RAGE_PAL
     draws the red enraged body."""
     P = pal or PAL
+    if RAGE and eyes == "open":
+        eyes = "angry"
     rows = slime.SHAPES[name]
     w = max(len(r) for r in rows)
     ox = round((SIZE - w * S) / 2) + dx
@@ -91,8 +119,9 @@ def shape(name, dx=0, eyes="open", crown_dy=0, crown=True, crown_at=None, bubble
             px_, py_ = _cells(rows, "p")[0] if _cells(rows, "p") else (ex1, (ey0 + ey1) // 2)
             gx = min(round(ox + px_ * S), X1) - 1                      # glint inside the eye, right edge
             c.rect(gx, round(oy + py_ * S), gx + 1, round(oy + py_ * S) + 1, P["p"], fill=True)
-            if eyes == "angry":
-                c.line(X0 - 2, Y0 - 2, X1 + 1, Y0, P["e"])
+            if eyes == "angry":   # a thick brow slanting down to the nose: a scowl
+                c.line(X0 - 3, Y0 - 3, X1 + 1, Y0 - 1, P["e"])
+                c.line(X0 - 3, Y0 - 2, X1 + 1, Y0, P["e"])
     if bubble >= 0 and len(rows) > 6:
         for k in range(2):
             by = FLOOR - 4 - ((bubble * 2 + k * 5) % max(3, round(len(rows) * S * 0.6)))
@@ -106,6 +135,10 @@ def shape(name, dx=0, eyes="open", crown_dy=0, crown=True, crown_at=None, bubble
             c.pixel(cx0 + 6, cy0 - 1, "#fff2a0")
     if crown_at:
         c.paste(cr, crown_at[0], crown_at[1])
+    if RAGE and crown:   # the anger mark beside the head, pulsing
+        size = "big" if (bubble if bubble >= 0 else crown_dy) % 2 == 0 else "small"
+        am = from_rows(ANGER[size], ANGER_PAL)
+        c.paste(am, min(SIZE - am.width - 1, round(SIZE / 2 + 8) + dx), max(1, oy - 12 + crown_dy))
     for yy in range(FLOOR + 1, SIZE):
         c.line(0, yy, SIZE - 1, yy, (0, 0, 0, 0))
     return c.outline(OUTLINE)
