@@ -1,0 +1,38 @@
+{
+  "standard": "creature-v1",
+  "size": "medium",
+  "frames": {
+    "move": [
+      "duỗi: chân sau đạp ra sau, chân trước vươn tới, thân phẳng, đuôi ngang",
+      "chân trước gần chạm đất: ngực hạ 1, đầu gật xuống theo cú chạm, đuôi bắt đầu hạ",
+      "dồn trọng lượng lên chân trước: ngực nén thấp nhất, đầu gật sâu nhất, hông nhấc, đuôi hạ",
+      "chân sau vung về trước dưới bụng: ngực nhổm lên, đầu nâng, đuôi rủ xuống (trễ nhịp)",
+      "chân sau chạm đất (thu gom): hông hạ, ngực nhấc cao, chân trước nhấc khỏi đất, đuôi thấp nhất",
+      "đạp chân sau: ngực bật cao nhất, đầu ngẩng, đuôi vung lên lại",
+      "bật người: chân trước vươn xa, thân vươn dài, đầu cao, đuôi lên",
+      "lơ lửng: bốn chân duỗi rộng, thân dài, đuôi vẫy cao (trễ một nhịp so với thân)"
+    ],
+    "attack": [
+      "phát hiện mồi: dừng, hạ đầu, tai dựng, lông gáy bắt đầu dựng",
+      "gồng: lông dựng hết cỡ dọc sống lưng, nhe nanh, mắt đỏ lóe, đuôi dựng cứng",
+      "thu mình: hông và ngực hạ thấp, chân gập, đầu sát đất, giữ lâu để người chơi né",
+      "lao: thân vươn dài, chân sau đạp thẳng, hàm há rộng hết cỡ",
+      "đớp: hàm sập lại, đầu chúi tới, chân trước tiếp đất",
+      "thu về: lông xẹp dần, hàm khép, chân thu lại",
+      "về dáng đứng: lông gần xẹp, đuôi hạ, sẵn sàng chạy tiếp"
+    ],
+    "hurt": [
+      "khựng: chớp trắng, đầu giật ngửa, tai cụp",
+      "giật lùi: thân lùi 2 px, hàm há kêu, một chân trước nhấc",
+      "hồi lại: đứng vững, lông xẹp, tai dựng lại"
+    ],
+    "death": [
+      "trúng đòn chí mạng: chớp, đầu ngửa lên, hàm há",
+      "khuỵu: chân gập, thân sụp thấp, đuôi rủ",
+      "ngã nghiêng: thân nằm dài, chân chĩa ra",
+      "nảy nhẹ khi chạm đất",
+      "nằm yên, mắt nhắm",
+      "mờ dần"
+    ]
+  }
+}

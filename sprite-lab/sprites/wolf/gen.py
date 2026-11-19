@@ -1,13 +1,14 @@
 #!/usr/bin/env python3
-"""Generator cho "wolf" (Sói Rừng): quái lao có báo trước của vùng Rừng Âm U (Bách Ải, đợt 6A).
+"""Generator cho "wolf" (Sói Rừng): quái lao có báo trước của Rừng Âm U (Bách Ải 6A).
 
-Nâng cấp 2026-11-18 (design/art/monster-upgrade.md): vai gồ, đầu chúi thấp chồm tới, lông gai lởm chởm, hàm há
-nanh trắng miệng đỏ, mắt đỏ phát sáng, sẹo, móng trắng, đuôi xù gai. Khi gồng (attack frame 1) nó hạ thấp người; game vẽ dải đỏ
-báo đường lao (Enemies.charge_lane). Frame 40x28, quay phải, neo giữa hai chân trên đất (20, 27), ground=True.
-move 4 (phi nước kiệu), attack 3 (hạ người → vồ → hạ cánh), hurt 2, death 4 (ngã, mờ dần).
-Chạy: gamekit art run wolf
+Chuẩn creature-v1 (sprite-lab/CREATURE_STANDARD.md), mô tả từng khung trong brief.json. Người dùng 2026-11-19:
+bản cũ "đơ như tượng, chỉ có chân di chuyển". Bản này dựng từ bộ phận, mỗi khung một tư thế: hông và ngực
+nhấp nhô lệch nhịp, đầu gật, đuôi vẫy trễ, lông gáy dựng dần khi gồng, hàm há/đớp.
+Ngoại hình (design/art/monster-upgrade.md): vai gồ, đầu thấp, lông gai, mắt đỏ phát sáng, nanh trắng, miệng đỏ.
+Frame 48x32, quay phải, neo (24, 31) giữa chân trên đất. Chạy: gamekit art run wolf
 """
 
+import math
 import sys
 from pathlib import Path
 
@@ -23,108 +24,191 @@ HERE = Path(__file__).resolve().parent
 sys.path.insert(0, str(_workspace() / "tools/gamekit/pipeline"))
 sys.path.insert(0, str(HERE.parents[1] / "lib"))
 
-from spritekit import Canvas, from_rows  # noqa: E402
+from spritekit import Canvas  # noqa: E402
 from sheet import export  # noqa: E402
 
 NAME = "wolf"
-W, H = 40, 28
-ANCHOR = (20.0, 27.0)
+W, H = 48, 32
+ANCHOR = (24.0, 31.0)
+PAW_Y = 29                     # paws on this row; the outline adds the floor row 30
 OUTLINE = "#0c0a10"
-# Upgrade 2026-11-18 (games/bach-ai/design/art/monster-upgrade.md): hunched shoulders, head low and forward,
-# jagged hackles, snarling red mouth with white fangs, glowing red eye, scar, white claws, spiky tail.
-PAL = {"K": "#2a2836", "g": "#57536a", "l": "#8a86a0", "s": "#b4b0c8", "b": "#a29cb2", "r": "#b01c2c",
-       "R": "#5a0c14", "t": "#f4ecdc", "e": "#ff3a2a", "E": "#ffd8a0", "n": "#0c0a10", "c": "#c06060"}
-BODY = [
-    "..................s..s..................",
-    "...............sKsKsKKs.................",
-    ".............sKgllgllgKs.......KK.......",
-    "...........sKgllllllllggK.....KlgK......",
-    "ss.......sKgllllgggggggggKK..KllggK.....",
-    "sKs....KKglllggggggggggggggKKglgggKK....",
-    ".sKgsKKggllgggggggggggggggggggggggeEKK..",
-    "..sKggglgggggggggggggggggggggggggggggKKn",
-    "...sKgggggcggggggggggggggggggggggKtRrrrK",
-    "....KKggggcgggggggggggggggggggggKtRRRRK.",
-    "......KgggggggggggggggggbbbbbbbKKtRtRtK.",
-    ".......KgggbbbbbbbbbbbbbbbbbbbbbKKKKKK..",
-    "........KKgbbbbbbbbbbbbbbbgggKKKK.......",
-]
-LEGS = {
-    0: [".........KgK.KgK...........KgK.KgK.....", "........KgK...KgK.........KgK...KgK....",
-        ".......KgK.....KgK.......KgK.....KgK...", "......KgK.......KgK.....KgK.......KgK..",
-        ".....KtK.........KtK...KtK.........KtK."],
-    1: [".........KgKKgK.............KgKKgK.....", ".........KgKKgK.............KgKKgK.....",
-        ".........KgKKgK.............KgKKgK.....", ".........KgKKgK.............KgKKgK.....",
-        "........KtKKKtK............KtKKKtK....."],
-    2: [".........KgK.KgK...........KgK.KgK.....", "..........KgKKgK............KgKKgK.....",
-        "...........KgKgK.............KgKgK.....", "............KgKgK.............KgKgK....",
-        "............KtKtK.............KtKtK...."],
-    3: [".........KgKKgK.............KgKKgK.....", ".........KgKKgK.............KgKKgK.....",
-        ".........KgKKgK.............KgKKgK.....", ".........KgKKgK.............KgKKgK.....",
-        "........KtKKKtK............KtKKKtK....."],
-}
+C = {"dark": "#2a2836", "fur": "#57536a", "lit": "#8a86a0", "tip": "#b4b0c8", "belly": "#a29cb2",
+     "mouth": "#b01c2c", "mouth_d": "#5a0c14", "fang": "#f4ecdc", "eye": "#ff3a2a", "eye_hot": "#ffd8a0",
+     "nose": "#0c0a10", "scar": "#c06060"}
 
 
-def wolf(legs=0, dy=0, dx=0, crouch=False, glare=False):
-    rows = list(BODY)
-    if glare:   # the eye flares before the dash
-        rows[6] = rows[6].replace("eE", "EE")
-    lg = LEGS[legs] if not crouch else LEGS[1][2:]
-    art = from_rows([r.ljust(40, ".") for r in rows + lg], PAL)
+def clip(c):
+    """Nothing below the paw row: thick strokes must not sink into the floor."""
+    for yy in range(PAW_Y + 1, H):
+        c.line(0, yy, W - 1, yy, (0, 0, 0, 0))
+    return c
+
+
+def ell(c, x, y, rx, ry, col):
+    c.ellipse(round(x - rx), round(y - ry), round(x + rx), round(y + ry), col, fill=True)
+
+
+def leg(c, jx, jy, paw_dx, lift, knee_dx, col, w=2, claw=True):
+    kx, ky = jx + knee_dx, jy + (PAW_Y - jy) * 0.5
+    px, py = jx + paw_dx, PAW_Y - lift
+    c.line(round(jx), round(jy), round(kx), round(ky), col, w + 1)
+    c.line(round(kx), round(ky), round(px), round(py), col, w)
+    if claw and lift == 0:
+        c.pixel(round(px) + 1, py, C["fang"])
+
+
+def wolf(p):
+    """p: pose dict (all optional): hip, chest (body dy), head_dx, head_dy, jaw (0..4), hackle (0..1),
+    tail (deg up from straight back), legs [(paw_dx, lift, knee_dx) x4: back far, back near, front far,
+    front near], dx (whole body), glow (eye flare), ears (0 back .. 2 pricked)."""
     c = Canvas(W, H)
-    c.paste(art, (W - art.width) // 2 + dx, 25 - (art.height - 1) + dy)
-    if glare:
-        for x, y in ((art.width - 2 + dx, 5 + 26 - (art.height - 1) + dy), (art.width + dx, 6 + 26 - (art.height - 1) + dy)):
-            if 0 <= x < W and 0 <= y < H:
-                c.pixel(x, y, "#ff8a5a")
-    return c.outline(OUTLINE)
+    dx = p.get("dx", 0)
+    hy, cy = 16 + p.get("hip", 0), 15 + p.get("chest", 0)   # body high: long legs under it
+    hipx, chx = 15 + dx, 29 + dx
+    legs = p.get("legs", [(-2, 0, 1), (0, 0, 1), (0, 0, 1), (2, 0, 1)])
+    # far legs (darker, behind)
+    leg(c, hipx - 1, hy + 2, legs[0][0], legs[0][1], legs[0][2], C["dark"], 2, False)
+    leg(c, chx - 1, cy + 3, legs[2][0], legs[2][1], legs[2][2], C["dark"], 2, False)
+    # tail: four segments, thick to thin, the tip lags (overlapping action)
+    a0 = math.radians(180 - p.get("tail", 10))
+    lag = math.radians(p.get("tail_lag", 12))
+    x, y = hipx - 6, hy - 3
+    for k, (ln, w) in enumerate(((3, 3), (3, 3), (3, 2), (2, 1))):
+        a = a0 + lag * k
+        nx, ny = x + math.cos(a) * ln, y - math.sin(a) * ln
+        c.line(round(x), round(y), round(nx), round(ny), C["fur"] if k < 3 else C["tip"], w)
+        x, y = nx, ny
+    c.pixel(round(x) - 1, round(y) - 1, C["tip"])
+    # torso: hips, chest with a shoulder hump, joined
+    ell(c, hipx, hy, 6, 3.5, C["fur"])                       # lean hips
+    ell(c, chx, cy, 7, 4.5, C["fur"])                        # deep chest, shoulder hump
+    c.polygon([(hipx, hy - 3), (chx, cy - 4), (chx - 2, cy + 4), (hipx + 2, hy + 2)], C["fur"])
+    c.line(hipx + 3, hy + 3, chx - 3, cy + 4, C["belly"])      # tucked belly line
+    ell(c, chx - 1, cy - 2, 4, 1.5, C["lit"])
+    ell(c, hipx + 1, hy - 2, 3, 1, C["lit"])
+    c.line(hipx + 5, hy - 1, hipx + 7, hy + 1, C["scar"])
+    # hackles along the spine: taller as the wolf bristles
+    hk = p.get("hackle", 0.15)
+    for k, sx in enumerate(range(hipx - 3, chx + 4, 2)):
+        t = (sx - (hipx - 3)) / max(1, chx + 4 - (hipx - 3))
+        sy = (hy - 3) * (1 - t) + (cy - 4) * t
+        h = round(1 + hk * (2 + (k * 7) % 3) * (0.6 + 0.8 * math.sin(t * math.pi)))
+        c.line(sx, round(sy), sx - 1, round(sy) - h, C["fur"])
+        c.pixel(sx - 1, round(sy) - h, C["tip"])
+    # near legs
+    leg(c, hipx + 1, hy + 2, legs[1][0], legs[1][1], legs[1][2], C["fur"])
+    leg(c, chx + 1, cy + 3, legs[3][0], legs[3][1], legs[3][2], C["fur"])
+    # head: low and forward from the chest
+    hx, hdy = chx + 8 + p.get("head_dx", 0), cy + 1 + p.get("head_dy", 0)
+    c.polygon([(chx + 2, cy - 4), (hx - 1, hdy - 3), (hx, hdy + 2), (chx + 4, cy + 2)], C["fur"])   # neck
+    ell(c, hx, hdy, 4, 3, C["fur"])
+    ell(c, hx - 1, hdy - 2, 3, 1.2, C["lit"])
+    ears = p.get("ears", 1)
+    ex = hx - 4 - (2 if ears == 0 else 0)            # ears flat back when snarling, pricked when alert
+    c.polygon([(hx - 3, hdy - 2), (ex, hdy - 6 - ears), (hx, hdy - 3)], C["fur"])
+    c.pixel(ex, hdy - 6 - ears, C["tip"])
+    # jaws: upper snout, lower jaw opens by `jaw`
+    jaw = p.get("jaw", 1)
+    c.polygon([(hx + 2, hdy - 2), (hx + 9, hdy), (hx + 2, hdy + 1)], C["fur"])                       # long snout
+    c.pixel(hx + 9, hdy, C["nose"])
+    if jaw > 0:
+        c.polygon([(hx + 2, hdy + 1), (hx + 7, hdy + 1), (hx + 2, hdy + 1 + jaw)], C["mouth"])
+        c.pixel(hx + 3, hdy + 1 + max(0, jaw - 1), C["mouth_d"])
+    c.polygon([(hx + 1, hdy + 1 + jaw), (hx + 6, hdy + 1 + jaw), (hx + 1, hdy + 3 + jaw)], C["dark"])    # lower jaw
+    c.pixel(hx + 6, hdy + 1, C["fang"])                       # upper fang
+    c.pixel(hx + 3, hdy + 1, C["fang"])
+    if jaw > 1:
+        c.pixel(hx + 5, hdy + jaw, C["fang"])                 # lower fang
+    # eye: red, flares hot when it is about to strike
+    c.pixel(hx + 2, hdy - 1, C["eye_hot"] if p.get("glow") else C["eye"])
+    c.pixel(hx + 1, hdy - 1, C["eye"])
+    if p.get("glow"):
+        c.pixel(hx + 3, hdy - 2, C["eye"])
+        c.pixel(hx + 4, hdy - 2, "#ff8a5a")
+    return clip(c).outline(OUTLINE)
 
 
 def flash(c, amount=0.7):
     px = c.img.load()
     for yy in range(c.height):
         for xx in range(c.width):
-            r, gg, b, a = px[xx, yy]
-            if a and (r, gg, b) != (0x0c, 0x0a, 0x10):
-                px[xx, yy] = (round(r + (255 - r) * amount), round(gg + (255 - gg) * amount),
+            r, g, b, a = px[xx, yy]
+            if a and (r, g, b) != (0x0c, 0x0a, 0x10):
+                px[xx, yy] = (round(r + (255 - r) * amount), round(g + (255 - g) * amount),
                               round(b + (255 - b) * amount), a)
     return c
 
 
-def fallen(fade=0.0):
-    rows = [
-        "...................................KK...",
-        "..........sKsKsKs................KglK...",
-        "ss....KKKgllllllllgKKKKKKKKKKKKKKglgKK..",
-        ".sKgKKggggggggggggggggggggggggggggggKRK.",
-        "..KKggggcggggggggggggggggggbbbbbbbKtRtK.",
-        "....KgbbbbbbbbbbbbbbbbbbbbbbbbgKKKKKK...",
-        "....KtKgKtK.........KtKgKtK.............",
-    ]
-    art = from_rows([r.ljust(40, ".") for r in rows], PAL)
+def lying(dy=0, fade=0.0):
+    """Fallen on its side: body low and long, legs sticking out forward, jaw slack."""
     c = Canvas(W, H)
-    c.paste(art, 0, 25 - (art.height - 1))
-    c = c.outline(OUTLINE)
+    by = 25 + dy
+    for k, x0 in enumerate((14, 17, 28, 31)):
+        c.line(x0, by + 2, x0 + 5, PAW_Y, C["dark"] if k % 2 == 0 else C["fur"], 2)
+    ell(c, 21, by, 13, 4, C["fur"])
+    ell(c, 21, by - 2, 10, 1.5, C["lit"])
+    for sx in range(11, 33, 2):
+        c.pixel(sx, by - 4, C["tip"])
+    c.line(8, by, 3, by + 2, C["fur"], 2)
+    ell(c, 37, by + 1, 4, 3, C["fur"])
+    c.polygon([(39, by), (45, by + 2), (39, by + 3)], C["fur"])
+    c.pixel(44, by + 3, C["mouth"])
+    c.line(37, by, 39, by, C["dark"])           # eye shut
+    c = clip(c).outline(OUTLINE)
     if fade:
         px = c.img.load()
         for yy in range(c.height):
             for xx in range(c.width):
-                if px[xx, yy][3] and (xx + yy) % 4 < round(fade * 4):
+                if px[xx, yy][3] and (xx * 3 + yy) % 5 < round(fade * 5):
                     px[xx, yy] = (0, 0, 0, 0)
     return c
 
 
-HB = {"shape": "rect", "center": [20.0, 27.0]}
+L = lambda *t: list(t)   # noqa: E731
+# rotary gallop, 8 keys: hips and chest rock out of phase, head nods, tail lags (brief.json says each)
+RUN = [
+    dict(hip=0, chest=0, head_dy=0, tail=12, legs=L((-6, 1, -1), (-5, 0, -1), (6, 2, 2), (7, 1, 2))),
+    dict(hip=0, chest=1, head_dy=1, tail=8, legs=L((-4, 2, 0), (-5, 1, -1), (6, 1, 2), (4, 0, 1))),
+    dict(hip=-1, chest=2, head_dy=2, tail=2, legs=L((-1, 3, 1), (-3, 2, 0), (2, 0, 1), (0, 0, 0))),
+    dict(hip=-1, chest=1, head_dy=1, tail=-4, legs=L((3, 2, 2), (1, 1, 1), (-1, 0, 0), (-3, 1, -1))),
+    dict(hip=1, chest=-1, head_dy=0, tail=-8, legs=L((4, 0, 2), (2, 0, 1), (-5, 2, -1), (-3, 3, -1))),
+    dict(hip=0, chest=-2, head_dy=-1, tail=-4, legs=L((0, 0, 1), (-2, 0, 0), (2, 3, 1), (4, 2, 2))),
+    dict(hip=-1, chest=-2, head_dy=-2, tail=4, legs=L((-4, 1, -1), (-5, 0, -1), (5, 2, 2), (6, 1, 2))),
+    dict(hip=-1, chest=-1, head_dy=-1, tail=10, legs=L((-6, 0, -1), (-6, 2, -1), (6, 2, 2), (7, 2, 2))),
+]
+STAND = L((-2, 0, 1), (0, 0, 1), (0, 0, 1), (2, 0, 1))
+CROUCH = L((-3, 0, 3), (-1, 0, 3), (-1, 0, 3), (1, 0, 3))
+ATTACK = [
+    dict(head_dx=-1, head_dy=2, hackle=0.4, jaw=1, ears=2, tail=15, legs=STAND),
+    dict(chest=1, head_dy=2, hackle=1.0, jaw=2, glow=True, ears=0, tail=30, tail_lag=4, legs=STAND),
+    dict(hip=2, chest=3, head_dy=3, hackle=1.0, jaw=2, glow=True, ears=0, tail=35, tail_lag=2, legs=CROUCH),
+    dict(hip=-2, chest=-3, head_dx=3, head_dy=-1, hackle=0.8, jaw=4, glow=True, ears=0, tail=10,
+         legs=L((-7, 1, -1), (-7, 0, -1), (7, 2, 2), (8, 2, 2))),
+    dict(hip=-1, chest=0, head_dx=3, head_dy=1, hackle=0.8, jaw=0, ears=0, tail=5,
+         legs=L((-5, 0, -1), (-4, 0, 0), (5, 0, 2), (6, 0, 2))),
+    dict(hip=0, chest=1, head_dx=1, hackle=0.6, jaw=1, ears=1, tail=8, legs=L((-3, 0, 0), (-1, 0, 1), (2, 0, 1), (3, 0, 1))),
+    dict(hip=0, chest=1, head_dy=1, hackle=0.3, jaw=1, ears=1, tail=10, legs=STAND),
+]
+HURT = [
+    dict(dx=-1, head_dx=-2, head_dy=-2, jaw=2, ears=0, hackle=0.5, tail=25, legs=STAND),
+    dict(dx=-2, chest=-1, head_dx=-3, head_dy=-3, jaw=3, ears=0, hackle=0.6, tail=30, legs=L((-3, 0, 0), (-1, 0, 0), (-1, 1, 0), (1, 0, 1))),
+    dict(dx=-1, head_dy=0, jaw=1, ears=1, hackle=0.3, tail=12, legs=STAND),
+]
+
+HB = {"shape": "rect", "center": [24.0, 31.0]}
 ANIMATIONS = [
-    ("move", [wolf(0), wolf(1), wolf(2), wolf(3)], 12, True,
-     {"durations_ms": [90, 90, 90, 90], "hitbox": {**HB, "active": [0, 3]}}),
-    ("attack", [wolf(1, 0, -1, crouch=True, glare=True), wolf(0, 0, 3, glare=True), wolf(2, 0, 1)], 12, False,
-     {"durations_ms": [220, 120, 140], "hitbox": {**HB, "active": [1, 2]}}),
-    ("hurt", [flash(wolf(1)), wolf(1, 0, -1)], 12, False, {"durations_ms": [80, 120], "hitbox": {**HB, "active": [0, 1]}}),
-    ("death", [flash(wolf(1), 0.5), fallen(), fallen(0.25), fallen(0.6)], 10, False,
-     {"durations_ms": [90, 160, 160, 240], "hitbox": {**HB, "active": [0, 3]}}),
+    ("move", [wolf({**p, "hackle": 0.2, "jaw": 1, "ears": 0}) for p in RUN], 12, True,
+     {"durations_ms": [70, 80, 90, 80, 70, 80, 90, 80], "hitbox": {**HB, "active": [0, 7]}}),
+    ("attack", [wolf(p) for p in ATTACK], 12, False,
+     {"durations_ms": [120, 160, 220, 80, 120, 120, 140], "hitbox": {**HB, "active": [3, 4]}}),
+    ("hurt", [flash(wolf(HURT[0])), wolf(HURT[1]), wolf(HURT[2])], 12, False,
+     {"durations_ms": [70, 110, 120], "hitbox": {**HB, "active": [0, 2]}}),
+    ("death", [flash(wolf(dict(head_dy=-3, head_dx=-1, jaw=3, ears=0, tail=30, hackle=0.6, legs=STAND)), 0.5),
+               wolf(dict(hip=3, chest=4, head_dy=4, jaw=2, ears=0, tail=-10, hackle=0.3, legs=CROUCH)),
+               lying(-1), lying(-2), lying(0), lying(0, 0.5)], 10, False,
+     {"durations_ms": [100, 140, 110, 90, 260, 300], "hitbox": {**HB, "active": [0, 5]}}),
 ]
 
 if __name__ == "__main__":
-    export(HERE, NAME, ANIMATIONS, anchor=ANCHOR, ground=True, body="move", preview_scale=8, gif_scale=4)
+    export(HERE, NAME, ANIMATIONS, anchor=ANCHOR, ground=True, body="move", preview_scale=5, gif_scale=4)
     print(f"OK {NAME}")
