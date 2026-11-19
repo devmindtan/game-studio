@@ -4,7 +4,7 @@
 Mô tả đầy đủ + tham khảo: games/bach-ai/design/art/toads.md. Cùng giải phẫu với Cóc Độc nhưng to x1.75, vẽ
 theo bộ phận bằng sprite-lab/lib/toadkit.py (khung lớn đủ chỗ cho hình học): đùi sau gập, tay trước chống,
 mắt lồi có gờ mày và đồng tử ngang, tuyến độc, miệng rộng, mụn độc tròn to nhỏ khác nhau, lưng lốm đốm,
-vương miện nấm độc tím, dãi độc khi gồng. Frame 56x44, quay phải, neo (28, 43).
+vương miện nấm độc tím, dãi độc khi gồng. Frame 56x48, quay phải, neo (28, 47).
 move 4 (ngồi, họng phập phồng), crouch 2 (lấy đà, dãi độc), jump 4 (bật → đỉnh → rơi → đáp; game nâng sprite
 theo đường cong), hurt 2, death 4 (bẹp, chảy thành vũng độc, vương miện nấm còn lại). Chạy: gamekit art run toad-king
 """
@@ -29,8 +29,8 @@ from sheet import export  # noqa: E402
 from toadkit import POSES, PAL, draw_toad, lerp_pose, CAP, CAP_L, STEM  # noqa: E402
 
 NAME = "toad-king"
-W, H = 56, 44
-ANCHOR = (28.0, 43.0)
+W, H = 56, 48
+ANCHOR = (28.0, 47.0)
 OUTLINE = "#14160c"
 S = 1.75
 KPAL = {**PAL, "lit": "#7a7a30", "back": "#4e5a22", "side": "#2e3418",
@@ -38,7 +38,7 @@ KPAL = {**PAL, "lit": "#7a7a30", "back": "#4e5a22", "side": "#2e3418",
 POOL, POOL_L = "#4a8a22", "#8ad040"
 
 
-def to_floor(c, floor=41):
+def to_floor(c, floor=45):
     """Every pose sits on the floor inside the frame: the game lifts the sprite along the hop arc."""
     box = c.img.getbbox()
     out = Canvas(c.width, c.height)
@@ -89,7 +89,7 @@ def mid(a, b, t=0.5, **extra):
 
 SPIT_BACK = {**P["sit"], "body": (16, 15, 9.5, 5.8, -18), "puff": 3}
 
-HB = {"shape": "rect", "center": [28.0, 43.0]}
+HB = {"shape": "rect", "center": [28.0, 47.0]}
 ANIMATIONS = [
     # move 8: sitting, throat sac breathing in and out, body bobbing, a slow blink
     ("move", [frame("sit"), frame(mid("sit", "sit_low", 0.3), puff=1), frame("sit_puff"), frame(mid("sit", "sit_puff", 0.5), puff=3),

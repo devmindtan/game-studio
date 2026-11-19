@@ -2,13 +2,13 @@
   "frames": 40,
   "frame_size": [
     56,
-    44
+    48
   ],
   "fps": 8.0,
   "loop": true,
   "anchor": [
     28.0,
-    43.0
+    47.0
   ],
   "anchor_source": "explicit",
   "animations": [
@@ -32,7 +32,7 @@
         "shape": "rect",
         "center": [
           27.0,
-          25.5
+          29.5
         ],
         "active": [
           0,
@@ -58,7 +58,7 @@
         "shape": "rect",
         "center": [
           27.0,
-          26.0
+          30.0
         ],
         "active": [
           0,
@@ -88,7 +88,7 @@
         "shape": "rect",
         "center": [
           28.0,
-          23.5
+          27.5
         ],
         "active": [
           0,
@@ -118,7 +118,7 @@
         "shape": "rect",
         "center": [
           30.5,
-          26.0
+          30.0
         ],
         "active": [
           3,
@@ -144,7 +144,7 @@
         "shape": "rect",
         "center": [
           27.5,
-          25.0
+          29.0
         ],
         "active": [
           0,
@@ -174,7 +174,7 @@
         "shape": "rect",
         "center": [
           29.0,
-          23.5
+          27.5
         ],
         "active": [
           0,
@@ -190,7 +190,7 @@
     "anim": "move",
     "center": [
       27.0,
-      27.0
+      31.0
     ],
     "radius": 18.0
   }
