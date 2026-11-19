@@ -139,7 +139,10 @@ Test của game (`gameplay_rules_test`) chặn sprite có `px_scale` mà sai chu
    thu về ≥ 2), `hurt` 3, `death` 6; quái nhảy thêm `crouch` 2 + `jump` 4.
 3. **Sống động, không đơ:** mỗi khung là một tư thế; thân nhấp nhô, đầu gật, đuôi/tai/áo chuyển động trễ nhịp;
    gồng phải đổi dáng thật (dựng lông, nhe nanh, mắt lóe).
-4. `gamekit art run` **từ chối** sprite có brief mà thiếu động tác/khung, mô tả không khớp số khung, hoặc thân trên
+4. **Dữ dằn nhưng vẫn đúng loài** (người dùng 2026-11-19: sói gắn gai lưng, lông tím, sẹo đỏ "giống con quái
+   vật"): giữ dấu hiệu nhận dạng của loài thật (sói: tai nhọn to, mõm dài, bờm cổ, đuôi xù, lông xám/nâu);
+   vẻ dữ đến từ tư thế (đầu hạ, nhe nanh, mắt lóe khi gồng, lông dựng **đúng chỗ**), không gắn gai lạ.
+5. `gamekit art run` **từ chối** sprite có brief mà thiếu động tác/khung, mô tả không khớp số khung, hoặc thân trên
    đổi < 4 % giữa các khung `move` (chỉ chân động).
 
 ## Quy tắc pixel art
