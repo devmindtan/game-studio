@@ -4,7 +4,8 @@
 Chuẩn creature-v1 (sprite-lab/CREATURE_STANDARD.md), mô tả từng khung trong brief.json. Người dùng 2026-11-19:
 bản cũ "đơ như tượng, chỉ có chân di chuyển". Bản này dựng từ bộ phận, mỗi khung một tư thế: hông và ngực
 nhấp nhô lệch nhịp, đầu gật, đuôi vẫy trễ, lông gáy dựng dần khi gồng, hàm há/đớp.
-Ngoại hình (design/art/monster-upgrade.md): vai gồ, đầu thấp, lông gai, mắt đỏ phát sáng, nanh trắng, miệng đỏ.
+Ngoại hình: sói thật (người dùng 2026-11-19: bản gai lưng "giống con quái vật"): tai nhọn to, mõm dài có khấc
+trán, bờm lông cổ dựng khi gồng, đuôi xù, lông xám có yên lưng sẫm, má/bụng sáng, mắt hổ phách (lóe đỏ khi gồng).
 Frame 48x32, quay phải, neo (24, 31) giữa chân trên đất. Chạy: gamekit art run wolf
 """
 
@@ -32,9 +33,9 @@ W, H = 48, 32
 ANCHOR = (24.0, 31.0)
 PAW_Y = 29                     # paws on this row; the outline adds the floor row 30
 OUTLINE = "#0c0a10"
-C = {"dark": "#2a2836", "fur": "#57536a", "lit": "#8a86a0", "tip": "#b4b0c8", "belly": "#a29cb2",
-     "mouth": "#b01c2c", "mouth_d": "#5a0c14", "fang": "#f4ecdc", "eye": "#ff3a2a", "eye_hot": "#ffd8a0",
-     "nose": "#0c0a10", "scar": "#c06060"}
+C = {"dark": "#3a3632", "fur": "#6e6860", "lit": "#9a948a", "tip": "#c8c2b6", "belly": "#d2ccbe",
+     "saddle": "#4a4540", "mouth": "#a82830", "mouth_d": "#5a1418", "fang": "#f4ecdc", "eye": "#f0b030",
+     "eye_hot": "#ff4a2a", "nose": "#141210"}
 
 
 def clip(c):
@@ -73,7 +74,7 @@ def wolf(p):
     a0 = math.radians(180 - p.get("tail", 10))
     lag = math.radians(p.get("tail_lag", 12))
     x, y = hipx - 6, hy - 3
-    for k, (ln, w) in enumerate(((3, 3), (3, 3), (3, 2), (2, 1))):
+    for k, (ln, w) in enumerate(((3, 4), (3, 4), (3, 3), (2, 2))):   # bushy
         a = a0 + lag * k
         nx, ny = x + math.cos(a) * ln, y - math.sin(a) * ln
         c.line(round(x), round(y), round(nx), round(ny), C["fur"] if k < 3 else C["tip"], w)
@@ -86,30 +87,34 @@ def wolf(p):
     c.line(hipx + 3, hy + 3, chx - 3, cy + 4, C["belly"])      # tucked belly line
     ell(c, chx - 1, cy - 2, 4, 1.5, C["lit"])
     ell(c, hipx + 1, hy - 2, 3, 1, C["lit"])
-    c.line(hipx + 5, hy - 1, hipx + 7, hy + 1, C["scar"])
-    # hackles along the spine: taller as the wolf bristles
+    c.polygon([(hipx - 3, hy - 3), (chx - 2, cy - 4), (chx - 4, cy - 1), (hipx, hy - 1)], C["saddle"])   # dark saddle
+    # neck ruff: a thick mane of fur at the shoulders; it rises in tufts when the wolf bristles
     hk = p.get("hackle", 0.15)
-    for k, sx in enumerate(range(hipx - 3, chx + 4, 2)):
-        t = (sx - (hipx - 3)) / max(1, chx + 4 - (hipx - 3))
-        sy = (hy - 3) * (1 - t) + (cy - 4) * t
-        h = round(1 + hk * (2 + (k * 7) % 3) * (0.6 + 0.8 * math.sin(t * math.pi)))
-        c.line(sx, round(sy), sx - 1, round(sy) - h, C["fur"])
-        c.pixel(sx - 1, round(sy) - h, C["tip"])
+    for k, sx in enumerate(range(chx - 5, chx + 5)):
+        base = cy - 4 + (1 if k < 2 else 0)
+        h = round(1 + hk * (1.4 + (k * 5) % 3 * 0.5))
+        c.line(sx, base, sx - 1 - round(h * 0.7), base - h, C["fur"] if k % 2 else C["lit"])   # tufts swept back
+        if hk > 0.5 and k % 2 == 0:
+            c.pixel(sx - 1 - round(h * 0.7), base - h, C["tip"])
     # near legs
     leg(c, hipx + 1, hy + 2, legs[1][0], legs[1][1], legs[1][2], C["fur"])
     leg(c, chx + 1, cy + 3, legs[3][0], legs[3][1], legs[3][2], C["fur"])
     # head: low and forward from the chest
     hx, hdy = chx + 8 + p.get("head_dx", 0), cy + 1 + p.get("head_dy", 0)
     c.polygon([(chx + 2, cy - 4), (hx - 1, hdy - 3), (hx, hdy + 2), (chx + 4, cy + 2)], C["fur"])   # neck
-    ell(c, hx, hdy, 4, 3, C["fur"])
+    ell(c, hx, hdy, 4.5, 3.5, C["fur"])
     ell(c, hx - 1, hdy - 2, 3, 1.2, C["lit"])
+    ell(c, hx, hdy + 2, 3, 1.3, C["belly"])                  # pale cheek
     ears = p.get("ears", 1)
-    ex = hx - 4 - (2 if ears == 0 else 0)            # ears flat back when snarling, pricked when alert
-    c.polygon([(hx - 3, hdy - 2), (ex, hdy - 6 - ears), (hx, hdy - 3)], C["fur"])
-    c.pixel(ex, hdy - 6 - ears, C["tip"])
+    # big pointed ears: pricked up when alert, laid back when snarling
+    tipx, tipy = (hx - 1, hdy - 8) if ears >= 1 else (hx - 6, hdy - 5)
+    c.polygon([(hx - 3, hdy - 2), (tipx, tipy), (hx + 1, hdy - 3)], C["fur"])
+    c.line(hx - 2, hdy - 3, tipx, tipy + 2, C["dark"])           # inner ear
+    c.pixel(tipx, tipy, C["dark"])
     # jaws: upper snout, lower jaw opens by `jaw`
     jaw = p.get("jaw", 1)
-    c.polygon([(hx + 2, hdy - 2), (hx + 9, hdy), (hx + 2, hdy + 1)], C["fur"])                       # long snout
+    c.polygon([(hx + 2, hdy - 2), (hx + 4, hdy - 1), (hx + 9, hdy), (hx + 2, hdy + 1)], C["fur"])   # muzzle with a stop
+    c.line(hx + 4, hdy - 1, hx + 8, hdy, C["lit"])
     c.pixel(hx + 9, hdy, C["nose"])
     if jaw > 0:
         c.polygon([(hx + 2, hdy + 1), (hx + 7, hdy + 1), (hx + 2, hdy + 1 + jaw)], C["mouth"])
@@ -121,10 +126,10 @@ def wolf(p):
         c.pixel(hx + 5, hdy + jaw, C["fang"])                 # lower fang
     # eye: red, flares hot when it is about to strike
     c.pixel(hx + 2, hdy - 1, C["eye_hot"] if p.get("glow") else C["eye"])
-    c.pixel(hx + 1, hdy - 1, C["eye"])
+    c.pixel(hx + 1, hdy - 2, C["dark"])                       # brow over the eye: a scowl
+    c.pixel(hx + 2, hdy - 2, C["dark"])
     if p.get("glow"):
-        c.pixel(hx + 3, hdy - 2, C["eye"])
-        c.pixel(hx + 4, hdy - 2, "#ff8a5a")
+        c.pixel(hx + 3, hdy - 1, "#ff8a5a")
     return clip(c).outline(OUTLINE)
 
 
@@ -147,8 +152,6 @@ def lying(dy=0, fade=0.0):
         c.line(x0, by + 2, x0 + 5, PAW_Y, C["dark"] if k % 2 == 0 else C["fur"], 2)
     ell(c, 21, by, 13, 4, C["fur"])
     ell(c, 21, by - 2, 10, 1.5, C["lit"])
-    for sx in range(11, 33, 2):
-        c.pixel(sx, by - 4, C["tip"])
     c.line(8, by, 3, by + 2, C["fur"], 2)
     ell(c, 37, by + 1, 4, 3, C["fur"])
     c.polygon([(39, by), (45, by + 2), (39, by + 3)], C["fur"])
@@ -197,7 +200,7 @@ HURT = [
 
 HB = {"shape": "rect", "center": [24.0, 31.0]}
 ANIMATIONS = [
-    ("move", [wolf({**p, "hackle": 0.2, "jaw": 1, "ears": 0}) for p in RUN], 12, True,
+    ("move", [wolf({**p, "hackle": 0.3, "jaw": 1, "ears": 1}) for p in RUN], 12, True,
      {"durations_ms": [70, 80, 90, 80, 70, 80, 90, 80], "hitbox": {**HB, "active": [0, 7]}}),
     ("attack", [wolf(p) for p in ATTACK], 12, False,
      {"durations_ms": [120, 160, 220, 80, 120, 120, 140], "hitbox": {**HB, "active": [3, 4]}}),
