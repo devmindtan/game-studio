@@ -391,7 +391,8 @@ cmd_shot() {
   [[ "$res" =~ ^[0-9]+x[0-9]+$ ]] || die "GK_SHOT_RES must be WxH (got $res)"
   "${RUN[@]}" timeout --kill-after=5 "$limit" "$GODOT" --path "$g" --windowed --resolution "$res" --fixed-fps 60 \
     -s res://addons/gamekit/debug/shot_capture.gd -- --gk-scene="$scene" --gk-capture="$frames" --gk-size="$res" \
-    --gk-out="$tmp" "${extra[@]}" 2>&1 | { grep -E "ERROR|Run over" | tee "$tmp/godot.log" >&2 || true; } || rc=$?  # stdout = paths only
+    --gk-out="$tmp" "${extra[@]}" 2>&1 | { grep -E "ERROR|Run over|GK:" | tee "$tmp/godot.log" >&2 || true; } || rc=$?  # stdout = paths only
+  # lines with "GK:" pass through, for debugging a shot (lesson 2026-11-19: other prints are dropped)
   [[ "$rc" == 124 || "$rc" == 137 ]] && die "shot timed out after ${limit}s (set GK_SHOT_TIMEOUT to allow longer)"
   # unique name: two shots in the same second once overwrote each other
   local stamp; stamp="$(date +%Y%m%d-%H%M%S)"
