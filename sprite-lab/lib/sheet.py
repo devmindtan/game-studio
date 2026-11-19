@@ -18,7 +18,74 @@ import json
 from spritekit import Canvas, check_layers, gif, preview, strip, write_anim_meta
 
 
+CREATURE_MIN = {"move": 6, "attack": 6, "hurt": 3, "death": 6}
+UPPER_CHANGE_MOVE = 0.04
+UPPER_CHANGE_WINDUP = 0.08
+
+
+def _upper_change(a, b, upper=0.6):
+    """Share of opaque pixels that differ between frames a and b in the top `upper` of their joint bbox."""
+    boxes = [x for x in (a.img.getbbox(), b.img.getbbox()) if x]
+    if not boxes:
+        return 0.0
+    top = min(x[1] for x in boxes)
+    bottom = max(x[3] for x in boxes)
+    cut = top + (bottom - top) * upper
+    pa, pb = a.img.load(), b.img.load()
+    diff = solid = 0
+    for y in range(top, int(cut)):
+        for x in range(a.width):
+            ca, cb = pa[x, y], pb[x, y]
+            if ca[3] or cb[3]:
+                solid += 1
+                if ca != cb:
+                    diff += 1
+    return diff / solid if solid else 0.0
+
+
+def check_creature(here: Path, animations):
+    """creature-v1 (sprite-lab/CREATURE_STANDARD.md): a sprite with brief.json must have every required
+    animation with enough frames, one description per frame, and a body that moves (not only the legs).
+    Returns a list of problems (empty = fine)."""
+    import json
+    bp = here / "brief.json"
+    if not bp.exists():
+        return []
+    brief = json.loads(bp.read_text())
+    if brief.get("standard") != "creature-v1":
+        return []
+    anims = {n: frames for n, frames, _, _, _ in animations}
+    desc = brief.get("frames", {})
+    need = dict(CREATURE_MIN)
+    if "jump" in anims or "crouch" in anims:
+        need.update({"crouch": 2, "jump": 4})
+    problems = []
+    for n, k in need.items():
+        if n not in anims:
+            problems.append(f"{n}: missing (creature-v1 needs {', '.join(need)})")
+            continue
+        if len(anims[n]) < k:
+            problems.append(f"{n}: {len(anims[n])} frames, creature-v1 needs >= {k}")
+    for n, frames in anims.items():
+        d = desc.get(n)
+        if d is None or len(d) != len(frames):
+            problems.append(f"{n}: brief.json describes {0 if d is None else len(d)} frames, the sprite has {len(frames)}")
+    mv = anims.get("move", [])
+    for i in range(len(mv)):
+        ch = _upper_change(mv[i], mv[(i + 1) % len(mv)])
+        if ch < UPPER_CHANGE_MOVE:
+            problems.append(f"move {i}->{(i + 1) % len(mv)}: upper body changes {ch:.1%} (< {UPPER_CHANGE_MOVE:.0%}): only the legs move")
+    if mv and anims.get("attack"):
+        ch = _upper_change(mv[0], anims["attack"][0])
+        if ch < UPPER_CHANGE_WINDUP:
+            problems.append(f"attack 0: wind-up pose differs {ch:.1%} from move 0 (< {UPPER_CHANGE_WINDUP:.0%}): no real pose change")
+    return problems
+
+
 def export(here: Path, name: str, animations, anchor, ground=False, preview_scale=None, gif_scale=None, body=None):
+    problems = check_creature(here, animations)
+    if problems:
+        raise ValueError("creature-v1 (sprite-lab/CREATURE_STANDARD.md): " + "; ".join(problems))
     flat = [f for _, frames, _, _, _ in animations for f in frames]
     w, h = flat[0].width, flat[0].height
     strip(flat).save(here / f"{name}_strip.png")

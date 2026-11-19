@@ -130,6 +130,18 @@ Hiệu ứng vùng của chiêu (nổ, bão, dậm đất…) vẽ theo chuẩn 
 người dùng chê "đơn giản, không thể hiện sức mạnh". Không phóng to bằng thuật toán (Scale2x đã bị bỏ).
 Test của game (`gameplay_rules_test`) chặn sprite có `px_scale` mà sai chuẩn; dashboard cảnh báo sprite cũ.
 
+## Sinh vật (quái, thú, boss): chuẩn `creature-v1` (bắt buộc, người dùng 2026-11-19)
+
+Đọc `sprite-lab/CREATURE_STANDARD.md` trước khi vẽ. Tóm tắt:
+1. **Brief trước, vẽ sau:** `sprites/<tên>/brief.json` ghi `"standard": "creature-v1"`, cỡ, và **một dòng mô tả
+   cho mỗi khung** của mỗi động tác (khung nào làm gì: thân, đầu, đuôi, tai, hàm…).
+2. Độ phân giải theo cỡ (nhỏ 24–32, vừa 32–48, boss 48–72 px); khung tối thiểu: `move` 6, `attack` 6 (gồng ≥ 2,
+   thu về ≥ 2), `hurt` 3, `death` 6; quái nhảy thêm `crouch` 2 + `jump` 4.
+3. **Sống động, không đơ:** mỗi khung là một tư thế; thân nhấp nhô, đầu gật, đuôi/tai/áo chuyển động trễ nhịp;
+   gồng phải đổi dáng thật (dựng lông, nhe nanh, mắt lóe).
+4. `gamekit art run` **từ chối** sprite có brief mà thiếu động tác/khung, mô tả không khớp số khung, hoặc thân trên
+   đổi < 4 % giữa các khung `move` (chỉ chân động).
+
 ## Quy tắc pixel art
 
 - **Hình đặc trưng vẽ bằng bản đồ pixel tay** (`from_rows` hoặc danh sách chuỗi): nón, mũ, đầu vũ khí, khuôn
