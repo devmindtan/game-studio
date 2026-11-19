@@ -144,7 +144,9 @@ Test của game (`gameplay_rules_test`) chặn sprite có `px_scale` mà sai chu
    vẻ dữ đến từ tư thế (đầu hạ, nhe nanh, mắt lóe khi gồng, lông dựng **đúng chỗ**), không gắn gai lạ.
 5. **Nâng cấp, không vẽ lại** sprite người dùng đã quen/duyệt (người dùng 2026-11-19, Vua Thạch Nhầy): giữ phong
    cách, hình khối và màu gốc; thêm khung chuyển tiếp và chi tiết trên nền đó. Muốn đổi phong cách thì hỏi trước.
-6. `gamekit art run` **từ chối** sprite có brief mà thiếu động tác/khung, mô tả không khớp số khung, hoặc thân trên
+6. **Không bịa đòn mới để lấp khung** (người dùng 2026-11-19: Vua Thạch Nhầy bị thêm đòn phun): `attack` vẽ
+   đúng đòn mà quái đang có trong game (Vua: nhảy dậm); muốn thêm đòn thì hỏi trước.
+7. `gamekit art run` **từ chối** sprite có brief mà thiếu động tác/khung, mô tả không khớp số khung, hoặc thân trên
    đổi < 4 % giữa các khung `move` (chỉ chân động).
 
 ## Quy tắc pixel art
