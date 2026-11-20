@@ -161,45 +161,34 @@ _BURN = ["#7a1c0e", "#e43d12", "#ff8a1f", "#ffd24a", "#fff3b0"]
 
 
 def burn(i):
+    """Crisp flames (user 2026-11-20: the old translucent, outline-free dot spray read as a blur, worst on
+    big monsters): three solid tongues with a white-yellow core, orange body, red rim and a dark outline,
+    swaying with the loop, plus a few solid embers. The game tiles this at whole scale on big bodies."""
     c = Canvas(S, S)
-    # a low fire at the feet that licks up over the lower half of the body.
-    # Nothing is drawn above the head; the tongues grow and sway with the loop.
-    widths = [1, 2, 3, 4, 5, 6, 7, 7, 6, 5]
-    for y, half in ((25, 7), (26, 4)):       # thin glow at the feet
-        for x in range(int(C - half), int(C + half) + 1):
-            _px(c, x, y, "#ff5a1f60" if abs(x - C) > half - 3 else "#ff9a3a70")
+    core, mid, body, rim = "#fff3b0", "#ffd24a", "#ff8a1f", "#e43d12"
 
-    def flame(cx, base, height, phase):
-        for j in range(height):
-            t = j / max(1, height - 1)
-            w = widths[min(len(widths) - 1, int(t * (len(widths) - 1) + 0.5))]
-            sway = round(math.sin(i * 0.9 + phase + j * 0.4) * t * 2)
-            for q in range(-w // 2, w - w // 2):
-                if abs(q) >= w // 2 - 1:
-                    col = "#7a1c0e"
-                elif t > 0.78:
-                    col = "#fff3b0" if q == 0 else "#ffd24a"
-                elif t > 0.45 and abs(q) <= 1:
-                    col = "#ffd24a"
-                elif t < 0.2:
-                    col = "#c42d10"
-                else:
-                    col = "#ff7a1fe0"
-                _px(c, cx + q + sway, base - j, col)
+    def tongue(cx, base, h, w, phase):
+        """A teardrop flame as three nested filled polygons (rim, body, core); the tip sways."""
+        sway = math.sin(i * math.tau / N + phase) * 2.0
+        def shape(scale, lift):
+            hh, ww = h * scale, w * scale
+            tip = (cx + sway * scale, base - hh - lift)
+            return [(cx - ww, base - lift), (cx - ww * 0.9, base - hh * 0.45 - lift), tip,
+                    (cx + ww * 0.9, base - hh * 0.4 - lift), (cx + ww, base - lift), (cx, base + 1 - lift)]
+        c.polygon(shape(1.0, 0), rim)
+        c.polygon(shape(0.72, 0), body)
+        c.polygon(shape(0.42, 0), mid)
+        c.polygon(shape(0.2, 0), core)
 
-    # four tongues along the feet, mid-height ones tallest
-    for cx, h0, ph in ((C - 10, 8, 0), (C - 4, 11, 1), (C + 3, 12, 3), (C + 9, 9, 5)):
-        flame(cx, C + 9, h0 + round(math.sin(i * 0.8 + ph)), ph)
-    for k in range(3):                        # embers rising off the fire
-        y = 22 - ((i * 3 + k * 6) % 11)
-        _px(c, C - 8 + k * 8 + round(math.sin(i + k)), y, "#ffd24a")
-    for k in range(5):                       # embers rising off the flames
-        y = 20 - ((i * 3 + k * 5) % 18)
-        x = C - 9 + k * 5 + math.sin(i * 0.7 + k) * 2
-        _px(c, x, y, "#ffd24a")
-        if k % 2 == 0:
-            _px(c, x, y + 1, "#ff8a1f80")
-    return c
+    lick = [0, 1, 2, 1, 0, -1, -1, 0][i % N]
+    tongue(C - 5, C + 8, 10 + lick, 3.2, 0.0)
+    tongue(C + 1, C + 8, 14 - lick, 4.2, 2.1)
+    tongue(C + 6, C + 8, 9 + (1 if i % 4 < 2 else 0), 2.8, 4.0)
+    for k in range(3):                        # solid embers rising and drifting
+        y = int(C + 2 - ((i * 2 + k * 5) % 14))
+        x = C - 4 + k * 5 + round(math.sin(i * 0.8 + k * 1.7) * 1.5)
+        _px(c, x, y, mid if k % 2 else core)
+    return c.outline("#4a0e06")
 
 
 # --- bleed: wound, drops, pool ----------------------------------------------------
