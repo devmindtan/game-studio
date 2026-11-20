@@ -39,6 +39,14 @@ WIND = {"l": "#ffffff", "m": "#bfeaff", "d": "#6fb7e0"}
 FIRE = {"l": "#fff2a0", "m": "#ff9a2a", "d": "#d9361e", "x": "#7a1410"}
 WOOD = {"m": "#8a5a2a", "d": "#5a3618"}
 RED = {"l": "#ff9a8a", "m": "#e0402e", "d": "#8a1a18"}
+ICE = {"l": "#ffffff", "m": "#9ee0ff", "d": "#3f8fe0", "x": "#1f4f8a"}
+BOLT = {"l": "#ffffff", "m": "#fff27a", "d": "#f2b64a", "x": "#a8661f"}
+ARC = {"l": "#f4e0ff", "m": "#c38df5", "d": "#7a4ad8", "x": "#3a2070"}
+VOID = {"l": "#e0b8ff", "m": "#7a3ab8", "d": "#3a1660", "x": "#14081e"}
+LEAF = {"l": "#c8f07a", "m": "#5ab83a", "d": "#2a6a28"}
+HEART = {"l": "#ffb0b0", "m": "#e0364a", "d": "#8a1a2a"}
+FEATHER = {"l": "#ffffff", "m": "#d8e8f0", "d": "#8aa0b8"}
+STONE = {"l": "#d8cfc0", "m": "#8a7e70", "d": "#4e463e"}
 
 
 def new():
@@ -197,8 +205,432 @@ def god_hammer():
     return done(c)
 
 
+# --- mage skills ---------------------------------------------------------------------------------------------
+
+def arcane_bolt():
+    """Tia phép: a violet star-tipped bolt streaking up-right with a sparkle trail."""
+    c = new()
+    for k, (x, y) in enumerate(((3, 20), (6, 17), (9, 14))):
+        c.rect(x, y, x + 2 - (k == 0), y + 2 - (k == 0), (ARC["d"], ARC["m"], ARC["m"])[k])
+    c.polygon([(17, 2), (19, 8), (23, 9), (19, 11), (17, 17), (15, 11), (11, 9), (15, 8)], ARC["m"])
+    c.polygon([(17, 5), (18, 8), (20, 9), (18, 10), (17, 13), (16, 10), (14, 9), (16, 8)], ARC["l"])
+    c.pixel(17, 9, "#ffffff")
+    c.line(10, 14, 14, 11, ARC["m"], 2)
+    return done(c)
+
+
+def fireball():
+    """Cầu lửa: a round fireball with a hot core flying left-down, flames streaming behind."""
+    c = new()
+    c.polygon([(22, 1), (14, 6), (18, 9), (11, 10), (16, 14), (21, 9), (17, 7)], FIRE["d"])
+    c.polygon([(20, 3), (14, 7), (16, 9), (12, 11), (16, 12)], FIRE["m"])
+    c.ellipse(2, 9, 15, 22, FIRE["d"])
+    c.ellipse(3, 10, 14, 21, FIRE["m"])
+    c.ellipse(4, 12, 11, 19, FIRE["l"])
+    c.ellipse(5, 13, 8, 16, "#ffffff")
+    return done(c)
+
+
+def frost_nova():
+    """Băng nổ: a six-armed ice crystal bursting, shards flying out."""
+    c = new()
+    import math
+    for k in range(6):
+        a = k * math.pi / 3 + math.pi / 6
+        x1, y1 = 12 + round(math.cos(a) * 10), 12 + round(math.sin(a) * 10)
+        c.line(12, 12, x1, y1, ICE["d"], 3)
+        c.line(12, 12, x1, y1, ICE["m"], 1)
+        c.pixel(x1, y1, ICE["l"])
+    c.ellipse(8, 8, 16, 16, ICE["m"])
+    c.ellipse(9, 9, 14, 14, ICE["l"])
+    return done(c)
+
+
+def lightning():
+    """Sét đánh: a single bright bolt striking down from a dark cloud onto a spark."""
+    c = new()
+    c.ellipse(1, 1, 13, 8, STONE["d"]); c.ellipse(8, 0, 22, 8, STONE["m"]); c.ellipse(10, 1, 18, 5, STONE["l"])
+    c.polygon([(12, 7), (16, 7), (13, 13), (17, 13), (9, 23), (11, 15), (7, 15)], BOLT["d"])
+    c.polygon([(13, 8), (15, 8), (12, 14), (15, 14), (10, 21), (11, 15), (8, 15)], BOLT["m"])
+    c.line(13, 9, 11, 13, BOLT["l"])
+    return done(c)
+
+
+def thunder_javelin():
+    """Giáo sấm: a javelin of lightning, a gold spear tip, bolts crackling along the shaft."""
+    c = new()
+    c.line(2, 21, 16, 7, BOLT["x"], 2)
+    c.line(3, 21, 16, 8, BOLT["d"])
+    c.polygon([(15, 4), (21, 2), (19, 8), (17, 9), (14, 6)], BOLT["m"])
+    c.polygon([(17, 4), (20, 3), (19, 6)], BOLT["l"])
+    for (x, y) in ((6, 14), (10, 10)):
+        c.line(x, y, x - 2, y - 3, BOLT["m"]); c.line(x - 2, y - 3, x, y - 4, BOLT["m"])
+        c.line(x + 1, y + 2, x + 4, y + 3, BOLT["l"])
+    return done(c)
+
+
+def meteor():
+    """Mưa thiên thạch: a burning rock diving down-left, a second smaller one behind."""
+    c = new()
+    c.polygon([(23, 0), (13, 7), (17, 12), (23, 5)], FIRE["d"])
+    c.polygon([(22, 2), (15, 8), (17, 10)], FIRE["m"])
+    c.ellipse(5, 6, 18, 19, STONE["d"])
+    c.ellipse(6, 7, 17, 17, STONE["m"])
+    c.ellipse(7, 8, 12, 12, STONE["l"])
+    c.pixel(13, 13, FIRE["m"]); c.pixel(9, 15, FIRE["m"]); c.pixel(14, 10, FIRE["d"])
+    c.line(15, 9, 17, 11, FIRE["l"])
+    c.ellipse(2, 18, 6, 22, STONE["m"]); c.pixel(3, 19, STONE["l"])
+    return done(c)
+
+
+def void_orb():
+    """Cầu hư không: a black orb with a violet rim, ringed by a tilted void halo."""
+    c = new()
+    c.ellipse(1, 9, 22, 15, VOID["m"], fill=False)
+    c.ellipse(4, 4, 19, 19, VOID["m"])
+    c.ellipse(5, 5, 18, 18, VOID["x"])
+    c.ellipse(6, 6, 11, 10, VOID["d"])
+    c.pixel(7, 7, VOID["l"])
+    c.line(1, 12, 4, 13, VOID["l"]); c.line(19, 11, 22, 12, VOID["l"])
+    c.rect(5, 13, 18, 13, VOID["m"])
+    return done(c)
+
+
+def blizzard():
+    """Bão tuyết: a swirling ice storm, snowflakes and icicles whipping round."""
+    c = new()
+    c.ellipse(2, 2, 21, 21, ICE["d"], fill=False)
+    c.ellipse(5, 5, 18, 18, ICE["m"], fill=False)
+    c.rect(12, 1, 23, 10, (0, 0, 0, 0)); c.rect(1, 13, 10, 23, (0, 0, 0, 0))
+    c.ellipse(9, 9, 14, 14, ICE["l"])
+    for (x, y) in ((4, 4), (19, 19), (19, 5), (4, 18)):
+        c.line(x - 1, y, x + 1, y, ICE["l"]); c.line(x, y - 1, x, y + 1, ICE["l"])
+    c.polygon([(14, 2), (17, 2), (15, 8)], ICE["m"])
+    c.polygon([(7, 16), (10, 22), (6, 22)], ICE["m"])
+    return done(c)
+
+
+def storm():
+    """Bão sét: a heavy storm cloud loosing three bolts at once."""
+    c = new()
+    c.ellipse(0, 1, 10, 9, STONE["d"]); c.ellipse(6, 0, 18, 9, STONE["m"]); c.ellipse(13, 2, 23, 10, STONE["d"])
+    c.ellipse(8, 1, 15, 5, STONE["l"])
+    for x in (4, 11, 18):
+        c.polygon([(x, 9), (x + 3, 9), (x + 1, 14), (x + 3, 14), (x - 1, 22), (x, 15), (x - 2, 15)], BOLT["m"])
+        c.line(x + 1, 10, x, 14, BOLT["l"])
+    return done(c)
+
+
+# --- stat cards (no reuse of the HUD stat icons: each card shows what grants the stat) ----------------------
+
+def back_slash():
+    """Chém ngược: the hero's blade points right while a second slash arc cuts behind, to the left."""
+    c = new()
+    c.ellipse(0, 2, 12, 21, WIND["d"], fill=False)
+    c.ellipse(1, 3, 12, 20, WIND["m"], fill=False)
+    c.ellipse(2, 4, 12, 19, WIND["l"], fill=False)
+    c.rect(7, 2, 12, 21, (0, 0, 0, 0))
+    c.polygon([(3, 19), (8, 20), (4, 23)], WIND["l"])
+    c.line(12, 12, 22, 12, STEEL["m"], 2); c.line(12, 11, 22, 11, STEEL["l"])
+    c.rect(10, 8, 11, 15, GOLD["m"]); c.rect(7, 11, 9, 12, WOOD["m"])
+    return done(c)
+
+
+def sharpen():
+    """Mài kiếm: a blade drawn across a whetstone, sparks flying."""
+    c = new()
+    c.rect(2, 16, 21, 21, STONE["m"]); c.line(2, 16, 21, 16, STONE["l"]); c.rect(2, 20, 21, 21, STONE["d"])
+    c.line(4, 15, 20, 5, STEEL["m"], 2); c.line(5, 15, 20, 6, STEEL["l"])
+    c.line(20, 5, 22, 3, STEEL["l"])
+    c.line(1, 12, 5, 16, GOLD["m"], 2)
+    for (x, y) in ((13, 13), (16, 12), (18, 14), (15, 9)):
+        c.pixel(x, y, BOLT["l"]); c.pixel(x + 1, y - 1, BOLT["m"])
+    return done(c)
+
+
+def haste():
+    """Nhanh tay: an hourglass whose sand runs fast, speed lines beside it."""
+    c = new()
+    c.rect(6, 2, 17, 3, WOOD["m"]); c.rect(6, 20, 17, 21, WOOD["m"])
+    c.polygon([(7, 4), (16, 4), (12, 11), (11, 11)], FEATHER["d"])
+    c.polygon([(11, 12), (12, 12), (16, 19), (7, 19)], FEATHER["d"])
+    c.polygon([(9, 5), (14, 5), (12, 9), (11, 9)], GOLD["m"])
+    c.polygon([(11, 15), (12, 15), (15, 19), (8, 19)], GOLD["m"])
+    c.line(11, 10, 11, 15, GOLD["l"])
+    c.line(18, 8, 22, 8, WIND["m"]); c.line(19, 12, 23, 12, WIND["l"]); c.line(18, 16, 22, 16, WIND["m"])
+    return done(c)
+
+
+def reach():
+    """Tầm với: a long spear reaching across the whole tile, a ring at its tip showing the reach."""
+    c = new()
+    c.line(2, 21, 17, 6, WOOD["m"], 2)
+    c.polygon([(16, 4), (22, 1), (19, 7), (17, 8)], STEEL["m"]); c.line(17, 5, 21, 2, STEEL["l"])
+    c.ellipse(14, 0, 23, 9, WIND["m"], fill=False)
+    c.line(1, 18, 4, 21, WIND["m"])
+    return done(c)
+
+
+def vitality():
+    """Sinh lực: a heart with a big green cross on it (more max hp), not the plain hp heart."""
+    c = new()
+    c.ellipse(2, 3, 12, 13, HEART["m"]); c.ellipse(11, 3, 21, 13, HEART["m"])
+    c.polygon([(2, 9), (21, 9), (12, 21)], HEART["m"])
+    c.ellipse(4, 5, 8, 8, HEART["l"])
+    c.polygon([(12, 21), (21, 9), (19, 12)], HEART["d"])
+    c.rect(14, 12, 23, 15, LEAF["d"]); c.rect(17, 9, 20, 18, LEAF["d"])
+    c.rect(15, 13, 22, 14, LEAF["l"]); c.rect(18, 10, 19, 17, LEAF["l"])
+    return done(c)
+
+
+def swift():
+    """Nhẹ chân: a white feather drifting, speed lines behind (lighter, faster)."""
+    c = new()
+    c.polygon([(20, 2), (23, 4), (13, 15), (6, 20), (9, 13)], FEATHER["m"])
+    c.polygon([(20, 2), (22, 3), (14, 12), (10, 14)], FEATHER["l"])
+    c.line(20, 3, 5, 21, FEATHER["d"])
+    c.line(1, 8, 6, 8, WIND["m"]); c.line(0, 12, 5, 12, WIND["l"]); c.line(1, 16, 4, 16, WIND["m"])
+    return done(c)
+
+
+def magnet():
+    """Nam châm: a horseshoe magnet with gems flying into it (not the HUD magnet alone)."""
+    c = new()
+    c.ellipse(2, 2, 16, 16, RED["m"], fill=False); c.ellipse(3, 3, 15, 15, RED["m"], fill=False)
+    c.ellipse(4, 4, 14, 14, RED["l"], fill=False)
+    c.rect(2, 9, 16, 16, (0, 0, 0, 0))
+    c.rect(2, 9, 5, 15, RED["m"]); c.rect(13, 9, 16, 15, RED["m"])
+    c.rect(2, 13, 5, 15, STEEL["l"]); c.rect(13, 13, 16, 15, STEEL["l"])
+    for (x, y, col) in ((19, 18, ICE["m"]), (9, 20, ICE["m"]), (20, 10, ICE["l"])):
+        c.polygon([(x, y - 2), (x + 2, y), (x, y + 2), (x - 2, y)], col)
+    return done(c)
+
+
+def regen():
+    """Hồi phục: a sprouting leaf with green healing drops rising."""
+    c = new()
+    c.line(11, 22, 11, 12, WOOD["m"], 2)
+    c.polygon([(11, 13), (3, 8), (2, 15), (7, 17)], LEAF["m"]); c.line(10, 13, 4, 10, LEAF["l"])
+    c.polygon([(12, 11), (20, 5), (22, 12), (15, 15)], LEAF["d"]); c.line(13, 11, 19, 7, LEAF["m"])
+    for (x, y) in ((6, 3), (16, 1), (19, 16)):
+        c.polygon([(x, y), (x + 2, y + 3), (x, y + 4), (x - 2, y + 3)], LEAF["l"])
+    return done(c)
+
+
+def toughness():
+    """Da thép: a riveted steel breastplate, an incoming arrow bouncing off it."""
+    c = new()
+    c.polygon([(4, 4), (19, 4), (19, 13), (12, 21), (4, 13)], STEEL["m"])
+    c.polygon([(4, 4), (11, 4), (11, 20), (4, 13)], STEEL["l"])
+    c.polygon([(12, 4), (19, 4), (19, 13), (12, 21)], STEEL["d"])
+    for (x, y) in ((6, 6), (17, 6), (6, 12), (17, 12)):
+        c.pixel(x, y, STEEL["x"])
+    c.line(20, 1, 23, 4, WOOD["m"]); c.polygon([(18, 1), (21, 0), (20, 3)], STEEL["l"])
+    return done(c)
+
+
+def extra_strike():
+    """Thêm đòn: two blades side by side and a gold plus: one more hit."""
+    c = new()
+    for x in (5, 11):
+        c.line(x, 2, x, 15, STEEL["m"], 2); c.line(x, 2, x, 15, STEEL["l"])
+        c.rect(x - 2, 16, x + 2, 17, GOLD["m"]); c.rect(x, 18, x + 1, 21, WOOD["m"])
+    c.rect(15, 9, 23, 12, GOLD["d"]); c.rect(18, 6, 20, 15, GOLD["d"])
+    c.rect(16, 10, 22, 11, GOLD["l"]); c.rect(18, 7, 20, 14, GOLD["l"])
+    return done(c)
+
+
+def arcane_power():
+    """Pháp lực: an open spellbook with a violet rune rising from its pages."""
+    c = new()
+    c.polygon([(1, 14), (11, 17), (11, 22), (1, 19)], ARC["d"])
+    c.polygon([(12, 17), (22, 14), (22, 19), (12, 22)], ARC["d"])
+    c.polygon([(2, 13), (11, 16), (11, 20), (2, 17)], FEATHER["m"])
+    c.polygon([(12, 16), (21, 13), (21, 17), (12, 20)], FEATHER["l"])
+    c.polygon([(11, 2), (15, 7), (11, 12), (7, 7)], ARC["m"])
+    c.polygon([(11, 4), (13, 7), (11, 10), (9, 7)], ARC["l"])
+    return done(c)
+
+
+def quick_cast():
+    """Niệm nhanh: a wand flicking a spark, a clock hand sweeping behind it."""
+    c = new()
+    c.ellipse(9, 1, 22, 14, ARC["d"], fill=False)
+    c.line(15, 7, 15, 3, ARC["l"]); c.line(15, 7, 19, 9, ARC["m"])
+    c.line(2, 21, 11, 12, WOOD["m"], 2)
+    c.polygon([(11, 9), (14, 12), (11, 15), (8, 12)], BOLT["m"]); c.pixel(11, 12, BOLT["l"])
+    return done(c)
+
+
+def wide_magic():
+    """Mở rộng: a magic circle with arrows pushing outward."""
+    c = new()
+    c.ellipse(5, 5, 18, 18, ARC["m"], fill=False)
+    c.ellipse(8, 8, 15, 15, ARC["l"], fill=False)
+    c.ellipse(10, 10, 13, 13, ARC["m"])
+    for (pts) in ([(12, 0), (15, 3), (9, 3)], [(12, 23), (15, 20), (9, 20)], [(0, 12), (3, 9), (3, 15)], [(23, 12), (20, 9), (20, 15)]):
+        c.polygon(pts, ARC["l"])
+    return done(c)
+
+
+def mana_shield():
+    """Áo phép: a blue magic bubble with a rune shield inside."""
+    c = new()
+    c.ellipse(1, 1, 22, 22, ICE["d"], fill=False)
+    c.ellipse(2, 2, 21, 21, ICE["m"], fill=False)
+    c.line(5, 6, 8, 3, ICE["l"])
+    c.polygon([(7, 7), (16, 7), (16, 13), (11, 18), (7, 13)], ARC["m"])
+    c.polygon([(7, 7), (11, 7), (11, 17), (7, 13)], ARC["l"])
+    c.pixel(11, 11, "#ffffff")
+    return done(c)
+
+
+def multicast():
+    """Thêm phép: a violet spark splitting into three elemental orbs (fire, ice, lightning)."""
+    c = new()
+    c.polygon([(12, 9), (14, 12), (12, 15), (10, 12)], ARC["l"])
+    for (x, y, col) in ((1, 14, FIRE), (8, 1, ICE), (15, 14, BOLT)):
+        c.ellipse(x, y, x + 7, y + 7, col["d"]); c.ellipse(x, y, x + 6, y + 6, col["m"])
+        c.ellipse(x + 1, y + 1, x + 3, y + 3, col["l"])
+    c.pixel(9, 14, ARC["m"]); c.pixel(12, 8, ARC["m"]); c.pixel(15, 14, ARC["m"])
+    return done(c)
+
+
+# --- special cards (milestone rewards; each its own icon, user 2026-11-20) ---------------------------------
+
+def sp_aegis_helm():
+    """Thần hộ: a ghostly blue shield shimmering in front of a helmet."""
+    c = new()
+    c.ellipse(4, 2, 19, 15, STEEL["m"]); c.rect(4, 9, 19, 15, STEEL["m"]); c.ellipse(5, 3, 11, 8, STEEL["l"])
+    c.rect(6, 10, 17, 11, STEEL["x"])
+    c.polygon([(9, 12), (22, 12), (22, 18), (15, 23), (9, 18)], ICE["d"])
+    c.polygon([(10, 13), (21, 13), (21, 18), (15, 22), (10, 18)], ICE["m"])
+    c.line(11, 14, 14, 14, ICE["l"]); c.line(11, 15, 11, 17, ICE["l"])
+    return done(c)
+
+
+def sp_aegis_chest():
+    """Phản chấn: a breastplate releasing a ring of force outward."""
+    c = new()
+    c.ellipse(0, 0, 23, 23, BOLT["d"], fill=False)
+    c.ellipse(2, 2, 21, 21, BOLT["m"], fill=False)
+    c.polygon([(6, 6), (17, 6), (17, 13), (12, 18), (6, 13)], STEEL["m"])
+    c.polygon([(6, 6), (11, 6), (11, 17), (6, 13)], STEEL["l"])
+    c.pixel(12, 10, BOLT["l"]); c.pixel(12, 11, BOLT["m"])
+    return done(c)
+
+
+def sp_aegis_greaves():
+    """Bàn thạch: a stone shell closing round the hero, cracks of orange light at its seams."""
+    c = new()
+    c.ellipse(2, 3, 21, 22, STONE["d"]); c.ellipse(3, 4, 20, 20, STONE["m"]); c.ellipse(5, 5, 11, 10, STONE["l"])
+    c.line(12, 4, 10, 10, FIRE["m"]); c.line(10, 10, 14, 15, FIRE["m"]); c.line(14, 15, 11, 21, FIRE["d"])
+    c.line(4, 13, 9, 12, STONE["d"]); c.line(15, 9, 20, 11, STONE["d"])
+    return done(c)
+
+
+def sp_aegis_gauntlets():
+    """Huyết quyền: a clenched steel fist dripping a red blood drop (heal on kills)."""
+    c = new()
+    c.rect(5, 5, 16, 14, STEEL["m"]); c.rect(5, 5, 16, 6, STEEL["l"])
+    for x in (7, 10, 13):
+        c.line(x, 5, x, 9, STEEL["d"])
+    c.rect(7, 14, 15, 19, STEEL["d"]); c.rect(3, 8, 5, 12, STEEL["m"])
+    c.polygon([(19, 12), (22, 17), (19, 21), (16, 17)], HEART["m"]); c.pixel(18, 16, HEART["l"])
+    return done(c)
+
+
+def sp_aegis_boots():
+    """Phong hành: a boot with a small wind wing at the heel (speed when hit)."""
+    c = new()
+    c.rect(7, 4, 13, 14, WOOD["m"]); c.rect(7, 4, 8, 14, EARTH["l"])
+    c.rect(7, 14, 19, 18, WOOD["m"]); c.rect(7, 17, 19, 18, WOOD["d"])
+    c.polygon([(6, 6), (1, 3), (2, 7), (0, 9), (4, 10), (6, 10)], WIND["l"])
+    c.line(1, 6, 5, 8, WIND["d"])
+    c.line(15, 20, 21, 20, WIND["m"]); c.line(17, 22, 23, 22, WIND["l"])
+    return done(c)
+
+
+def sp_aegis_blade():
+    """Thánh kiếm: a holy sword pointing up inside a ring of light (pulses round the hero)."""
+    c = new()
+    c.ellipse(1, 3, 22, 22, HOLY["d"], fill=False)
+    c.ellipse(2, 4, 21, 21, HOLY["m"], fill=False)
+    c.line(11, 1, 11, 15, STEEL["l"], 2); c.line(12, 2, 12, 15, STEEL["m"])
+    c.rect(7, 15, 16, 16, GOLD["m"]); c.rect(11, 17, 12, 21, WOOD["m"])
+    return done(c)
+
+
+def sp_star_hat():
+    """Lôi ấn: a lightning seal: a gold circle sigil struck through by a bolt."""
+    c = new()
+    c.ellipse(2, 2, 21, 21, BOLT["x"], fill=False); c.ellipse(4, 4, 19, 19, BOLT["d"], fill=False)
+    c.polygon([(13, 1), (16, 1), (12, 10), (16, 10), (8, 22), (10, 13), (6, 13)], BOLT["m"])
+    c.line(14, 2, 11, 10, BOLT["l"])
+    return done(c)
+
+
+def sp_star_robe():
+    """Tim bất diệt: a heart wrapped in gold wings (one second life)."""
+    c = new()
+    c.polygon([(9, 9), (0, 4), (2, 10), (0, 13), (6, 15)], GOLD["m"]); c.line(1, 6, 7, 10, GOLD["l"])
+    c.polygon([(14, 9), (23, 4), (21, 10), (23, 13), (17, 15)], GOLD["m"]); c.line(22, 6, 16, 10, GOLD["l"])
+    c.ellipse(6, 6, 12, 12, HEART["m"]); c.ellipse(11, 6, 17, 12, HEART["m"])
+    c.polygon([(6, 10), (17, 10), (11, 19)], HEART["m"]); c.ellipse(7, 7, 9, 9, HEART["l"])
+    return done(c)
+
+
+def sp_star_pants():
+    """Hoả y: a ring of fire burning round a point (an aura that burns nearby monsters)."""
+    c = new()
+    import math
+    for k in range(8):
+        a = k * math.pi / 4
+        x, y = 12 + round(math.cos(a) * 8), 12 + round(math.sin(a) * 8)
+        c.polygon([(x - 2, y + 2), (x, y - 3), (x + 2, y + 2)], FIRE["d"])
+        c.polygon([(x - 1, y + 1), (x, y - 1), (x + 1, y + 1)], FIRE["l"])
+    c.ellipse(5, 5, 18, 18, FIRE["m"], fill=False)
+    c.ellipse(10, 10, 13, 13, FIRE["l"])
+    return done(c)
+
+
+def sp_star_bracer():
+    """Băng ấn: an ice seal: a frozen hexagon sigil with a snowflake core."""
+    c = new()
+    c.polygon([(12, 1), (21, 6), (21, 17), (12, 22), (3, 17), (3, 6)], ICE["d"])
+    c.polygon([(12, 3), (19, 7), (19, 16), (12, 20), (5, 16), (5, 7)], ICE["m"])
+    c.line(12, 6, 12, 17, ICE["l"]); c.line(7, 9, 17, 14, ICE["l"]); c.line(7, 14, 17, 9, ICE["l"])
+    c.ellipse(10, 10, 14, 14, "#ffffff")
+    return done(c)
+
+
+def sp_star_shoes():
+    """Lưu tinh: a shooting star with a long glittering tail (a speed rune on kills)."""
+    c = new()
+    c.polygon([(2, 22), (14, 9), (16, 12)], ARC["d"]); c.polygon([(4, 21), (14, 10), (15, 11)], ARC["l"])
+    c.polygon([(17, 1), (19, 6), (23, 7), (19, 9), (17, 14), (15, 9), (11, 7), (15, 6)], BOLT["m"])
+    c.polygon([(17, 4), (18, 6), (20, 7), (18, 8), (17, 11), (16, 8), (14, 7), (16, 6)], BOLT["l"])
+    c.pixel(6, 14, ARC["l"]); c.pixel(10, 20, ARC["m"])
+    return done(c)
+
+
+def sp_star_staff():
+    """Vĩnh cửu: an infinity loop of violet light (every cooldown resets)."""
+    c = new()
+    c.ellipse(1, 6, 12, 17, ARC["d"], fill=False); c.ellipse(2, 7, 11, 16, ARC["m"], fill=False)
+    c.ellipse(11, 6, 22, 17, ARC["d"], fill=False); c.ellipse(12, 7, 21, 16, ARC["m"], fill=False)
+    c.line(4, 8, 7, 7, ARC["l"]); c.line(16, 15, 19, 15, ARC["l"])
+    c.pixel(11, 11, "#ffffff"); c.pixel(12, 12, "#ffffff")
+    return done(c)
+
+
 ICONS = {f.__name__: f for f in (blade_arc, whirlwind, earth_strike, ground_slam, cleave_wave, holy_column, dash,
-                                 earthquake, solar_ray, god_hammer)}
+                                 earthquake, solar_ray, god_hammer, arcane_bolt, fireball, frost_nova, lightning,
+                                 thunder_javelin, meteor, void_orb, blizzard, storm, back_slash, sharpen, haste, reach,
+                                 vitality, swift, magnet, regen, toughness, extra_strike, arcane_power, quick_cast,
+                                 wide_magic, mana_shield, multicast, sp_aegis_helm, sp_aegis_chest, sp_aegis_greaves,
+                                 sp_aegis_gauntlets, sp_aegis_boots, sp_aegis_blade, sp_star_hat, sp_star_robe,
+                                 sp_star_pants, sp_star_bracer, sp_star_shoes, sp_star_staff)}
 
 if __name__ == "__main__":
     anims = [(n, [f()], 1, False, {}) for n, f in ICONS.items()]
