@@ -4,7 +4,7 @@
     48,
     48
   ],
-  "fps": 12.0,
+  "fps": 14.0,
   "loop": true,
   "anchor": [
     24.0,
@@ -16,46 +16,46 @@
       "name": "move",
       "start": 0,
       "frames": 8,
-      "fps": 12.0,
+      "fps": 14.0,
       "loop": true,
       "hitbox": {
         "shape": "rect",
         "center": [
-          27.5,
-          31.5
+          23.5,
+          30.0
         ],
         "active": [
           0,
           7
         ],
-        "half_w": 11.5,
-        "half_h": 12.5
+        "half_w": 10.5,
+        "half_h": 14.0
       }
     },
     {
       "name": "attack",
       "start": 8,
       "frames": 4,
-      "fps": 10.0,
+      "fps": 8.0,
       "loop": false,
       "durations_ms": [
-        260.0,
-        90.0,
-        120.0,
+        160.0,
+        200.0,
+        200.0,
         140.0
       ],
       "hitbox": {
-        "shape": "circle",
+        "shape": "rect",
         "center": [
-          24.0,
-          44.0
+          20.0,
+          31.0
         ],
         "active": [
-          1,
-          2
+          0,
+          3
         ],
-        "radius": 25.0,
-        "inner": 1.0
+        "half_w": 12.0,
+        "half_h": 13.0
       }
     },
     {
@@ -71,15 +71,15 @@
       "hitbox": {
         "shape": "rect",
         "center": [
-          22.0,
-          32.5
+          19.5,
+          27.5
         ],
         "active": [
           0,
           1
         ],
-        "half_w": 11.0,
-        "half_h": 11.5
+        "half_w": 11.5,
+        "half_h": 16.5
       }
     },
     {
@@ -98,15 +98,15 @@
       "hitbox": {
         "shape": "rect",
         "center": [
-          19.0,
-          32.5
+          25.5,
+          28.0
         ],
         "active": [
           0,
           4
         ],
-        "half_w": 15.0,
-        "half_h": 11.5
+        "half_w": 21.5,
+        "half_h": 16.0
       }
     }
   ],
@@ -114,10 +114,10 @@
   "body": {
     "anim": "move",
     "center": [
-      26.0,
-      31.5
+      24.0,
+      28.5
     ],
-    "radius": 9.5
+    "radius": 10.5
   },
   "variant_of": "goblin"
 }
