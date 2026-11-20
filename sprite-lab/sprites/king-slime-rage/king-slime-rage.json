@@ -1,5 +1,5 @@
 {
-  "frames": 40,
+  "frames": 52,
   "frame_size": [
     48,
     48
@@ -179,6 +179,40 @@
         "active": [
           0,
           7
+        ],
+        "half_w": 22.5,
+        "half_h": 20.0
+      }
+    },
+    {
+      "name": "transform",
+      "start": 40,
+      "frames": 12,
+      "fps": 8.0,
+      "loop": false,
+      "durations_ms": [
+        100.0,
+        100.0,
+        110.0,
+        110.0,
+        120.0,
+        120.0,
+        120.0,
+        130.0,
+        160.0,
+        120.0,
+        140.0,
+        250.0
+      ],
+      "hitbox": {
+        "shape": "rect",
+        "center": [
+          24.5,
+          27.0
+        ],
+        "active": [
+          0,
+          11
         ],
         "half_w": 22.5,
         "half_h": 20.0

@@ -37,6 +37,19 @@ ROOT = "#4e3220"
 # Phase 2, Cổ Thụ Trụi Lá (bach-ai design/bosses.md, user 2026-11-19): BARE drops the canopy for dry
 # twigs round a glowing jade crystal core, and the roots curl into two thick root legs that run.
 BARE = False
+# The transform animation (phase 1 -> 2) switches the parts one by one: CROWN (bare crown + crystal) and
+# LEGS (root legs); None follows BARE.
+CROWN = None
+LEGS = None
+CURL = 0   # transform: every root tip lifts this many px (the roots draw in before they become legs)
+
+
+def _crown_on():
+    return BARE if CROWN is None else CROWN
+
+
+def _legs_on():
+    return BARE if LEGS is None else LEGS
 JADE_D, JADE, JADE_L = "#1a7a6a", "#3ad8b8", "#c8fff0"
 TWIG = "#5a4630"
 
@@ -72,11 +85,11 @@ def roots(c, base, phase, front=False):
     Walking: the roots take turns curling their tips up a pixel and straightening (they grip and drag)."""
     if not front:
         return
-    if BARE:
+    if _legs_on():
         legs(c, base, phase)
         return
     for k, (path, thorns) in enumerate(ROOT_PATHS):
-        lift = 2 if (k + phase) % 3 == 0 else 0
+        lift = CURL if CURL else (2 if (k + phase) % 3 == 0 else 0)
         pts = []
         for n, (x, y) in enumerate(path):
             tip = n >= len(path) - 2 and len(path) > 2
@@ -163,7 +176,7 @@ def crown(c, cx, cy, pulse):
             c.pixel(cx + hx, cy + hy, JADE_L)
 
 
-def tree(sway=0, arms=0, legs=0, dy=0, eyes=True, lean=0, glow=False, leaf=-1, mouth=0):
+def tree(sway=0, arms=0, legs=0, dy=0, eyes=True, lean=0, glow=False, leaf=-1, mouth=0, shed=0.0, curl=0):
     """sway: canopy offset; arms 0 down, 1 raised, 2 slammed; legs 0/1 shuffle."""
     if BARE:   # phase 2 always glares, snarls and leans into the charge
         glow = glow or eyes
@@ -175,8 +188,8 @@ def tree(sway=0, arms=0, legs=0, dy=0, eyes=True, lean=0, glow=False, leaf=-1, m
     # trunk (slightly wider at the bottom)
     top = 18 + dy
     # the trunk flares into the root mass at the bottom (no legs)
-    lift = 9 if BARE else 0   # phase 2: the trunk ends at the hips so the two root legs show below it
-    flare = 2 if BARE else 0   # and the hips flare wide over them
+    lift = 9 if _legs_on() else 0   # phase 2: the trunk ends at the hips so the two root legs show below it
+    flare = 2 if _legs_on() else 0   # and the hips flare wide over them
     c.polygon([(16 + lean, top), (32 + lean, top), (33 + flare, base - 6 - lift), (31 + flare, base - 3 - lift),
                (17 - flare, base - 3 - lift), (15 - flare, base - 6 - lift)], BARK)
     c.line(18 + lean, top + 2, 14, base - 5 - lift, BARK_L)
@@ -223,16 +236,29 @@ def tree(sway=0, arms=0, legs=0, dy=0, eyes=True, lean=0, glow=False, leaf=-1, m
     # canopy
     cx = 24 + sway + lean
     cy = top - 4
-    if BARE:   # phase 2: no leaves, a bare crown round the crystal core
+    if _crown_on():   # phase 2: no leaves, a bare crown round the crystal core
         crown(c, cx, cy, legs % 2 == 0)
         c.pixel(17 + lean, top + 1, MOSS)
         return c.outline(OUTLINE)
+    keep = 1.0 - shed   # transform: the canopy thins and its leaves burst outward
     for dx, ddy, r in ((-8, 2, 7), (8, 2, 7), (0, -3, 9), (-4, 4, 6), (5, 4, 6)):
-        disk(c, cx + dx, cy + ddy, r, LEAF)
+        if r * keep >= 1:
+            disk(c, cx + dx, cy + ddy, r * keep, LEAF)
     for dx, ddy, r in ((-6, -1, 3), (4, -6, 3), (9, 0, 2)):
-        disk(c, cx + dx, cy + ddy, r, LEAF_L)
+        if r * keep >= 1:
+            disk(c, cx + dx, cy + ddy, r * keep, LEAF_L)
     for dx, ddy in ((-10, 6), (0, 7), (9, 6), (-3, 5)):
-        disk(c, cx + dx, cy + ddy, 2, LEAF_D)
+        if keep > 0.5:
+            disk(c, cx + dx, cy + ddy, 2, LEAF_D)
+    if shed > 0:
+        import math
+        for n in range(14):   # torn leaves flying out of the canopy all round
+            a = n / 14.0 * 2.0 * math.pi + n * 0.3
+            dist = 6 + shed * 16 + (n % 3) * 2
+            lx, ly = round(cx + math.cos(a) * dist), round(cy + math.sin(a) * dist * 0.8)
+            if 0 <= lx < S - 1 and 0 <= ly < S:
+                c.pixel(lx, ly, LEAF_L if n % 2 else LEAF)
+                c.pixel(lx + 1, ly, LEAF)
     c.pixel(17 + lean, top + 1, MOSS); c.pixel(30 + lean, top + 2, MOSS)
     if leaf >= 0:   # a leaf drifting down from the canopy (secondary motion)
         lx = 10 + (leaf * 5) % 30 + (1 if leaf % 2 else -1)
