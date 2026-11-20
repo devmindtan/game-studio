@@ -148,6 +148,13 @@ Test của game (`gameplay_rules_test`) chặn sprite có `px_scale` mà sai chu
    đúng đòn mà quái đang có trong game (Vua: nhảy dậm); muốn thêm đòn thì hỏi trước.
 7. `gamekit art run` **từ chối** sprite có brief mà thiếu động tác/khung, mô tả không khớp số khung, hoặc thân trên
    đổi < 4 % giữa các khung `move` (chỉ chân động).
+8. **Dạng pha 2 / phẫn nộ phải trông dữ hơn dạng thường** (người dùng 2026-11-20: chân Cổ Thụ Trụi Lá "xấu, phải hùng
+   hổ hơn"): dáng thấp và rộng, chân/tay to dồn trọng lượng, đầu gối choãi, vuốt bám đất, thân chúi tới, mặt cau
+   nhe nanh. Chi mảnh, ngắn, đứng sát nhau trông ngây ngô. Chi duỗi dài nằm ngang trông như chân nhện. Xem ở 5×
+   cả 8 khung `move` trước khi báo xong.
+9. **Boss đổi pha phải có animation `transform`** (≥ 8 khung, ~1,5 s, người dùng 2026-11-20: "thiếu animation chuyển
+   trạng thái") trong sheet pha 2: khựng → biến hình từng bước → gầm. Chỉ chớp màu là không đủ (test
+   `monster_standard_test` của bach-ai chặn). Đổi màu dần thì nháy giữa hai màu, đừng trộn màu (xanh + đỏ ra nâu bẩn).
 
 ## Quy tắc pixel art
 
