@@ -1,0 +1,43 @@
+{
+  "frames": 7,
+  "frame_size": [
+    12,
+    12
+  ],
+  "fps": 10.0,
+  "loop": true,
+  "anchor": [
+    6.0,
+    6.0
+  ],
+  "anchor_source": "explicit",
+  "animations": [
+    {
+      "name": "fly",
+      "start": 0,
+      "frames": 4,
+      "fps": 10.0,
+      "loop": true,
+      "hitbox": {
+        "shape": "circle",
+        "center": [
+          6.0,
+          6.0
+        ],
+        "active": [
+          0,
+          3
+        ],
+        "radius": 7.0,
+        "inner": 0.0
+      }
+    },
+    {
+      "name": "pop",
+      "start": 4,
+      "frames": 3,
+      "fps": 14.0,
+      "loop": false
+    }
+  ]
+}
