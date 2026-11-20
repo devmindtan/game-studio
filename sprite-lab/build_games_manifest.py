@@ -226,8 +226,10 @@ def progression_of(data, classes):
         out = []
         for rid in ids:
             r = ms.get("rewards", {}).get(rid, {})
-            card = cards.get(str(r.get("skill", rid)), {}) if r.get("kind") == "skill" else {}
-            out.append({"id": rid, "kind": r.get("kind", ""), "class": r.get("class", ""), "icon": r.get("icon", rid),
+            ref = r.get("skill") if r.get("kind") == "skill" else (r.get("card") if r.get("kind") == "card" else None)
+            card = cards.get(str(ref or rid), {}) if ref else {}
+            out.append({"id": rid, "kind": r.get("kind", ""), "class": r.get("class", ""),
+                        "icon": r.get("icon", card.get("icon", ref or rid)),
                         "name": card.get("name", r.get("name", rid)), "desc": card.get("desc", r.get("desc", ""))})
         milestones.append({"level": int(lv), "rewards": out})
     return {"count": len(curve), "boss_every": every, "scale": k, "rewards": rw, "curve": curve,
@@ -278,6 +280,7 @@ def skill_entry(skill_id, defn, upgrade, cls, root):
         "icon": upgrade.get("icon", skill_id),
         "max_level": int(upgrade.get("max_level", 1)), "weight": upgrade.get("weight", 1),
         "start": skill_id in (cls.get("start_skills") or {}),
+        "rarity": upgrade.get("rarity", "common"),
         "params": defn, "tiers": tiers, "levels": levels,
     }
 
@@ -425,15 +428,29 @@ def check_skill(skill, cls, rules_doc, sprite_meta, scale):
     return grade(res, rules)
 
 
+def _tier_max_plus():
+    """Cường hoá cap per rarity, read from the game's src/meta/profile.gd (TIER_MAX_PLUS) so the dashboard
+    never drifts from the game."""
+    import re
+    src = os.path.join(GAMES, "bach-ai", "src", "meta", "profile.gd")
+    m = re.search(r"TIER_MAX_PLUS := (\{[^}]*\})", open(src).read()) if os.path.exists(src) else None
+    return json.loads(m.group(1)) if m else {}
+
+
+TIER_MAX_PLUS = {}
+
+
 def items_of(root, data, cfg, monsters):
     """assets/data/items.json with each item's sprite and the numbers behind it."""
     items = load(os.path.join(data, "items.json"))
+    TIER_MAX_PLUS.update(_tier_max_plus())
     pick = cfg.get("pickups", {})
     out = {"pickups": [], "buffs": [], "equipment": [], "special_buffs": []}
     bcfg = cfg.get("buffs", {})
     for group in out:
         for iid, it in clean(items.get(group, {})).items():
             e = {"id": iid, "name": it.get("name", iid), "desc": it.get("desc", ""), "slot": it.get("slot", ""),
+                 "max_plus": TIER_MAX_PLUS.get(it.get("rarity", ""), 0), "subs": len(it.get("subs", [])),
                  "sprite": sprite_info(root, str(it.get("sprite", ""))), "icon": it.get("icon", ""),
                  "rarity": it.get("rarity", ""), "class": it.get("class", "")}
             if iid == "xp_gem":
@@ -565,7 +582,14 @@ def build_game(slug):
     monsters = clean(load(os.path.join(data, "monsters.json")))
     stages = [stage_entry(p) for p in sorted(glob.glob(os.path.join(data, "waves", "stage_*.json")))]
 
-    heroes, skills, stat_ups = [], [], []
+    heroes, skills, stat_ups, specials = [], [], [], []
+    deck_cfg = load(os.path.join(data, "card_trees.json")).get("deck", {})
+    cost_of = deck_cfg.get("cost", {})
+    rarity_cfg = load(os.path.join(data, "card_rarity.json"))
+    ms_level = {}   # special card id -> the level milestone that offers it
+    for lv, ids in clean(load(os.path.join(data, "milestones.json")).get("levels", {})).items():
+        for rid in ids:
+            ms_level[rid] = int(lv)
     for cid, cls in classes.items():
         pool = load(os.path.join(data, str(cls.get("upgrades", ""))))
         ups = [u for u in pool.get("upgrades", []) if isinstance(u, dict)]
@@ -579,10 +603,16 @@ def build_game(slug):
             if u.get("kind") == "skill" and isinstance(defs.get(sid), dict):
                 e = skill_entry(sid, defs[sid], u, cls, root)
                 e["class"] = cid
+                e["cost"] = 0 if e["start"] else int(cost_of.get(e["rarity"], 0))
                 skills.append(e)
+            elif "special" in u:   # a special card: a one-level level-milestone reward (user 2026-11-20)
+                specials.append({"id": sid, "class": cid, "name": u.get("name", sid), "desc": u.get("desc", ""),
+                                 "icon": u.get("icon", sid), "rarity": u.get("rarity", "epic"),
+                                 "milestone": ms_level.get(sid, 0), "special": u.get("special", {})})
             else:
                 stat_ups.append({"id": sid, "class": cid, "name": u.get("name", sid), "desc": u.get("desc", ""),
-                                 "icon": u.get("icon", sid),
+                                 "icon": u.get("icon", sid), "rarity": u.get("rarity", "common"),
+                                 "cost": int(cost_of.get(u.get("rarity", "common"), 0)),
                                  "max_level": int(u.get("max_level", 1)), "weight": u.get("weight", 1),
                                  "levels": [level_values(u, lv) for lv in range(1, int(u.get("max_level", 1)) + 1)]})
 
@@ -613,6 +643,9 @@ def build_game(slug):
         "world": cfg.get("world", {}), "xp": cfg.get("xp", {}), "pickups": cfg.get("pickups", {}),
         "stages": stages, "progression": progression_of(data, classes), "heroes": heroes,
         "skill_tree": load(os.path.join(data, "skill_tree.json")), "challenges": load(os.path.join(data, "challenges.json")), "monsters": mons, "skills": skills, "stat_ups": stat_ups,
+        "specials": specials, "deck": deck_cfg, "card_rarity": rarity_cfg,
+        "balance": cfg.get("balance", {}), "time_scale": cfg.get("time_scale", {}),
+        "cooldown_floor": cfg.get("player", {}).get("cooldown_floor", 0),
         "sprites": sprites,
         "rules": rules_doc, "rule_doc": rel(os.path.join(root, "design", "gameplay-rules.md")),
         "statuses": statuses_of(root, data),   # buff/debuff effects drawn on characters
