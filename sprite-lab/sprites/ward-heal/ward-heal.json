@@ -1,0 +1,23 @@
+{
+  "frames": 12,
+  "frame_size": [
+    48,
+    48
+  ],
+  "fps": 15.0,
+  "loop": false,
+  "anchor": [
+    24.0,
+    44.0
+  ],
+  "anchor_source": "explicit",
+  "animations": [
+    {
+      "name": "cast",
+      "start": 0,
+      "frames": 12,
+      "fps": 15.0,
+      "loop": false
+    }
+  ]
+}

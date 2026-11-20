@@ -578,7 +578,8 @@ function itemEffects(m){
     const sh={};
     [['hero',heroInfo],['dummy',dummy&&dummy.sprite],['aura',auraInfo],['auraBack',auraBackInfo],
      ['wardBreak',breakInfo],
-     ['ring',ringSprite],['status',status?anySprite('status-'+status):null],
+     ['ring',ringSprite],['proc',!ring&&sp&&sp.fx?anySprite(sp.fx):null],
+     ['status',status?anySprite('status-'+status):null],
      ['scorch',kind==='burn_aura'?anySprite('scorch'):null]]
       .forEach(([k,info])=>{ if(info) sheetOf(info).then(x=>{sh[k]=x;}); });
     // Rule (user 2026-11-19): scale the VIEW, not the effect. The ring keeps its
@@ -598,7 +599,7 @@ function itemEffects(m){
     // Demo loops every 2.4 s (the card's text gives the real trigger interval):
     // a 6-15 s cooldown would leave the effect invisible most of the time.
     const period=2.4,lead=0.25,dur=ring?1.55:(breakInfo?0.95:1.0);
-    const visual=!!(auraInfo||ring||status||kind==='burn_aura');
+    const visual=!!(auraInfo||ring||status||kind==='burn_aura'||(!ring&&sp&&sp.fx));
     const cv=liveCanvas(W,H,(g,t)=>{
       const u=t%period,on=u>=lead&&u<lead+dur;
       const active=sh.wardBreak?(u>=0.45&&u<1.35):on;
@@ -627,6 +628,7 @@ function itemEffects(m){
         const ra=sh.ring.has('shock')?'shock':'burst';
         sh.ring.draw(g,ra,u-lead,hx,hy,ringScale);   // true scale; the view is what shrank
       }
+      if(sh.proc&&u<1.2) sh.proc.draw(g,'cast',u,hx,hy,2);   // one-shot item proc
       if(!visual){ g.setTransform(1,0,0,1,0,0); g.fillStyle='#e9eef8'; g.font='12px system-ui';
         g.textAlign='center'; g.fillText('Không có hiệu ứng hình ảnh riêng',W/2,H-12); }
     });
