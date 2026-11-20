@@ -104,27 +104,47 @@ def roots(c, base, phase, front=False):
 
 
 def legs(c, base, phase):
-    """Cổ Thụ Trụi Lá: the root mass curled into two thick gnarled legs. A run cycle over 8 phases: the
-    feet swing front / back in turn (a lifted foot rides 2 px up), knobby knees, root toes curling at
-    each foot."""
+    """Cổ Thụ Trụi Lá: the roots curled into two massive legs (user 2026-11-20: the first stubby legs looked
+    clumsy, it must look ferocious). Bow-legged wide stance, thick root-bundle thighs tapering to thorny shins,
+    feet of three root claws digging forward plus a heel spur. A charging run over 8 phases: long strides,
+    the lifted foot high, soil kicked up behind the planted heel. Refs: OpenGameArt treant, pixie.haus
+    menacing treants (weight on two thick root legs, low wide stance)."""
     import math
-    swing = math.sin(phase / 8.0 * 2.0 * math.pi)
-    for side, hip_x in ((-1, 19), (1, 29)):
-        s = swing * side
-        foot_x = round(hip_x + 4 * s)
-        lift = 2 if s > 0.3 else 0   # the leg swinging forward is in the air
-        foot_y = base - lift
-        knee_x = round(hip_x + 2 * s + side)
-        knee_y = base - 6 - lift // 2
-        for (ax, ay), (bx, by), w in (((hip_x, base - 9), (knee_x, knee_y), 4), ((knee_x, knee_y), (foot_x, foot_y), 3)):
-            c.line(ax, ay, bx, by, OUTLINE, w + 1)
-        for (ax, ay), (bx, by), w in (((hip_x, base - 9), (knee_x, knee_y), 4), ((knee_x, knee_y), (foot_x, foot_y), 3)):
-            c.line(ax, ay, bx, by, BARK if side < 0 else ROOT, w)
-        c.pixel(knee_x, knee_y - 1, BARK_L)   # knobby knee
-        c.pixel(knee_x + side, knee_y, BARK_D)
-        for t in (-2, 0, 2):   # root toes curling up at the foot
-            c.pixel(foot_x + t, foot_y, BARK_D)
-            c.pixel(foot_x + t + (1 if t > 0 else -1 if t < 0 else 0), foot_y - 1, BARK_L if t == 0 else BARK)
+    t = phase / 8.0 * 2.0 * math.pi
+    swing = math.sin(t)
+    hip_y = base - 11
+    for side, hip_x in ((-1, 18), (1, 30)):
+        s = swing * side   # > 0: this leg reaches forward (right, the facing)
+        foot_x = round(hip_x + side * 6 + 4 * s)   # a stride that stays under the body (long ones read as spider legs)
+        up = max(0.0, s)
+        foot_y = base - round(3 * up)
+        knee_x = round((hip_x + foot_x) / 2 + side * 3)   # knees bowed out
+        knee_y = hip_y + 5 - round(3 * up)   # the forward knee drives up
+        col = BARK if side < 0 else ROOT
+        thigh = [(hip_x - 3, hip_y), (hip_x + 3, hip_y), (knee_x + 2, knee_y), (knee_x - 2, knee_y)]
+        shin = [(knee_x - 2, knee_y), (knee_x + 2, knee_y), (foot_x + 1, foot_y - 1), (foot_x - 1, foot_y - 1)]
+        for poly in (thigh, shin):   # dark rim, then the bark
+            c.polygon([(x + dx, y + dy) for x, y in poly for dx, dy in ((0, 0),)], OUTLINE)
+        c.polygon(thigh, col)
+        c.polygon(shin, col)
+        c.line(hip_x - 1, hip_y + 1, knee_x - 1, knee_y, BARK_L)   # twisted strands of the root bundle
+        c.line(hip_x + 1, hip_y + 2, knee_x + 1, knee_y - 1, BARK_D)
+        c.line(knee_x, knee_y + 1, foot_x, foot_y - 2, BARK_L)
+        c.pixel(knee_x + side * 2, knee_y, BARK_L)   # knobby knee
+        c.pixel(knee_x + side * 3, knee_y - 1, BARK_D)
+        for k in (2, 4):   # thorns on the outer shin
+            tx = round(knee_x + (foot_x - knee_x) * k / 6) + side * 2
+            ty = round(knee_y + (foot_y - knee_y) * k / 6)
+            c.pixel(tx, ty, BARK_D)
+            c.pixel(tx + side, ty - 1, BARK_L)
+        for dx, dy2 in ((2, 0), (4, -1), (3, 1)):   # three root claws digging forward, a heel spur behind
+            c.line(foot_x, foot_y - 1, foot_x + dx, foot_y - 1 + dy2, BARK_D)
+            c.pixel(foot_x + dx, foot_y - 1 + dy2, BARK_L)
+        c.line(foot_x, foot_y - 1, foot_x - 3, foot_y, BARK_D)
+        if s < -0.6:   # the planted back foot kicks soil up behind it
+            c.pixel(foot_x - 5, foot_y - 3, SOIL_L)
+            c.pixel(foot_x - 6, foot_y - 5, SOIL)
+            c.pixel(foot_x - 4, foot_y - 6, SOIL_L)
     for yy in range(base + 1, base + 4):
         c.line(0, yy, 47, yy, (0, 0, 0, 0))
 
@@ -145,14 +165,20 @@ def crown(c, cx, cy, pulse):
 
 def tree(sway=0, arms=0, legs=0, dy=0, eyes=True, lean=0, glow=False, leaf=-1, mouth=0):
     """sway: canopy offset; arms 0 down, 1 raised, 2 slammed; legs 0/1 shuffle."""
+    if BARE:   # phase 2 always glares, snarls and leans into the charge
+        glow = glow or eyes
+        mouth = max(mouth, 2)   # a snarl of bark teeth
+        lean = lean + 1
+        dy = dy + (1 if legs % 4 in (0, 1) else 0)   # it drops onto each planted foot
     c = Canvas(S, S)
     base = 45
     # trunk (slightly wider at the bottom)
     top = 18 + dy
     # the trunk flares into the root mass at the bottom (no legs)
-    lift = 7 if BARE else 0   # phase 2: the trunk ends at the hips so the two root legs show below it
-    c.polygon([(16 + lean, top), (32 + lean, top), (33, base - 6 - lift), (31, base - 3 - lift), (17, base - 3 - lift),
-               (15, base - 6 - lift)], BARK)
+    lift = 9 if BARE else 0   # phase 2: the trunk ends at the hips so the two root legs show below it
+    flare = 2 if BARE else 0   # and the hips flare wide over them
+    c.polygon([(16 + lean, top), (32 + lean, top), (33 + flare, base - 6 - lift), (31 + flare, base - 3 - lift),
+               (17 - flare, base - 3 - lift), (15 - flare, base - 6 - lift)], BARK)
     c.line(18 + lean, top + 2, 14, base - 5 - lift, BARK_L)
     c.line(30 + lean, top + 4, 34, base - 6 - lift, BARK_D)
     c.line(24 + lean, top + 14, 23, base - 5 - lift, BARK_D)   # crack
