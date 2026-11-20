@@ -145,7 +145,7 @@ def draw_toad(c, pose, s=1.0, ox=0, oy=0, pal=PAL, king=False):
         m2 = _sc(_on_body(body, 0.95, 0.05 + 0.5 * mo), s, ox, oy)
         c.polygon([m1, m0, m2], "#5a1a20")
         c.line(m1[0], m1[1], m2[0], m2[1], "#c85060")      # tongue / pink inside
-        if mo > 0.7:   # poison glob leaving the mouth
+        if mo > 0.7 and not NO_GLOB:   # poison glob leaving the mouth (Cóc Độc Bào Tử shoots its tongue instead)
             gx, gy = m0[0] + round(2 * s), (m0[1] + m2[1]) // 2
             c.ellipse(gx, gy - round(s), gx + round(2 * s), gy + round(s), "#8ad040", fill=True)
             c.pixel(gx + 1, gy - 1, "#c8ff7a")
@@ -171,19 +171,31 @@ def draw_toad(c, pose, s=1.0, ox=0, oy=0, pal=PAL, king=False):
 
 
 CAP, CAP_L, CAP_D, STEM = "#7a3aa8", "#b070e0", "#4a2070", "#e0d8c0"
+# Cóc Độc Bào Tử (Cóc Chúa phase 2, bach-ai design/bosses.md): the crown swells (CROWN_GROW) and glows,
+# puffing spores (CROWN_GLOW; SPORE_PHASE moves the puffs frame to frame). Defaults leave Cóc Chúa as it was.
+CROWN_GROW = 1.0
+CROWN_GLOW = False
+SPORE_PHASE = 0
+NO_GLOB = False
+GLOW, GLOW_L = "#c060ff", "#f0c8ff"
 
 
 def _crown(c, body, s, ox, oy, pose):
     """A crown of toxic mushrooms on the head behind the eye (Cóc Chúa)."""
     for u, h, r in ((-0.05, 3.0, 2.2), (-0.32, 2.2, 1.7), (0.18, 1.6, 1.3)):   # behind the eye
         bx, by = _sc(_on_body(body, u, -0.98), s, ox, oy)
-        hh = round(h * s)
-        rr = round(r * s)
+        hh = round(h * s * CROWN_GROW)
+        rr = round(r * s * CROWN_GROW)
         c.line(bx, by, bx, by - hh, STEM, max(1, round(0.8 * s)))
         c.ellipse(bx - rr, by - hh - rr, bx + rr, by - hh + rr // 2, CAP_D, fill=True)
-        c.ellipse(bx - rr, by - hh - rr, bx + rr, by - hh, CAP, fill=True)
-        c.pixel(bx - rr // 2, by - hh - rr + 1, CAP_L)
-        c.pixel(bx + rr // 2, by - hh - rr // 2, CAP_L)
+        c.ellipse(bx - rr, by - hh - rr, bx + rr, by - hh, GLOW if CROWN_GLOW else CAP, fill=True)
+        c.pixel(bx - rr // 2, by - hh - rr + 1, GLOW_L if CROWN_GLOW else CAP_L)
+        c.pixel(bx + rr // 2, by - hh - rr // 2, GLOW_L if CROWN_GLOW else CAP_L)
+        if CROWN_GLOW:   # spots on the swollen cap and spore puffs rising off it
+            c.pixel(bx, by - hh - rr // 2, CAP_L)
+            for k in range(3):
+                t = (SPORE_PHASE + k * 3) % 8
+                c.pixel(bx - rr + (k * 5 + SPORE_PHASE) % (2 * rr + 1), by - hh - rr - 1 - t, GLOW_L if t < 5 else GLOW)
 
 
 def lerp_pose(a, b, t):

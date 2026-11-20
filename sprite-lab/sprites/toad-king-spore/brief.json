@@ -1,0 +1,58 @@
+{
+  "standard": "creature-v1",
+  "size": "boss",
+  "frames": {
+    "move": [
+      "ngồi bè",
+      "hạ người, họng bắt đầu phồng",
+      "họng phồng",
+      "họng phồng to nhất",
+      "họng xẹp dần",
+      "nhún, chớp mắt",
+      "thân hạ thấp",
+      "nhổm về dáng ngồi"
+    ],
+    "crouch": [
+      "bắt đầu thu mình, dãi độc chảy",
+      "thu mình, đùi nén",
+      "nén sâu hơn, dãi dài",
+      "nén sâu nhất, giữ để người chơi né"
+    ],
+    "jump": [
+      "đạp: thân ngóc lên",
+      "bật: thân ngẩng 30°, chân sau duỗi",
+      "đang lên",
+      "đỉnh: thân duỗi ngang, chân sau duỗi thẳng ra sau",
+      "chúc xuống",
+      "rơi: tay chúc xuống, chân sau thu về trước",
+      "đáp: bẹp, tay xòe",
+      "hồi về dáng ngồi"
+    ],
+    "attack": [
+      "ngửa đầu ra sau, họng phồng",
+      "ngửa thêm, họng căng",
+      "ngửa hết cỡ, họng căng, dãi độc",
+      "há miệng",
+      "phun cục độc",
+      "phun cục thứ hai",
+      "khép miệng",
+      "về dáng ngồi"
+    ],
+    "hurt": [
+      "chớp trắng",
+      "ngửa ra sau, nhắm mắt",
+      "lún xuống",
+      "hồi lại"
+    ],
+    "death": [
+      "trúng đòn chí mạng: chớp",
+      "ngóc lên, mắt nhắm",
+      "đổ xuống",
+      "nằm bẹp",
+      "nảy nhẹ",
+      "nằm yên",
+      "xẹp thành vũng độc",
+      "vũng độc loang, còn vương miện nấm"
+    ]
+  }
+}

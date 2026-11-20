@@ -34,6 +34,11 @@ LEAF_D, LEAF, LEAF_L = "#1e3a22", "#2e5a30", "#4a8040"
 EYE, EYE_L = "#7aff6a", "#e0ffd0"
 MOSS = "#5a8a3a"
 ROOT = "#4e3220"
+# Phase 2, Cổ Thụ Trụi Lá (bach-ai design/bosses.md, user 2026-11-19): BARE drops the canopy for dry
+# twigs round a glowing jade crystal core, and the roots curl into two thick root legs that run.
+BARE = False
+JADE_D, JADE, JADE_L = "#1a7a6a", "#3ad8b8", "#c8fff0"
+TWIG = "#5a4630"
 
 
 def disk(c, x, y, r, col):
@@ -67,6 +72,9 @@ def roots(c, base, phase, front=False):
     Walking: the roots take turns curling their tips up a pixel and straightening (they grip and drag)."""
     if not front:
         return
+    if BARE:
+        legs(c, base, phase)
+        return
     for k, (path, thorns) in enumerate(ROOT_PATHS):
         lift = 2 if (k + phase) % 3 == 0 else 0
         pts = []
@@ -95,6 +103,46 @@ def roots(c, base, phase, front=False):
         c.line(0, yy, 47, yy, (0, 0, 0, 0))
 
 
+def legs(c, base, phase):
+    """Cổ Thụ Trụi Lá: the root mass curled into two thick gnarled legs. A run cycle over 8 phases: the
+    feet swing front / back in turn (a lifted foot rides 2 px up), knobby knees, root toes curling at
+    each foot."""
+    import math
+    swing = math.sin(phase / 8.0 * 2.0 * math.pi)
+    for side, hip_x in ((-1, 19), (1, 29)):
+        s = swing * side
+        foot_x = round(hip_x + 4 * s)
+        lift = 2 if s > 0.3 else 0   # the leg swinging forward is in the air
+        foot_y = base - lift
+        knee_x = round(hip_x + 2 * s + side)
+        knee_y = base - 6 - lift // 2
+        for (ax, ay), (bx, by), w in (((hip_x, base - 9), (knee_x, knee_y), 4), ((knee_x, knee_y), (foot_x, foot_y), 3)):
+            c.line(ax, ay, bx, by, OUTLINE, w + 1)
+        for (ax, ay), (bx, by), w in (((hip_x, base - 9), (knee_x, knee_y), 4), ((knee_x, knee_y), (foot_x, foot_y), 3)):
+            c.line(ax, ay, bx, by, BARK if side < 0 else ROOT, w)
+        c.pixel(knee_x, knee_y - 1, BARK_L)   # knobby knee
+        c.pixel(knee_x + side, knee_y, BARK_D)
+        for t in (-2, 0, 2):   # root toes curling up at the foot
+            c.pixel(foot_x + t, foot_y, BARK_D)
+            c.pixel(foot_x + t + (1 if t > 0 else -1 if t < 0 else 0), foot_y - 1, BARK_L if t == 0 else BARK)
+    for yy in range(base + 1, base + 4):
+        c.line(0, yy, 47, yy, (0, 0, 0, 0))
+
+
+def crown(c, cx, cy, pulse):
+    """Cổ Thụ Trụi Lá's crown: dry bare twigs fanning out and a jade crystal core that pulses."""
+    for dx, dy2 in ((-9, -4), (-6, -9), (0, -11), (6, -9), (9, -4), (-11, 1), (11, 1)):
+        c.line(cx, cy + 2, cx + dx, cy + dy2, TWIG, 1)
+        c.pixel(cx + dx, cy + dy2, BARK_L)
+    c.polygon([(cx, cy - 7), (cx + 4, cy - 2), (cx + 2, cy + 3), (cx - 2, cy + 3), (cx - 4, cy - 2)], JADE_D)
+    c.polygon([(cx, cy - 6), (cx + 3, cy - 2), (cx + 1, cy + 2), (cx - 1, cy + 2), (cx - 3, cy - 2)], JADE)
+    c.line(cx - 1, cy - 4, cx - 2, cy - 1, JADE_L)
+    if pulse:   # the core flares: a glint and a halo of light
+        c.pixel(cx + 1, cy - 5, "#ffffff")
+        for hx, hy in ((-5, -6), (5, -6), (-6, 0), (6, 0), (0, -9)):
+            c.pixel(cx + hx, cy + hy, JADE_L)
+
+
 def tree(sway=0, arms=0, legs=0, dy=0, eyes=True, lean=0, glow=False, leaf=-1, mouth=0):
     """sway: canopy offset; arms 0 down, 1 raised, 2 slammed; legs 0/1 shuffle."""
     c = Canvas(S, S)
@@ -102,10 +150,12 @@ def tree(sway=0, arms=0, legs=0, dy=0, eyes=True, lean=0, glow=False, leaf=-1, m
     # trunk (slightly wider at the bottom)
     top = 18 + dy
     # the trunk flares into the root mass at the bottom (no legs)
-    c.polygon([(16 + lean, top), (32 + lean, top), (33, base - 6), (31, base - 3), (17, base - 3), (15, base - 6)], BARK)
-    c.line(18 + lean, top + 2, 14, base - 5, BARK_L)
-    c.line(30 + lean, top + 4, 34, base - 6, BARK_D)
-    c.line(24 + lean, top + 14, 23, base - 5, BARK_D)   # crack
+    lift = 7 if BARE else 0   # phase 2: the trunk ends at the hips so the two root legs show below it
+    c.polygon([(16 + lean, top), (32 + lean, top), (33, base - 6 - lift), (31, base - 3 - lift), (17, base - 3 - lift),
+               (15, base - 6 - lift)], BARK)
+    c.line(18 + lean, top + 2, 14, base - 5 - lift, BARK_L)
+    c.line(30 + lean, top + 4, 34, base - 6 - lift, BARK_D)
+    c.line(24 + lean, top + 14, 23, base - 5 - lift, BARK_D)   # crack
     roots(c, base, legs, front=True)   # many separate gnarled roots over the trunk foot
     # face
     fy = top + 7
@@ -147,6 +197,10 @@ def tree(sway=0, arms=0, legs=0, dy=0, eyes=True, lean=0, glow=False, leaf=-1, m
     # canopy
     cx = 24 + sway + lean
     cy = top - 4
+    if BARE:   # phase 2: no leaves, a bare crown round the crystal core
+        crown(c, cx, cy, legs % 2 == 0)
+        c.pixel(17 + lean, top + 1, MOSS)
+        return c.outline(OUTLINE)
     for dx, ddy, r in ((-8, 2, 7), (8, 2, 7), (0, -3, 9), (-4, 4, 6), (5, 4, 6)):
         disk(c, cx + dx, cy + ddy, r, LEAF)
     for dx, ddy, r in ((-6, -1, 3), (4, -6, 3), (9, 0, 2)):
@@ -182,6 +236,10 @@ def fallen(k, h=None):
     roots(c, base, k, front=True)   # the stump keeps its roots
     c.polygon([(15, base - h), (33, base - h + 3), (34, base), (14, base)], BARK)
     c.line(23, base - h, 25, base, BARK_D)
+    if BARE:   # the crystal core lies shattered by the stump
+        for n in range(4 + 2 * k):
+            c.pixel(8 + (n * 11) % 32, base - 1 - (n * 5) % 6, JADE if n % 2 else JADE_L)
+        return c.outline(OUTLINE)
     for n in range(10 + 4 * k):
         x = 6 + (n * 13) % 36
         y = base - 2 - (n * 7) % (8 + 6 * (2 - k))
@@ -190,25 +248,30 @@ def fallen(k, h=None):
 
 
 HB = {"shape": "rect", "center": [24.0, 47.0]}
-ANIMATIONS = [
-    # move 8: canopy sways and lags the trunk, roots curl in turn, trunk bobs, a leaf drifts down
-    ("move", [tree(0, 0, 0, 0, leaf=0), tree(1, 0, 1, 1, leaf=1), tree(2, 0, 2, 0, leaf=2), tree(1, 0, 3, 1, leaf=3),
-              tree(0, 0, 4, 0, leaf=4), tree(-1, 0, 5, 1, leaf=5), tree(-2, 0, 6, 0, leaf=6), tree(-1, 0, 7, 1)], 6, True,
-     {"durations_ms": [170, 160, 160, 180, 170, 160, 160, 180], "hitbox": {**HB, "active": [0, 7]}}),
-    # attack 8: eyes blaze, branches rise, roars, rears up high, slams the branches into the ground, impact, recovers
-    ("attack", [tree(0, 0.5, 0, 0, glow=True), tree(0, 1, 0, -1, glow=True), tree(-1, 1, 1, -2, glow=True, mouth=2),
-                tree(-1, 1, 1, -3, glow=True, mouth=3), tree(1, 1.5, 2, -1, glow=True, mouth=2, lean=1),
-                tree(2, 2, 2, 1, glow=True, lean=1), tree(1, 2, 3, 1, glow=True), tree(0, 0.5, 0, 0)], 8, False,
-     {"durations_ms": [160, 180, 200, 260, 80, 160, 160, 160], "hitbox": {**HB, "active": [5, 6]}}),
-    # hurt 4: flash, canopy whips back, groan, settles
-    ("hurt", [flash(tree(1, 0, 0)), tree(-2, 0.5, 1, 0, eyes=False, mouth=1), tree(-1, 0, 2, 1, mouth=1), tree(0, 0, 3)], 12, False,
-     {"durations_ms": [70, 110, 110, 130], "hitbox": {**HB, "active": [0, 3]}}),
-    # death 8: struck, roars, branches drop, the trunk cracks and sinks, splits, leaves scatter, a stump remains
-    ("death", [flash(tree(0, 1, 0, -1, glow=True, mouth=3), 0.4), tree(-1, 1, 1, -1, mouth=3), tree(1, 2, 2, 1, eyes=False),
-               fallen(0, 26), fallen(0), fallen(1, 18), fallen(1), fallen(2)], 6, False,
-     {"durations_ms": [140, 180, 180, 160, 200, 200, 240, 400], "hitbox": {**HB, "active": [0, 7]}}),
-]
+
+
+def build():
+    """The animations, built now (tree-boss-bare sets BARE first, then calls this)."""
+    return [
+        # move 8: canopy sways and lags the trunk, roots curl in turn, trunk bobs, a leaf drifts down
+        ("move", [tree(0, 0, 0, 0, leaf=0), tree(1, 0, 1, 1, leaf=1), tree(2, 0, 2, 0, leaf=2), tree(1, 0, 3, 1, leaf=3),
+                  tree(0, 0, 4, 0, leaf=4), tree(-1, 0, 5, 1, leaf=5), tree(-2, 0, 6, 0, leaf=6), tree(-1, 0, 7, 1)], 6, True,
+         {"durations_ms": [170, 160, 160, 180, 170, 160, 160, 180], "hitbox": {**HB, "active": [0, 7]}}),
+        # attack 8: eyes blaze, branches rise, roars, rears up high, slams the branches into the ground, impact, recovers
+        ("attack", [tree(0, 0.5, 0, 0, glow=True), tree(0, 1, 0, -1, glow=True), tree(-1, 1, 1, -2, glow=True, mouth=2),
+                    tree(-1, 1, 1, -3, glow=True, mouth=3), tree(1, 1.5, 2, -1, glow=True, mouth=2, lean=1),
+                    tree(2, 2, 2, 1, glow=True, lean=1), tree(1, 2, 3, 1, glow=True), tree(0, 0.5, 0, 0)], 8, False,
+         {"durations_ms": [160, 180, 200, 260, 80, 160, 160, 160], "hitbox": {**HB, "active": [5, 6]}}),
+        # hurt 4: flash, canopy whips back, groan, settles
+        ("hurt", [flash(tree(1, 0, 0)), tree(-2, 0.5, 1, 0, eyes=False, mouth=1), tree(-1, 0, 2, 1, mouth=1), tree(0, 0, 3)], 12, False,
+         {"durations_ms": [70, 110, 110, 130], "hitbox": {**HB, "active": [0, 3]}}),
+        # death 8: struck, roars, branches drop, the trunk cracks and sinks, splits, leaves scatter, a stump remains
+        ("death", [flash(tree(0, 1, 0, -1, glow=True, mouth=3), 0.4), tree(-1, 1, 1, -1, mouth=3), tree(1, 2, 2, 1, eyes=False),
+                   fallen(0, 26), fallen(0), fallen(1, 18), fallen(1), fallen(2)], 6, False,
+         {"durations_ms": [140, 180, 180, 160, 200, 200, 240, 400], "hitbox": {**HB, "active": [0, 7]}}),
+    ]
+
 
 if __name__ == "__main__":
-    export(HERE, NAME, ANIMATIONS, anchor=ANCHOR, ground=True, body="move", preview_scale=6, gif_scale=4)
+    export(HERE, NAME, build(), anchor=ANCHOR, ground=True, body="move", preview_scale=6, gif_scale=4)
     print(f"OK {NAME}")

@@ -1,0 +1,141 @@
+{
+  "frames": 28,
+  "frame_size": [
+    48,
+    48
+  ],
+  "fps": 6.0,
+  "loop": true,
+  "anchor": [
+    24.0,
+    47.0
+  ],
+  "anchor_source": "explicit",
+  "animations": [
+    {
+      "name": "move",
+      "start": 0,
+      "frames": 8,
+      "fps": 6.0,
+      "loop": true,
+      "durations_ms": [
+        170.0,
+        160.0,
+        160.0,
+        180.0,
+        170.0,
+        160.0,
+        160.0,
+        180.0
+      ],
+      "hitbox": {
+        "shape": "rect",
+        "center": [
+          24.5,
+          24.5
+        ],
+        "active": [
+          0,
+          7
+        ],
+        "half_w": 19.5,
+        "half_h": 22.5
+      }
+    },
+    {
+      "name": "attack",
+      "start": 8,
+      "frames": 8,
+      "fps": 8.0,
+      "loop": false,
+      "durations_ms": [
+        160.0,
+        180.0,
+        200.0,
+        260.0,
+        80.0,
+        160.0,
+        160.0,
+        160.0
+      ],
+      "hitbox": {
+        "shape": "rect",
+        "center": [
+          25.0,
+          25.0
+        ],
+        "active": [
+          5,
+          6
+        ],
+        "half_w": 19.0,
+        "half_h": 22.0
+      }
+    },
+    {
+      "name": "hurt",
+      "start": 16,
+      "frames": 4,
+      "fps": 12.0,
+      "loop": false,
+      "durations_ms": [
+        70.0,
+        110.0,
+        110.0,
+        130.0
+      ],
+      "hitbox": {
+        "shape": "rect",
+        "center": [
+          24.5,
+          24.5
+        ],
+        "active": [
+          0,
+          3
+        ],
+        "half_w": 19.5,
+        "half_h": 22.5
+      }
+    },
+    {
+      "name": "death",
+      "start": 20,
+      "frames": 8,
+      "fps": 6.0,
+      "loop": false,
+      "durations_ms": [
+        140.0,
+        180.0,
+        180.0,
+        160.0,
+        200.0,
+        200.0,
+        240.0,
+        400.0
+      ],
+      "hitbox": {
+        "shape": "rect",
+        "center": [
+          25.0,
+          24.0
+        ],
+        "active": [
+          0,
+          7
+        ],
+        "half_w": 20.0,
+        "half_h": 23.0
+      }
+    }
+  ],
+  "ground": true,
+  "body": {
+    "anim": "move",
+    "center": [
+      24.5,
+      25.5
+    ],
+    "radius": 16.5
+  }
+}

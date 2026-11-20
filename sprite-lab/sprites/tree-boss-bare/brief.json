@@ -1,0 +1,42 @@
+{
+  "standard": "creature-v1",
+  "size": "boss",
+  "frames": {
+    "move": [
+      "chân trái chạm đất trước, lõi tinh thể sáng",
+      "dồn trọng lượng, thân nhún, chân phải nhấc",
+      "chân phải vung qua, cành khô rung",
+      "chân phải chạm đất, lõi sáng",
+      "chân phải chạm trước, thân nhún",
+      "dồn trọng lượng, chân trái nhấc",
+      "chân trái vung qua, cành khô rung",
+      "chân trái sắp chạm đất, về khung đầu"
+    ],
+    "attack": [
+      "mắt rực, cành nâng nửa chừng, lõi sáng",
+      "giơ cao cành, thân vươn lên",
+      "gầm: thân tách miệng, vươn cao hơn",
+      "giữ thế cao nhất, miệng gầm to (cho người chơi né)",
+      "cành quật xuống, thân ngả tới",
+      "cành cắm xuống đất: rễ gai trồi",
+      "giữ cành dưới đất",
+      "rút cành về, thôi gầm"
+    ],
+    "hurt": [
+      "chớp trắng",
+      "bật ra sau, nhắm mắt, rên",
+      "nhún xuống, chân khuỵu",
+      "đứng lại"
+    ],
+    "death": [
+      "trúng đòn chí mạng: chớp, gầm",
+      "gầm lần cuối, cành giơ",
+      "cành rủ xuống, mắt tắt",
+      "thân nứt, bắt đầu sụp",
+      "gãy, thân thấp hẳn",
+      "sụp thêm, tinh thể vỡ văng",
+      "còn gốc, mảnh tinh thể rơi",
+      "gốc cụt giữa hai chân rễ, mảnh ngọc vương"
+    ]
+  }
+}
