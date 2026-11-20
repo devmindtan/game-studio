@@ -1,0 +1,86 @@
+{
+  "frames": 10,
+  "frame_size": [
+    24,
+    24
+  ],
+  "fps": 1.0,
+  "loop": false,
+  "anchor": [
+    12.0,
+    12.0
+  ],
+  "anchor_source": "explicit",
+  "animations": [
+    {
+      "name": "blade_arc",
+      "start": 0,
+      "frames": 1,
+      "fps": 1.0,
+      "loop": false
+    },
+    {
+      "name": "whirlwind",
+      "start": 1,
+      "frames": 1,
+      "fps": 1.0,
+      "loop": false
+    },
+    {
+      "name": "earth_strike",
+      "start": 2,
+      "frames": 1,
+      "fps": 1.0,
+      "loop": false
+    },
+    {
+      "name": "ground_slam",
+      "start": 3,
+      "frames": 1,
+      "fps": 1.0,
+      "loop": false
+    },
+    {
+      "name": "cleave_wave",
+      "start": 4,
+      "frames": 1,
+      "fps": 1.0,
+      "loop": false
+    },
+    {
+      "name": "holy_column",
+      "start": 5,
+      "frames": 1,
+      "fps": 1.0,
+      "loop": false
+    },
+    {
+      "name": "dash",
+      "start": 6,
+      "frames": 1,
+      "fps": 1.0,
+      "loop": false
+    },
+    {
+      "name": "earthquake",
+      "start": 7,
+      "frames": 1,
+      "fps": 1.0,
+      "loop": false
+    },
+    {
+      "name": "solar_ray",
+      "start": 8,
+      "frames": 1,
+      "fps": 1.0,
+      "loop": false
+    },
+    {
+      "name": "god_hammer",
+      "start": 9,
+      "frames": 1,
+      "fps": 1.0,
+      "loop": false
+    }
+  ]
+}
