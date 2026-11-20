@@ -3,7 +3,8 @@
 
 Nâng cấp từ toad-king đã duyệt (không vẽ lại): cùng dáng, cùng khung 56x48 và neo; cụm nấm trên lưng phình to
 (x1.45), tím rực, có đốm và liên tục nhả khói bào tử (các hạt bào tử bay lên qua từng khung); các nốt sần hai bên đỏ
-rực, phập phồng sáng / tối luân phiên như sắp nổ. attack há miệng không có cục độc (pha 2 phóng lưỡi, không phun). Cùng animation và mô tả khung với toad-king. game đổi sang sheet
+rực, phập phồng sáng / tối luân phiên như sắp nổ; da sẫm bệnh hoạn, gân tím phát sáng trên lưng, mụn rỉ dịch tím,
+mắt vàng rực đồng tử chấm đỏ dưới mày gằn, hàm trễ nhỏ dãi độc tím (người dùng 2026-11-20: phải hùng hổ, ghê rợn). attack há miệng không có cục độc (pha 2 phóng lưỡi, không phun). Cùng animation và mô tả khung với toad-king. game đổi sang sheet
 này khi boss vào pha 2 (monsters.json rage_sprite, Enemies.sheet_of).
 Chạy: gamekit art run toad-king-spore
 """
@@ -16,6 +17,10 @@ HERE = Path(__file__).resolve().parent
 _spec = importlib.util.spec_from_file_location("toad_king_gen", HERE.parent / "toad-king" / "gen.py")
 king = importlib.util.module_from_spec(_spec)
 _spec.loader.exec_module(king)
+
+GRIM_PAL = {"lit": "#6a6a2a", "back": "#454c1e", "side": "#262c12", "belly": "#b0a060", "belly_d": "#857440",
+            "throat": "#b880d0", "gland": "#8a3ab0", "brow": "#120e08"}   # sickly dark skin, a purple throat sac
+
 
 def _mix(a, b, t):
     ca = [int(a[i:i + 2], 16) for i in (1, 3, 5)]
@@ -40,6 +45,9 @@ def transform():
     for n, (pose, red, grow, glow, burst, mouth) in enumerate(steps):
         king.SPORE = False
         king.KPAL = {**base, **{k: _mix(base[k], v, red) for k, v in king.SPORE_PAL.items()}}
+        tk.GRIM = n >= 10   # it bellows with its new face: the last frames match phase 2
+        if tk.GRIM:
+            king.KPAL = {**king.KPAL, **GRIM_PAL}
         tk.CROWN_GROW, tk.CROWN_GLOW, tk.SPORE_PHASE, tk.NO_GLOB = grow, glow, n, True
         extra = {"mouth": mouth} if mouth else {}
         if n in (1, 3):   # squeezes its eyes shut as it strains
@@ -64,6 +72,8 @@ def transform():
 if __name__ == "__main__":
     king.toadkit.NO_GLOB = True
     tf = transform()
+    king.toadkit.GRIM = True   # phase 2 proper (the transform keeps the old face until it bellows)
+    king.KPAL = {**king.KPAL, **GRIM_PAL}
     king.SPORE = True
     king.toadkit.CROWN_GROW = 1.45
     king.toadkit.CROWN_GLOW = True

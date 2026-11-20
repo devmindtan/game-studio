@@ -130,17 +130,26 @@ def draw_toad(c, pose, s=1.0, ox=0, oy=0, pal=PAL, king=False):
     ex, ey = _sc(_on_body(body, 0.6, -1.0), s, ox, oy)   # bulges above the head line
     er = max(2, round(2.2 * s))
     c.ellipse(ex - er, ey - er, ex + er, ey + er, pal["back"], fill=True)
-    if pose.get("eyes", "open") == "open":
+    if pose.get("eyes", "open") == "open" and GRIM:   # burning eye, a red pinprick pupil
+        c.ellipse(ex - er + 1, ey - er + 1, ex + er - 1, ey + er - 1, "#ffd040", fill=True)
+        c.ellipse(ex - er + 2, ey - er + 2, ex + er - 2, ey + er - 2, "#fff4a0", fill=True)
+        c.rect(ex, ey, ex + 1, ey, "#e01810", fill=True)
+    elif pose.get("eyes", "open") == "open":
         c.ellipse(ex - er + 1, ey - er + 1, ex + er - 1, ey + er - 1, pal["eye"], fill=True)
         c.line(ex - er + 1, ey, ex + er - 1, ey, pal["pupil"])          # horizontal pupil
         c.pixel(ex - er + 2, ey - er + 1, "#fff6c8")                     # glint
     else:
         c.line(ex - er + 1, ey, ex + er - 1, ey, pal["pupil"])
     c.line(ex - er, ey - er, ex + er - 1, ey - er - 1, pal["brow"])     # brow ridge
+    if GRIM:   # a heavy brow slanting down to the snout: a scowl
+        c.line(ex - er - 1, ey - er - 2, ex + er, ey - er + 1, pal["brow"])
+        c.line(ex - er, ey - er - 1, ex + er, ey - er + 2, pal["brow"])
     # wide mouth from the snout back under the eye; "mouth" > 0 opens it (spitting)
     m0 = _sc(_on_body(body, 0.98, 0.05), s, ox, oy)
     m1 = _sc(_on_body(body, 0.45, 0.15), s, ox, oy)
     mo = pose.get("mouth", 0)
+    if GRIM:
+        mo = max(mo, 0.3)   # the jaw always hangs open
     if mo > 0.2:
         m2 = _sc(_on_body(body, 0.95, 0.05 + 0.5 * mo), s, ox, oy)
         c.polygon([m1, m0, m2], "#5a1a20")
@@ -160,10 +169,27 @@ def draw_toad(c, pose, s=1.0, ox=0, oy=0, pal=PAL, king=False):
             x, y = _sc(_on_body(body, u, v), s, ox, oy)
             _wart(c, x, y, max(2, round(1.6 * s * m)), pal)
         _crown(c, body, s, ox, oy, pose)
+        if GRIM:
+            for path in (((-0.7, -0.55), (-0.4, -0.7), (-0.1, -0.6), (0.15, -0.75)), ((-0.6, -0.2), (-0.3, -0.35), (0.0, -0.25)),
+                         ((-0.85, 0.05), (-0.6, -0.05), (-0.45, 0.15))):   # glowing purple veins over the back
+                pts = [_sc(_on_body(body, u, v), s, ox, oy) for u, v in path]
+                for (ax, ay), (bx, by) in zip(pts, pts[1:]):
+                    c.line(ax, ay, bx, by, VEIN)
+                c.pixel(pts[1][0], pts[1][1], VEIN_L)
+            for n, (u, v) in enumerate(((-0.5, 0.1), (-0.15, 0.2), (0.2, 0.1))):   # warts ooze purple down the flank
+                x, y = _sc(_on_body(body, u, v), s, ox, oy)
+                drip = 1 + (SPORE_PHASE + n) % 3
+                c.line(x, y + 1, x, y + drip, OOZE)
+                c.pixel(x, y + drip + 1, VEIN_L)
+            mx, my = _sc(_on_body(body, 0.9, 0.2), s, ox, oy)   # poison drool strings from the hanging jaw
+            for k, dx in enumerate((0, -2)):
+                ln = 2 + (SPORE_PHASE + k) % 4
+                c.line(mx + dx, my, mx + dx, my + ln, OOZE)
+                c.pixel(mx + dx, my + ln + 1, VEIN_L)
         if pose.get("drool"):   # poison drips from the mouth corner while it winds up
             dx, dy = _sc(_on_body(body, 0.9, 0.2), s, ox, oy)
-            c.line(dx, dy, dx, dy + round(3 * s), "#8ad040")
-            c.pixel(dx, dy + round(3 * s) + 1, "#c8ff7a")
+            c.line(dx, dy, dx, dy + round(3 * s), OOZE if GRIM else "#8ad040")
+            c.pixel(dx, dy + round(3 * s) + 1, VEIN_L if GRIM else "#c8ff7a")
     else:
         for u, v in WARTS:
             x, y = _sc(_on_body(body, u, v), s, ox, oy)
@@ -177,6 +203,12 @@ CROWN_GROW = 1.0
 CROWN_GLOW = False
 SPORE_PHASE = 0
 NO_GLOB = False
+# Cóc Độc Bào Tử looks ferocious and ghastly (user 2026-11-20): GRIM gives burning eyes with a red pinprick
+# pupil under a heavy scowling brow, a mouth hanging open and drooling purple poison, glowing purple veins
+# over the back and warts oozing purple. Refs: Dragon Quest toxic toad (oozes poison from every pore), Dark
+# Souls basilisk (bulging eyes, beady pinprick pupils).
+GRIM = False
+VEIN, VEIN_L, OOZE = "#7a2aa8", "#d070ff", "#b050e8"
 GLOW, GLOW_L = "#c060ff", "#f0c8ff"
 
 
