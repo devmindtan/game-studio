@@ -181,12 +181,13 @@ def burn(i):
         c.polygon(shape(0.42, 0), mid)
         c.polygon(shape(0.2, 0), core)
 
-    lick = [0, 1, 2, 1, 0, -1, -1, 0][i % N]
-    tongue(C - 5, C + 8, 10 + lick, 3.2, 0.0)
-    tongue(C + 1, C + 8, 14 - lick, 4.2, 2.1)
-    tongue(C + 6, C + 8, 9 + (1 if i % 4 < 2 else 0), 2.8, 4.0)
+    # low flames licking round the feet (user 2026-11-20: tall ones covered the monster)
+    lick = [0, 1, 1, 0, 0, -1, -1, 0][i % N]
+    tongue(C - 5, C + 9, 5 + lick, 2.8, 0.0)
+    tongue(C + 1, C + 9, 7 - lick, 3.4, 2.1)
+    tongue(C + 6, C + 9, 5 + (1 if i % 4 < 2 else 0), 2.6, 4.0)
     for k in range(3):                        # solid embers rising and drifting
-        y = int(C + 2 - ((i * 2 + k * 5) % 14))
+        y = int(C + 5 - ((i * 2 + k * 5) % 8))
         x = C - 4 + k * 5 + round(math.sin(i * 0.8 + k * 1.7) * 1.5)
         _px(c, x, y, mid if k % 2 else core)
     return c.outline("#4a0e06")
