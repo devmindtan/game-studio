@@ -131,26 +131,27 @@ STAR = ["..L..", ".LML.", "LMMML", ".M.M.", "M...M"]
 
 
 def stun(i):
+    """Three solid, outlined five-point stars circling the head (user 2026-11-20: crisp, no faint dots);
+    the back stars are smaller and darker. Opacity comes from the game (statuses.json alpha)."""
     c = Canvas(S, 14)
     cx, cy = 15.5, 7.0
-    for k in range(3):
+
+    def star(x, y, r, fill, light):
+        pts = []
+        for k in range(10):
+            a = -math.pi / 2 + k * math.pi / 5
+            rr = r if k % 2 == 0 else r * 0.45
+            pts.append((x + math.cos(a) * rr, y + math.sin(a) * rr))
+        c.polygon(pts, fill)
+        _px(c, x, y - r * 0.4, light)
+
+    order = sorted(range(3), key=lambda k: math.sin(i * math.tau / N + k * math.tau / 3))
+    for k in order:                           # back stars first
         a = i * math.tau / N + k * math.tau / 3
-        x, y = cx + math.cos(a) * 11, cy + math.sin(a) * 3.5
+        x, y = cx + math.cos(a) * 10, cy + math.sin(a) * 3.0
         front = math.sin(a) > 0
-        pal = {"L": "#ffffff" if front else "#fff2a8", "M": "#ffd04a" if front else "#c9922a"}
-        rows = STAR if front else ["L.", "LM"]          # back stars smaller
-        oy = -2 if front else -1
-        for r, row in enumerate(rows):
-            for q, ch in enumerate(row):
-                if ch != ".":
-                    _px(c, x - len(row) // 2 + q, y + oy + r, pal[ch])
-    # dotted orbit
-    for k in range(24):
-        if (k + i) % 3 == 0:
-            a = k * math.tau / 24
-            if math.sin(a) < 0:
-                _px(c, cx + math.cos(a) * 11, cy + math.sin(a) * 3.5, "#fff2a860")
-    return c
+        star(x, y, 3.4 if front else 2.4, "#ffd04a" if front else "#c9922a", "#ffffff" if front else "#ffe8a0")
+    return c.outline("#3a2a10")
 
 
 # --- burn: a fire halo hugging the monster, not a row of campfires ---------------
@@ -193,27 +194,21 @@ def burn(i):
 
 # --- bleed: wound, drops, pool ----------------------------------------------------
 def bleed(i):
+    """Two solid wound slashes, teardrop drops sliding down, a pool at the feet; dark outline."""
     c = Canvas(S, S)
-    DARK, MID, LIGHT = "#5e0c1a", "#c4202f", "#ff6a6a"
-    # two wounds on the body (3 px slashes, lit top edge)
-    for ox, oy in ((-4, -2), (2, 2)):
-        for k in range(5):
-            x, y = C + ox + k, C + oy - k * 0.6
-            _px(c, x, y, DARK); _px(c, x, y + 1, MID); _px(c, x, y - 1, LIGHT if k % 2 == 0 else MID)
-    # drops (2 px wide) running down, each with a lit top
-    for k, x in enumerate((C - 7, C + 6, C - 2, C + 2)):
-        y = C - 1 + ((i * 2 + k * 4) % 12)
-        for dx in (0, 1):
-            _px(c, x + dx, y, LIGHT if dx == 0 else MID)
-            _px(c, x + dx, y + 1, MID)
-            _px(c, x + dx, y + 2, DARK)
-    # pool under the feet, spreading and shrinking with the loop
-    w = 8 + (i % 4 > 1)
-    for y, half in ((26, w - 2), (27, w), (28, w - 1)):
-        for x in range(int(C - half), int(C + half) + 1):
-            _px(c, x, y, DARK if y == 28 or abs(x - C) > half - 1 else MID)
-    _px(c, C - 3, 26, LIGHT); _px(c, C - 2, 26, LIGHT)
-    return c
+    DARK, MID, LIGHT = "#7a0e1e", "#d0243a", "#ff7a7a"
+    for ox, oy in ((-5, -3), (1, 1)):         # wounds
+        c.polygon([(C + ox, C + oy + 2), (C + ox + 6, C + oy - 2), (C + ox + 7, C + oy - 1), (C + ox + 1, C + oy + 3)], MID)
+        c.line(C + ox + 1, C + oy + 1, C + ox + 6, C + oy - 2, LIGHT)
+    for k, x in enumerate((C - 9, C + 9)):   # drops sliding down beside the wounds
+        y = C + 1 + ((i * 2 + k * 5) % 9)
+        c.polygon([(x, y - 2), (x + 2, y + 1), (x + 1, y + 3), (x - 1, y + 3), (x - 2, y + 1)], MID)
+        _px(c, x - 1, y, LIGHT)
+    w = 7 + (1 if i % 4 > 1 else 0)          # pool
+    c.ellipse(C - w, 25, C + w, 28, MID)
+    c.line(C - w + 2, 25, C - 1, 25, LIGHT)
+    c.line(C - w + 1, 28, C + w - 1, 28, DARK)
+    return c.outline("#2e0610")
 
 
 # --- slow: viscous drag, not a solid ice block ------------------------------------
@@ -221,38 +216,27 @@ def bleed(i):
 # with drips at the feet, big DOWN arrows sinking past the body, and short drag
 # streaks at the sides. Freeze keeps the solid crystal, so the two read apart.
 def slow(i):
+    """A sticky blue puddle at the feet and two solid down-chevrons sinking past the body; dark outline."""
     c = Canvas(S, S)
-    DEEP, MID, FIELD = "#394c62c0", "#626d83d0", "#83aa9ca8"
-    LIGHT, BRIGHT = "#a4c2cd", "#cbdbfc"
-    # sticky pool with a lit surface and two drips
-    for y, half in ((26, 9), (27, 11), (28, 9)):
-        for x in range(int(C - half), int(C + half) + 1):
-            _px(c, x, y, DEEP if y == 28 or abs(x - C) >= half - 1 else MID)
-    for dx in (-6, 5):
-        for j in range(2):
-            _px(c, C + dx, 29 + j, DEEP)
-    for k in range(3):                        # slow bubbles
-        x = C - 6 + ((i + k * 3) % 7) * 2
-        _px(c, x, 25 - (i + k) % 2, LIGHT)
-    # short drag streaks at both sides (the monster is being pulled back)
-    for k in range(2):
-        for x in range(int(C - 13), int(C - 9)):
-            _px(c, x, 11 + k * 6 + (i % 2), FIELD)
-        for x in range(int(C + 9), int(C + 13)):
-            _px(c, x, 13 + k * 6 + (i % 2), FIELD)
-    # two big downward arrows, sinking through the loop
-    for k, x in enumerate((C - 11, C + 11)):
-        y = 6 + ((i * 2 + k * 7) % 14)
-        for j in range(4):
-            _px(c, x, y + j, MID)
-        _px(c, x - 1, y + 3, LIGHT); _px(c, x + 1, y + 3, LIGHT)
-        _px(c, x - 2, y + 2, BRIGHT); _px(c, x + 2, y + 2, BRIGHT)
-        _px(c, x, y + 4, BRIGHT)
-    return c
+    DEEP, MID, LIGHT, BRIGHT = "#2f5a8a", "#4f86c0", "#9cc8ff", "#e0f0ff"
+    c.ellipse(C - 11, 24, C + 11, 29, MID)    # puddle
+    c.line(C - 8, 24, C + 2, 24, LIGHT)
+    c.line(C - 10, 29, C + 10, 29, DEEP)
+    for dx in (-6, 5):                        # drips
+        c.line(C + dx, 29, C + dx, 31, DEEP)
+    for k in range(2):                        # slow bubbles
+        _px(c, C - 4 + ((i + k * 4) % 9), 26 - (i + k) % 2, BRIGHT)
+    for k, x in enumerate((C - 11, C + 11)):  # chevrons sinking
+        y = 5 + ((i * 2 + k * 7) % 13)
+        for dy in (0, 4):
+            c.polygon([(x - 3, y + dy), (x, y + dy + 3), (x + 3, y + dy), (x + 3, y + dy + 2), (x, y + dy + 5), (x - 3, y + dy + 2)],
+                      MID if dy else LIGHT)
+    return c.outline("#14243a")
 
 
 # --- shock: arcs round the body ------------------------------------------------------
 def shock(i):
+    """Solid zigzag arcs crackling round the body (2 px, bright core) with sparks; dark outline."""
     c = Canvas(S, S)
     for k in range(3):
         a0 = (i * 1.7 + k * 2.1) % math.tau
@@ -262,12 +246,13 @@ def shock(i):
             r = R + 2 + (2 if (j + i + k) % 2 else -1)
             pts.append((C + math.cos(a) * r, C + math.sin(a) * r))
         for (xa, ya), (xb, yb) in zip(pts, pts[1:]):
-            _line(c, xa, ya, xb, yb, "#7fe8ff80")
-            _line(c, xa, ya - 1, xb, yb - 1, "#fff6a0" if k != 1 else "#ffffff")
+            c.line(xa, ya, xb, yb, "#7fe8ff", 2)
+            _line(c, xa, ya, xb, yb, "#ffffff" if k == 1 else "#fff6a0")
     for k in range(4):
         a = i * 0.9 + k * 1.6
-        _px(c, C + math.cos(a) * (R + 5), C + math.sin(a) * (R + 5), "#ffe14a")
-    return c
+        x, y = C + math.cos(a) * (R + 5), C + math.sin(a) * (R + 5)
+        _px(c, x, y, "#ffe14a"); _px(c, x + 1, y, "#ffe14a")
+    return c.outline("#10283a")
 
 
 DRAW = {"slow": slow, "stun": stun, "freeze": freeze, "bleed": bleed, "burn": burn, "shock": shock}
