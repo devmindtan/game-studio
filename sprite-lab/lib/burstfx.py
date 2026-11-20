@@ -84,6 +84,30 @@ DUST_L = "#d8c09a"
 EARTH_MS = [70, 60, 55, 55, 60, 70, 80, 90, 100, 110, 120, 130]
 
 
+def _dust_settle(c, cx, cy, radius, age):
+    """Kicked-up dust settling as separate motes, never as a filled disk.
+
+    A uniform dithered disk over the ground reads as a flat veil lying on the
+    arena (user 2026-11-20: "có một lớp màn"), so the dust is 2-3 px clumps with
+    a dark underside, denser near the centre and thinning outward while it drifts.
+    """
+    n = 54 - 10 * age
+    for k in range(n):
+        a = (k * 2.399963 + 0.7) % math.tau
+        d = radius * 0.92 * math.sqrt((k + 0.5) / n)
+        x = cx + math.cos(a) * d + (_h01(k, age, 5) - 0.5) * 4.0
+        y = cy + math.sin(a) * d * 0.78 - age * 1.8 + (_h01(k, age, 9) - 0.5) * 3.0
+        xi, yi = int(round(x)), int(round(y))
+        if not (0 <= xi < c.width and 1 <= yi < c.height):
+            continue
+        if _h01(xi, yi, 3 + age) < 0.2:
+            continue
+        c.pixel(xi, yi, DIRT_D)
+        c.pixel(xi, yi - 1, DUST_L if k % 5 == 0 else DUST)
+        if k % 7 == 0:
+            c.pixel(xi + 1, yi, DUST)
+
+
 def earth_burst(tier, size, radius, seed=31):
     cx = cy = size / 2
     radius = min(radius, size / 2 - 6)
@@ -113,7 +137,7 @@ def earth_burst(tier, size, radius, seed=31):
                     x, y = cx + math.cos(a) * radius * d, cy + math.sin(a) * radius * d * 0.8
                     fk.streak(c, x + rng.uniform(-3, 3), y - rng.uniform(4, 12), 0, -1, 3, DUST_L, DUST)
         if f >= 6:
-            _disk(c, cx, cy - (f - 6), radius * 0.8, DUST, density=0.22 - 0.03 * (f - 6))
+            _dust_settle(c, cx, cy, radius, f - 6)
         if f >= 8:
             _fade(c, min(0.95, 0.1 + 0.2 * (f - 7)))
         out.append(c)
