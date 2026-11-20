@@ -201,6 +201,10 @@ Test của game (`gameplay_rules_test`) chặn sprite có `px_scale` mà sai chu
 - 1 pixel = 1 đơn vị thiết kế; scale nguyên, nearest.
 - Silhouette phải đọc được ở 1x; outline tối 1px hoặc selective outline.
 - Animation: 4–8 frame cho idle/loop, 6–10 cho walk/run; đổi 1–2 pixel mỗi frame; neo cố định qua mọi frame.
+- **Vũ khí dựng từ một trục** (người dùng 2026-11-20: lưỡi Chém kiếm lệch khỏi cán): kiếm/giáo/búa vẽ bằng một hàm
+  nhận (chuôi, mũi) rồi tự tính cán phía sau, chắn tay vuông góc qua chuôi, lưỡi từ chuôi tới mũi (ví dụ `sword()` trong
+  `sprite-lab/sprites/card-icons/gen.py`). Không đặt toạ độ từng bộ phận bằng tay. Soát ảnh phóng to: lưỡi phải mọc từ
+  giữa chắn tay.
 - Nền trong suốt (`RGBA`), không viền quanh cả canvas.
 - **Quái nhảy phải có animation nhảy** (người dùng 2026-11-18): `crouch` (lấy đà, nén) và `jump` (bật → đỉnh →
   rơi → đáp), mọi tư thế đặt chân ở hàng đất trong khung; game nâng sprite theo `hop_height` và giữ bóng.

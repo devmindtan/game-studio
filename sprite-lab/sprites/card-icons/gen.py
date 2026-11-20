@@ -57,6 +57,23 @@ def done(c):
     return c.outline(OUTLINE)
 
 
+def sword(c, hilt, tip, guard=3, grip=4):
+    """A straight sword built on ONE axis from [hilt] (guard centre) to [tip]: grip behind the hilt, a guard
+    perpendicular through the hilt, the blade from the hilt to the tip (user 2026-11-20: hand-placed parts
+    drifted off the axis and the blade stuck out beside its handle). Every sword icon uses this."""
+    import math
+    (hx, hy), (tx, ty) = hilt, tip
+    L = math.hypot(tx - hx, ty - hy)
+    ux, uy = (tx - hx) / L, (ty - hy) / L
+    px, py = -uy, ux
+    c.line(hx, hy, tx, ty, STEEL["m"], 2)
+    c.line(round(hx + ux), round(hy + uy), tx, ty, STEEL["l"])
+    gx, gy = round(hx - ux * grip), round(hy - uy * grip)
+    c.line(hx, hy, gx, gy, WOOD["m"], 2)
+    c.pixel(gx, gy, GOLD["d"])
+    c.line(round(hx - px * guard), round(hy - py * guard), round(hx + px * guard), round(hy + py * guard), GOLD["m"], 2)
+
+
 # --- knight skills -------------------------------------------------------------------------------------------
 
 def blade_arc():
@@ -67,12 +84,7 @@ def blade_arc():
     c.ellipse(4, 4, 19, 20, WIND["l"], fill=False)
     c.rect(9, 5, 23, 23, (0, 0, 0, 0))                       # keep only the left arc
     c.rect(4, 15, 23, 23, (0, 0, 0, 0))
-    c.line(9, 15, 19, 5, STEEL["m"], 2)                      # blade
-    c.line(10, 15, 19, 6, STEEL["l"])
-    c.line(20, 4, 21, 3, STEEL["l"])
-    c.line(6, 15, 11, 20, GOLD["m"], 2)                       # guard
-    c.line(6, 18, 8, 20, WOOD["m"], 2)                        # grip
-    c.pixel(5, 21, GOLD["d"]); c.pixel(6, 21, GOLD["d"])
+    sword(c, (8, 16), (20, 4))
     return done(c)
 
 
@@ -340,9 +352,7 @@ def sharpen():
     """Mài kiếm: a blade drawn across a whetstone, sparks flying."""
     c = new()
     c.rect(2, 16, 21, 21, STONE["m"]); c.line(2, 16, 21, 16, STONE["l"]); c.rect(2, 20, 21, 21, STONE["d"])
-    c.line(4, 15, 20, 5, STEEL["m"], 2); c.line(5, 15, 20, 6, STEEL["l"])
-    c.line(20, 5, 22, 3, STEEL["l"])
-    c.line(1, 12, 5, 16, GOLD["m"], 2)
+    sword(c, (6, 13), (21, 4))
     for (x, y) in ((13, 13), (16, 12), (18, 14), (15, 9)):
         c.pixel(x, y, BOLT["l"]); c.pixel(x + 1, y - 1, BOLT["m"])
     return done(c)
@@ -624,13 +634,113 @@ def sp_star_staff():
     return done(c)
 
 
+# --- lobby / menu icons (nav_*, user 2026-11-20: the lobby buttons get their own icon set) -------------------
+
+def nav_character():
+    """Nhân vật: a knight's helmet bust with a red plume."""
+    c = new()
+    c.polygon([(12, 1), (16, 2), (18, 5), (13, 4)], RED["m"])
+    c.ellipse(5, 4, 18, 17, STEEL["m"]); c.rect(5, 11, 18, 18, STEEL["m"])
+    c.ellipse(6, 5, 11, 9, STEEL["l"]); c.rect(16, 6, 18, 18, STEEL["d"])
+    c.rect(7, 11, 16, 12, STEEL["x"]); c.line(11, 13, 11, 17, STEEL["d"])
+    c.polygon([(2, 19), (21, 19), (23, 23), (0, 23)], RED["d"])
+    return done(c)
+
+
+def nav_deck():
+    """Bộ thẻ: three cards fanned out, the front one gold-framed."""
+    c = new()
+    for k, (pts, col) in enumerate((([(1, 6), (9, 3), (13, 17), (5, 20)], ARC["d"]),
+                                    ([(6, 3), (14, 2), (16, 17), (8, 18)], ICE["d"]))):
+        c.polygon(pts, col)
+    c.rect(10, 4, 20, 20, GOLD["d"]); c.rect(11, 5, 19, 19, "#2a2438")
+    c.polygon([(15, 8), (18, 12), (15, 16), (12, 12)], GOLD["m"]); c.pixel(14, 11, GOLD["l"])
+    return done(c)
+
+
+def nav_gacha():
+    """Gacha: a glowing crystal orb on a gold stand, sparkles round it."""
+    c = new()
+    c.ellipse(4, 2, 19, 17, ARC["d"]); c.ellipse(5, 3, 18, 16, ARC["m"]); c.ellipse(7, 5, 11, 9, ARC["l"])
+    c.pixel(8, 6, "#ffffff")
+    c.polygon([(6, 17), (17, 17), (19, 22), (4, 22)], GOLD["m"]); c.line(5, 21, 18, 21, GOLD["d"])
+    for (x, y) in ((1, 3), (21, 6), (20, 1)):
+        c.pixel(x, y, BOLT["l"])
+    return done(c)
+
+
+def nav_missions():
+    """Nhiệm vụ: a parchment scroll with a green tick."""
+    c = new()
+    c.rect(4, 3, 18, 20, "#e8d8b0"); c.rect(4, 3, 5, 20, "#c8b080")
+    c.rect(3, 1, 19, 3, "#b8905a"); c.rect(3, 20, 19, 22, "#b8905a")
+    for y in (7, 10, 13):
+        c.line(7, y, 12, y, "#8a7050")
+    c.line(12, 15, 15, 18, LEAF["d"], 2); c.line(15, 18, 21, 10, LEAF["d"], 2)
+    c.line(13, 15, 15, 17, LEAF["l"]); c.line(15, 17, 20, 11, LEAF["l"])
+    return done(c)
+
+
+def nav_settings():
+    """Cài đặt: a steel cog."""
+    c = new()
+    import math
+    for k in range(8):
+        a = k * math.pi / 4
+        x, y = 12 + round(math.cos(a) * 9), 12 + round(math.sin(a) * 9)
+        c.rect(x - 2, y - 2, x + 1, y + 1, STEEL["m"])
+    c.ellipse(4, 4, 19, 19, STEEL["m"]); c.ellipse(5, 5, 12, 12, STEEL["l"])
+    c.ellipse(9, 9, 14, 14, "#2a2438")
+    return done(c)
+
+
+def nav_title():
+    """Menu chính: a little house (home)."""
+    c = new()
+    c.polygon([(12, 2), (23, 11), (1, 11)], RED["m"]); c.line(12, 2, 1, 11, RED["l"])
+    c.rect(4, 11, 19, 21, "#e8d8b0"); c.rect(4, 11, 5, 21, "#c8b080")
+    c.rect(10, 14, 14, 21, WOOD["m"]); c.pixel(13, 17, GOLD["m"])
+    return done(c)
+
+
+def nav_tree():
+    """Cây kỹ năng: a small tree whose branches end in glowing nodes."""
+    c = new()
+    c.line(11, 22, 11, 12, WOOD["m"], 3)
+    c.line(11, 13, 5, 7, WOOD["m"], 2); c.line(12, 13, 18, 7, WOOD["m"], 2); c.line(11, 12, 11, 4, WOOD["m"], 2)
+    for (x, y, col) in ((4, 6, LEAF), (18, 6, LEAF), (11, 3, GOLD)):
+        c.ellipse(x - 3, y - 3, x + 3, y + 3, col["d"]); c.ellipse(x - 2, y - 2, x + 1, y + 1, col["l"])
+    c.rect(6, 21, 17, 22, EARTH["d"])
+    return done(c)
+
+
+def nav_equipment():
+    """Trang bị: a breastplate and a sword crossed behind it."""
+    c = new()
+    sword(c, (6, 17), (20, 3))
+    c.polygon([(8, 6), (21, 6), (21, 15), (14, 22), (8, 15)], STEEL["m"])
+    c.polygon([(8, 6), (14, 6), (14, 21), (8, 15)], STEEL["l"])
+    c.pixel(17, 10, RED["m"])
+    return done(c)
+
+
+def nav_stages():
+    """Chọn ải: a red flag planted on a hill (the next stage)."""
+    c = new()
+    c.ellipse(0, 15, 23, 30, LEAF["d"]); c.ellipse(3, 16, 14, 22, LEAF["m"])
+    c.line(10, 2, 10, 17, WOOD["d"], 2)
+    c.polygon([(11, 2), (21, 5), (11, 9)], RED["m"]); c.line(12, 3, 18, 5, RED["l"])
+    return done(c)
+
+
 ICONS = {f.__name__: f for f in (blade_arc, whirlwind, earth_strike, ground_slam, cleave_wave, holy_column, dash,
                                  earthquake, solar_ray, god_hammer, arcane_bolt, fireball, frost_nova, lightning,
                                  thunder_javelin, meteor, void_orb, blizzard, storm, back_slash, sharpen, haste, reach,
                                  vitality, swift, magnet, regen, toughness, extra_strike, arcane_power, quick_cast,
                                  wide_magic, mana_shield, multicast, sp_aegis_helm, sp_aegis_chest, sp_aegis_greaves,
                                  sp_aegis_gauntlets, sp_aegis_boots, sp_aegis_blade, sp_star_hat, sp_star_robe,
-                                 sp_star_pants, sp_star_bracer, sp_star_shoes, sp_star_staff)}
+                                 sp_star_pants, sp_star_bracer, sp_star_shoes, sp_star_staff, nav_character, nav_deck,
+                                 nav_gacha, nav_missions, nav_settings, nav_title, nav_tree, nav_equipment, nav_stages)}
 
 if __name__ == "__main__":
     anims = [(n, [f()], 1, False, {}) for n, f in ICONS.items()]

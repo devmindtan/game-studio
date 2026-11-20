@@ -1,5 +1,5 @@
 {
-  "frames": 46,
+  "frames": 55,
   "frame_size": [
     24,
     24
@@ -330,6 +330,69 @@
     {
       "name": "sp_star_staff",
       "start": 45,
+      "frames": 1,
+      "fps": 1.0,
+      "loop": false
+    },
+    {
+      "name": "nav_character",
+      "start": 46,
+      "frames": 1,
+      "fps": 1.0,
+      "loop": false
+    },
+    {
+      "name": "nav_deck",
+      "start": 47,
+      "frames": 1,
+      "fps": 1.0,
+      "loop": false
+    },
+    {
+      "name": "nav_gacha",
+      "start": 48,
+      "frames": 1,
+      "fps": 1.0,
+      "loop": false
+    },
+    {
+      "name": "nav_missions",
+      "start": 49,
+      "frames": 1,
+      "fps": 1.0,
+      "loop": false
+    },
+    {
+      "name": "nav_settings",
+      "start": 50,
+      "frames": 1,
+      "fps": 1.0,
+      "loop": false
+    },
+    {
+      "name": "nav_title",
+      "start": 51,
+      "frames": 1,
+      "fps": 1.0,
+      "loop": false
+    },
+    {
+      "name": "nav_tree",
+      "start": 52,
+      "frames": 1,
+      "fps": 1.0,
+      "loop": false
+    },
+    {
+      "name": "nav_equipment",
+      "start": 53,
+      "frames": 1,
+      "fps": 1.0,
+      "loop": false
+    },
+    {
+      "name": "nav_stages",
+      "start": 54,
       "frames": 1,
       "fps": 1.0,
       "loop": false
