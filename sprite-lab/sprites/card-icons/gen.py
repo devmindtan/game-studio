@@ -57,21 +57,28 @@ def done(c):
     return c.outline(OUTLINE)
 
 
-def sword(c, hilt, tip, guard=3, grip=4):
-    """A straight sword built on ONE axis from [hilt] (guard centre) to [tip]: grip behind the hilt, a guard
-    perpendicular through the hilt, the blade from the hilt to the tip (user 2026-11-20: hand-placed parts
-    drifted off the axis and the blade stuck out beside its handle). Every sword icon uses this."""
-    import math
+def sword(c, hilt, tip, guard=3, grip=3):
+    """A straight sword on ONE 45-degree axis from [hilt] (guard centre) to [tip], placed pixel by pixel:
+    every part (blade, guard, grip) is two pixels thick with its second pixel on the SAME side (+x), so the
+    blade comes out of the guard's middle (user 2026-11-20, twice: width-2 lines thickened each part on a
+    different side and the blade sat off its handle). Only diagonal swords: tip - hilt must be (+-n, +-n)."""
     (hx, hy), (tx, ty) = hilt, tip
-    L = math.hypot(tx - hx, ty - hy)
-    ux, uy = (tx - hx) / L, (ty - hy) / L
-    px, py = -uy, ux
-    c.line(hx, hy, tx, ty, STEEL["m"], 2)
-    c.line(round(hx + ux), round(hy + uy), tx, ty, STEEL["l"])
-    gx, gy = round(hx - ux * grip), round(hy - uy * grip)
-    c.line(hx, hy, gx, gy, WOOD["m"], 2)
-    c.pixel(gx, gy, GOLD["d"])
-    c.line(round(hx - px * guard), round(hy - py * guard), round(hx + px * guard), round(hy + py * guard), GOLD["m"], 2)
+    n = abs(tx - hx)
+    assert n == abs(ty - hy) and n > 0, "sword(): the axis must be exactly 45 degrees"
+    dx, dy = (1 if tx > hx else -1), (1 if ty > hy else -1)
+
+    def two(x, y, col, col2=None):
+        c.pixel(x, y, col)
+        c.pixel(x + 1, y, col2 or col)
+
+    for k in range(1, n + 1):                              # blade: light edge + steel body
+        two(hx + dx * k, hy + dy * k, STEEL["l"], STEEL["m"])
+    c.pixel(tx + (1 if dx > 0 else 0), ty, STEEL["l"])
+    for k in range(-guard, guard + 1):                     # guard: perpendicular through the hilt
+        two(hx + dx * k, hy - dy * k, GOLD["m"], GOLD["d"])
+    for k in range(1, grip + 1):                           # grip behind the hilt, pommel at its end
+        two(hx - dx * k, hy - dy * k, WOOD["m"], WOOD["d"])
+    two(hx - dx * (grip + 1), hy - dy * (grip + 1), GOLD["d"])
 
 
 # --- knight skills -------------------------------------------------------------------------------------------
@@ -84,7 +91,7 @@ def blade_arc():
     c.ellipse(4, 4, 19, 20, WIND["l"], fill=False)
     c.rect(9, 5, 23, 23, (0, 0, 0, 0))                       # keep only the left arc
     c.rect(4, 15, 23, 23, (0, 0, 0, 0))
-    sword(c, (8, 16), (20, 4))
+    sword(c, (8, 15), (18, 5))
     return done(c)
 
 
@@ -352,7 +359,7 @@ def sharpen():
     """Mài kiếm: a blade drawn across a whetstone, sparks flying."""
     c = new()
     c.rect(2, 16, 21, 21, STONE["m"]); c.line(2, 16, 21, 16, STONE["l"]); c.rect(2, 20, 21, 21, STONE["d"])
-    sword(c, (6, 13), (21, 4))
+    sword(c, (7, 13), (16, 4))
     for (x, y) in ((13, 13), (16, 12), (18, 14), (15, 9)):
         c.pixel(x, y, BOLT["l"]); c.pixel(x + 1, y - 1, BOLT["m"])
     return done(c)
@@ -717,7 +724,7 @@ def nav_tree():
 def nav_equipment():
     """Trang bị: a breastplate and a sword crossed behind it."""
     c = new()
-    sword(c, (6, 17), (20, 3))
+    sword(c, (6, 17), (18, 5))
     c.polygon([(8, 6), (21, 6), (21, 15), (14, 22), (8, 15)], STEEL["m"])
     c.polygon([(8, 6), (14, 6), (14, 21), (8, 15)], STEEL["l"])
     c.pixel(17, 10, RED["m"])
