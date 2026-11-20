@@ -1,5 +1,5 @@
 {
-  "frames": 75,
+  "frames": 79,
   "frame_size": [
     16,
     16
@@ -531,8 +531,36 @@
       "loop": false
     },
     {
-      "name": "item_low_hp",
+      "name": "rarity_common",
       "start": 74,
+      "frames": 1,
+      "fps": 1.0,
+      "loop": false
+    },
+    {
+      "name": "rarity_rare",
+      "start": 75,
+      "frames": 1,
+      "fps": 1.0,
+      "loop": false
+    },
+    {
+      "name": "rarity_epic",
+      "start": 76,
+      "frames": 1,
+      "fps": 1.0,
+      "loop": false
+    },
+    {
+      "name": "rarity_legendary",
+      "start": 77,
+      "frames": 1,
+      "fps": 1.0,
+      "loop": false
+    },
+    {
+      "name": "item_low_hp",
+      "start": 78,
       "frames": 1,
       "fps": 1.0,
       "loop": false

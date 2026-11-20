@@ -863,6 +863,26 @@ ICONS = {
         "...yrrry........", "..yrrrrry.......", ".yrrwrrry.......", ".yrrwrrry.......",
         "..yrrrrry.......", "...yrrry........", "....yyy.........",
     ]),
+    # card rarity (design/card-rarity.md, user 2026-11-20): one SHAPE per tier (Riftbound-style gems), so the
+    # tier reads without colour: Thường round stone, Hiếm rhombus, Sử thi pentagon, Huyền thoại star with rays.
+    "rarity_common": ({"g": "#a8a29a", "l": "#e2ddd2", "d": "#6a645c"}, [
+        "...gggg...", ".gglllgg..", ".glllgggd.", "gglggggggd", "gglgggggd.", "ggggggggdd",
+        "ggggggggdd", ".gggggddd.", ".ggdddddd.", "...dddd...",
+    ]),
+    "rarity_rare": ({"b": "#3f8fe0", "l": "#a8dcff", "w": "#ffffff", "d": "#1f4f8a"}, [
+        "......w......", ".....blb.....", "....bllbb....", "...bllbbbb...", "..bllbbbbbb..",
+        ".bwlbbbbbbbd.", "..bbbbbbbbd..", "...bbbbbbd...", "....bbbbd....", ".....bdd.....", "......d......",
+    ]),
+    "rarity_epic": ({"p": "#9a5ad8", "l": "#e0b8ff", "w": "#ffffff", "d": "#5a2a8a", "m": "#c38df5"}, [
+        "......w......", ".....plp.....", "...ppllmpp...", ".ppllllmmppp.", "pplllllmmmppd",
+        "pllllllmmmmpd", ".pllllpmmmpd.", ".ppllpppmmpd.", "..pplpppppd..", "..pppppppdd..",
+        "...ppddddd...",
+    ]),
+    "rarity_legendary": ({"y": "#f2b64a", "l": "#fff2a0", "w": "#ffffff", "o": "#c0701a", "r": "#ff5a3a"}, [
+        "w.....l.....w..", ".w....y....w...", "......y........", ".....yly.......", "yyyyyylllyyyyy.",
+        ".yylllrlllyyo..", "..yyllrllyyo...", "...yylllyyo....", "..yyyyoyyyo....", ".yyyo...oyyo...",
+        "yyo.......oyo..", "w............w.",
+    ]),
     "item_low_hp": ({"y": "#f2c14e", "s": "#9a8e80", "d": "#5a5048", "r": "#ff6a2a"}, [
         "..yyyyyyyyyy..", ".yssssssssssy.", "yssdsdssdsssy.", "yssdsdssdsssy.",
         "ysssssrsssssy.", "ysssssrsssssy.", "ydsssrrssssdy.", "ysdssrrsssdsy.",
