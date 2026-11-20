@@ -150,7 +150,8 @@ Test của game (`gameplay_rules_test`) chặn sprite có `px_scale` mà sai chu
    đổi < 4 % giữa các khung `move` (chỉ chân động).
 8. **Dạng pha 2 / phẫn nộ phải trông dữ hơn dạng thường** (người dùng 2026-11-20: chân Cổ Thụ Trụi Lá "xấu, phải hùng
    hổ hơn"): dáng thấp và rộng, chân/tay to dồn trọng lượng, đầu gối choãi, vuốt bám đất, thân chúi tới, mặt cau
-   nhe nanh. Chi mảnh, ngắn, đứng sát nhau trông ngây ngô. Chi duỗi dài nằm ngang trông như chân nhện. Xem ở 5×
+   nhe nanh. Chi mảnh, ngắn, đứng sát nhau trông ngây ngô. Chi duỗi dài nằm ngang trông như chân nhện. Thêm chân thì **giữ chiều cao thân** (nâng đỉnh thân, đừng rút đáy
+   thân lên: người dùng chê "thân cụt ngủn"); tay quái dữ có vuốt nhọn (Cổ Thụ: bàn tay quỷ bằng cành sắt). Xem ở 5×
    cả 8 khung `move` trước khi báo xong.
 9. **Boss đổi pha phải có animation `transform`** (≥ 8 khung, ~1,5 s, người dùng 2026-11-20: "thiếu animation chuyển
    trạng thái") trong sheet pha 2: khựng → biến hình từng bước → gầm. Chỉ chớp màu là không đủ (test

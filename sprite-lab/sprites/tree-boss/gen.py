@@ -52,6 +52,7 @@ def _legs_on():
     return BARE if LEGS is None else LEGS
 JADE_D, JADE, JADE_L = "#1a7a6a", "#3ad8b8", "#c8fff0"
 TWIG = "#5a4630"
+IRON, IRON_L = "#3a3a46", "#a8a8b8"   # Cổ Thụ Trụi Lá's claws: branch tips gone hard and sharp as iron
 
 
 def disk(c, x, y, r, col):
@@ -164,7 +165,7 @@ def legs(c, base, phase):
 
 def crown(c, cx, cy, pulse):
     """Cổ Thụ Trụi Lá's crown: dry bare twigs fanning out and a jade crystal core that pulses."""
-    for dx, dy2 in ((-9, -4), (-6, -9), (0, -11), (6, -9), (9, -4), (-11, 1), (11, 1)):
+    for dx, dy2 in ((-9, -3), (-6, -7), (0, -8), (6, -7), (9, -3), (-11, 1), (11, 1)):
         c.line(cx, cy + 2, cx + dx, cy + dy2, TWIG, 1)
         c.pixel(cx + dx, cy + dy2, BARK_L)
     c.polygon([(cx, cy - 7), (cx + 4, cy - 2), (cx + 2, cy + 3), (cx - 2, cy + 3), (cx - 4, cy - 2)], JADE_D)
@@ -186,7 +187,7 @@ def tree(sway=0, arms=0, legs=0, dy=0, eyes=True, lean=0, glow=False, leaf=-1, m
     c = Canvas(S, S)
     base = 45
     # trunk (slightly wider at the bottom)
-    top = 18 + dy
+    top = 18 + dy - (5 if _crown_on() else 0)   # phase 2: the trunk keeps its height above the legs (user 2026-11-20: it looked stubby)
     # the trunk flares into the root mass at the bottom (no legs)
     lift = 9 if _legs_on() else 0   # phase 2: the trunk ends at the hips so the two root legs show below it
     flare = 2 if _legs_on() else 0   # and the hips flare wide over them
@@ -233,6 +234,25 @@ def tree(sway=0, arms=0, legs=0, dy=0, eyes=True, lean=0, glow=False, leaf=-1, m
     else:
         c.line(16, top + 6, 8, base - 2, BARK, 2); c.line(8, base - 2, 7, base, BARK_D)
         c.line(32, top + 6, 41, base - 2, BARK, 2); c.line(41, base - 2, 42, base, BARK_D)
+    if _crown_on():   # phase 2: demon hands, sharp iron-dark branch claws spread at each hand (user 2026-11-20)
+        hands = {0: ((7, top + 5), (41, top + 5)), 0.5: ((6, top - 2), (42, top - 2)), 1: ((6, top - 8), (43, top - 8)),
+                 1.5: ((6, top + 16), (42, top + 16))}.get(arms, ((7, base - 2), (42, base - 2)))
+        for (hx, hy), side in zip(hands, (-1, 1)):
+            for ang in (-60, -25, 10, 45):   # four hooked claws fanning out of the hand
+                import math
+                a = math.radians(ang) if side > 0 else math.pi - math.radians(ang)
+                if arms == 1:   # raised: the claws point up
+                    a -= math.pi / 2 * side * 0.6
+                mx, my = round(hx + math.cos(a) * 3), min(base - 1, round(hy - math.sin(a) * 3))
+                tx = max(1, min(S - 2, round(hx + math.cos(a) * 6)))   # inside the frame (the outline needs a pixel)
+                ty = min(base - 1, round(hy - math.sin(a) * 6))   # above the floor: the outline goes one lower
+                c.line(hx, hy, mx, my, IRON, 2)   # thick at the knuckle
+                c.line(mx, my, tx, ty, IRON, 1)   # tapering to a needle point
+                hook = -1 if ty < hy else 1
+                c.pixel(tx, min(base - 1, ty + hook), IRON)   # the point hooks back
+                c.pixel(tx, ty, IRON_L)
+                c.pixel(mx, my, IRON_L)
+            c.rect(hx - 1, hy - 1, hx + 1, hy + 1, BARK_D, fill=True)   # the knotted wrist
     # canopy
     cx = 24 + sway + lean
     cy = top - 4
