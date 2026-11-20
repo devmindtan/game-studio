@@ -218,7 +218,15 @@ def tree(sway=0, arms=0, legs=0, dy=0, eyes=True, lean=0, glow=False, leaf=-1, m
         c.line(21 + lean, fy + 5, 28 + lean, fy + 5, BARK_D)
         c.pixel(29 + lean, fy + 6, BARK_D)
     # branch arms
-    if arms == 0:
+    swing_y = (0, 0)
+    if _crown_on() and arms == 0:   # phase 2 runs swinging its arms against its legs (the upper body is alive)
+        import math
+        sw = math.sin(legs / 8.0 * 2.0 * math.pi)
+        swing_y = (round(-3 * sw), round(3 * sw))
+        for (sx, ex, side), dyh in zip(((16, 7, -1), (32, 41, 1)), swing_y):
+            c.line(sx, top + 6, ex + side * 2, top + 7 + dyh, BARK, 2)
+            c.line(ex + side * 2, top + 7 + dyh, ex, top + 5 + dyh, BARK_D)
+    elif arms == 0:
         # resting branches stay at the shoulders and bend up: branches reaching the ground read as legs
         c.line(16, top + 6, 10, top + 9, BARK, 2); c.line(10, top + 9, 7, top + 5, BARK_D); c.pixel(6, top + 4, LEAF)
         c.line(32, top + 6, 38, top + 9, BARK, 2); c.line(38, top + 9, 41, top + 5, BARK_D); c.pixel(42, top + 4, LEAF)
@@ -235,7 +243,7 @@ def tree(sway=0, arms=0, legs=0, dy=0, eyes=True, lean=0, glow=False, leaf=-1, m
         c.line(16, top + 6, 8, base - 2, BARK, 2); c.line(8, base - 2, 7, base, BARK_D)
         c.line(32, top + 6, 41, base - 2, BARK, 2); c.line(41, base - 2, 42, base, BARK_D)
     if _crown_on():   # phase 2: demon hands, sharp iron-dark branch claws spread at each hand (user 2026-11-20)
-        hands = {0: ((7, top + 5), (41, top + 5)), 0.5: ((6, top - 2), (42, top - 2)), 1: ((6, top - 8), (43, top - 8)),
+        hands = {0: ((7, top + 5 + swing_y[0]), (41, top + 5 + swing_y[1])), 0.5: ((6, top - 2), (42, top - 2)), 1: ((6, top - 8), (43, top - 8)),
                  1.5: ((6, top + 16), (42, top + 16))}.get(arms, ((7, base - 2), (42, base - 2)))
         for (hx, hy), side in zip(hands, (-1, 1)):
             for ang in (-60, -25, 10, 45):   # four hooked claws fanning out of the hand
@@ -256,8 +264,8 @@ def tree(sway=0, arms=0, legs=0, dy=0, eyes=True, lean=0, glow=False, leaf=-1, m
     # canopy
     cx = 24 + sway + lean
     cy = top - 4
-    if _crown_on():   # phase 2: no leaves, a bare crown round the crystal core
-        crown(c, cx, cy, legs % 2 == 0)
+    if _crown_on():   # phase 2: no leaves, a bare crown round the crystal core, fixed to the trunk top
+        crown(c, 24 + lean, cy, legs % 2 == 0)   # (user 2026-11-20: it slid side to side: sway is for the leafy canopy)
         c.pixel(17 + lean, top + 1, MOSS)
         return c.outline(OUTLINE)
     keep = 1.0 - shed   # transform: the canopy thins and its leaves burst outward
