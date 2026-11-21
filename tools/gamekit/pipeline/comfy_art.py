@@ -282,6 +282,108 @@ def cmd_animate(args):
     print(f"ok {len(results)} frames -> {out_dir}")
 
 
+# --- concept: AI chỉ để chốt ngoại hình, rồi pixel hoá về đúng cỡ sprite ---------------
+
+def pixelize(img, height: int = 30, colors: int = 12, bg_tol: int = 40):
+    """Ảnh SDXL (768², 'pixel art' giả, mờ) -> sprite tham chiếu thật: nền trong suốt, nhân vật cao `height` px,
+    tối đa `colors` màu, không dither.
+
+    Ảnh gốc mờ vì "pixel" của model không khớp lưới và có chuyển màu (người dùng 2026-11-21); thu nhỏ BOX về
+    đúng chiều cao sprite rồi lượng tử hoá cho ra pixel sắc, màu phẳng như sprite trong game.
+    Nền = màu trung vị của viền ảnh; pixel khác nền quá `bg_tol` là nhân vật.
+    """
+    from PIL import Image
+    im = img.convert("RGB")
+    w, h = im.size
+    px = im.load()
+    border = [px[x, y] for x in range(0, w, 4) for y in (0, h - 1)] + \
+             [px[x, y] for y in range(0, h, 4) for x in (0, w - 1)]
+    bg = tuple(sorted(c[i] for c in border)[len(border) // 2] for i in range(3))
+    mask = Image.new("L", (w, h), 0)
+    mp = mask.load()
+    for y in range(h):
+        for x in range(w):
+            r, g, b = px[x, y]
+            if abs(r - bg[0]) + abs(g - bg[1]) + abs(b - bg[2]) > bg_tol:
+                mp[x, y] = 255
+    box = mask.getbbox()
+    if not box:
+        raise ValueError("không tách được nhân vật khỏi nền")
+    im, mask = im.crop(box), mask.crop(box)
+    # Lượng tử ở độ phân giải gốc (chỉ pixel nhân vật), rồi mỗi ô lấy màu NHIỀU NHẤT: thu nhỏ BOX trộn màu
+    # nên mặt/khăn nhỏ thành màu bùn (đã thấy 2026-11-21).
+    # Palette chỉ từ pixel nhân vật (nền xám từng chiếm 9/12 màu và nuốt màu da); FASTOCTREE giữ vùng màu nhỏ.
+    mp = mask.load()
+    ip = im.load()
+    fg = [ip[x, y] for y in range(im.height) for x in range(im.width) if mp[x, y]]
+    sample = Image.new("RGB", (len(fg), 1))
+    sample.putdata(fg)
+    palimg = sample.quantize(colors, method=Image.Quantize.FASTOCTREE, dither=Image.Dither.NONE)
+    q = im.quantize(palette=palimg, dither=Image.Dither.NONE)
+    pal = q.getpalette()
+    qp = q.load()
+    tw = max(1, round(im.width * height / im.height))
+    out = Image.new("RGBA", (tw, height), (0, 0, 0, 0))
+    op = out.load()
+    for ty in range(height):
+        y0, y1 = ty * im.height // height, max(ty * im.height // height + 1, (ty + 1) * im.height // height)
+        for tx in range(tw):
+            x0, x1 = tx * im.width // tw, max(tx * im.width // tw + 1, (tx + 1) * im.width // tw)
+            votes, inside, total = {}, 0, 0
+            for y in range(y0, y1):
+                for x in range(x0, x1):
+                    total += 1
+                    if mp[x, y]:
+                        inside += 1
+                        i = qp[x, y]
+                        votes[i] = votes.get(i, 0) + 1
+            if inside * 2 >= total:
+                i = max(votes, key=votes.get)
+                op[tx, ty] = (pal[i * 3], pal[i * 3 + 1], pal[i * 3 + 2], 255)
+    return out
+
+
+def palette_of(img) -> list[dict]:
+    """Màu của các pixel đặc, nhiều trước: [{"hex": "#rrggbb", "count": n}]."""
+    counts = {}
+    for r, g, b, a in img.getdata():
+        if a:
+            counts[(r, g, b)] = counts.get((r, g, b), 0) + 1
+    return [{"hex": "#%02x%02x%02x" % c, "count": n} for c, n in sorted(counts.items(), key=lambda kv: -kv[1])]
+
+
+def cmd_concept(args):
+    """N seed -> <dir>/raw_<seed>.png (ảnh AI), <seed>.png (pixel 1x), <seed>.json (palette), sheet.png (xem)."""
+    from PIL import Image
+    out = Path(args.dir)
+    out.mkdir(parents=True, exist_ok=True)
+    seeds = [args.seed + i for i in range(args.seeds)]
+    tiles = []
+    for s in seeds:
+        raw = out / f"raw_{s}.png"
+        wf = workflow_keyframe(args.prompt, seed=s, size=args.size, filename_prefix="gameart/concept")
+        t0 = time.time()
+        imgs = extract_images(run_prompt(args.api, wf, timeout=args.timeout))
+        if not imgs:
+            raise SystemExit("không có ảnh output")
+        download_image(args.api, imgs[0], raw)
+        px = pixelize(Image.open(raw), args.height, args.colors)
+        px.save(out / f"{s}.png")
+        (out / f"{s}.json").write_text(json.dumps({"seed": s, "prompt": args.prompt, "height": args.height,
+                                                   "palette": palette_of(px)}, indent=2) + "\n")
+        tiles.append((Image.open(raw).convert("RGB"), px))
+        print(f"  seed {s}: {out / f'{s}.png'} {px.width}x{px.height} {round(time.time() - t0, 1)}s")
+    # sheet.png: hàng trên ảnh AI thu nhỏ, hàng dưới bản pixel phóng NEAREST cùng cỡ
+    cell = 8 * args.height
+    sheet = Image.new("RGB", (cell * len(tiles), cell * 2), (40, 42, 54))
+    for i, (raw, px) in enumerate(tiles):
+        sheet.paste(raw.resize((cell, cell)), (i * cell, 0))
+        big = px.resize((px.width * 8, px.height * 8), Image.NEAREST)
+        sheet.paste(big, (i * cell + (cell - big.width) // 2, cell + (cell - big.height) // 2), big)
+    sheet.save(out / "sheet.png")
+    print(f"ok {len(tiles)} concept -> {out / 'sheet.png'} (chọn một seed, dùng palette trong <seed>.json)")
+
+
 def cmd_workflow(args):
     if args.kind == "keyframe":
         wf = workflow_keyframe("PROMPT", filename_prefix="gameart/keyframe")
@@ -314,6 +416,14 @@ def main(argv=None):
     p.add_argument("--size", type=int, default=512)
     p.add_argument("--control", type=float, default=0.8)
     p.add_argument("--ip-weight", type=float, default=0.85)
+    p = sub.add_parser("concept", help="chốt ngoại hình: N ảnh AI -> sprite tham chiếu pixel + palette")
+    p.add_argument("--prompt", required=True)
+    p.add_argument("--dir", required=True)
+    p.add_argument("--seeds", type=int, default=3)
+    p.add_argument("--seed", type=int, default=101)
+    p.add_argument("--size", type=int, default=768)
+    p.add_argument("--height", type=int, default=30, help="chiều cao nhân vật (px) trong sprite")
+    p.add_argument("--colors", type=int, default=12)
     p = sub.add_parser("workflow")
     p.add_argument("kind", choices=["keyframe", "animate"])
     a = ap.parse_args(argv)
@@ -323,6 +433,8 @@ def main(argv=None):
         cmd_keyframe(a)
     elif a.cmd == "animate":
         cmd_animate(a)
+    elif a.cmd == "concept":
+        cmd_concept(a)
     elif a.cmd == "workflow":
         cmd_workflow(a)
 

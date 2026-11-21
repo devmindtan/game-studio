@@ -53,6 +53,11 @@ Model nằm trong `~/gameart-gpu/app/models/` (riêng, không dùng chung symlin
 - `animate` (SD1.5 + ControlNet OpenPose + IP-Adapter, 512²/20 step): ~17 s/frame. Nhân vật theo dáng nhưng chi
   tiết (vũ khí, màu) trôi giữa các frame, nên chỉ dùng làm tham chiếu dáng, không làm frame game.
 
+## Dùng trong quy trình sprite
+
+`gamekit art concept <tên> "<prompt>"` tự `start`/`release` dịch vụ, tạo concept và pixel hoá (xem skill
+`pixel-sprite`, bước 0). AI chỉ chốt ngoại hình; animation vẽ bằng `minifig`/rig trong Sprite Lab.
+
 ## Quy tắc
 
 - Không tải model ComfyUI/diffusion nặng về laptop; tải lên máy GPU.

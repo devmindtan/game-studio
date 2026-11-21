@@ -55,6 +55,13 @@ chọn nguồn `.poses.json` nếu sprite có file đó; sprite dùng `gen.py` t
 
 ## Quy trình (đủ các bước mới được báo xong)
 
+0. **Chốt ngoại hình bằng concept AI** (nhân vật/quái mới; người dùng 2026-11-21: AI chỉ để xác định ngoại hình,
+   **không** dùng model để làm animation): `gamekit art concept <tên> "<prompt tiếng Anh>" [--seeds 4] [--height 30]`
+   chạy SDXL trên máy GPU (`tools/gpuhost`, ~10 s/ảnh) và pixel hoá về đúng cỡ sprite →
+   `sprites/<tên>/concept/<seed>.png` (1x, nền trong) + `<seed>.json` (palette) + `sheet.png` (xem). Ảnh AI gốc
+   mờ, **không** dùng trực tiếp. Chọn một seed, ghi vào docstring `gen.py`, lấy palette từ `<seed>.json`, rồi
+   vẽ bằng `minifig` cùng chuẩn với nhân vật của game (48×48, neo (24,44), lớp đồ). Không có máy GPU thì bỏ
+   bước này và nói rõ. Sprite mới phải có dòng trong `sprite-lab/sprite-tags.json`, nếu không web chỉ hiện ở "Tất cả".
 1. **Chốt spec**: kích thước (16/24/32/48/64; nhân vật cao thì chừa khoảng trống phía trên cho nhảy), palette
    4–16 màu, hướng nhìn (mặc định quay phải), **điểm neo** (nhân vật đứng: giữa hai bàn chân trên mặt đất;
    vật bay: tâm thân; đạn/giọt: đầu va chạm), danh sách animation với số frame/fps/loop. Mơ hồ thì chọn mặc

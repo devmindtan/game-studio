@@ -87,6 +87,7 @@ Sprite Lab (sprite-lab/: make + test sprites here, then promote into a game)
   art tiers <skill>                 tiers <skill>-i..v side by side: check each keeps the previous motif
   art promote <name> <game>         copy strip + json into games/<g>/assets/sprites/custom/<name>/
   art ase|open <name>               .ase for editing by hand in LibreSprite
+  art concept <name> "<prompt>" [--seeds N]  AI (GPU) chốt ngoại hình -> sprite tham chiếu pixel + palette
   art comfy smoke|keyframe|animate|workflow  ComfyUI on GPU host (gpuhost), pixel art/FX tests
 
   hires <game> [names]         x4 Scale2x copies of skill sprites (drawn big): denser pixels, same size
@@ -666,6 +667,10 @@ art_rig() {
       art_check_one "$n"
       # keep the web viewer's manifest current (image URLs carry ?v=<mtime>)
       [[ -f "$LAB/build_manifest.py" ]] && python3 "$LAB/build_manifest.py" --quiet
+      # chưa có nhãn thì web viewer chỉ hiện ở "Tất cả", không vào nhóm (người dùng 2026-11-21: "không thấy trên web")
+      python3 -c 'import json,sys; sys.exit(0 if sys.argv[2] in json.load(open(sys.argv[1])) else 1)' \
+        "$LAB/sprite-tags.json" "$n" 2>/dev/null \
+        || echo "   CẢNH BÁO: $n chưa có trong sprite-lab/sprite-tags.json → web chỉ hiện ở 'Tất cả'; thêm {\"cat\": …, \"tags\": […]}"
       echo "   preview: sprite-lab/sprites/$n/preview.png"
       ;;
     *) die "usage: gamekit art rig new <name> [hero|hero-sword|knight] | validate <name> | inspect <name> [animation] | motion <name> <animation> [speed] | build <name>" ;;
@@ -809,10 +814,21 @@ cmd_art() {
       lab_ready
       cmd_test "$LAB"
       ;;
+    concept)  # bước đầu của nhân vật/quái mới: AI (GPU) chỉ chốt ngoại hình -> sprite tham chiếu pixel + palette
+      n="$(art_name "${1:-}")"; shift
+      [[ -n "${1:-}" ]] || die "usage: gamekit art concept <name> \"<prompt>\" [--seeds N] [--height PX] [--colors N]"
+      local prompt="$1"; shift
+      local gh="$WS/tools/gpuhost/gpuhost" lease="$$" rc=0
+      "$gh" start comfyui --lease "$lease" >/dev/null || die "GPU host not ready: $gh status"
+      python3 "$KIT/pipeline/comfy_art.py" concept --prompt "$prompt" --dir "$LAB/sprites/$n/concept" "$@" || rc=$?
+      "$gh" release comfyui --lease "$lease" >/dev/null || true
+      (( rc == 0 )) || die "concept failed"
+      echo "Next: xem sprite-lab/sprites/$n/concept/sheet.png, chọn seed, vẽ gen.py theo <seed>.png + <seed>.json"
+      ;;
     comfy)  # ComfyUI workflow on GPU host (gpuhost tunnel must be up: tools/gpuhost/gpuhost start comfyui)
       python3 "$KIT/pipeline/comfy_art.py" "$@"
       ;;
-    *) die "usage: gamekit art new|rig|run|lab|shot|check|list|promote|ase|open|test|comfy ... (gamekit help)" ;;
+    *) die "usage: gamekit art new|rig|concept|run|lab|shot|check|list|promote|ase|open|test|comfy ... (gamekit help)" ;;
   esac
 }
 
