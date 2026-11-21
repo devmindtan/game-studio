@@ -111,6 +111,7 @@ xuất kéo dài thì khuyên người dùng mở phiên mới ở đó.
 - **README của game nói về game** (cách chơi, phím, cấu trúc, ai sở hữu thư mục nào). Tài liệu về công cụ
   nằm ở `tools/gamekit/README.md` và trong template, không chép vào game.
 - API Godot 4.7: tra `games/<g>/docs/engine-reference/godot/` trước khi dùng API mà mình không chắc.
+- **Lọc output không được che lỗi:** lệnh `gamekit … | tail` (hoặc `| grep`) nối `&& git commit` thì phải `setopt pipefail` trước (zsh), nếu không exit của gamekit bị mất và commit vẫn chạy (bài học 2026-11-21).
 - **Shell là zsh.** Không dựa vào word splitting (`set -- $s`, `for x in $list` với chuỗi có dấu cách): gọi
   từng lệnh riêng hoặc dùng mảng. **Không gom nhiều đường dẫn vào một biến** (`L="a b"; git add $L` hỏng):
   viết thẳng các đường dẫn vào lệnh. Script trong `tools/gamekit` viết bằng bash (`#!/usr/bin/env bash`).
