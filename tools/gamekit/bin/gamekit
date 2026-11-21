@@ -195,6 +195,12 @@ cmd_tidy() {
       [[ -f "$a" ]] && { rm -f "$a"; n=$((n + 1)); }
     done
     (( n > 0 )) && echo "   removed $n Unity / Unreal agents (engine: Godot)"
+    # other engines' API snapshots and the console certification template (review 2026-11-21); Steam / itch stay
+    local d
+    for d in "$game"/docs/engine-reference/unity "$game"/docs/engine-reference/unreal "$game"/docs/engine-reference/web \
+             "$game"/.claude/docs/templates/certification-console.md; do
+      [[ -e "$d" ]] && { rm -rf "$d"; echo "   removed ${d#"$game"/} (engine: Godot)"; }
+    done
   fi
   agents_link_game 0 "$game"
   # origin pointed at the framework; keep it as 'framework' so 'origin' is free for the game's own remote.
