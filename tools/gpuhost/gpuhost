@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+# Thin launcher: run gpuhost.py with the system python (stdlib only, see README.md).
+set -euo pipefail
+here="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+exec python3 "$here/gpuhost.py" "$@"

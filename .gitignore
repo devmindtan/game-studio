@@ -31,3 +31,9 @@ __pycache__/
 
 # Repomix dumps: local debug only, never committed (user 2026-11-21)
 /repomix-output.xml
+
+# ComfyUI install (models ~GB, local only)
+/tools/comfyui/
+
+# Máy GPU: cấu hình riêng của từng máy, log tunnel và lease (tools/gpuhost)
+/.gpu/

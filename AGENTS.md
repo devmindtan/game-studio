@@ -20,6 +20,8 @@ game-studio/
 │   └── <slug>/                   mỗi game là một repo git riêng (clone template + Godot + addon gamekit)
 └── tools/
     ├── gamekit/                  bộ công cụ của workspace: CLI, addon Godot, pipeline sprite, pixel art, build/export
+    ├── gdgraph/                  index GDScript cho graphify (graphify không đọc .gd)
+    ├── gpuhost/                  kết nối máy GPU desktop-kndgm60 qua SSH tunnel để chạy ComfyUI/art nặng
     └── lpc-generator/            Universal LPC Spritesheet Character Generator (clone upstream, CHỈ ĐỌC)
 ```
 
@@ -55,6 +57,7 @@ xuất kéo dài thì khuyên người dùng mở phiên mới ở đó.
 | Mọi việc lớn/nhiều bước | chia thành task **nguyên tử** trước khi code: skill **`.agents/skills/free-agent-workloop/SKILL.md`** — mỗi task một thay đổi, tự kiểm tra và commit được, làm xong một cái mới sang cái kế tiếp; khi tắc/không xem được ảnh thì dừng và báo rõ |
 | Sửa pipeline Python (sprite-lab, gamekit pipeline, dashboard) | `tools/free-tools/venv/bin/ruff check <path> --select F401,F841,F821,F541` (bắt bug nhẹ); toàn bộ linter ở `tools/free-tools/README.md` |
 | Kiểm GDScript khác ngoài gamekit test | `tools/free-tools/venv/bin/gdlint src/` trong game (chỉ đọc; không `--fix` hàng loạt) |
+| Tạo art bằng AI / ComfyUI / diffusion | `tools/gpuhost/gpuhost` (GPU `desktop-kndgm60`, SSH tunnel, không chạy local). Cài/chạy: `gpuhost init` → `gpuhost start comfyui` → dùng API `127.0.0.1:8190`; xong `gpuhost release comfyui`. Model/output ở `~/gameart-gpu` trên máy GPU, không tải model nặng về laptop, không đụng `~/imagegen-gpu` |
 | Thiết kế art trước khi vẽ (tránh thiết kế mò) | skill **`.agents/skills/art-reference/SKILL.md`**: tra `art-refs/palettes/` và LPC `spritesheets/`; **bắt buộc** thêm tra Internet (game cùng thể loại / phong cách pixel gần): xem mẫu chính thống công khai, ghi lại 3 dòng (học gì / tránh gì / quyết định của mình), không có Internet thì nói rõ đã bỏ bước này. Tuân `art-refs/ATTRIBUTIONS.md` |
 | "Thêm tính năng" (lớn, nhiều hệ thống) | `/quick-design` (thay đổi nhỏ) hoặc `/design-system` → `/create-stories` → `/dev-story` → `/story-done` |
 | "Game khó/dễ quá", "chỉnh tốc độ…" | sửa `assets/data/*.json` (không hardcode trong code) → `/balance-check` → `gamekit test` + `gamekit shot` |
