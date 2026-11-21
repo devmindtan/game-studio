@@ -66,7 +66,8 @@ STONE_D = "#4a4038"
 
 
 def storm(tier, size, radius, seed=11):
-    """12 frames: cloud gathers, four strike frames (outlined bolts, flash, sparkles),
+    """No dithered veil over the area (user 2026-11-21: the purple wash hid the field).
+    12 frames: cloud gathers, four strike frames (outlined bolts, flash, sparkles),
     sparks crawl, fade."""
     import fxkit as fk
     cx = cy = size / 2
@@ -80,7 +81,6 @@ def storm(tier, size, radius, seed=11):
         c = Canvas(size, size)
         if f < 3:
             t = (f + 1) / 3
-            _disk(c, cx, cy, radius * 0.9 * t, CLOUD, density=0.2)
             lay = Canvas(size, size)
             for k in range(5 + tier):
                 a = k * math.tau / (5 + tier) + f * 0.4
@@ -89,7 +89,6 @@ def storm(tier, size, radius, seed=11):
             if f == 2:
                 fk.sparkle(c, int(cx), int(cy - 6), 3, BOLT, GLOW)
         elif f < 7:
-            _disk(c, cx, cy, radius * 0.9, CLOUD, density=0.15)
             lay = Canvas(size, size)
             import boltfx
             for i, (x, y) in enumerate(spots):

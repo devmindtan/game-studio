@@ -214,6 +214,7 @@ Thêm bậc: thêm một dòng vào `TIERS` và một thư mục có stub giốn
   nó làm dày mỗi nét về một phía khác nhau; đặt từng pixel trên trục 45°, mọi phần dày về cùng một phía. Soát ảnh phóng to: lưỡi phải mọc từ
   giữa chắn tay.
 - Nền trong suốt (`RGBA`), không viền quanh cả canvas.
+- **Hiệu ứng chiêu không phủ màn/lớp mờ lên cả vùng** (đĩa chấm lưới, nền màu bán trong suốt): người dùng 2026-11-21 bỏ màn tím của Bão sét vì che sân. Vùng tác dụng thể hiện bằng chính hiệu ứng (tia, nổ, vòng mảnh), không bằng lớp phủ.
 - **Quái nhảy phải có animation nhảy** (người dùng 2026-11-18): `crouch` (lấy đà, nén) và `jump` (bật → đỉnh →
   rơi → đáp), mọi tư thế đặt chân ở hàng đất trong khung; game nâng sprite theo `hop_height` và giữ bóng.
   Test `data_consistency_test.gd` của Bách Ải chặn quái nhảy thiếu hai animation này. Vẽ sinh vật nhỏ
