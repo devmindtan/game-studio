@@ -814,8 +814,17 @@ function skills(m){
   t.appendChild(el('tr',{},el('th',{},'Thẻ'),el('th',{},'Độ hiếm'),el('th',{},'Mô tả'),...Array.from({length:maxL},(_,i)=>el('th',{class:'num'},'Cấp '+(i+1)))));
   ups.forEach(u=>{const cells=Array.from({length:maxL},(_,i)=>{const lv=u.levels[i]; if(!lv) return el('td',{});
       return el('td',{class:'num small'},effText(lv));});
-    t.appendChild(el('tr',{},el('td',{},el('div',{class:'iconRow'},iconCanvas(u.icon||u.id,2),el('b',{},u.name))),el('td',{class:'small'},rarityBadge(u.rarity),el('div',{class:'muted small'},(u.cost||0)+' điểm')),el('td',{class:'small muted'},u.desc),...cells));});
+    t.appendChild(el('tr',{},el('td',{},el('div',{class:'iconRow'},iconCanvas(u.icon||u.id,2),el('b',{},u.name))),el('td',{class:'small'},rarityBadge(u.rarity),el('div',{class:'muted small'},(u.cost||0)+' điểm'+(u.unlimited?' · không giới hạn cấp':''))),el('td',{class:'small muted'},u.desc),...cells));});
   su.appendChild(t); charSec.appendChild(su);
+  // level-up card odds by run level (card_rarity.json level_curve, user 2026-11-21) - same formula as CardRarity.level_weights
+  const lc=(game.card_rarity||{}).level_curve;
+  if(lc){ const odds=lv=>{let w=lc.start.map((v,t)=>Math.min(lc.max[t],Math.max(lc.min[t],v+lc.per_level[t]*Math.max(0,lv-1))));
+      const tot=w.reduce((a,b)=>a+b,0); return w.map(v=>v*100/tot);};
+    const tiers=['common','rare','epic','legendary'], oc=el('div',{class:'card',style:'margin-top:14px'},el('h3',{},'Tỉ lệ thẻ khi lên cấp (theo cấp trong trận)'));
+    const ot=el('table',{class:'mid'}); ot.appendChild(el('tr',{},el('th',{},'Cấp'),...tiers.map(t=>el('th',{class:'num'},rarityBadge(t)))));
+    [1,5,10,15,20,25,30].forEach(lv=>{const w=odds(lv); ot.appendChild(el('tr',{},el('td',{},String(lv)),...w.map(v=>el('td',{class:'num'},(Math.round(v*10)/10).toString().replace('.',',')+'%'))));});
+    oc.appendChild(ot); oc.appendChild(el('p',{class:'muted small'},'Thẻ chỉ số không giới hạn cấp: hết thẻ chiêu để nâng thì vẫn luôn có thẻ chỉ số. Rương báu / rương vàng có tỉ lệ riêng.'));
+    charSec.appendChild(oc); }
   itemEffects(m);
 }
 function skillPane(pane,s){

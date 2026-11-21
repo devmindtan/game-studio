@@ -614,7 +614,8 @@ def build_game(slug):
                                  "icon": u.get("icon", sid), "rarity": u.get("rarity", "common"),
                                  "cost": int(cost_of.get(u.get("rarity", "common"), 0)),
                                  "max_level": int(u.get("max_level", 1)), "weight": u.get("weight", 1),
-                                 "levels": [level_values(u, lv) for lv in range(1, int(u.get("max_level", 1)) + 1)]})
+                                 "unlimited": int(u.get("max_level", 1)) == 0,   # no level cap (user 2026-11-21)
+                                 "levels": [level_values(u, lv) for lv in range(1, (int(u.get("max_level", 1)) or 5) + 1)]})
 
     mons = [{"id": mid, "stats": m, "sprite": sprite_info(root, str(m.get("sprite", mid)))}
             for mid, m in monsters.items()]
