@@ -69,7 +69,9 @@ chọn nguồn `.poses.json` nếu sprite có file đó; sprite dùng `gen.py` t
      `sprite-lab/designs/<tên>/variants.py` → `variants.png` (idle + run + tư thế đặc trưng) để chọn.
    - **Vũ khí cầm đúng thực tế** (bài học 2026-11-21: cung thủ nắm dây cung): cung nắm ở giữa thân (riser),
      lưng cung về phía mục tiêu, dây cung phía thân người; kiếm/giáo nắm chuôi/cán, lưỡi liền tay. Không chắc
-     thì tra ảnh người thật/game rồi mới vẽ.
+     thì tra ảnh người thật/game rồi mới vẽ. Chi tiết mảnh song song (dây cung với thân cung, cán với lưỡi) phải
+     cách nhau một khe ≥ 1 px ở 1x, nếu không viền nuốt mất (bài học 2026-11-21: dây cung chỉ thấy khi dash);
+     thêm kiểm tra vào `gen.py` như `check_string_visible` của `sprites/archer`.
 1. **Chốt spec**: kích thước (16/24/32/48/64; nhân vật cao thì chừa khoảng trống phía trên cho nhảy), palette
    4–16 màu, hướng nhìn (mặc định quay phải), **điểm neo** (nhân vật đứng: giữa hai bàn chân trên mặt đất;
    vật bay: tâm thân; đạn/giọt: đầu va chạm), danh sách animation với số frame/fps/loop. Mơ hồ thì chọn mặc

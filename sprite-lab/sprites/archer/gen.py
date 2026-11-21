@@ -103,11 +103,10 @@ def _bow(c, cx, cy, facing_deg, depth, pull):
 
 
 def bow(c, p, g):
-    """p["weapon"] = hướng lưng cung (0 = sẵn sàng về trước). Tay sau giữ dây khi ở gần, không thì dây thẳng."""
+    """p["weapon"] = hướng lưng cung (0 = sẵn sàng về trước). Cung cong 4 px để dây (thẳng giữa hai đầu) tách
+    khỏi thân cung một khe; cong 2 px thì dây dính sát thân cung, chỉ thấy khi cung xoay (bài học 2026-11-21)."""
     hx, hy = g["hand_front"]
-    hb = g["hand_back"]
-    near = abs(hb[0] - (hx - 3)) <= 3 and abs(hb[1] - hy) <= 3 and p["weapon"] == 0
-    _bow(c, hx, hy, p["weapon"], 2, (hx - 3, hy) if near else None)
+    _bow(c, hx, hy, p["weapon"], 4, None)
 
 
 CHAR = {"pal": PAL, "body": "tunic", "head": head, "hair": hair, "held": bow, "front": pad}
@@ -176,7 +175,39 @@ ANIMATIONS = [
 ]
 
 
+def check_string_visible(strip_path, min_px=4):
+    """Dây cung phải nhìn thấy trong MỌI frame của strip cuối (sau khi ghép lớp + viền).
+    Bài học 2026-11-21: cung cong 2 px nên dây nằm sát thân cung, bị viền nuốt; chỉ hiện khi dash."""
+    from PIL import Image
+    im = Image.open(strip_path).convert("RGBA")
+    rgb = lambda h: tuple(int(h[i:i + 2], 16) for i in (1, 3, 5))  # noqa: E731
+    want, wood = rgb(PAL["string"]), {rgb(PAL["wood"]), rgb(PAL["wood_d"])}
+    # frame nháy trắng (frame đầu hurt/death, flash > 0) đổi mọi màu: không kiểm
+    skip, start = set(), 0
+    for name, frames, *_ in ANIMATIONS:
+        if name in ("hurt", "death"):
+            skip.add(start)
+        start += len(frames)
+    bad = []
+    for f in range(im.width // 48):
+        if f in skip:
+            continue
+        fr = im.crop((f * 48, 0, f * 48 + 48, 48)).load()
+        woods = [(x, y) for y in range(48) for x in range(48) if fr[x, y][3] and fr[x, y][:3] in wood]
+        n = 0
+        for y in range(48):
+            for x in range(48):
+                if fr[x, y][3] and fr[x, y][:3] == want and \
+                        all(max(abs(x - wx), abs(y - wy)) >= 2 for wx, wy in woods):
+                    n += 1      # có khe (>= 1 px) giữa dây và thân cung theo mọi hướng = mắt thấy hai nét
+        if n < min_px:
+            bad.append((f, n))
+    if bad:
+        raise SystemExit(f"dây cung không thấy ở frame (frame, số px): {bad}")
+
+
 if __name__ == "__main__":
     export_layered(HERE, NAME, ANIMATIONS, anchor=ANCHOR, outline=mf.OUTLINE, ground=True, body="idle",
                    preview_scale=4, gif_scale=4)
+    check_string_visible(HERE / f"{NAME}_strip.png")
     print(f"OK {NAME}")
