@@ -1,0 +1,193 @@
+{
+  "frames": 25,
+  "frame_size": [
+    64,
+    64
+  ],
+  "fps": 5.0,
+  "loop": true,
+  "anchor": [
+    32.0,
+    60.0
+  ],
+  "anchor_source": "explicit",
+  "animations": [
+    {
+      "name": "idle",
+      "start": 0,
+      "frames": 4,
+      "fps": 5.0,
+      "loop": true,
+      "durations_ms": [
+        240.0,
+        160.0,
+        240.0,
+        120.0
+      ],
+      "hitbox": {
+        "shape": "rect",
+        "center": [
+          37.0,
+          38.0
+        ],
+        "active": [
+          0,
+          3
+        ],
+        "half_w": 19.0,
+        "half_h": 22.0
+      }
+    },
+    {
+      "name": "run",
+      "start": 4,
+      "frames": 8,
+      "fps": 12.0,
+      "loop": true,
+      "hitbox": {
+        "shape": "rect",
+        "center": [
+          31.0,
+          37.0
+        ],
+        "active": [
+          0,
+          7
+        ],
+        "half_w": 17.0,
+        "half_h": 23.0
+      }
+    },
+    {
+      "name": "hurt",
+      "start": 12,
+      "frames": 3,
+      "fps": 12.0,
+      "loop": false,
+      "durations_ms": [
+        90.0,
+        110.0,
+        120.0
+      ],
+      "hitbox": {
+        "shape": "rect",
+        "center": [
+          34.0,
+          38.0
+        ],
+        "active": [
+          0,
+          2
+        ],
+        "half_w": 22.0,
+        "half_h": 22.0
+      }
+    },
+    {
+      "name": "dash",
+      "start": 15,
+      "frames": 5,
+      "fps": 14.0,
+      "loop": false,
+      "durations_ms": [
+        60.0,
+        50.0,
+        70.0,
+        70.0,
+        90.0
+      ],
+      "hitbox": {
+        "shape": "rect",
+        "center": [
+          36.5,
+          39.0
+        ],
+        "active": [
+          0,
+          4
+        ],
+        "half_w": 20.5,
+        "half_h": 21.0
+      }
+    },
+    {
+      "name": "death",
+      "start": 20,
+      "frames": 5,
+      "fps": 8.0,
+      "loop": false,
+      "durations_ms": [
+        120.0,
+        140.0,
+        110.0,
+        100.0,
+        400.0
+      ],
+      "hitbox": {
+        "shape": "rect",
+        "center": [
+          21.0,
+          39.0
+        ],
+        "active": [
+          0,
+          4
+        ],
+        "half_w": 21.0,
+        "half_h": 21.0
+      }
+    }
+  ],
+  "ground": true,
+  "body": {
+    "anim": "idle",
+    "center": [
+      33.5,
+      40.0
+    ],
+    "radius": 15.5
+  },
+  "layers": [
+    "chest_back",
+    "legs_back",
+    "feet_back",
+    "arms_back",
+    "weapon_back",
+    "chest",
+    "legs_front",
+    "feet_front",
+    "body",
+    "head",
+    "weapon",
+    "arms_front"
+  ],
+  "outline": "#1b1726",
+  "slots": {
+    "head": [
+      "head"
+    ],
+    "chest": [
+      "chest_back",
+      "chest"
+    ],
+    "arms": [
+      "arms_back",
+      "arms_front"
+    ],
+    "legs": [
+      "legs_back",
+      "legs_front"
+    ],
+    "feet": [
+      "feet_back",
+      "feet_front"
+    ],
+    "weapon": [
+      "weapon_back",
+      "weapon"
+    ]
+  },
+  "base": [
+    "body"
+  ]
+}

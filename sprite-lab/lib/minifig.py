@@ -264,8 +264,9 @@ def draw_layers(char, p):
 
 def compose(layers) -> Canvas:
     """Layers (dict in z order, or list of canvases) stacked into one canvas."""
-    out = Canvas(W, H)
-    for c in (layers.values() if isinstance(layers, dict) else layers):
+    cs = list(layers.values() if isinstance(layers, dict) else layers)
+    out = Canvas(cs[0].width, cs[0].height) if cs else Canvas(W, H)   # cỡ theo lớp: hdfig dùng khung 64
+    for c in cs:
         out.img.alpha_composite(c.img)
     return out
 

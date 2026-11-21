@@ -1493,5 +1493,12 @@
     "tags": [
       "player"
     ]
+  },
+  "swordsman-hd": {
+    "cat": "character",
+    "tags": [
+      "player",
+      "hd-40px"
+    ]
   }
 }
