@@ -1,39 +1,9 @@
 #!/usr/bin/env python3
-"""earth-strike-ii
-
-Chuẩn fx_craft (2026-11-18): sprite-lab/lib/burstfx.py, mật độ gấp đôi ("px_scale": 0.5), >= 12 frame, mở đầu ->
-trúng (chớp + tia) -> đọng lại -> tan. Bậc 2.  Chạy: gamekit art run earth-strike-ii
+"""earth-strike-ii: tier of the earth-strike family. The drawing lives in sprite-lab/families/earth-strike.py (one file per family,
+review 2026-11-21); this stub runs it for this folder. Chạy: gamekit art run earth-strike-ii
 """
-import json
-import sys
+import runpy
 from pathlib import Path
 
-
-def _ws():
-    for p in Path(__file__).resolve().parents:
-        if (p / "tools/gamekit/pipeline/spritekit.py").exists():
-            return p
-    raise SystemExit("no workspace")
-
-
-HERE = Path(__file__).resolve().parent
-sys.path.insert(0, str(_ws() / "tools/gamekit/pipeline"))
-sys.path.insert(0, str(Path(__file__).resolve().parents[2] / "lib"))
-import burstfx  # noqa: E402
-from sheet import export  # noqa: E402
-
-NAME = HERE.name
-SIZE = 112
-RADIUS = 54
-C = SIZE / 2
-ANCHOR = (C, C)
-ANIM = [("burst", burstfx.earth_burst(2, SIZE, RADIUS), 12, False,
-         {"durations_ms": burstfx.EARTH_MS, "hitbox": {"shape": "circle", "center": [C, C], "active": [2, 5], "radius": float(RADIUS), "inner": 0.0}})]
-
-if __name__ == "__main__":
-    export(HERE, NAME, ANIM, anchor=ANCHOR, preview_scale=2, gif_scale=2)
-    meta = HERE / f"{NAME}.json"
-    m = json.loads(meta.read_text())
-    m["px_scale"] = 0.5
-    meta.write_text(json.dumps(m, indent=2) + "\n")
-    print("OK", NAME)
+runpy.run_path(str(Path(__file__).resolve().parents[2] / "families" / "earth-strike.py"), init_globals={"TIER_FILE": __file__},
+               run_name="__main__")

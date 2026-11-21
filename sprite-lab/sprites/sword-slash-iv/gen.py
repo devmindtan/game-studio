@@ -1,22 +1,9 @@
 #!/usr/bin/env python3
-"""sword-slash-iv: bậc IV của sword-slash (bậc I là sprite sword-slash). Kế thừa bậc trước và thêm một ý
-(lib/tierfx.py: II quầng sáng, III tia lửa, IV vỏ năng lượng, V tia sáng + lõi trắng). Chạy: gamekit art run sword-slash-iv
+"""sword-slash-iv: tier of the sword-slash family. The drawing lives in sprite-lab/families/sword-slash.py (one file per family,
+review 2026-11-21); this stub runs it for this folder. Chạy: gamekit art run sword-slash-iv
 """
-import sys
+import runpy
 from pathlib import Path
 
-def _ws():
-    for p in Path(__file__).resolve().parents:
-        if (p / "tools/gamekit/pipeline/spritekit.py").exists():
-            return p
-    raise SystemExit("no workspace")
-
-HERE = Path(__file__).resolve().parent
-sys.path.insert(0, str(_ws() / "tools/gamekit/pipeline"))
-sys.path.insert(0, str(HERE.parents[1] / "lib"))
-from tierfx import build
-from sheet import export
-
-if __name__ == "__main__":
-    build(HERE, "sword-slash", 4, "#e8f4ff", "#7fc8ff", export)
-    print("OK", HERE.name)
+runpy.run_path(str(Path(__file__).resolve().parents[2] / "families" / "sword-slash.py"), init_globals={"TIER_FILE": __file__},
+               run_name="__main__")

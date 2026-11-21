@@ -1,38 +1,9 @@
 #!/usr/bin/env python3
-"""earthquake-rift-iii: bậc III. Giữ vết nứt + mảnh đá của bậc II, thêm 2 vết nứt nhánh tách ra.
-
-Vẽ bằng sprite-lab/lib/stormfx.py (2026-11-18): mật độ điểm ảnh gấp đôi ("px_scale": 0.5, cùng cỡ trên màn hình),
-có pha mở đầu, trúng, đọng lại và tan. Bậc 3.  Chạy: gamekit art run earthquake-rift-iii
+"""earthquake-rift-iii: tier of the earthquake-rift family. The drawing lives in sprite-lab/families/earthquake-rift.py (one file per family,
+review 2026-11-21); this stub runs it for this folder. Chạy: gamekit art run earthquake-rift-iii
 """
-import json
-import sys
+import runpy
 from pathlib import Path
 
-
-def _ws():
-    for p in Path(__file__).resolve().parents:
-        if (p / "tools/gamekit/pipeline/spritekit.py").exists():
-            return p
-    raise SystemExit("no workspace")
-
-
-HERE = Path(__file__).resolve().parent
-sys.path.insert(0, str(_ws() / "tools/gamekit/pipeline"))
-sys.path.insert(0, str(Path(__file__).resolve().parents[2] / "lib"))
-import stormfx  # noqa: E402
-from sheet import export  # noqa: E402
-
-NAME = HERE.name
-SIZE = 152
-RADIUS = 72
-C = SIZE / 2
-ANIM = [("spell", stormfx.earthquake(3, SIZE, RADIUS), 12, False,
-         {"durations_ms": stormfx.QUAKE_MS, "hitbox": {"shape": "rect", "center": [C, C], "active": [2, 5], "half_w": float(RADIUS), "half_h": float(RADIUS) * 0.4}})]
-
-if __name__ == "__main__":
-    export(HERE, NAME, ANIM, anchor=(C, C), preview_scale=2, gif_scale=2)
-    meta = HERE / f"{NAME}.json"
-    m = json.loads(meta.read_text())
-    m["px_scale"] = 0.5
-    meta.write_text(json.dumps(m, indent=2) + "\n")
-    print("OK", NAME)
+runpy.run_path(str(Path(__file__).resolve().parents[2] / "families" / "earthquake-rift.py"), init_globals={"TIER_FILE": __file__},
+               run_name="__main__")

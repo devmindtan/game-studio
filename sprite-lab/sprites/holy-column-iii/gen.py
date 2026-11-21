@@ -1,39 +1,9 @@
 #!/usr/bin/env python3
-"""holy-column-iii
-
-Chuẩn fx_craft (2026-11-18): sprite-lab/lib/burstfx.py, mật độ gấp đôi ("px_scale": 0.5), >= 12 frame, mở đầu ->
-trúng (chớp + tia) -> đọng lại -> tan. Bậc 3.  Chạy: gamekit art run holy-column-iii
+"""holy-column-iii: tier of the holy-column family. The drawing lives in sprite-lab/families/holy-column.py (one file per family,
+review 2026-11-21); this stub runs it for this folder. Chạy: gamekit art run holy-column-iii
 """
-import json
-import sys
+import runpy
 from pathlib import Path
 
-
-def _ws():
-    for p in Path(__file__).resolve().parents:
-        if (p / "tools/gamekit/pipeline/spritekit.py").exists():
-            return p
-    raise SystemExit("no workspace")
-
-
-HERE = Path(__file__).resolve().parent
-sys.path.insert(0, str(_ws() / "tools/gamekit/pipeline"))
-sys.path.insert(0, str(Path(__file__).resolve().parents[2] / "lib"))
-import burstfx  # noqa: E402
-from sheet import export  # noqa: E402
-
-NAME = HERE.name
-W, H = 192, 256
-GROUND = 226.0
-RADIUS = 39
-ANCHOR = (W / 2, GROUND)
-ANIM = [("descend", burstfx.holy_column(3, W, H, GROUND, RADIUS), 12, False,
-         {"durations_ms": burstfx.HOLY_MS, "hitbox": {"shape": "rect", "center": [W / 2, GROUND - 46.0], "half_w": 39.0, "half_h": 62.0, "active": [3, 6]}})]
-
-if __name__ == "__main__":
-    export(HERE, NAME, ANIM, anchor=ANCHOR, preview_scale=1, gif_scale=1)
-    meta = HERE / f"{NAME}.json"
-    m = json.loads(meta.read_text())
-    m["px_scale"] = 0.5
-    meta.write_text(json.dumps(m, indent=2) + "\n")
-    print("OK", NAME)
+runpy.run_path(str(Path(__file__).resolve().parents[2] / "families" / "holy-column.py"), init_globals={"TIER_FILE": __file__},
+               run_name="__main__")

@@ -157,6 +157,13 @@ Test của game (`gameplay_rules_test`) chặn sprite có `px_scale` mà sai chu
    trạng thái") trong sheet pha 2: khựng → biến hình từng bước → gầm. Chỉ chớp màu là không đủ (test
    `monster_standard_test` của bach-ai chặn). Đổi màu dần thì nháy giữa hai màu, đừng trộn màu (xanh + đỏ ra nâu bẩn).
 
+## Chiêu nhiều bậc (I–V): một file cho cả họ
+
+Bản vẽ của mọi bậc một chiêu nằm trong **`sprite-lab/families/<họ>.py`** (phần chung + bảng `TIERS` các số đổi theo bậc,
+đánh giá 2026-11-21: các gen.py bậc trước đây là bản sao chỉ khác vài con số). Thư mục bậc (`<họ>-ii` …) giữ `gen.py`
+3 dòng gọi file họ, nên `gamekit art run <họ>-iii` vẫn chạy như cũ. Sửa cả dòng chiêu: sửa file họ, chạy lại mọi bậc.
+Thêm bậc: thêm một dòng vào `TIERS` và một thư mục có stub giống các bậc khác.
+
 ## Quy tắc pixel art
 
 - **Hình đặc trưng vẽ bằng bản đồ pixel tay** (`from_rows` hoặc danh sách chuỗi): nón, mũ, đầu vũ khí, khuôn
