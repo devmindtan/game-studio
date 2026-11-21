@@ -740,6 +740,40 @@ def nav_stages():
     return done(c)
 
 
+
+# --- region events (end-of-run damage table, design/region-events-plan.md) ------------------------------------
+
+def ev_tornado():
+    """Lốc cỏ: a grass-green funnel, wide at the top, leaves whipping round it."""
+    c = new()
+    for i, (y, w) in enumerate(((3, 9), (7, 7), (11, 5), (15, 4), (19, 2))):
+        c.rect(12 - w, y, 12 + w - 1, y + 2, LEAF["m"] if i % 2 == 0 else LEAF["d"])
+        c.line(12 - w, y, 12 - w + 2, y, LEAF["l"])
+    c.rect(11, 22, 12, 23, LEAF["d"])
+    c.polygon([(1, 10), (4, 9), (3, 12)], LEAF["l"]); c.polygon([(20, 16), (23, 15), (22, 18)], LEAF["l"])
+    return done(c)
+
+
+def ev_falling_tree():
+    """Cây đổ: a tree trunk tipping over to the right, its crown crashing down."""
+    c = new()
+    c.rect(1, 20, 22, 22, EARTH["d"])
+    c.line(4, 19, 14, 9, WOOD["m"], 3); c.line(4, 18, 13, 9, WOOD["d"])
+    c.ellipse(11, 2, 23, 14, LEAF["d"]); c.ellipse(13, 3, 20, 9, LEAF["m"]); c.pixel(15, 4, LEAF["l"])
+    c.line(1, 15, 3, 13, STONE["l"]); c.line(6, 22, 9, 20, STONE["l"])
+    return done(c)
+
+
+def ev_poison_tide():
+    """Nước độc dâng: a green poison pool swelling up, bubbles on top, a rising arrow."""
+    c = new()
+    c.ellipse(1, 12, 22, 22, LEAF["d"]); c.ellipse(3, 13, 20, 20, "#7ad04a"); c.ellipse(5, 14, 12, 17, LEAF["l"])
+    for (x, y, r) in ((6, 8, 2), (15, 5, 3), (19, 10, 1)):
+        c.ellipse(x - r, y - r, x + r, y + r, "#9ae05a", fill=False)
+    c.polygon([(11, 1), (14, 5), (8, 5)], GOLD["m"]); c.rect(10, 5, 12, 10, GOLD["m"])
+    return done(c)
+
+
 ICONS = {f.__name__: f for f in (blade_arc, whirlwind, earth_strike, ground_slam, cleave_wave, holy_column, dash,
                                  earthquake, solar_ray, god_hammer, arcane_bolt, fireball, frost_nova, lightning,
                                  thunder_javelin, meteor, void_orb, blizzard, storm, back_slash, sharpen, haste, reach,
@@ -747,7 +781,8 @@ ICONS = {f.__name__: f for f in (blade_arc, whirlwind, earth_strike, ground_slam
                                  wide_magic, mana_shield, multicast, sp_aegis_helm, sp_aegis_chest, sp_aegis_greaves,
                                  sp_aegis_gauntlets, sp_aegis_boots, sp_aegis_blade, sp_star_hat, sp_star_robe,
                                  sp_star_pants, sp_star_bracer, sp_star_shoes, sp_star_staff, nav_character, nav_deck,
-                                 nav_gacha, nav_missions, nav_settings, nav_title, nav_tree, nav_equipment, nav_stages)}
+                                 nav_gacha, nav_missions, nav_settings, nav_title, nav_tree, nav_equipment, nav_stages, ev_tornado, ev_falling_tree,
+                                 ev_poison_tide)}
 
 if __name__ == "__main__":
     anims = [(n, [f()], 1, False, {}) for n, f in ICONS.items()]

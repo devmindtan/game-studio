@@ -1,5 +1,5 @@
 {
-  "frames": 55,
+  "frames": 58,
   "frame_size": [
     24,
     24
@@ -393,6 +393,27 @@
     {
       "name": "nav_stages",
       "start": 54,
+      "frames": 1,
+      "fps": 1.0,
+      "loop": false
+    },
+    {
+      "name": "ev_tornado",
+      "start": 55,
+      "frames": 1,
+      "fps": 1.0,
+      "loop": false
+    },
+    {
+      "name": "ev_falling_tree",
+      "start": 56,
+      "frames": 1,
+      "fps": 1.0,
+      "loop": false
+    },
+    {
+      "name": "ev_poison_tide",
+      "start": 57,
       "frames": 1,
       "fps": 1.0,
       "loop": false
