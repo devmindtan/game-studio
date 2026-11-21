@@ -1500,5 +1500,12 @@
       "player",
       "hd-40px"
     ]
+  },
+  "ronin-hd": {
+    "cat": "character",
+    "tags": [
+      "player",
+      "hd-40px"
+    ]
   }
 }

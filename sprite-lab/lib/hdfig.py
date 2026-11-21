@@ -155,6 +155,104 @@ def eyes(c, x, y, kind, pal):
             put(c, x + dx, y + dy, e)
 
 
+def robe(c, g, p, pal):
+    """Áo khoác dài tới gối: thân 3 tông như tunic, từ hông xoè dần xuống gối, vạt trước mở (đường tối),
+    gấu đung đưa theo tốc độ; đai lưng vải. Quần + ủng lộ dưới gấu (chân vẽ ở lớp legs như thường)."""
+    hip, top = g["hip"], g["top"]
+    hem_y = hip[1] + 7
+    sway = _r(math.sin(p["phase"]) * 1.5 * (0.3 + p["speed"]))
+    for y in range(top[1], hem_y + 1):
+        if y <= hip[1]:
+            t = (y - top[1]) / max(1, hip[1] - top[1])
+            cx = _r(top[0] + (hip[0] - top[0]) * t)
+            x0, x1 = cx - 5, cx + 4
+        else:
+            k = y - hip[1]
+            cx = hip[0] - _r(sway * k / 7)
+            x0, x1 = cx - 5 - k // 2 - _r(p["speed"] * k / 3), cx + 4 + k // 3
+        c.rect(x0, y, x1, y, color(pal["robe"]))
+        c.pixel(x0, y, pal["robe_d"])
+        c.pixel(x0 + 1, y, pal["robe_d"])
+        c.pixel(x1, y, pal["robe_l"])
+        if y > hip[1]:
+            c.pixel(cx + 1, y, pal["robe_d"])                 # vạt trước mở
+        if y == hem_y:
+            c.rect(x0, y, x1, y, color(pal["trim"]))
+    put(c, top[0], top[1], pal["robe_d"])                     # cổ chéo
+    put(c, top[0] + 1, top[1] + 1, pal["robe_d"])
+    put(c, top[0] + 2, top[1] + 2, pal["robe_d"])
+    bx = hip[0]
+    rect(c, bx - 5, hip[1] - 2, bx + 4, hip[1] - 1, pal["belt"])          # đai
+    rect(c, bx - 6, hip[1] - 1, bx - 5, hip[1] + 2, pal["belt"])          # mối đai rủ sau
+
+
+def grid_sword(c, hand, angle, length, pal, floor_margin=1):
+    """Kiếm bám lưới pixel: hướng làm tròn về bội số 45°, đặt pixel theo bước nguyên -> lưỡi là một đường
+    sạch (góc lẻ như 35° ra bậc thang 1-2-1 px, trông cong; bài học 2026-11-21). Sau khi làm tròn vẫn giữ
+    mũi kiếm trên sàn. Màu: blade, blade_d, guard, guard_d (tuỳ), grip, grip_l (tuỳ)."""
+    hx, hy = hand
+    ang = keep_above_floor(hx, hy, angle, length)
+    q = round(ang / 45) * 45
+    for _ in range(4):
+        sx, sy = round(math.cos(math.radians(q))), round(math.sin(math.radians(q)))
+        steps = length if (sx == 0 or sy == 0) else round(length / 1.41)
+        if hy + steps * sy <= SOLE - floor_margin:
+            break
+        q += -45 if math.cos(math.radians(ang)) >= 0 else 45
+    ex, ey = (0, 1) if sx else (1, 0)
+    gx, gy = -sy, sx
+    for k in (-1, -2, -3):
+        put(c, hx + k * sx, hy + k * sy, pal.get("grip_l", pal["grip"]) if k == -2 else pal["grip"])
+    put(c, hx - 4 * sx, hy - 4 * sy, pal["guard"])
+    for j in range(-2, 3):
+        put(c, hx + sx + j * gx, hy + sy + j * gy, pal.get("guard_d", pal["guard"]) if abs(j) == 2 else pal["guard"])
+    for k in range(2, steps + 1):
+        put(c, hx + k * sx, hy + k * sy, pal["blade"])
+        if k < steps:
+            put(c, hx + k * sx + ex, hy + k * sy + ey, pal["blade_d"])
+
+
+# --- kiểm tra dùng chung cho gen.py (exit khác 0 khi hỏng) -------------------------------------
+
+def _rgb(h):
+    return tuple(int(h[i:i + 2], 16) for i in (1, 3, 5))
+
+
+def standing_frames(animations, skip_flash=True):
+    """Chỉ số frame đứng: bỏ death (nằm) và frame nháy trắng đầu tiên của hurt."""
+    out, start = [], 0
+    for name, frames, *_ in animations:
+        for i in range(len(frames)):
+            if name == "death" or (skip_flash and name == "hurt" and i == 0):
+                continue
+            out.append(start + i)
+        start += len(frames)
+    return out
+
+
+def check_blade(strip_path, animations, pal, length, frame=64, angle=None):
+    """Lưỡi kiếm thấy >= nửa (bài học: kiếm chĩa ra sau bị thân che) và thẳng một đường (một giá trị x-y,
+    x+y, x hoặc y cho pixel sáng) trong mọi frame đứng. angle=45 còn đòi đúng hướng chéo xuống-trước (x - y
+    không đổi): góc cố định không được bị xoay đi vì chạm sàn (bài học 2026-11-21, ronin-hd dash)."""
+    from PIL import Image
+    im = Image.open(strip_path).convert("RGBA")
+    light, dark = _rgb(pal["blade"]), _rgb(pal["blade_d"])
+    hidden, bent = [], []
+    for f in standing_frames(animations):
+        fr = im.crop((f * frame, 0, f * frame + frame, frame)).load()
+        pts = [(x, y) for y in range(frame) for x in range(frame) if fr[x, y][3] and fr[x, y][:3] == light]
+        n = len(pts) + sum(1 for y in range(frame) for x in range(frame) if fr[x, y][3] and fr[x, y][:3] == dark)
+        if n < length:
+            hidden.append((f, n))
+        if pts and min(len({fn(x, y) for x, y in pts}) for fn in (lambda x, y: x - y, lambda x, y: x + y,
+                                                                    lambda x, y: x, lambda x, y: y)) != 1:
+            bent.append(f)
+        elif pts and angle == 45 and len({x - y for x, y in pts}) != 1:
+            bent.append(f)
+    if hidden or bent:
+        raise SystemExit(f"kiếm: bị che ở frame {hidden}; không thẳng ở frame {bent}")
+
+
 # --- ghép ------------------------------------------------------------------------------------
 
 def draw_layers(char, p):
@@ -167,7 +265,10 @@ def draw_layers(char, p):
     arm(L["arms_back"], g["sh_back"], g["hand_back"], pal, True, L["arms_back"])
     if char.get("held_back"):
         char["held_back"](L["weapon_back"], p, g)
-    tunic(L["chest"], g, p, pal)
+    if char.get("body", "tunic") == "robe":
+        robe(L["chest"], g, p, pal)
+    else:
+        tunic(L["chest"], g, p, pal)
     leg(L["legs_front"], g["hip"], g["foot_front"], pal, False, L["feet_front"])
     if char.get("neck"):
         char["neck"](L["chest"], p, g)

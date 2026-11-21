@@ -106,29 +106,7 @@ def sword(c, p, g):
 
 
 def _sword(c, p, g):
-    """Kiếm bám lưới pixel: hướng làm tròn về bội số 45° và đặt từng pixel theo bước nguyên, để lưỡi là một
-    đường thẳng sạch (góc lẻ như 35° cho bậc thang 1-2-1 px, trông cong; bài học 2026-11-21)."""
-    hx, hy = g["hand_front"]
-    ang = hd.keep_above_floor(hx, hy, p["weapon"], BLADE)
-    q = round(ang / 45) * 45
-    for _ in range(4):                                    # làm tròn xong vẫn phải trên sàn
-        sx, sy = round(math.cos(math.radians(q))), round(math.sin(math.radians(q)))
-        steps = BLADE if (sx == 0 or sy == 0) else round(BLADE / 1.41)
-        if hy + steps * sy <= hd.SOLE - 1:
-            break
-        q += -45 if math.cos(math.radians(ang)) >= 0 else 45
-    ex, ey = (0, 1) if sx else (1, 0)                     # cạnh tối của lưỡi, nằm sát một phía
-    gx, gy = -sy, sx                                      # trục chắn kiếm, vuông góc lưỡi
-    n = BLADE if (sx == 0 or sy == 0) else round(BLADE / 1.41)
-    for k in (-1, -2, -3):                                # chuôi quấn
-        put(c, hx + k * sx, hy + k * sy, PAL["grip_l"] if k == -2 else PAL["grip"])
-    put(c, hx - 4 * sx, hy - 4 * sy, PAL["guard"])        # núm
-    for j in range(-2, 3):                                # chắn kiếm
-        put(c, hx + sx + j * gx, hy + sy + j * gy, PAL["guard_d"] if abs(j) == 2 else PAL["guard"])
-    for k in range(2, n + 1):                             # lưỡi: đường sáng + cạnh tối sát bên
-        put(c, hx + k * sx, hy + k * sy, PAL["blade"])
-        if k < n:
-            put(c, hx + k * sx + ex, hy + k * sy + ey, PAL["blade_d"])
+    hd.grid_sword(c, g["hand_front"], p["weapon"], BLADE, PAL)
 
 
 CHAR = {"pal": PAL, "head": None, "hair": hair, "neck": neck, "behind": scarf_tail,
@@ -201,58 +179,8 @@ ANIMATIONS = [
 ]
 
 
-def check_blade_visible(min_px=16):   # >= nửa lưỡi (16 px x 2)
-    """Lưỡi kiếm phải nhìn thấy trong mọi frame đứng của strip cuối (death nằm xuống: bỏ qua).
-    Bài học 2026-11-21: run cầm kiếm chĩa ra sau (205°) nên lưỡi nằm ở lớp sau lưng, bị thân che hết."""
-    from PIL import Image
-    im = Image.open(HERE / f"{NAME}_strip.png").convert("RGBA")
-    blade = {tuple(int(PAL[k][i:i + 2], 16) for i in (1, 3, 5)) for k in ("blade", "blade_d")}
-    skip, start = set(), 0
-    for name, frames, *_ in ANIMATIONS:
-        if name == "death":
-            skip.update(range(start, start + len(frames)))
-        elif name == "hurt":
-            skip.add(start)                                   # frame nháy trắng
-        start += len(frames)
-    bad = []
-    for f in range(im.width // 64):
-        if f in skip:
-            continue
-        n = sum(1 for px in im.crop((f * 64, 0, f * 64 + 64, 64)).getdata() if px[3] and px[:3] in blade)
-        if n < min_px:
-            bad.append((f, n))
-    if bad:
-        raise SystemExit(f"lưỡi kiếm bị che ở frame (frame, số px): {bad}")
-
-
-def check_blade_straight():
-    """Lưỡi kiếm (màu blade, các frame đứng) phải là MỘT đường chéo 45° sạch: mọi pixel cùng x - y.
-    Bài học 2026-11-21: góc 35° cho bậc thang 1-2-1 px, người dùng thấy kiếm "không thẳng"."""
-    from PIL import Image
-    im = Image.open(HERE / f"{NAME}_strip.png").convert("RGBA")
-    light = tuple(int(PAL["blade"][i:i + 2], 16) for i in (1, 3, 5))
-    skip, start = set(), 0
-    for name, frames, *_ in ANIMATIONS:
-        if name == "death":
-            skip.update(range(start, start + len(frames)))
-        elif name == "hurt":
-            skip.add(start)
-        start += len(frames)
-    bad = []
-    for f in range(im.width // 64):
-        if f in skip:
-            continue
-        fr = im.crop((f * 64, 0, f * 64 + 64, 64)).load()
-        diag = {x - y for y in range(64) for x in range(64) if fr[x, y][3] and fr[x, y][:3] == light}
-        if len(diag) != 1:
-            bad.append((f, len(diag)))
-    if bad:
-        raise SystemExit(f"lưỡi kiếm không thẳng ở frame (frame, số đường chéo): {bad}")
-
-
 if __name__ == "__main__":
     export_layered(HERE, NAME, ANIMATIONS, anchor=ANCHOR, outline=hd.OUTLINE, ground=True, body="idle",
                    preview_scale=3, gif_scale=3)
-    check_blade_visible()
-    check_blade_straight()
+    hd.check_blade(HERE / f"{NAME}_strip.png", ANIMATIONS, PAL, BLADE, angle=SWORD)
     print(f"OK {NAME}")
