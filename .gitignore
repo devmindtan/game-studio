@@ -27,3 +27,6 @@ __pycache__/
 /sprite-lab/sprites/**/*.gif
 /sprite-lab/sprites/**/preview.png
 /sprite-lab/sprites/**/preview.png.import
+
+# Repomix dumps: local debug only, never committed (user 2026-11-21)
+/repomix-output.xml
