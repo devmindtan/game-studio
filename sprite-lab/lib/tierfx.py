@@ -168,6 +168,8 @@ def build(here: Path, base: str, tier: int, light: str, glow: str, export_fn, th
             spec = {"shape": hb["shape"], "center": [hb["center"][0] + PAD, hb["center"][1] + PAD], "active": hb["active"]}
             if "dir_deg" in hb:
                 spec["dir_deg"] = hb["dir_deg"]
+            if hb.get("swept"):   # a solid cone carries over to the tiers
+                spec["swept"] = True
             extra["hitbox"] = spec
         anims.append((a["name"], out, a["fps"], a["loop"], extra))
     ax, ay = meta["anchor"]

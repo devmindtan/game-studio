@@ -484,6 +484,9 @@ def fit_hitbox(frames, spec):
     box = {"shape": shape, "center": [float(v) for v in spec["center"]], "active": [int(first), int(last)],
            "radius": float(math.ceil(max(d for d, _ in pts))),
            "inner": float(math.floor(min(d for d, _ in pts)))}
+    if spec.get("swept"):   # a swung blade sweeps the whole fan, not only its drawn edge: solid cone
+        box["inner"] = 0.0
+        box["swept"] = True
     if shape == "arc":
         direction = float(spec.get("dir_deg", 0.0))
         box["dir_deg"] = direction

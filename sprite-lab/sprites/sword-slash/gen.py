@@ -101,7 +101,7 @@ def turned(frames, op):
 
 RIGHT = [frame(i) for i in range(5)]
 DURATIONS = [50.0, 50.0, 70.0, 70.0, 60.0]
-HIT = {"shape": "arc", "center": list(PIVOT), "active": [1, 2]}
+HIT = {"shape": "arc", "center": list(PIVOT), "active": [1, 2], "swept": True}   # solid cone (blade-arc-redesign.md)
 ANIMATIONS = [
     ("slash_right", RIGHT, 16, False, {"durations_ms": DURATIONS, "hitbox": {**HIT, "dir_deg": 0.0}}),
     ("slash_left", turned(RIGHT, Image.Transpose.FLIP_LEFT_RIGHT), 16, False,
