@@ -1,0 +1,37 @@
+{
+  "frames": 6,
+  "frame_size": [
+    64,
+    64
+  ],
+  "fps": 12.0,
+  "loop": false,
+  "anchor": [
+    32.0,
+    32.0
+  ],
+  "anchor_source": "explicit",
+  "animations": [
+    {
+      "name": "slash",
+      "start": 0,
+      "frames": 6,
+      "fps": 12.0,
+      "loop": false,
+      "hitbox": {
+        "shape": "rect",
+        "center": [
+          51.5,
+          31.0
+        ],
+        "active": [
+          1,
+          4
+        ],
+        "half_w": 11.5,
+        "half_h": 24.0
+      }
+    }
+  ],
+  "hit_source": "estimated"
+}
