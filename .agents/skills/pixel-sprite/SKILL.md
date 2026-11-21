@@ -62,6 +62,11 @@ chọn nguồn `.poses.json` nếu sprite có file đó; sprite dùng `gen.py` t
    - **Model AI chỉ để lấy ý tưởng ban đầu**, không tham gia quy trình thiết kế: `gamekit art concept <tên>
      "<prompt>"` (GPU, pixel hoá) cho gợi ý ngoại hình; tư thế, cách cầm vũ khí, animation, palette cuối do mình
      thiết kế (tham khảo game thật qua skill `art-reference`).
+   - **LPC làm tham khảo tư thế/animation** (người dùng 2026-11-21, hướng b): xem animation vẽ tay của LPC
+     (`tools/lpc-generator/spritesheets/body/bodies/<giới>/<anim>.png` + lớp vũ khí trong `weapon/`, hàng 4 =
+     quay phải; ví dụ `shoot` cho cung) để lấy chuỗi động tác và cách cầm, rồi vẫn **vẽ bằng minifig**. Không
+     chép pixel LPC vào sprite (không cần credit vì chỉ tham khảo). Phương án đặt ở
+     `sprite-lab/designs/<tên>/variants.py` → `variants.png` (idle + run + tư thế đặc trưng) để chọn.
    - **Vũ khí cầm đúng thực tế** (bài học 2026-11-21: cung thủ nắm dây cung): cung nắm ở giữa thân (riser),
      lưng cung về phía mục tiêu, dây cung phía thân người; kiếm/giáo nắm chuôi/cán, lưỡi liền tay. Không chắc
      thì tra ảnh người thật/game rồi mới vẽ.
