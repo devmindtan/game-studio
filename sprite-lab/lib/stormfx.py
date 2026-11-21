@@ -15,6 +15,18 @@ import random
 from spritekit import Canvas
 from icefx import _disk, _fade, _p
 
+
+def _alpha_fade(c, amount):
+    """Fades the whole frame by lowering its alpha (no checkerboard holes: review 2026-11-21, the dithered fade
+    read as a dot cloud over the boss / hero)."""
+    px = c.img.load()
+    k = 1.0 - amount
+    for y in range(c.height):
+        for x in range(c.width):
+            r, g, b, a = px[x, y]
+            if a:
+                px[x, y] = (r, g, b, int(a * k))
+
 CLOUD = "#3a3a5a"
 CLOUD_L = "#5a5a80"
 BOLT = "#fff8c0"
@@ -152,11 +164,17 @@ def stomp(tier, size, radius, seed=13):
             k = f - 6
             for a, d in cracks:
                 c.line(int(cx), int(cy), int(cx + math.cos(a) * radius * d), int(cy + math.sin(a) * radius * d * 0.8), DIRT)
-            _disk(c, cx, cy - k, radius * (0.9 + 0.05 * k), DUST, density=0.28 - 0.04 * k)
+            # dust settles as soft puffs along the rim, rising and shrinking; the middle stays clear (review
+            # 2026-11-21: a dithered dust disk covered the boss / hero standing in it)
+            n = 8 + 2 * tier
+            for q in range(n):
+                a = q * math.tau / n + 0.3
+                pr = max(1.0, 3.2 + tier * 0.3 - 0.6 * k)
+                fk.glow(c, cx + math.cos(a) * radius * 0.92, cy + math.sin(a) * radius * 0.92 * 0.8 - 2 * k, pr, [DUST, DUST_L])
             for a, d in rocks:
                 _p(c, cx + math.cos(a) * radius * d, cy + math.sin(a) * radius * d, STONE)
             if k >= 1:
-                _fade(c, min(0.95, 0.1 + 0.18 * k))
+                _alpha_fade(c, min(0.9, 0.15 + 0.2 * k))
         out.append(c)
         masks.append(fk.mask_art(c, cx, cy, radius * 0.35 if f == 0 else radius * (0.3 + 0.7 * f / 5) + 4 if f < 6 else radius))
     return fk.FxFrames(out, masks)
