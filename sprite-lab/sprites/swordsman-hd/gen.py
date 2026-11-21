@@ -139,7 +139,8 @@ def idle(i):
 
 
 def run(i):
-    return hd.draw_layers(CHAR, run_pose(i, weapon=205 + 8 * math.sin(i * math.pi / 4)))
+    """Chạy cầm kiếm chúc mũi xuống phía trước, lắc theo nhịp tay (205° = chĩa ra sau thì lưỡi bị thân che)."""
+    return hd.draw_layers(CHAR, run_pose(i, weapon=40 + 12 * math.sin(i * math.pi / 4)))
 
 
 def hurt(i):
@@ -157,7 +158,7 @@ def dash(i):
     Feet stay on the floor (ground=True); the body leans hard, arms and sword trail back,
     the scarf flies out at full speed."""
     return [
-        frame(bob=2, lean=1, feet=((-4, 0), (3, 0)), hands=((-3, 5), (3, 5)), weapon=200, speed=0.4),
+        frame(bob=2, lean=1, feet=((-4, 0), (3, 0)), hands=((-3, 5), (3, 5)), weapon=35, speed=0.4),
         frame(bob=2, lean=3, feet=((-6, 1), (5, 0)), hands=((-6, 4), (-1, 5)), weapon=190, speed=1.0, phase=0.6),
         frame(bob=2, lean=3, feet=((-7, 2), (5, 0)), hands=((-7, 3), (-2, 4)), weapon=185, speed=1.0, phase=1.4),
         frame(bob=2, lean=3, feet=((-6, 1), (5, 0)), hands=((-7, 4), (-2, 5)), weapon=188, speed=1.0, phase=2.2),
@@ -189,7 +190,32 @@ ANIMATIONS = [
 ]
 
 
+def check_blade_visible(min_px=16):   # >= nửa lưỡi (16 px x 2)
+    """Lưỡi kiếm phải nhìn thấy trong mọi frame đứng của strip cuối (death nằm xuống: bỏ qua).
+    Bài học 2026-11-21: run cầm kiếm chĩa ra sau (205°) nên lưỡi nằm ở lớp sau lưng, bị thân che hết."""
+    from PIL import Image
+    im = Image.open(HERE / f"{NAME}_strip.png").convert("RGBA")
+    blade = {tuple(int(PAL[k][i:i + 2], 16) for i in (1, 3, 5)) for k in ("blade", "blade_d")}
+    skip, start = set(), 0
+    for name, frames, *_ in ANIMATIONS:
+        if name == "death":
+            skip.update(range(start, start + len(frames)))
+        elif name == "hurt":
+            skip.add(start)                                   # frame nháy trắng
+        start += len(frames)
+    bad = []
+    for f in range(im.width // 64):
+        if f in skip:
+            continue
+        n = sum(1 for px in im.crop((f * 64, 0, f * 64 + 64, 64)).getdata() if px[3] and px[:3] in blade)
+        if n < min_px:
+            bad.append((f, n))
+    if bad:
+        raise SystemExit(f"lưỡi kiếm bị che ở frame (frame, số px): {bad}")
+
+
 if __name__ == "__main__":
     export_layered(HERE, NAME, ANIMATIONS, anchor=ANCHOR, outline=hd.OUTLINE, ground=True, body="idle",
                    preview_scale=3, gif_scale=3)
+    check_blade_visible()
     print(f"OK {NAME}")
