@@ -201,7 +201,7 @@ dùng bảo commit dở dang thì mới commit, và dùng type `wip`.
   xem có file nào vừa biến mất khỏi danh sách.
 - Commit kèm file `.uid` mà Godot sinh ra cạnh script/shader (quy tắc của framework); **không** commit `.godot/`,
   `builds/`, file tạm, log, `*.import` của file bị xóa, hay credential/khóa ký.
-- **Có** commit: `export_presets.cfg`, `assets/source/lpc/*.zip`, `sprite-lab/sprites/<tên>/` (gen.py, strip, json, preview),
+- **Có** commit: `export_presets.cfg`, `assets/source/lpc/*.zip`, `sprite-lab/sprites/<tên>/` (gen.py, strip, json, hitmask; **không** GIF và `preview.png`: sinh lại bằng `gamekit art run`, đã ở `.gitignore` từ 2026-11-21),
   ảnh trong `production/qa/evidence/`.
 
 ### 4. Chia commit

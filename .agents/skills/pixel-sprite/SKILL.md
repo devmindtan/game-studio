@@ -75,7 +75,7 @@ chọn nguồn `.poses.json` nếu sprite có file đó; sprite dùng `gen.py` t
 6. **Thử di chuyển**: `gamekit art shot <tên> move` rồi xem ảnh lưới. Đạt khi: lật hướng không làm sprite
    xê dịch, đi/chạy có nhịp, nhảy có độ cao và bóng hợp lý, đòn đánh/phép/trúng đòn đọc được.
 7. **Test**: `gamekit art test` (unit `SpriteSheet`/`SpriteAnchor` + integration mọi sprite trong lab).
-8. **Commit** ở repo gốc (`sprite-lab/` thuộc repo gốc): `gen.py`, strip, json, png, preview, gif.
+8. **Commit** ở repo gốc (`sprite-lab/` thuộc repo gốc): `gen.py`, strip, json, png, hitmask (GIF và `preview.png` là file sinh ra, đã bị `.gitignore`: người dùng 2026-11-21).
 9. **Đưa vào game** (chỉ khi game cần): `gamekit art promote <tên> <game>` → vẽ bằng `SpriteSheet` trong code
    game → `gamekit test <g>` + `gamekit shot <g>` và **xem ảnh** → commit repo game.
 
