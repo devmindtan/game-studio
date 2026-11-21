@@ -117,7 +117,7 @@ def frame(**kw):
     return mf.draw_layers(CHAR, pose(**kw))
 
 
-READY = ((3, 3), (7, 2))     # tay sau sát dây, tay trước duỗi ra trước
+READY = ((4, 4), (10, 4))    # tay sau trước ngực, tay trước duỗi gần hết cỡ: cung tránh xa mặt
 
 
 # --- animations: di chuyển và trạng thái (bắn tên là sprite hiệu ứng riêng) ----------------------
@@ -135,9 +135,9 @@ def run(i):
 
 def hurt(i):
     return [
-        frame(bob=1, lean=-2, head=(-1, 0), feet=((-4, 0), (2, 0)), hands=((-3, 4), (3, 5)), weapon=30,
+        frame(bob=1, lean=-2, head=(-1, 0), feet=((-4, 0), (2, 0)), hands=((-3, 4), (8, 6)), weapon=30,
               eyes="wince", flash=0.75, speed=0.5, tilt=-1),
-        frame(bob=1, lean=-2, head=(-1, 0), feet=((-4, 0), (2, 0)), hands=((-3, 5), (3, 5)), weapon=30,
+        frame(bob=1, lean=-2, head=(-1, 0), feet=((-4, 0), (2, 0)), hands=((-3, 5), (8, 6)), weapon=30,
               eyes="wince", speed=0.3, phase=1.0, tilt=-1),
         frame(bob=0, lean=1, feet=((-4, 0), (3, 0)), hands=READY),
     ][i]
@@ -146,7 +146,7 @@ def hurt(i):
 def dash(i):
     """Lướt: lấy đà, phóng, hai frame lướt (cung kéo ra sau như vật bị gió đẩy), thu về tư thế sẵn sàng."""
     return [
-        frame(bob=2, lean=1, feet=((-4, 0), (3, 0)), hands=((2, 4), (5, 4)), weapon=20, speed=0.4),
+        frame(bob=2, lean=1, feet=((-4, 0), (3, 0)), hands=((2, 4), (9, 5)), weapon=20, speed=0.4),
         frame(bob=2, lean=3, feet=((-6, 1), (5, 0)), hands=((-3, 4), (3, 4)), weapon=60, speed=1.0, phase=0.6),
         frame(bob=2, lean=3, feet=((-7, 2), (5, 0)), hands=((-4, 3), (2, 4)), weapon=70, speed=1.0, phase=1.4),
         frame(bob=2, lean=3, feet=((-6, 1), (5, 0)), hands=((-3, 4), (3, 4)), weapon=60, speed=1.0, phase=2.2),
@@ -206,8 +206,35 @@ def check_string_visible(strip_path, min_px=4):
         raise SystemExit(f"dây cung không thấy ở frame (frame, số px): {bad}")
 
 
+def check_bow_clear_of_face(min_gap=2):
+    """Cung (lớp weapon) không được đè/chạm mặt (lớp body) ở mọi frame đứng: cách >= min_gap ô.
+    Bài học 2026-11-21: tay trước duỗi 7 px, cung cao 15 px -> đầu cung trên đè lên cằm."""
+    from PIL import Image
+    w = Image.open(HERE / "layers/weapon_strip.png").convert("RGBA")
+    b = Image.open(HERE / "layers/body_strip.png").convert("RGBA")
+    skip, start = set(), 0
+    for name, frames, *_ in ANIMATIONS:
+        if name == "death":
+            skip.update(range(start, start + len(frames)))     # nằm xuống: cung rơi cạnh người
+        start += len(frames)
+    bad = []
+    for f in range(w.width // 48):
+        if f in skip:
+            continue
+        wp = w.crop((f * 48, 0, f * 48 + 48, 48)).load()
+        bp = b.crop((f * 48, 0, f * 48 + 48, 48)).load()
+        face = [(x, y) for y in range(48) for x in range(48) if bp[x, y][3]]
+        gap = min((max(abs(x - fx), abs(y - fy)) for y in range(48) for x in range(48) if wp[x, y][3]
+                   for fx, fy in face), default=99)
+        if gap < min_gap:
+            bad.append((f, gap))
+    if bad:
+        raise SystemExit(f"cung đè/chạm mặt ở frame (frame, khoảng cách): {bad}")
+
+
 if __name__ == "__main__":
     export_layered(HERE, NAME, ANIMATIONS, anchor=ANCHOR, outline=mf.OUTLINE, ground=True, body="idle",
                    preview_scale=4, gif_scale=4)
     check_string_visible(HERE / f"{NAME}_strip.png")
+    check_bow_clear_of_face()
     print(f"OK {NAME}")
