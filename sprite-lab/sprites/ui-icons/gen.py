@@ -411,20 +411,21 @@ ICONS = {
         "..drrrd......",
         "...ddd.......",
     ]),
-    # unyielding (knight passive): a steel shield cracked red, a gold flame rising from it
+    # unyielding (knight passive): a symmetric steel shield (redrawn 2026-11-21: it leaned left) cracked red, a gold flame rising from it
     "unyielding": ({"r": "#9fb3c8", "d": "#5f7186", "l": "#e8f0f6", "y": "#ffd04a", "w": "#fff2a8", "k": "#c4202f"}, [
         "......w......",
         ".....wyw.....",
         "....yywyy....",
-        ".rrrryyyrrrr.",
+        ".rrrryyyrrrd.",
         ".rlllryrrrrd.",
         ".rlrrrkrrrrd.",
         ".rlrrkrrrrrd.",
         "..rrrrkrrrd..",
-        "..rrrrkrrrd..",
-        "...rrrrrdd...",
-        "....rrrdd....",
-        ".....rd......",
+        "..rrrrrkrrd..",
+        "...rrrkrrd...",
+        "....rrrrd....",
+        ".....rrd.....",
+        "......d......",
     ]),
     # elemental_resonance (mage passive): an orb split into fire, ice and lightning
     "elemental_resonance": ({"f": "#ff6a2a", "o": "#ffb43a", "i": "#7ef0ff", "b": "#37b9e8", "y": "#ffe14a", "w": "#ffffff", "v": "#8b5cf6"}, [
