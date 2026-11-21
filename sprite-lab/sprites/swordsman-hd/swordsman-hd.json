@@ -27,14 +27,14 @@
       "hitbox": {
         "shape": "rect",
         "center": [
-          36.0,
+          34.5,
           38.0
         ],
         "active": [
           0,
           3
         ],
-        "half_w": 18.0,
+        "half_w": 16.5,
         "half_h": 22.0
       }
     },
@@ -47,14 +47,14 @@
       "hitbox": {
         "shape": "rect",
         "center": [
-          36.0,
+          34.5,
           37.0
         ],
         "active": [
           0,
           7
         ],
-        "half_w": 22.0,
+        "half_w": 20.5,
         "half_h": 23.0
       }
     },
@@ -72,14 +72,14 @@
       "hitbox": {
         "shape": "rect",
         "center": [
-          33.0,
+          31.5,
           38.0
         ],
         "active": [
           0,
           2
         ],
-        "half_w": 21.0,
+        "half_w": 19.5,
         "half_h": 22.0
       }
     },
@@ -99,14 +99,14 @@
       "hitbox": {
         "shape": "rect",
         "center": [
-          36.0,
+          34.5,
           39.0
         ],
         "active": [
           0,
           4
         ],
-        "half_w": 20.0,
+        "half_w": 18.5,
         "half_h": 21.0
       }
     },
@@ -142,10 +142,10 @@
   "body": {
     "anim": "idle",
     "center": [
-      33.5,
+      33.0,
       40.0
     ],
-    "radius": 15.5
+    "radius": 15.0
   },
   "layers": [
     "chest_back",

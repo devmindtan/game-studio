@@ -106,20 +106,29 @@ def sword(c, p, g):
 
 
 def _sword(c, p, g):
+    """Kiếm bám lưới pixel: hướng làm tròn về bội số 45° và đặt từng pixel theo bước nguyên, để lưỡi là một
+    đường thẳng sạch (góc lẻ như 35° cho bậc thang 1-2-1 px, trông cong; bài học 2026-11-21)."""
     hx, hy = g["hand_front"]
-    a = math.radians(hd.keep_above_floor(hx, hy, p["weapon"], BLADE))
-    dx, dy = math.cos(a), math.sin(a)
-    px, py = -dy, dx
-    gx, gy = hx + 0.5, hy + 0.5
-    line(c, gx - dx * 3, gy - dy * 3, gx, gy, PAL["grip"], 2)                 # chuôi
-    put(c, gx - dx * 2, gy - dy * 2, PAL["grip_l"])                           # quấn chuôi
-    put(c, gx - dx * 4, gy - dy * 4, PAL["guard"])                            # núm
-    line(c, gx + dx + px * 2.5, gy + dy + py * 2.5, gx + dx - px * 2.5, gy + dy - py * 2.5, PAL["guard"], 2)
-    put(c, gx + dx + px * 2.5, gy + dy + py * 2.5, PAL["guard_d"])
-    line(c, gx + dx * 3, gy + dy * 3, gx + dx * BLADE, gy + dy * BLADE, PAL["blade"], 2)
-    line(c, gx + dx * 3 + px, gy + dy * 3 + py, gx + dx * (BLADE - 1) + px, gy + dy * (BLADE - 1) + py,
-         PAL["blade_d"], 1)                                                    # mép tối
-    put(c, gx + dx * (BLADE + 1), gy + dy * (BLADE + 1), PAL["blade"])        # mũi nhọn
+    ang = hd.keep_above_floor(hx, hy, p["weapon"], BLADE)
+    q = round(ang / 45) * 45
+    for _ in range(4):                                    # làm tròn xong vẫn phải trên sàn
+        sx, sy = round(math.cos(math.radians(q))), round(math.sin(math.radians(q)))
+        steps = BLADE if (sx == 0 or sy == 0) else round(BLADE / 1.41)
+        if hy + steps * sy <= hd.SOLE - 1:
+            break
+        q += -45 if math.cos(math.radians(ang)) >= 0 else 45
+    ex, ey = (0, 1) if sx else (1, 0)                     # cạnh tối của lưỡi, nằm sát một phía
+    gx, gy = -sy, sx                                      # trục chắn kiếm, vuông góc lưỡi
+    n = BLADE if (sx == 0 or sy == 0) else round(BLADE / 1.41)
+    for k in (-1, -2, -3):                                # chuôi quấn
+        put(c, hx + k * sx, hy + k * sy, PAL["grip_l"] if k == -2 else PAL["grip"])
+    put(c, hx - 4 * sx, hy - 4 * sy, PAL["guard"])        # núm
+    for j in range(-2, 3):                                # chắn kiếm
+        put(c, hx + sx + j * gx, hy + sy + j * gy, PAL["guard_d"] if abs(j) == 2 else PAL["guard"])
+    for k in range(2, n + 1):                             # lưỡi: đường sáng + cạnh tối sát bên
+        put(c, hx + k * sx, hy + k * sy, PAL["blade"])
+        if k < n:
+            put(c, hx + k * sx + ex, hy + k * sy + ey, PAL["blade_d"])
 
 
 CHAR = {"pal": PAL, "head": None, "hair": hair, "neck": neck, "behind": scarf_tail,
@@ -130,7 +139,7 @@ def frame(**kw):
     return hd.draw_layers(CHAR, pose(**kw))
 
 
-SWORD = 35   # góc cầm kiếm cố định cho mọi tư thế đứng: chúc mũi xuống phía trước, không bị thân che
+SWORD = 45   # góc cầm kiếm cố định (bội số 45°: đường pixel sạch) cho mọi tư thế đứng: chúc mũi xuống phía trước, không bị thân che
 
 # --- animations: movement and state only (attacks are effect sprites) -------------
 
@@ -216,8 +225,34 @@ def check_blade_visible(min_px=16):   # >= nửa lưỡi (16 px x 2)
         raise SystemExit(f"lưỡi kiếm bị che ở frame (frame, số px): {bad}")
 
 
+def check_blade_straight():
+    """Lưỡi kiếm (màu blade, các frame đứng) phải là MỘT đường chéo 45° sạch: mọi pixel cùng x - y.
+    Bài học 2026-11-21: góc 35° cho bậc thang 1-2-1 px, người dùng thấy kiếm "không thẳng"."""
+    from PIL import Image
+    im = Image.open(HERE / f"{NAME}_strip.png").convert("RGBA")
+    light = tuple(int(PAL["blade"][i:i + 2], 16) for i in (1, 3, 5))
+    skip, start = set(), 0
+    for name, frames, *_ in ANIMATIONS:
+        if name == "death":
+            skip.update(range(start, start + len(frames)))
+        elif name == "hurt":
+            skip.add(start)
+        start += len(frames)
+    bad = []
+    for f in range(im.width // 64):
+        if f in skip:
+            continue
+        fr = im.crop((f * 64, 0, f * 64 + 64, 64)).load()
+        diag = {x - y for y in range(64) for x in range(64) if fr[x, y][3] and fr[x, y][:3] == light}
+        if len(diag) != 1:
+            bad.append((f, len(diag)))
+    if bad:
+        raise SystemExit(f"lưỡi kiếm không thẳng ở frame (frame, số đường chéo): {bad}")
+
+
 if __name__ == "__main__":
     export_layered(HERE, NAME, ANIMATIONS, anchor=ANCHOR, outline=hd.OUTLINE, ground=True, body="idle",
                    preview_scale=3, gif_scale=3)
     check_blade_visible()
+    check_blade_straight()
     print(f"OK {NAME}")
