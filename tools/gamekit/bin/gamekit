@@ -185,6 +185,17 @@ cmd_tidy() {
       "$game/CLAUDE.md" > "$game/CLAUDE.md.tmp" && mv "$game/CLAUDE.md.tmp" "$game/CLAUDE.md"
     echo "   CLAUDE.md: added '## This game' (pointers + commit rule)"
   fi
+  # Agents of the engines this game does not use (review 2026-11-21: 11 Unity / Unreal specialists listed to
+  # every session of a Godot game). The framework only picks them for those engines, so removing them is safe;
+  # run again after `gamekit update-template` brings them back.
+  local eng; eng="$(sed -n '/^engine:/,/^[a-z]/s/^  name: *"\{0,1\}\([A-Za-z]*\).*/\1/p' "$game/project.yaml" 2>/dev/null | head -1)"
+  if [[ "$eng" == "Godot" && -d "$game/.claude/agents" ]]; then
+    local n=0 a
+    for a in "$game"/.claude/agents/unity-*.md "$game"/.claude/agents/ue-*.md "$game"/.claude/agents/unreal-*.md; do
+      [[ -f "$a" ]] && { rm -f "$a"; n=$((n + 1)); }
+    done
+    (( n > 0 )) && echo "   removed $n Unity / Unreal agents (engine: Godot)"
+  fi
   agents_link_game 0 "$game"
   # origin pointed at the framework; keep it as 'framework' so 'origin' is free for the game's own remote.
   if [[ "$(git -C "$game" remote get-url origin 2>/dev/null)" == "$UPSTREAM" ]]; then
