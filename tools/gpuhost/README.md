@@ -58,6 +58,20 @@ Model nằm trong `~/gameart-gpu/app/models/` (riêng, không dùng chung symlin
 `gamekit art concept <tên> "<prompt>"` tự `start`/`release` dịch vụ, tạo concept và pixel hoá (xem skill
 `pixel-sprite`, bước 0). AI chỉ chốt ngoại hình; animation vẽ bằng `minifig`/rig trong Sprite Lab.
 
+## Wan 2.1 T2V 1.3B: clip tham khảo chuyển động (thử 2026-11-21)
+
+Model trên máy GPU: `diffusion_models/wan2.1_t2v_1.3B_fp16.safetensors` (2,7 GB), `text_encoders/umt5-xxl-encoder-Q4_K_M.gguf`
+(3,5 GB, node ComfyUI-GGUF, để vừa 12 GB RAM của WSL), `vae/wan_2.1_vae.safetensors`. Lệnh:
+`gamekit art motion-ref <slug> "<prompt>" [--width 384 --height 384 --steps 15]` → `sprite-lab/refs/motion/<slug>/`.
+
+| Thử | Thời gian | Chuyển động |
+|---|---|---|
+| kiếm sĩ áo choàng chạy, 480², 20 step, 17 frame (gồm nạp model) | 5,4 phút | gần như đứng yên, chân không chạy |
+| cóc nhảy dậm, 384², 15 step, 17 frame (model đã nạp) | 3,3 phút | chỉ ngồi thụp ở cuối, không nhảy |
+
+Kết luận: chạy được nhưng chậm (3–5 phút/clip, không phải 15–25 s như trên RTX) và chuyển động yếu với clip ngắn.
+Chỉ dùng khi cần ý tưởng nhịp chuyển động; bản 14B không chạy được (vượt 12 GB RAM của WSL).
+
 ## Quy tắc
 
 - Không tải model ComfyUI/diffusion nặng về laptop; tải lên máy GPU.

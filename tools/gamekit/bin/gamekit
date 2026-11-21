@@ -88,6 +88,7 @@ Sprite Lab (sprite-lab/: make + test sprites here, then promote into a game)
   art promote <name> <game>         copy strip + json into games/<g>/assets/sprites/custom/<name>/
   art ase|open <name>               .ase for editing by hand in LibreSprite
   art concept <name> "<prompt>" [--seeds N]  AI (GPU) chốt ngoại hình -> sprite tham chiếu pixel + palette
+  art motion-ref <slug> "<prompt>"        Wan 1.3B (GPU): clip tham khảo nhịp chuyển động
   art comfy smoke|keyframe|animate|workflow  ComfyUI on GPU host (gpuhost), pixel art/FX tests
 
   hires <game> [names]         x4 Scale2x copies of skill sprites (drawn big): denser pixels, same size
@@ -825,10 +826,21 @@ cmd_art() {
       (( rc == 0 )) || die "concept failed"
       echo "Next: xem sprite-lab/sprites/$n/concept/sheet.png, chọn seed, vẽ gen.py theo <seed>.png + <seed>.json"
       ;;
+    motion-ref)  # Wan 2.1 1.3B trên GPU: clip THAM KHẢO nhịp chuyển động (áo bay, nhảy dậm), không phải frame game
+      local slug="${1:-}"; [[ "$slug" =~ ^[a-z0-9][a-z0-9-]*$ ]] || die "usage: gamekit art motion-ref <slug> \"<prompt>\" [--seed N] [--length 17]"
+      shift; [[ -n "${1:-}" ]] || die "usage: gamekit art motion-ref <slug> \"<prompt>\""
+      local prompt="$1"; shift
+      local gh="$WS/tools/gpuhost/gpuhost" lease="$$" rc=0
+      "$gh" start comfyui --lease "$lease" >/dev/null || die "GPU host not ready: $gh status"
+      python3 "$KIT/pipeline/comfy_art.py" --timeout 1800 motion --prompt "$prompt" --dir "$LAB/refs/motion/$slug" "$@" || rc=$?
+      "$gh" release comfyui --lease "$lease" >/dev/null || true
+      (( rc == 0 )) || die "motion-ref failed"
+      echo "Xem sprite-lab/refs/motion/$slug/sheet.png (+ motion.gif); vẽ frame bằng gen.py, KHÔNG chép frame AI"
+      ;;
     comfy)  # ComfyUI workflow on GPU host (gpuhost tunnel must be up: tools/gpuhost/gpuhost start comfyui)
       python3 "$KIT/pipeline/comfy_art.py" "$@"
       ;;
-    *) die "usage: gamekit art new|rig|concept|run|lab|shot|check|list|promote|ase|open|test|comfy ... (gamekit help)" ;;
+    *) die "usage: gamekit art new|rig|concept|motion-ref|run|lab|shot|check|list|promote|ase|open|test|comfy ... (gamekit help)" ;;
   esac
 }
 
