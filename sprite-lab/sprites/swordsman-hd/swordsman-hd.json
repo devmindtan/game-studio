@@ -27,14 +27,14 @@
       "hitbox": {
         "shape": "rect",
         "center": [
-          37.0,
+          36.0,
           38.0
         ],
         "active": [
           0,
           3
         ],
-        "half_w": 19.0,
+        "half_w": 18.0,
         "half_h": 22.0
       }
     },
@@ -72,14 +72,14 @@
       "hitbox": {
         "shape": "rect",
         "center": [
-          34.0,
+          33.0,
           38.0
         ],
         "active": [
           0,
           2
         ],
-        "half_w": 22.0,
+        "half_w": 21.0,
         "half_h": 22.0
       }
     },
@@ -99,14 +99,14 @@
       "hitbox": {
         "shape": "rect",
         "center": [
-          36.5,
+          36.0,
           39.0
         ],
         "active": [
           0,
           4
         ],
-        "half_w": 20.5,
+        "half_w": 20.0,
         "half_h": 21.0
       }
     },

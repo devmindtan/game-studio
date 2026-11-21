@@ -130,26 +130,28 @@ def frame(**kw):
     return hd.draw_layers(CHAR, pose(**kw))
 
 
+SWORD = 35   # góc cầm kiếm cố định cho mọi tư thế đứng: chúc mũi xuống phía trước, không bị thân che
+
 # --- animations: movement and state only (attacks are effect sprites) -------------
 
 def idle(i):
     bob = [0, 0, 1, 0][i]
-    return frame(bob=bob, hands=((-2, 7), (3, 5)), weapon=20, phase=i * 1.2,
+    return frame(bob=bob, hands=((-2, 7), (3, 5)), weapon=SWORD, phase=i * 1.2,
                  eyes="closed" if i == 3 else "open")
 
 
 def run(i):
-    """Chạy cầm kiếm chúc mũi xuống phía trước, lắc theo nhịp tay (205° = chĩa ra sau thì lưỡi bị thân che)."""
-    return hd.draw_layers(CHAR, run_pose(i, weapon=40 + 12 * math.sin(i * math.pi / 4)))
+    """Chạy: kiếm giữ nguyên góc SWORD, chỉ đi theo tay (người dùng 2026-11-21: kiếm không cần tự chuyển động)."""
+    return hd.draw_layers(CHAR, run_pose(i, weapon=SWORD))
 
 
 def hurt(i):
     return [
         frame(bob=1, lean=-2, head=(-1, 0), feet=((-4, 0), (2, 0)), hands=((-4, 3), (1, 4)),
-              weapon=200, eyes="wince", flash=0.75, speed=0.5),
+              weapon=SWORD, eyes="wince", flash=0.75, speed=0.5),
         frame(bob=1, lean=-2, head=(-1, 0), feet=((-4, 0), (2, 0)), hands=((-4, 4), (1, 5)),
-              weapon=200, eyes="wince", speed=0.3, phase=1.0),
-        frame(bob=0, lean=0, hands=((-2, 7), (3, 5)), weapon=20),
+              weapon=SWORD, eyes="wince", speed=0.3, phase=1.0),
+        frame(bob=0, lean=0, hands=((-2, 7), (3, 5)), weapon=SWORD),
     ][i]
 
 
@@ -158,11 +160,11 @@ def dash(i):
     Feet stay on the floor (ground=True); the body leans hard, arms and sword trail back,
     the scarf flies out at full speed."""
     return [
-        frame(bob=2, lean=1, feet=((-4, 0), (3, 0)), hands=((-3, 5), (3, 5)), weapon=35, speed=0.4),
-        frame(bob=2, lean=3, feet=((-6, 1), (5, 0)), hands=((-6, 4), (-1, 5)), weapon=190, speed=1.0, phase=0.6),
-        frame(bob=2, lean=3, feet=((-7, 2), (5, 0)), hands=((-7, 3), (-2, 4)), weapon=185, speed=1.0, phase=1.4),
-        frame(bob=2, lean=3, feet=((-6, 1), (5, 0)), hands=((-7, 4), (-2, 5)), weapon=188, speed=1.0, phase=2.2),
-        frame(bob=1, lean=1, feet=((-3, 0), (3, 0)), hands=((-2, 6), (3, 5)), weapon=30, speed=0.5, phase=3.0),
+        frame(bob=2, lean=1, feet=((-4, 0), (3, 0)), hands=((-3, 5), (3, 5)), weapon=SWORD, speed=0.4),
+        frame(bob=2, lean=3, feet=((-6, 1), (5, 0)), hands=((-6, 4), (-1, 5)), weapon=SWORD, speed=1.0, phase=0.6),
+        frame(bob=2, lean=3, feet=((-7, 2), (5, 0)), hands=((-7, 3), (-2, 4)), weapon=SWORD, speed=1.0, phase=1.4),
+        frame(bob=2, lean=3, feet=((-6, 1), (5, 0)), hands=((-7, 4), (-2, 5)), weapon=SWORD, speed=1.0, phase=2.2),
+        frame(bob=1, lean=1, feet=((-3, 0), (3, 0)), hands=((-2, 6), (3, 5)), weapon=SWORD, speed=0.5, phase=3.0),
     ][i]
 
 
