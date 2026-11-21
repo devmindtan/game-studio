@@ -1,0 +1,3 @@
+Starter pose source copied and renamed from Pixelbolt 0.17.0 examples/hero-sword.poses.json.
+Copyright (c) 2026 PixelForge contributors; MIT License.
+Full license text: tools/gamekit/PIXELBOLT-LICENSE.txt.

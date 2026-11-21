@@ -1,0 +1,60 @@
+{
+  "frames": 17,
+  "frame_size": [
+    40,
+    37
+  ],
+  "fps": 5.0,
+  "loop": true,
+  "anchor": [
+    19.0,
+    36.0
+  ],
+  "anchor_source": "explicit",
+  "animations": [
+    {
+      "name": "idle",
+      "start": 0,
+      "frames": 4,
+      "fps": 5.0,
+      "loop": true,
+      "durations_ms": [
+        200.0,
+        200.0,
+        200.0,
+        200.0
+      ]
+    },
+    {
+      "name": "walk",
+      "start": 4,
+      "frames": 8,
+      "fps": 12.5,
+      "loop": true,
+      "durations_ms": [
+        80.0,
+        80.0,
+        80.0,
+        80.0,
+        80.0,
+        80.0,
+        80.0,
+        80.0
+      ]
+    },
+    {
+      "name": "attack",
+      "start": 12,
+      "frames": 5,
+      "fps": 12.5,
+      "loop": false,
+      "durations_ms": [
+        80.0,
+        80.0,
+        80.0,
+        80.0,
+        80.0
+      ]
+    }
+  ]
+}
