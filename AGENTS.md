@@ -126,8 +126,9 @@ xuất kéo dài thì khuyên người dùng mở phiên mới ở đó.
 ## Điều tra code (graphify)
 
 - **Tối ưu đọc/điều hướng code trước** (ổn định, local, miễn phí): dùng `graphify` (CLI/skill) cho câu hỏi "ở đâu / gọi cái gì / liên kết thế nào", sau đó **chỉ đọc đúng file/line** được chỉ và xác minh trong source trước khi sửa.
-- **Duy trì index AST cục bộ** (không cần LLM, chạy qua `limited`): nếu khu vực làm việc chưa có `graphify-out/` hoặc code vừa thay đổi nhiều, chạy `limited graphify update <khu-vực>`. `<khu-vực>` ưu tiên phạm vi hẹp đang làm việc: `tools/gamekit`, `sprite-lab`, `.agents`, hoặc `games/<g>` (mỗi game là repo riêng; không index `templates/`, `tools/lpc-generator/`).
-- **Truy vấn**: `graphify explain "<symbol>" --graph <khu-vực>/graphify-out/graph.json`, `graphify path "A" "B" --graph <khu-vực>/graphify-out/graph.json` (hoặc dùng đường dẫn mặc định nếu đang ở đúng khu vực).
+- **Duy trì index AST cục bộ** (không cần LLM, chạy qua `limited`): đầu mỗi ngày làm việc hoặc khi code vừa thay đổi nhiều, chạy `limited graphify update tools/gamekit` và `limited graphify update sprite-lab` (~10 s mỗi cái, giữ index mới thì `explain` mới đúng).
+- **Chỉ hai khu vực trên.** `graphify` 0.9.104 **không đọc GDScript** (kiểm 2026-11-21: index `games/bach-ai` ra **0** node `.gd`, chỉ nhặt 4.892 file `.md` trong `.claude/`) — đừng index `games/`, `templates/`, `tools/lpc-generator/`; tìm trong `.gd` bằng `rg -n "<chuỗi>" src/`. Index cũ mà vẫn trả lời thì câu trả lời sai theo code cũ: `explain` báo "No node matching" nghĩa là index chưa phủ symbol/ngôn ngữ đó, chạy lại `update` rồi mới kết luận.
+- **Truy vấn**: `graphify explain "<symbol>" --graph <khu-vực>/graphify-out/graph.json`, `graphify path "A" "B" --graph <khu-vực>/graphify-out/graph.json` (hoặc dùng đường dẫn mặc định nếu đang ở đúng khu vực). Ví dụ tiết kiệm thật: `explain "earth_burst"` trả 900 byte kèm số dòng cho 11 chỗ gọi, thay vì đọc cả `burstfx.py` (441 dòng, 21 KB).
 - **Quy ước**: `graphify-out/` là artifact sinh ra, **không commit**. Thay đổi rộng hoặc codebase lạ: cập nhật/đọc graph trước rồi mới sửa.
 
 ## Âm thanh báo (người dùng 2026-11-18)
