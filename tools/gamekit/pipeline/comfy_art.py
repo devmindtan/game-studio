@@ -19,12 +19,15 @@ from __future__ import annotations
 
 import argparse
 import json
-import math
 import sys
 import time
 import urllib.error
 import urllib.request
 from pathlib import Path
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from PIL import Image
 
 DEFAULT_API = "http://127.0.0.1:8190"
 NEGATIVE = "blurry, photo, 3d render, text, watermark, frame, border, gradient background, bad anatomy"
@@ -158,6 +161,24 @@ OPENPOSE_COLORS = {
 }
 
 
+POSE_KEYS = ("hip", "top", "head", "sh_back", "sh_front", "hand_back", "hand_front", "foot_back", "foot_front")
+
+
+def _fit_pose(g: dict, size: int, fill: float = 0.85) -> tuple[float, float, float]:
+    """scale, ox, oy để khung xương cao `fill` × ảnh, giữa theo ngang, đáy chừa lề như nhau.
+
+    Vẽ thẳng theo canvas 48 px thì người chỉ cao ~20% ảnh và ControlNet bỏ qua pose (đo 2026-11-21).
+    Đầu là một điểm nên cộng thêm nửa đầu (~4 px minifig) ở trên.
+    """
+    xs = [g[k][0] for k in POSE_KEYS]
+    ys = [g[k][1] for k in POSE_KEYS]
+    top, bottom = min(ys) - 4, max(ys)
+    scale = size * fill / max(1.0, bottom - top)
+    ox = size / 2 - (min(xs) + max(xs)) / 2 * scale
+    oy = size * (1 + fill) / 2 - bottom * scale
+    return scale, ox, oy
+
+
 def openpose_from_pose(pose: dict, size: int = 512, src: int = 48) -> "Image.Image":
     """Vẽ stick figure kiểu OpenPose từ minifig geometry lên nền đen."""
     from PIL import Image, ImageDraw
@@ -171,11 +192,11 @@ def openpose_from_pose(pose: dict, size: int = 512, src: int = 48) -> "Image.Ima
     g = mf.geometry(pose)
     img = Image.new("RGB", (size, size), (0, 0, 0))
     d = ImageDraw.Draw(img)
-    scale = size / src
+    scale, ox, oy = _fit_pose(g, size)
     sw = max(2, size // 64)
 
     def pt(p):
-        return (p[0] * scale, p[1] * scale)
+        return (ox + p[0] * scale, oy + p[1] * scale)
 
     def limb(a, b, col):
         d.line([pt(a), pt(b)], fill=col, width=sw)
@@ -189,6 +210,7 @@ def openpose_from_pose(pose: dict, size: int = 512, src: int = 48) -> "Image.Ima
     head = g["head"]
     limb(hip, top, OPENPOSE_COLORS["body"])
     limb(top, head, OPENPOSE_COLORS["head"])
+    limb(g["sh_back"], g["sh_front"], (255, 85, 0))
     limb(g["sh_back"], g["hand_back"], OPENPOSE_COLORS["arm_l"])
     limb(g["sh_front"], g["hand_front"], OPENPOSE_COLORS["arm_r"])
     limb(hip, g["foot_back"], OPENPOSE_COLORS["leg_l"])

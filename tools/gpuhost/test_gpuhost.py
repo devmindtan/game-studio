@@ -78,3 +78,47 @@ class LeaseTest(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class RemoteArgvTest(unittest.TestCase):
+    """2026-11-21: `gpuhost ssh 'python -c "import a;print(1)"'` vỡ vì lệnh bị bọc "…" cho cmd của Windows."""
+
+    def test_quotes_survive(self):
+        import base64
+        cmd = 'python -c "import torch;print(1)" && echo \'x y\' | grep "x"'
+        argv = gpuhost.remote_argv(cmd)
+        self.assertEqual(argv[:4], ["wsl", "-e", "bash", "-c"])
+        blob = argv[4]
+        self.assertFalse(set('"\'&;<>^%') & set(blob.split(" ")[1]))
+        self.assertEqual(base64.b64decode(blob.split(" ")[1]).decode(), cmd)
+
+
+class OrphanTest(unittest.TestCase):
+    """2026-11-21: WSL sập giữa chừng → `stop` vẫn in 'đã dừng' và ComfyUI (8 GB RAM) chạy mồ côi không tunnel."""
+
+    def setUp(self):
+        self.root = make_root({"host": "desktop-kndgm60"})
+        self.calls = []
+        self.saved = {k: getattr(gpuhost, k) for k in ("ssh", "remote_state", "probe", "acquire")}
+
+    def tearDown(self):
+        for k, v in self.saved.items():
+            setattr(gpuhost, k, v)
+
+    def test_stop_fails_when_remote_unreachable(self):
+        gpuhost.ssh = lambda c, cmd, timeout=30: None
+        with self.assertRaises(SystemExit):
+            gpuhost.stop("comfyui", root=self.root)
+
+    def test_start_kills_orphan_without_tunnel(self):
+        import subprocess
+        def fake_ssh(c, cmd, timeout=30):
+            self.calls.append(cmd)
+            return subprocess.CompletedProcess([], 0, "", "")
+        gpuhost.ssh = fake_ssh
+        gpuhost.remote_state = lambda root=None: {"reachable": True, "installed": {"comfyui": True},
+                                                  "running": {"comfyui": True}}
+        gpuhost.acquire = lambda s, who: None
+        gpuhost.probe = lambda s: {"state": "ready"}
+        gpuhost.start("comfyui", root=self.root)
+        self.assertTrue(any(cmd.endswith("/stop.sh") for cmd in self.calls), self.calls)

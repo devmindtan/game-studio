@@ -8,6 +8,7 @@ cách làm: `.gpu/host.json` ngoài Git, một vòng SSH để dò trạng thái
 """
 
 import argparse
+import base64
 import json
 import os
 import re
@@ -77,13 +78,20 @@ def service(root, sid):
     return services[sid]
 
 
-def ssh(c, cmd, timeout=30):
-    """Chạy `cmd` bằng bash trong WSL của máy GPU. Trả CompletedProcess, hoặc None nếu không gọi được ssh.
+def remote_argv(cmd):
+    """argv sau `ssh <host>` để chạy `cmd` bằng bash -l trong WSL.
 
-    Windows OpenSSH mở bằng cmd nên phải gói cả lệnh trong một cặp nháy kép, giống bản Node tham khảo.
+    Windows OpenSSH mở bằng cmd: nháy kép/&/; trong lệnh bị cmd hiểu sai (bài học 2026-11-21). Lệnh đi dưới
+    dạng base64 (chỉ A-Za-z0-9+/=), gói trong một cặp nháy kép, giải mã rồi chạy trong WSL.
     """
+    b64 = base64.b64encode(cmd.encode()).decode()
+    return ["wsl", "-e", "bash", "-c", f'"echo {b64} | base64 -d | bash -l"']
+
+
+def ssh(c, cmd, timeout=30):
+    """Chạy `cmd` bằng bash trong WSL của máy GPU. Trả CompletedProcess, hoặc None nếu không gọi được ssh."""
     try:
-        return subprocess.run(["ssh", *SSH, c["host"], "wsl", "-e", "bash", "-lc", f'"{cmd}"'],
+        return subprocess.run(["ssh", *SSH, c["host"], *remote_argv(cmd)],
                               capture_output=True, text=True, timeout=timeout)
     except (OSError, subprocess.SubprocessError):
         return None
@@ -195,6 +203,9 @@ def start(sid="comfyui", lease=None, root=ROOT):
     if not st.get("reachable") or not st.get("installed", {}).get(sid):
         raise SystemExit(f"máy GPU chưa sẵn sàng cho {s['label']}: {st.get('reason') or s['dir'] + '/run.sh thiếu'}"
                          " (xem tools/gpuhost/README.md)")
+    if st.get("running", {}).get(sid) and not tunnel_pid(s):
+        # còn bản chạy mồ côi (tunnel đã chết, vd WSL sập): dừng để trả RAM/VRAM rồi mở lại có tunnel
+        ssh(c, f"{s['dir']}/stop.sh", timeout=60)
     acquire(s, lease or str(os.getpid()))
     now = probe(s)
     if now["state"] == "ready":
@@ -208,7 +219,7 @@ def start(sid="comfyui", lease=None, root=ROOT):
         child = subprocess.Popen(
             ["ssh", *SSH, "-o", "ExitOnForwardFailure=yes", "-o", "ServerAliveInterval=30",
              "-L", f"127.0.0.1:{s['local_port']}:127.0.0.1:{s['remote_port']}",
-             c["host"], "wsl", "-e", "bash", "-lc", f'"{s["dir"]}/run.sh"'],
+             c["host"], *remote_argv(f"{s['dir']}/run.sh")],
             stdin=subprocess.DEVNULL, stdout=log, stderr=log, start_new_session=True)
         log.close()
         s["pid_file"].write_text(str(child.pid), encoding="utf-8")
@@ -237,6 +248,9 @@ def stop(sid="comfyui", root=ROOT):
     for name in holders(s):
         (s["leases"] / name).unlink(missing_ok=True)
     remote = ((r.stdout or "") + (r.stderr or "")).strip() if r else "không gọi được ssh"
+    if r is None or r.returncode != 0:
+        raise SystemExit(f"Chưa dừng được {s['label']} trên {c['host']} ({remote}); dịch vụ có thể còn giữ "
+                         f"RAM/VRAM. Chạy lại `gpuhost stop {sid}` khi máy GPU trả lời.")
     return {"remote": remote, "tunnel": bool(pid)}
 
 

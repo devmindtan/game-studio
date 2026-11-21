@@ -35,10 +35,23 @@ Tách khỏi `~/imagegen-gpu` (20-repo, port 8188):
 | Thư mục WSL | `~/gameart-gpu` |
 | Port remote | `8189` |
 | Port local (tunnel) | `8190` |
-| Chạy | `run.sh` → ComfyUI `--listen 127.0.0.1 --port 8189 --lowvram --reserve-vram 0.5` |
+| Chạy | `run.sh` → ComfyUI `--listen 127.0.0.1 --port 8189 --lowvram --reserve-vram 0.5 --fp8_e4m3fn-unet --fp8_e4m3fn-text-enc` (**không** `--cpu-vae`) |
 | Dừng | `stop.sh` (chỉ kill process thuộc `~/gameart-gpu/app`) |
 
 Model nằm trong `~/gameart-gpu/app/models/` (riêng, không dùng chung symlink `/mnt/d/...` của imagegen-gpu). Custom node trong `~/gameart-gpu/app/custom_nodes/`.
+
+## Cấu hình đã đo (2026-11-21, GTX 1660 SUPER 6 GB, WSL 11 GB RAM)
+
+| `run.sh` | keyframe SDXL Lightning 768², 4 step (ấm máy) | Ghi chú |
+|---|---|---|
+| có `--cpu-vae` | 26,3 s | decode VAE trên CPU chiếm ~2/3 thời gian |
+| bỏ `--cpu-vae` | **9,3 s** | cấu hình đang dùng |
+| bỏ thêm fp8 + `--lowvram` | sập | SDXL fp16 vượt 11 GB RAM của WSL, ComfyUI chạy mồ côi |
+
+- Lần đầu sau khi bật mất thêm ~15–40 s để nạp model. Đo nhiều lần thì đổi seed: prompt trùng y hệt được ComfyUI
+  cache (1,7 s, không phải tốc độ thật).
+- `animate` (SD1.5 + ControlNet OpenPose + IP-Adapter, 512²/20 step): ~17 s/frame. Nhân vật theo dáng nhưng chi
+  tiết (vũ khí, màu) trôi giữa các frame, nên chỉ dùng làm tham chiếu dáng, không làm frame game.
 
 ## Quy tắc
 
