@@ -219,6 +219,70 @@ def grid_sword(c, hand, angle, length, pal, floor_margin=1):
             put(c, hx + k * sx + ex, hy + k * sy + ey, pal["blade_d"])
 
 
+def held_sprite(c, template, anchor, hand, angle_deg, up=8):
+    """Vũ khí vẽ MỘT LẦN thẳng đứng (template: PIL RGBA, đỉnh ở trên) với điểm neo `anchor` = chỗ tay cầm, rồi
+    xoay cả khối quanh điểm neo `angle_deg` độ (dương = đỉnh ngả về trước/phải) và đặt neo vào `hand`.
+    Mọi bộ phận (đầu trượng, quả cầu, chỗ quấn) khớp nhau ở mọi góc (người dùng 2026-11-21: thay cho việc nắn
+    tay từng phần theo dốc). Xoay kiểu RotSprite đơn giản: phóng `up` lần, xoay NEAREST, thu về bằng màu chiếm
+    đa số trong mỗi ô (ô đặc >= nửa). Đuôi chạm sàn thì cắt bớt hàng dưới cùng của template rồi xoay lại."""
+    from collections import Counter
+    from PIL import Image
+    ax, ay = anchor
+    tpl = template
+    for _ in range(tpl.height):
+        R = max(tpl.width, tpl.height) * 2 + 4
+        big = Image.new("RGBA", (R * up, R * up), (0, 0, 0, 0))
+        big.paste(tpl.resize((tpl.width * up, tpl.height * up), Image.NEAREST),
+                  ((R // 2 - ax) * up, (R // 2 - ay) * up))
+        rot = big.rotate(-angle_deg, resample=Image.NEAREST, center=(R // 2 * up + up / 2, R // 2 * up + up / 2))
+        px = rot.load()
+        out = {}
+        for by in range(R):
+            for bx in range(R):
+                cnt = Counter()
+                for yy in range(by * up, by * up + up):
+                    for xx in range(bx * up, bx * up + up):
+                        v = px[xx, yy]
+                        if v[3]:
+                            cnt[v] += 1
+                if cnt and sum(cnt.values()) * 2 >= up * up:
+                    out[(bx - R // 2, by - R // 2)] = cnt.most_common(1)[0][0]
+        lowest = max((hand[1] + dy for (_, dy) in out), default=0)
+        if lowest <= SOLE - 1 or tpl.height <= ay + 2:
+            break
+        tpl = tpl.crop((0, 0, tpl.width, tpl.height - 1))          # đuôi chạm sàn: ngắn lại 1 hàng
+    for (dx, dy), v in out.items():
+        x, y = hand[0] + dx, hand[1] + dy
+        if 0 <= x < W and 0 <= y < H:
+            c.img.putpixel((x, y), v)
+
+
+def weapon_pieces(layer_strip_path, animations, frame=64):
+    """Số mảnh rời (8-liền) của lớp vũ khí trong từng frame đứng: {frame: số mảnh}."""
+    from PIL import Image
+    im = Image.open(layer_strip_path).convert("RGBA")
+    res = {}
+    for f in standing_frames(animations):
+        fr = im.crop((f * frame, 0, f * frame + frame, frame)).load()
+        seen, n = set(), 0
+        for y in range(frame):
+            for x in range(frame):
+                if fr[x, y][3] and (x, y) not in seen:
+                    n += 1
+                    stack = [(x, y)]
+                    seen.add((x, y))
+                    while stack:
+                        cx, cy = stack.pop()
+                        for dx in (-1, 0, 1):
+                            for dy in (-1, 0, 1):
+                                q = (cx + dx, cy + dy)
+                                if 0 <= q[0] < frame and 0 <= q[1] < frame and q not in seen and fr[q[0], q[1]][3]:
+                                    seen.add(q)
+                                    stack.append(q)
+        res[f] = n
+    return res
+
+
 # --- kiểm tra dùng chung cho gen.py (exit khác 0 khi hỏng) -------------------------------------
 
 def _rgb(h):

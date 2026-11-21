@@ -31,10 +31,8 @@ from sheet import export_layered  # noqa: E402
 
 NAME = "mage-hd"
 ANCHOR = (float(hd.ROOT_X), float(hd.FLOOR))
-STAFF_UP = 22       # tay -> đỉnh thân trượng (trượng cao ngang người, chống từ sàn lên quá đầu)
-STAFF_DOWN = 18     # tay -> đáy trượng (cắt bớt khi chạm sàn)
-SLOPE = 3           # nghiêng về trước 1 cột mỗi 3 hàng: dốc 1:3 vẫn là đường pixel đều
-STAFF = -90         # tư thế đứng: trượng dựng (nghiêng SLOPE); frame nằm dùng cùng góc rồi được xoay
+TILT = math.degrees(math.atan(1 / 3))   # ~18.4°: đỉnh trượng ngả về trước, góc cố định ở mọi tư thế đứng
+STAFF = -90                              # tư thế đứng; frame nằm đặt góc khác, độ xoay = weapon + 90 + TILT
 
 PAL = {   # của mage, thêm bậc tối/sáng
     "hat": "#4a2a7a", "hat_d": "#301f58", "hat_l": "#6d47ad",
@@ -50,7 +48,7 @@ PAL = {   # của mage, thêm bậc tối/sáng
     "wrap": "#5a2f3a", "ring": "#e2bd5e", "metal": "#9aa6b8", "metal_d": "#5c6678",
     "boot": "#4a3157", "boot_d": "#2b1a33", "boot_l": "#6a4a7a",
     "pants": "#3a2a4a", "pants_d": "#241630",
-    "magic": "#7ef0ff", "magic_mid": "#37b9e8", "magic_deep": "#8b5cf6", "core": "#effdff", "spark": "#b48cff",
+    "magic": "#7ef0ff", "magic_mid": "#37b9e8", "magic_deep": "#3b6fd0", "core": "#effdff",
     "eye": "#140d20", "eye_l": "#ffffff",
 }
 
@@ -118,95 +116,80 @@ def hat(c, p, g):
                 put(c, hx - 8 + col, y, PAL[HAT_KEYS[ch]])
 
 
-def staff(c, p, g):
-    """Trượng cao ngang người, nghiêng về trước dốc 1:3 (đường pixel đều), góc cố định ở mọi tư thế đứng.
-    Thân gỗ 2 tông, chỗ cầm quấn da có 2 vòng vàng, đáy bọc kim loại; đầu trượng là hai chạc gỗ (màu gnarl)
-    ôm viên pha lê hình thoi nhiều mặt có lõi sáng và đốm phép. p["weapon"] chỉ dùng ở frame nằm (xoay sẵn)."""
-    hx, hy = g["hand_front"]
-    top = None
-    for k in range(-STAFF_DOWN, STAFF_UP + 1):
-        y = hy - k
-        x = hx + k // SLOPE
-        if y > hd.SOLE - 1:
-            continue
-        if k <= -STAFF_DOWN + 1 or y >= hd.SOLE - 2:          # đáy bọc kim loại (2 px cuối)
-            put(c, x, y, PAL["metal"])
-            put(c, x + 1, y, PAL["metal_d"])
-            continue
-        col = PAL["wood"]
-        if k in (-3, 3):
-            col = PAL["ring"]                                  # vòng vàng
-        elif -2 <= k <= 2:
-            col = PAL["wrap"]                                  # quấn da chỗ cầm
-        put(c, x, y, col)
-        put(c, x + 1, y, PAL["wood_d"] if col == PAL["wood"] else col)
-        top = (x, y)
-    tx, ty = top
+def staff_template():
+    """Trượng vẽ MỘT LẦN thẳng đứng (11 x 42), điểm neo = chỗ tay cầm (5, 25). Từ trên xuống: quả cầu tròn 7x7
+    (sáng trên-phải, bóng dưới-trái, đốm sáng), hai chạc gỗ ôm hai bên cầu, nối vào thân ở hàng 9; thân gỗ 2 tông;
+    vòng vàng - quấn da - vòng vàng quanh chỗ cầm; đáy bọc kim loại."""
+    from PIL import Image
+    w, h = 11, 42
+    img = Image.new("RGBA", (w, h), (0, 0, 0, 0))
 
-    def hp(dx, dy, col):
-        """Pixel đầu trượng ở (dx, dy) so với đỉnh thân, nghiêng CÙNG dốc 1:SLOPE với thân (dy < 0 là lên)."""
-        put(c, tx + dx + (-dy) // SLOPE, ty + dy, col)
+    def px(x, y, key):
+        img.putpixel((x, y), hd._rgb(PAL[key]) + (255,))
 
-    # hai chạc gỗ ôm pha lê
-    for dx, dy in ((-1, -1), (-2, -2), (-3, -3), (-3, -4), (-3, -5), (-2, -7), (-1, -8)):
-        hp(dx, dy, PAL["gnarl"])
-    for dx, dy in ((2, -1), (3, -2), (4, -3), (4, -4), (4, -5), (3, -7), (2, -8)):
-        hp(dx, dy, PAL["gnarl"])
-    # quả cầu tròn 7x7 (tròn thì không cần nghiêng theo dốc): tâm đặt trên trục kéo dài của thân
-    ox, oy = tx + 1 + 5 // SLOPE, ty - 5
+    cx, cy = 5, 4
     for dy in range(-3, 4):
-        half = 2 if abs(dy) == 3 else 3
-        for dx in range(-half, half + 1):
+        for dx in range(-3, 4):
             if dx * dx + dy * dy > 11:
                 continue
-            col = PAL["magic_mid"]
-            if dx + dy >= 3:
-                col = PAL["magic_deep"]                         # bóng phía dưới-phải
-            elif dx - dy >= 3 or (dx >= 1 and dy <= -1):
-                col = PAL["magic"]                              # sáng phía trên-phải
-            put(c, ox + dx, oy + dy, col)
-    put(c, ox + 1, oy - 2, PAL["core"])
-    put(c, ox + 2, oy - 1, PAL["core"])
-    for dx, dy in ((-4, -11), (7, -9), (2, -16)):             # đốm phép (đặc, để ghép lớp khớp)
-        hp(dx, dy, PAL["spark"])
+            key = "magic_mid"
+            if dx - dy <= -3 or (dx <= -1 and dy >= 1):
+                key = "magic_deep"
+            elif dx - dy >= 2:
+                key = "magic"
+            px(cx + dx, cy + dy, key)
+    px(cx + 1, cy - 2, "core")
+    px(cx + 2, cy - 1, "core")
+    for x, y in ((1, 2), (1, 3), (1, 4), (1, 5), (2, 6), (2, 7), (3, 8), (4, 8),   # chạc trái
+                 (9, 2), (9, 3), (9, 4), (9, 5), (8, 6), (8, 7), (7, 8), (6, 8),   # chạc phải
+                 (0, 1), (10, 1)):                                                 # mũi chạc cong ra
+        px(x, y, "gnarl")
+    for y in range(9, h):
+        if y >= h - 2:
+            px(5, y, "metal")
+            px(6, y, "metal_d")
+        elif y in (22, 28):
+            px(5, y, "ring")
+            px(6, y, "ring")
+        elif 23 <= y <= 27:
+            px(5, y, "wrap")
+            px(6, y, "wrap")
+        else:
+            px(5, y, "wood")
+            px(6, y, "wood_d")
+    return img
 
 
-def check_staff(min_gem=12):
-    """Mọi frame đứng: thân trượng (wood + ring + wrap, cột trái nhất) là đường dốc 1:3 đều; quả cầu tròn 7x7 có tâm trên trục thân;
-    quả cầu thấy được (>= min_gem px)."""
+STAFF_TPL = staff_template()
+STAFF_ANCHOR = (5, 25)
+
+
+def staff(c, p, g):
+    """Đặt điểm neo của trượng vào bàn tay trước và xoay cả khối (hd.held_sprite)."""
+    hd.held_sprite(c, STAFF_TPL, STAFF_ANCHOR, g["hand_front"], p["weapon"] + 90 + TILT)
+
+
+def check_staff(min_orb=30):
+    """Mọi frame đứng: lớp vũ khí là MỘT khối liền (không mảnh rời như đốm phép trôi, chạc rời quả cầu), quả cầu
+    tròn (khung bao vuông 7x7) và thấy được (>= min_orb px trong ảnh cuối). Bài học 2026-11-21: trượng nắn tay
+    từng phần (thân theo dốc, chạc kéo xéo, cầu thẳng) lệch nhau; giờ vẽ một lần rồi xoay quanh điểm neo."""
     from PIL import Image
+    pieces = hd.weapon_pieces(HERE / "layers/weapon_strip.png", ANIMATIONS)
     im = Image.open(HERE / f"{NAME}_strip.png").convert("RGBA")
-    main = {hd._rgb(PAL[k]) for k in ("wood", "wrap", "ring")}
-    gem = {hd._rgb(PAL[k]) for k in ("magic", "magic_mid", "magic_deep", "core")}
+    orb = {hd._rgb(PAL[k]) for k in ("magic", "magic_mid", "magic_deep", "core")}
     bad = []
     for f in hd.standing_frames(ANIMATIONS):
         fr = im.crop((f * 64, 0, f * 64 + 64, 64)).load()
-        rows = {}
-        for y in range(64):
-            xs = [x for x in range(64) if fr[x, y][3] and fr[x, y][:3] in main]
-            if xs:
-                rows[y] = [min(xs)]          # cột chính = pixel trái nhất (bên phải là cạnh tối/quấn)
-        n_gem = sum(1 for y in range(64) for x in range(64) if fr[x, y][3] and fr[x, y][:3] in gem)
-        # dốc đều kể cả khi tay che vài hàng: tồn tại pha phi và hằng c với x = c - (y + phi) // SLOPE
-        ok = n_gem >= min_gem and len(rows) >= 10 and any(
-            len({v[0] + (y + phi) // SLOPE for y, v in rows.items()}) == 1 for phi in range(SLOPE))
-        if ok:
-            # quả cầu tròn (khung bao vuông, mỗi hàng đối xứng quanh tâm) và tâm nằm trên trục kéo dài của thân
-            # (bài học 2026-11-21: đầu vẽ lệch trục thân trông bị gãy)
-            pts = [(x, y) for y in range(64) for x in range(64) if fr[x, y][3] and fr[x, y][:3] in gem]
-            ys = [y for _, y in pts]
-            bx = [x for x, _ in pts]
-            by = ys
-            w, h = max(bx) - min(bx) + 1, max(by) - min(by) + 1
-            xc, yc = (max(bx) + min(bx)) / 2, (max(by) + min(by)) / 2
-            phis = [phi for phi in range(SLOPE) if len({v[0] + (y + phi) // SLOPE for y, v in rows.items()}) == 1]
-            axis = min(abs(xc - (rows[min(rows)][0] + (min(rows) + phi) // SLOPE - (yc + phi) / SLOPE))
-                       for phi in phis) if phis else 99
-            ok = w == h == 7 and axis <= 1.5
-        if not ok:
-            bad.append((f, n_gem))
+        pts = [(x, y) for y in range(64) for x in range(64) if fr[x, y][3] and fr[x, y][:3] in orb]
+        if pts:
+            w = max(x for x, _ in pts) - min(x for x, _ in pts) + 1
+            h = max(y for _, y in pts) - min(y for _, y in pts) + 1
+        else:
+            w = h = 0
+        if pieces[f] != 1 or len(pts) < min_orb or abs(w - h) > 1:
+            bad.append((f, pieces[f], len(pts), (w, h)))
     if bad:
-        raise SystemExit(f"trượng không đều dốc 1:{SLOPE} hoặc mất pha lê ở frame (frame, px pha lê): {bad}")
+        raise SystemExit(f"trượng hỏng (frame, số mảnh, px cầu, khung cầu): {bad}")
 
 
 CHAR = {"pal": PAL, "body": "robe", "robe_len": "long", "head": beard, "hair": hat, "held": staff}
@@ -248,11 +231,13 @@ def hurt(i):
 
 
 def death(i):
+    # ngã ngửa: trượng ngả RA TRƯỚC, xa mặt (-135° ngả ra sau làm quả cầu đè lên mặt). Frame nằm (lie) được
+    # xoay nguyên khối 90° ngược chiều kim đồng hồ: trượng dựng (-90°) trước khi xoay sẽ nằm dọc theo người.
     return [
         frame(bob=1, lean=-2, head=(-1, 0), feet=((-4, 0), (2, 0)), hands=((-4, 3), (1, 3)),
-              weapon=-135, eyes="x", flash=0.5, tilt=-1),
-        frame(bob=3, lean=-1, feet=((-3, 0), (3, 0)), hands=((-3, 6), (2, 6)), weapon=-135, eyes="x"),
-        frame(bob=3, lean=-2, feet=((-3, 0), (3, 0)), hands=((-3, 6), (2, 6)), weapon=-135, eyes="x", lie=0.4),
+              weapon=-30, eyes="x", flash=0.5, tilt=-1),
+        frame(bob=3, lean=-1, feet=((-3, 0), (3, 0)), hands=((-3, 6), (2, 6)), weapon=-30, eyes="x"),
+        frame(bob=3, lean=-2, feet=((-3, 0), (3, 0)), hands=((-3, 6), (2, 6)), weapon=-60, eyes="x", lie=0.4),
         frame(bob=3, lean=-2, feet=((-3, 0), (3, 0)), hands=((-3, 6), (3, 6)), weapon=-90, eyes="x", lie=0.85),
         frame(bob=3, lean=-2, feet=((-3, 0), (3, 0)), hands=((-3, 6), (3, 6)), weapon=-90, eyes="x", lie=1.0),
     ][i]

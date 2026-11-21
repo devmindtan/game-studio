@@ -74,8 +74,13 @@ chọn nguồn `.poses.json` nếu sprite có file đó; sprite dùng `gen.py` t
      thêm kiểm tra vào `gen.py` như `check_string_visible` của `sprites/archer`. Vũ khí thẳng (kiếm, giáo, gậy)
      chỉ vẽ ở góc sạch của lưới pixel: 0°/45°/90° (hoặc dốc 2:1), đặt pixel theo bước nguyên; góc lẻ (35°) ra
      bậc thang không đều, trông cong (bài học 2026-11-21, `check_blade_straight` của `sprites/swordsman-hd`).
-     Phần gắn ở đầu vũ khí (pha lê, lưỡi rìu, đầu giáo, chắn kiếm) vẽ trong toạ độ của TRỤC vũ khí: nghiêng/xoay
-     cùng thân, không vẽ thẳng đứng trên thân nghiêng (bài học 2026-11-21, `check_staff` của `sprites/mage-hd`).
+     **Vũ khí cầm tay vẽ MỘT LẦN thẳng đứng như sprite riêng, có điểm neo ở chỗ tay cầm, rồi xoay cả khối quanh
+     điểm neo** (`hdfig.held_sprite`, người dùng 2026-11-21). Không nắn tay từng bộ phận theo dốc (thân theo dốc,
+     đầu kéo xéo, phần gắn thẳng) vì chúng lệch nhau. Kiểm: lớp vũ khí là một khối liền (`hdfig.weapon_pieces`).
+     Frame nằm (lie) được xoay 90° ngược chiều kim đồng hồ: chọn góc vũ khí TRƯỚC khi xoay cho đúng chỗ sau khi xoay.
+   - **Soát logic trước khi báo xong** (người dùng 2026-11-21: "sửa cái là ok luôn vậy"): phóng to từng bộ phận và
+     tự hỏi có hợp lý không (phần gắn có ôm/khớp nhau, có mảnh lơ lửng, có đè lên mặt, tư thế chết có tự nhiên);
+     ghi các lỗi tìm được trước, rồi mới báo.
 1. **Chốt spec**: kích thước (16/24/32/48/64; nhân vật cao thì chừa khoảng trống phía trên cho nhảy), palette
    4–16 màu, hướng nhìn (mặc định quay phải), **điểm neo** (nhân vật đứng: giữa hai bàn chân trên mặt đất;
    vật bay: tâm thân; đạn/giọt: đầu va chạm), danh sách animation với số frame/fps/loop. Mơ hồ thì chọn mặc
