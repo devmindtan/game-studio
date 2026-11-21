@@ -50,25 +50,47 @@ def arc_stroke(c, cx, cy, r, a0, a1, col, step=4):
         a += step
 
 
+def blade(c, a_head, span, r0, r1):
+    """A solid crescent blade of wind: filled between r0 and r1 over `span` degrees ending at a_head; the
+    head (leading edge) is white-hot, the tail fades to steel blue (user 2026-11-21: the dotted arcs read as
+    a faint blur)."""
+    for y in range(SIZE):
+        for x in range(SIZE):
+            dx, dy = x + 0.5 - CX, y + 0.5 - CY
+            r = math.hypot(dx, dy)
+            if not (r0 <= r <= r1):
+                continue
+            a = math.degrees(math.atan2(dy, dx)) % 360
+            back = (a_head - a) % 360          # degrees behind the head
+            if back > span:
+                continue
+            t = back / span                    # 0 head .. 1 tail
+            inner = r0 + (r1 - r0) * (t ** 0.7)        # thick at the head, a thin hook at the tail
+            if r < inner:
+                continue
+            rim = r > r1 - 1.6                         # the outer cutting edge catches the light
+            if rim and t < 0.7:
+                col = CORE
+            elif t < 0.25:
+                col = EDGE
+            elif t < 0.6:
+                col = WIND
+            else:
+                col = WIND_D
+            p(c, x, y, col)
+
+
 def spin(i):
     c = Canvas(SIZE, SIZE)
     base = i * 45
-    # hai cung chém đối xứng quay tròn
-    for k, (r, col, span) in enumerate(((18, WIND_D, 120), (15, EDGE, 90), (12, CORE, 60))):
-        a0 = base + k * 10
-        arc_stroke(c, CX, CY, r, a0, a0 + span, col, step=3)
-        arc_stroke(c, CX, CY, r, a0 + 180, a0 + 180 + span, col, step=3)
-    # vòng gió ngoài
-    arc_stroke(c, CX, CY, 20, base + 30, base + 110, WIND, step=5)
-    arc_stroke(c, CX, CY, 20, base + 210, base + 290, WIND, step=5)
-    # tia lửa/gió nhỏ
-    for k in range(6):
-        a = math.radians(base * 2 + k * 60)
-        r = 16 + (k % 2) * 3
-        p(c, round(CX + math.cos(a) * r), round(CY + math.sin(a) * r), EDGE if k % 2 else STEEL)
-    # tâm gió mờ
-    c.ellipse(CX - 4, CY - 4, CX + 4, CY + 4, "#cfe8ff22")
-    return c
+    for k in (0, 180):                        # two blades opposite each other
+        blade(c, base + k + 120, 160, 9, 20)
+    for k in (0, 180):                        # a thin outer gust trailing each blade
+        arc = base + k + 60
+        for d in range(0, 70, 2):
+            rad = math.radians(arc - d)
+            p(c, round(CX + math.cos(rad) * 21.5), round(CY + math.sin(rad) * 21.5), WIND if d < 40 else WIND_D)
+    return c.outline("#1b2a40")
 
 
 ANIMATIONS = [

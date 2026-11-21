@@ -18,5 +18,5 @@ from tierfx import build
 from sheet import export
 
 if __name__ == "__main__":
-    build(HERE, "whirlwind", 5, "#e8fff8", "#5fe0c0", export, thin=True)
+    build(HERE, "whirlwind", 5, "#e8fff8", "#5fe0c0", export)
     print("OK", HERE.name)
