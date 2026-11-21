@@ -100,7 +100,7 @@ gamekit art rig build <tên>            # xuất Pixelbolt thành strip/metadata
 gamekit art run <tên>                 # vẽ + kiểm tra <tên>.json (frames, animation, điểm neo)
 gamekit art shot <tên> sheet|move     # ảnh để xem: mọi animation / 8 khoảnh khắc thử di chuyển
 gamekit shot <game> "" 300,600 -- …  # ảnh game: 60 fps cố định, không vsync, nhiều frame trong một lần chạy
-GK_SHOW=1 gamekit shot …               # mặc định cửa sổ chụp nằm ngoài màn hình (không nhấp nháy); GK_SHOW=1 để thấy
+GK_SHOW=1 gamekit shot …               # mặc định chạy trên màn hình ảo Xvfb (xvfb-run; không có thì cửa sổ ngoài màn hình); GK_SHOW=1 để thấy
                                      # chỉ in các dòng ERROR / Run over / "GK:": debug thì printerr("GK: …")
 gamekit ui-shots <game>              # chụp lại bộ màn hình hiện tại (production/ui/screens.json → production/ui/*.png)
 gamekit art lab [<tên>] [sheet|move]  # mở lab (người dùng tự điều khiển)
