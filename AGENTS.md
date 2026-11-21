@@ -93,6 +93,7 @@ xuất kéo dài thì khuyên người dùng mở phiên mới ở đó.
   đổi thứ người chơi thấy thì chạy `gamekit ui-shots <g>`, xem ảnh, commit `production/ui`. Dashboard (`games.html`)
   chỉ hiện bộ này và báo khi nó cũ hơn code; ảnh trong `production/qa/evidence/` là bằng chứng lịch sử, không phải
   giao diện hiện tại.
+- **Tiết kiệm RAM/thời gian** (người dùng 2026-11-21: làm lâu, ngốn RAM): `gamekit ui-shots <g> <tên màn…>` chỉ chụp lại các màn vừa đổi (mỗi màn là một Godot render bằng CPU trên Xvfb); chụp cả bộ chỉ trước khi xuất bản web. Tra code bằng `tools/gdgraph` / graphify thay vì đọc cả file lớn (`run.gd` > 3000 dòng).
 - **Chụp nhanh:** cần nhiều ảnh thì **một** lệnh `gamekit shot <g> "" 300,320,340 -- …`, không gọi `shot` lặp lại
   trong vòng lặp (mỗi lần là một lần mở Godot và chạy lại từ đầu). Cảnh muộn trong game thì tua bằng cờ của game
   (ví dụ `--sim-steps=4`), không chụp ở frame 1500.
