@@ -56,18 +56,23 @@ HEROES = {"knight": "swordsman", "mage": "mage"}
 # --- knight looks -----------------------------------------------------------------
 
 def knight_helm(P, rarity):
+    """A closed great helm over the whole head (user 2026-11-21: the old cap only sat on top, the face
+    and sides showed): dome, cheek plates, neck guard, a face plate with one dark eye slit."""
     def draw(c, p, g):
         hx, hy = g["head"]
         rect(c, hx - 3, hy - 10, hx + 2, hy - 10, P["m"])        # dome top
-        rect(c, hx - 4, hy - 9, hx + 3, hy - 7, P["m"])
-        put(c, hx - 1, hy - 9, P["h"])
+        rect(c, hx - 4, hy - 9, hx + 4, hy, P["m"])             # the shell: covers the whole face block
+        rect(c, hx - 4, hy - 9, hx - 3, hy, P["d"])             # back of the head in shade
+        put(c, hx - 1, hy - 9, P["h"])                          # highlight on the dome
         put(c, hx, hy - 9, P["l"])
         put(c, hx - 2, hy - 8, P["l"])
         rect(c, hx - 4, hy - 6, hx + 4, hy - 6, P["t"])         # brow band
-        rect(c, hx - 4, hy - 5, hx - 3, hy - 1, P["m"])         # neck guard behind the face
-        put(c, hx - 4, hy - 1, P["d"])
-        put(c, hx + 4, hy - 5, P["m"])                          # nose guard
-        put(c, hx + 3, hy - 9, P["d"])
+        rect(c, hx, hy - 4, hx + 4, hy - 4, "#14111c")          # eye slit
+        put(c, hx + 2, hy - 4, P["h"] if p.get("eyes") not in ("closed", "x") else "#14111c")   # eye glint
+        rect(c, hx + 1, hy - 3, hx + 4, hy - 1, P["l"])         # face plate, lit side
+        put(c, hx + 3, hy - 2, P["d"])                          # breathing holes
+        put(c, hx + 3, hy, P["d"])
+        rect(c, hx - 4, hy, hx + 4, hy, P["d"])                 # lower rim
         if rarity == "rare":                                    # crest
             rect(c, hx - 2, hy - 11, hx + 1, hy - 11, P["t"])
         if rarity == "epic":                                    # horns

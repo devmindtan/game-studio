@@ -767,15 +767,21 @@ cmd_art() {
       mkdir -p "$dest"
       cp "$LAB/sprites/$n/${n}_strip.png" "$LAB/sprites/$n/$n.png" "$dest/" 2>/dev/null || cp "$LAB/sprites/$n/${n}_strip.png" "$dest/"
       # layered characters (equipment): the layer strips go along, stale ones are removed
-      rm -rf "$dest/layers"
+      # strips only, the game's .import files (uids) stay; a strip gone from the lab goes with its .import
       if [[ -d "$LAB/sprites/$n/layers" ]]; then
         mkdir -p "$dest/layers"
-        cp "$LAB/sprites/$n/layers/"*_strip.png "$dest/layers/"
+        rsync -a --delete --include='*_strip.png' --exclude='*' "$LAB/sprites/$n/layers/" "$dest/layers/"
+      else
+        rm -rf "$dest/layers"
       fi
       # equipment drawn on the hero (sprite-lab/sprites/hero-gear): gear/<item>/<layer>_strip.png
-      rm -rf "$dest/gear"
+      # images only: the game keeps its own .import files (their uids), the lab's would replace every
+      # uid on each promote (lesson 2026-11-21: 56 .import files churned by one helmet redraw)
       if [[ -d "$LAB/sprites/$n/gear" ]]; then
-        cp -r "$LAB/sprites/$n/gear" "$dest/gear"
+        mkdir -p "$dest/gear"
+        rsync -a --delete --exclude='*.import' --exclude='__pycache__' "$LAB/sprites/$n/gear/" "$dest/gear/"
+      else
+        rm -rf "$dest/gear"
       fi
       # The copy records where it came from; the source stays in the lab only.
       python3 -c 'import json,sys; m=json.load(open(sys.argv[1])); m["source"]="sprite-lab/sprites/"+sys.argv[3]; open(sys.argv[2],"w").write(json.dumps(m, indent=2)+"\n")' \
