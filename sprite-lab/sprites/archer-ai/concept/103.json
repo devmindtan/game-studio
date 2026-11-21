@@ -1,0 +1,55 @@
+{
+  "seed": 103,
+  "prompt": "pixel art game sprite, young female archer, full body, side view facing right, holding a wooden longbow, quiver of arrows on her back, plain light grey background, clean outline, limited palette",
+  "height": 30,
+  "palette": [
+    {
+      "hex": "#573528",
+      "count": 79
+    },
+    {
+      "hex": "#5b4934",
+      "count": 42
+    },
+    {
+      "hex": "#675f51",
+      "count": 37
+    },
+    {
+      "hex": "#883a2a",
+      "count": 13
+    },
+    {
+      "hex": "#9a6c5d",
+      "count": 12
+    },
+    {
+      "hex": "#9b4d2e",
+      "count": 8
+    },
+    {
+      "hex": "#788370",
+      "count": 8
+    },
+    {
+      "hex": "#e1a88d",
+      "count": 8
+    },
+    {
+      "hex": "#c76231",
+      "count": 4
+    },
+    {
+      "hex": "#97928f",
+      "count": 4
+    },
+    {
+      "hex": "#d29475",
+      "count": 2
+    },
+    {
+      "hex": "#9a8770",
+      "count": 1
+    }
+  ]
+}
