@@ -836,6 +836,10 @@ function skillPane(pane,s){
   const card=el('div',{class:'card'});
   card.appendChild(el('div',{class:'iconRow'},iconCanvas(s.icon||s.id,3),el('h3',{style:'margin:0'},s.name)));
   card.appendChild(el('p',{class:'muted',style:'margin:6px 0'},s.desc));
+  const SCALE_VI={damage:'sát thương',max_hp:'máu tối đa',armor:'giáp',move_speed:'tốc độ chạy',magnet:'tầm hút',regen:'hồi máu'};
+  const sc=(s.params&&s.params.scale)||{damage:(s.params&&s.params.damage_mul)||1};
+  card.appendChild(el('div',{class:'small',style:'margin:0 0 6px'},el('b',{},'Scale theo: '),
+    Object.entries(sc).map(([k,v])=>(SCALE_VI[k]||k)+' ×'+v).join(' + ')));
   card.appendChild(ruleLine(s.check));
   let level=1, showHb=true, speed=1, paused=false, clock=0, last=performance.now();
   const ctl=el('div',{class:'row'});

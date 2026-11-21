@@ -250,6 +250,15 @@ def level_values(upgrade, level):
     return out
 
 
+def skill_base(defn, stats):
+    """Same as the game's Run.skill_base: "scale" {stat: coefficient} sums stat x coefficient,
+    else damage x damage_mul (roadmap 2026-11-21: skills scale on damage, armor, hp, speed...)."""
+    sc = defn.get("scale") or {}
+    if not sc:
+        return float(stats.get("damage", 10.0)) * float(defn.get("damage_mul", 1.0))
+    return sum(float(stats.get(k, 0.0)) * float(v) for k, v in sc.items())
+
+
 def skill_entry(skill_id, defn, upgrade, cls, root):
     stats = cls.get("stats", {})
     base_damage = float(stats.get("damage", 10.0))
@@ -265,7 +274,7 @@ def skill_entry(skill_id, defn, upgrade, cls, root):
             cooldown = float(stats.get("cooldown", 1.0)) * float(defn.get("cooldown_mul", 1.0))
         levels.append({
             "level": lv,
-            "damage": round(base_damage * float(defn.get("damage_mul", 1.0)) * dmg_mul, 1),
+            "damage": round(skill_base(defn, stats) * dmg_mul, 1),
             "size": round(float(stats.get("area", 1.0)) * float(defn.get("size_mul", 1.0)) * area_mul, 2),
             "cooldown": round(cooldown, 2),
             "sprite": tiers[min(lv - 1, len(tiers) - 1)],
