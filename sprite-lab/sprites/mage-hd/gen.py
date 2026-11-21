@@ -31,9 +31,10 @@ from sheet import export_layered  # noqa: E402
 
 NAME = "mage-hd"
 ANCHOR = (float(hd.ROOT_X), float(hd.FLOOR))
-STAFF_UP = 15       # tay -> quả cầu
-STAFF_DOWN = 8      # tay -> đầu gậy dưới
-STAFF = -90         # góc gậy cố định cho mọi tư thế đứng (thẳng đứng: đường pixel sạch)
+STAFF_UP = 22       # tay -> đỉnh thân trượng (trượng cao ngang người, chống từ sàn lên quá đầu)
+STAFF_DOWN = 18     # tay -> đáy trượng (cắt bớt khi chạm sàn)
+SLOPE = 3           # nghiêng về trước 1 cột mỗi 3 hàng: dốc 1:3 vẫn là đường pixel đều
+STAFF = -90         # tư thế đứng: trượng dựng (nghiêng SLOPE); frame nằm dùng cùng góc rồi được xoay
 
 PAL = {   # của mage, thêm bậc tối/sáng
     "hat": "#4a2a7a", "hat_d": "#301f58", "hat_l": "#6d47ad",
@@ -45,7 +46,8 @@ PAL = {   # của mage, thêm bậc tối/sáng
     "skin": "#f3cea6", "skin_d": "#cf9c73",
     "hair_d": "#b8b5cf",
     "beard": "#eceaf5", "beard_d": "#b8b5cf",
-    "wood": "#8a5a2e", "wood_d": "#563418",
+    "wood": "#8a5a2e", "wood_d": "#563418", "gnarl": "#6e4424",
+    "wrap": "#5a2f3a", "ring": "#e2bd5e", "metal": "#9aa6b8", "metal_d": "#5c6678",
     "boot": "#4a3157", "boot_d": "#2b1a33", "boot_l": "#6a4a7a",
     "pants": "#3a2a4a", "pants_d": "#241630",
     "magic": "#7ef0ff", "magic_mid": "#37b9e8", "magic_deep": "#8b5cf6", "core": "#ffffff",
@@ -117,43 +119,68 @@ def hat(c, p, g):
 
 
 def staff(c, p, g):
-    """Gậy bám lưới: góc làm tròn về bội số 45° (đứng: STAFF = -90, thẳng đứng), đầu dưới không chạm sàn;
-    quả cầu 5x5 bo góc ở đầu trên, lõi trắng, đốm sáng xung quanh (đặc, để ghép lớp khớp từng pixel)."""
+    """Trượng cao ngang người, nghiêng về trước dốc 1:3 (đường pixel đều), góc cố định ở mọi tư thế đứng.
+    Thân gỗ 2 tông, chỗ cầm quấn da có 2 vòng vàng, đáy bọc kim loại; đầu trượng là hai chạc gỗ (màu gnarl)
+    ôm viên pha lê hình thoi nhiều mặt có lõi sáng và đốm phép. p["weapon"] chỉ dùng ở frame nằm (xoay sẵn)."""
     hx, hy = g["hand_front"]
-    q = round(p["weapon"] / 45) * 45
-    sx, sy = round(math.cos(math.radians(q))), round(math.sin(math.radians(q)))
-    up = STAFF_UP if (sx == 0 or sy == 0) else round(STAFF_UP / 1.41)
-    down = STAFF_DOWN if (sx == 0 or sy == 0) else round(STAFF_DOWN / 1.41)
-    while down > 0 and hy - down * sy > hd.SOLE - 1:
-        down -= 1
-    ex, ey = (1, 0) if sy else (0, 1)
-    for k in range(-down, up + 1):
-        put(c, hx + k * sx, hy + k * sy, PAL["wood"])
-        put(c, hx + k * sx + ex, hy + k * sy + ey, PAL["wood_d"])
-    ox, oy = hx + (up + 3) * sx, hy + (up + 3) * sy
-    rect(c, ox - 2, oy - 1, ox + 2, oy + 1, PAL["magic_mid"])
-    rect(c, ox - 1, oy - 2, ox + 1, oy + 2, PAL["magic_mid"])
-    rect(c, ox - 1, oy - 1, ox + 1, oy + 1, PAL["magic"])
-    put(c, ox - 1, oy - 1, PAL["core"])
-    for dx, dy in ((-3, 0), (3, 0), (0, -3), (2, -2)):
-        put(c, ox + dx, oy + dy, PAL["magic_deep"])
+    top = None
+    for k in range(-STAFF_DOWN, STAFF_UP + 1):
+        y = hy - k
+        x = hx + k // SLOPE
+        if y > hd.SOLE - 1:
+            continue
+        if k <= -STAFF_DOWN + 1 or y >= hd.SOLE - 2:          # đáy bọc kim loại (2 px cuối)
+            put(c, x, y, PAL["metal"])
+            put(c, x + 1, y, PAL["metal_d"])
+            continue
+        col = PAL["wood"]
+        if k in (-3, 3):
+            col = PAL["ring"]                                  # vòng vàng
+        elif -2 <= k <= 2:
+            col = PAL["wrap"]                                  # quấn da chỗ cầm
+        put(c, x, y, col)
+        put(c, x + 1, y, PAL["wood_d"] if col == PAL["wood"] else col)
+        top = (x, y)
+    tx, ty = top
+    # hai chạc gỗ ôm pha lê
+    for dx, dy in ((-1, -1), (-2, -2), (-3, -3), (-3, -4), (-3, -5), (-2, -7), (-1, -8)):
+        put(c, tx + dx, ty + dy, PAL["gnarl"])
+    for dx, dy in ((2, -1), (3, -2), (4, -3), (4, -4), (4, -5), (3, -7), (2, -8)):
+        put(c, tx + dx, ty + dy, PAL["gnarl"])
+    # pha lê hình thoi 7 hàng: mặt tối trái, giữa, sáng phải, lõi trắng
+    cx, cy = tx + 1, ty - 5
+    for dy, half in ((-3, 0), (-2, 1), (-1, 2), (0, 2), (1, 2), (2, 1), (3, 0)):
+        for dx in range(-half, half + 1):
+            put(c, cx + dx, cy + dy, PAL["magic_deep"] if dx < 0 else PAL["magic_mid"] if dx == 0 else PAL["magic"])
+    put(c, cx, cy - 1, PAL["core"])
+    put(c, cx + 1, cy - 2, PAL["core"])
+    for dx, dy in ((-5, -6), (6, -4), (1, -11)):              # đốm phép (đặc, để ghép lớp khớp)
+        put(c, cx + dx, cy + dy, PAL["magic_deep"])
 
 
-def check_staff(min_orb=8):
-    """Mọi frame đứng: thân gậy (màu wood) thẳng đứng một cột và quả cầu thấy được (>= min_orb px)."""
+def check_staff(min_gem=12):
+    """Mọi frame đứng: thân trượng (màu wood + ring + wrap ở cột chính) là đường dốc 1:3 đều: mỗi hàng đúng
+    một pixel chính, cột chỉ tăng 1 sau đúng SLOPE hàng; viên pha lê thấy được (>= min_gem px)."""
     from PIL import Image
     im = Image.open(HERE / f"{NAME}_strip.png").convert("RGBA")
-    wood = hd._rgb(PAL["wood"])
-    orb = {hd._rgb(PAL[k]) for k in ("magic", "magic_mid", "core")}
+    main = {hd._rgb(PAL[k]) for k in ("wood", "wrap", "ring")}
+    gem = {hd._rgb(PAL[k]) for k in ("magic", "magic_mid", "magic_deep", "core")}
     bad = []
     for f in hd.standing_frames(ANIMATIONS):
         fr = im.crop((f * 64, 0, f * 64 + 64, 64)).load()
-        xs = {x for y in range(64) for x in range(64) if fr[x, y][3] and fr[x, y][:3] == wood}
-        n_orb = sum(1 for y in range(64) for x in range(64) if fr[x, y][3] and fr[x, y][:3] in orb)
-        if len(xs) != 1 or n_orb < min_orb:
-            bad.append((f, len(xs), n_orb))
+        rows = {}
+        for y in range(64):
+            xs = [x for x in range(64) if fr[x, y][3] and fr[x, y][:3] in main]
+            if xs:
+                rows[y] = [min(xs)]          # cột chính = pixel trái nhất (bên phải là cạnh tối/quấn)
+        n_gem = sum(1 for y in range(64) for x in range(64) if fr[x, y][3] and fr[x, y][:3] in gem)
+        # dốc đều kể cả khi tay che vài hàng: tồn tại pha phi và hằng c với x = c - (y + phi) // SLOPE
+        ok = n_gem >= min_gem and len(rows) >= 10 and any(
+            len({v[0] + (y + phi) // SLOPE for y, v in rows.items()}) == 1 for phi in range(SLOPE))
+        if not ok:
+            bad.append((f, n_gem))
     if bad:
-        raise SystemExit(f"gậy: (frame, số cột gỗ, px quả cầu) hỏng: {bad}")
+        raise SystemExit(f"trượng không đều dốc 1:{SLOPE} hoặc mất pha lê ở frame (frame, px pha lê): {bad}")
 
 
 CHAR = {"pal": PAL, "body": "robe", "robe_len": "long", "head": beard, "hair": hat, "held": staff}
