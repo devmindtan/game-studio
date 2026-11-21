@@ -74,6 +74,8 @@ chọn nguồn `.poses.json` nếu sprite có file đó; sprite dùng `gen.py` t
      thêm kiểm tra vào `gen.py` như `check_string_visible` của `sprites/archer`. Vũ khí thẳng (kiếm, giáo, gậy)
      chỉ vẽ ở góc sạch của lưới pixel: 0°/45°/90° (hoặc dốc 2:1), đặt pixel theo bước nguyên; góc lẻ (35°) ra
      bậc thang không đều, trông cong (bài học 2026-11-21, `check_blade_straight` của `sprites/swordsman-hd`).
+     Phần gắn ở đầu vũ khí (pha lê, lưỡi rìu, đầu giáo, chắn kiếm) vẽ trong toạ độ của TRỤC vũ khí: nghiêng/xoay
+     cùng thân, không vẽ thẳng đứng trên thân nghiêng (bài học 2026-11-21, `check_staff` của `sprites/mage-hd`).
 1. **Chốt spec**: kích thước (16/24/32/48/64; nhân vật cao thì chừa khoảng trống phía trên cho nhảy), palette
    4–16 màu, hướng nhìn (mặc định quay phải), **điểm neo** (nhân vật đứng: giữa hai bàn chân trên mặt đất;
    vật bay: tâm thân; đạn/giọt: đầu va chạm), danh sách animation với số frame/fps/loop. Mơ hồ thì chọn mặc

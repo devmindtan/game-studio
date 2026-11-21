@@ -142,20 +142,24 @@ def staff(c, p, g):
         put(c, x + 1, y, PAL["wood_d"] if col == PAL["wood"] else col)
         top = (x, y)
     tx, ty = top
+
+    def hp(dx, dy, col):
+        """Pixel đầu trượng ở (dx, dy) so với đỉnh thân, nghiêng CÙNG dốc 1:SLOPE với thân (dy < 0 là lên)."""
+        put(c, tx + dx + (-dy) // SLOPE, ty + dy, col)
+
     # hai chạc gỗ ôm pha lê
     for dx, dy in ((-1, -1), (-2, -2), (-3, -3), (-3, -4), (-3, -5), (-2, -7), (-1, -8)):
-        put(c, tx + dx, ty + dy, PAL["gnarl"])
+        hp(dx, dy, PAL["gnarl"])
     for dx, dy in ((2, -1), (3, -2), (4, -3), (4, -4), (4, -5), (3, -7), (2, -8)):
-        put(c, tx + dx, ty + dy, PAL["gnarl"])
+        hp(dx, dy, PAL["gnarl"])
     # pha lê hình thoi 7 hàng: mặt tối trái, giữa, sáng phải, lõi trắng
-    cx, cy = tx + 1, ty - 5
     for dy, half in ((-3, 0), (-2, 1), (-1, 2), (0, 2), (1, 2), (2, 1), (3, 0)):
         for dx in range(-half, half + 1):
-            put(c, cx + dx, cy + dy, PAL["magic_deep"] if dx < 0 else PAL["magic_mid"] if dx == 0 else PAL["magic"])
-    put(c, cx, cy - 1, PAL["core"])
-    put(c, cx + 1, cy - 2, PAL["core"])
-    for dx, dy in ((-5, -6), (6, -4), (1, -11)):              # đốm phép (đặc, để ghép lớp khớp)
-        put(c, cx + dx, cy + dy, PAL["magic_deep"])
+            hp(1 + dx, -5 + dy, PAL["magic_deep"] if dx < 0 else PAL["magic_mid"] if dx == 0 else PAL["magic"])
+    hp(1, -6, PAL["core"])
+    hp(2, -7, PAL["core"])
+    for dx, dy in ((-4, -11), (7, -9), (2, -16)):             # đốm phép (đặc, để ghép lớp khớp)
+        hp(dx, dy, PAL["magic_deep"])
 
 
 def check_staff(min_gem=12):
@@ -177,6 +181,15 @@ def check_staff(min_gem=12):
         # dốc đều kể cả khi tay che vài hàng: tồn tại pha phi và hằng c với x = c - (y + phi) // SLOPE
         ok = n_gem >= min_gem and len(rows) >= 10 and any(
             len({v[0] + (y + phi) // SLOPE for y, v in rows.items()}) == 1 for phi in range(SLOPE))
+        if ok:
+            # đầu trượng nghiêng CÙNG dốc với thân: tâm pha lê mỗi hàng + y/SLOPE gần như không đổi
+            # (bài học 2026-11-21: đầu vẽ thẳng đứng trên thân nghiêng, trông bị gãy)
+            cen = []
+            for y in range(64):
+                xs = [x for x in range(64) if fr[x, y][3] and fr[x, y][:3] in gem]
+                if len(xs) >= 2:
+                    cen.append((min(xs) + max(xs)) / 2 + y / SLOPE)
+            ok = len(cen) >= 4 and max(cen) - min(cen) <= 1.0
         if not ok:
             bad.append((f, n_gem))
     if bad:
