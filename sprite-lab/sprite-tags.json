@@ -1487,19 +1487,5 @@
       "player",
       "concept-ai"
     ]
-  },
-  "archer-classic": {
-    "cat": "character",
-    "tags": [
-      "player",
-      "experiment-classic"
-    ]
-  },
-  "archer-ai": {
-    "cat": "character",
-    "tags": [
-      "player",
-      "concept-ai"
-    ]
   }
 }
