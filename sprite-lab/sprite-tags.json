@@ -1487,5 +1487,11 @@
       "player",
       "concept-ai"
     ]
+  },
+  "archer": {
+    "cat": "character",
+    "tags": [
+      "player"
+    ]
   }
 }
