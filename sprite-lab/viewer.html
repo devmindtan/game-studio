@@ -312,10 +312,11 @@ function renderList(){
     arr.forEach(s=>{
       const d=document.createElement('div'); d.className='item'+(current&&current.name===s.name?' active':'');
       const a=(s.meta.animations||[]).map(x=>x.name).join(', ')||'1 animation';
-      const fs=(s.meta.frame_size||[]).join('×');
+      const fs=(s.meta.frame_size||[]);
+      const fsText=fs[0]+'×'+fs[1]+' px';
       const thumb=s.thumb||('sprites/'+s.name+'/'+s.name+'.png');
       const tg=(s._tags||[]).slice(0,4).map(t=>'<span class="tag">'+t+'</span>').join(' ');
-      d.innerHTML='<img class="thumb" src="'+thumb+'" alt="" loading="lazy"><div class="info"><div class="row1"><div class="name">'+s.name+'</div><div class="tag">'+fs+'</div></div><div class="meta">'+a+'</div><div class="tags">'+tg+'</div></div>';
+      d.innerHTML='<img class="thumb" src="'+thumb+'" alt="" loading="lazy"><div class="info"><div class="row1"><div class="name">'+s.name+'</div><div class="tag">'+fsText+'</div></div><div class="meta">'+a+'</div><div class="tags">'+tg+'</div></div>';
       const im=d.querySelector('img.thumb'); im.onerror=()=>{im.style.visibility='hidden';};
       d.onclick=()=>selectSprite(s); body.appendChild(d);
     });
@@ -334,7 +335,7 @@ function selectSprite(s,animName,keepFrame){
   $('vCat').textContent=catLabel(s._cat);
   const fs=s.meta.frame_size||[0,0];
   const nAnim=(s.meta.animations||[]).length||1;
-  $('vMeta').textContent=fs[0]+'×'+fs[1]+' px · '+(s.meta.frames||'?')+' frame · '+nAnim+' animation · neo ['+(s.meta.anchor||[]).join(', ')+']'+(s.meta.ground?' · đứng trên đất':'');
+  $('vMeta').textContent=fs[0]+'×'+fs[1]+' px (rộng×cao) · '+(s.meta.frames||'?')+' frame · '+nAnim+' animation · neo ['+(s.meta.anchor||[]).join(', ')+']'+(s.meta.ground?' · đứng trên đất':'');
   $('previewImg').src=s.preview||'';
   anims=(s.meta.animations&&s.meta.animations.length)?s.meta.animations:[{name:'default',start:0,frames:s.meta.frames||1,fps:s.meta.fps||8,loop:s.meta.loop!==false}];
   animIdx=Math.max(0,anims.findIndex(a=>a.name===animName));
