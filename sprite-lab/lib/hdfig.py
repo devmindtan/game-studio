@@ -155,11 +155,16 @@ def eyes(c, x, y, kind, pal):
             put(c, x + dx, y + dy, e)
 
 
-def robe(c, g, p, pal):
+def robe_hem(g, length="knee"):
+    """Hàng gấu áo: "knee" = hông + 7, "long" = chấm tới cổ ủng (pháp sư)."""
+    return SOLE - 3 if length == "long" else g["hip"][1] + 7
+
+
+def robe(c, g, p, pal, char_len="knee"):
     """Áo khoác dài tới gối: thân 3 tông như tunic, từ hông xoè dần xuống gối, vạt trước mở (đường tối),
     gấu đung đưa theo tốc độ; đai lưng vải. Quần + ủng lộ dưới gấu (chân vẽ ở lớp legs như thường)."""
     hip, top = g["hip"], g["top"]
-    hem_y = hip[1] + 7
+    hem_y = robe_hem(g, char_len)
     sway = _r(math.sin(p["phase"]) * 1.5 * (0.3 + p["speed"]))
     for y in range(top[1], hem_y + 1):
         if y <= hip[1]:
@@ -168,8 +173,10 @@ def robe(c, g, p, pal):
             x0, x1 = cx - 5, cx + 4
         else:
             k = y - hip[1]
-            cx = hip[0] - _r(sway * k / 7)
-            x0, x1 = cx - 5 - k // 2 - _r(p["speed"] * k / 3), cx + 4 + k // 3
+            span = max(1, hem_y - hip[1])
+            cx = hip[0] - _r(sway * k / span)
+            flare = k * 7 // span                                   # xoè như nhau dù dài hay ngắn
+            x0, x1 = cx - 5 - flare // 2 - _r(p["speed"] * flare / 3), cx + 4 + flare // 3
         c.rect(x0, y, x1, y, color(pal["robe"]))
         c.pixel(x0, y, pal["robe_d"])
         c.pixel(x0 + 1, y, pal["robe_d"])
@@ -266,13 +273,20 @@ def draw_layers(char, p):
     if char.get("held_back"):
         char["held_back"](L["weapon_back"], p, g)
     if char.get("body", "tunic") == "robe":
-        robe(L["chest"], g, p, pal)
+        robe(L["chest"], g, p, pal, char.get("robe_len", "knee"))
     else:
         tunic(L["chest"], g, p, pal)
     leg(L["legs_front"], g["hip"], g["foot_front"], pal, False, L["feet_front"])
+    if char.get("body", "tunic") == "robe":
+        # lớp legs nằm TRÊN chest: phần quần phía trên gấu áo phải bỏ, nếu không đùi đè lên vạt áo
+        hem = robe_hem(g, char.get("robe_len", "knee"))
+        for name in ("legs_back", "legs_front"):
+            L[name].img.paste((0, 0, 0, 0), (0, 0, W, hem + 1))
     if char.get("neck"):
         char["neck"](L["chest"], p, g)
     face(L["body"], p, g, pal)
+    if char.get("head"):          # vẽ thêm lên mặt (râu...): vẫn là lớp nền, không phải ô trang bị
+        char["head"](L["body"], p, g)
     if char.get("hair"):
         char["hair"](L["head"], p, g)
     if char.get("held"):
@@ -289,19 +303,28 @@ def draw_layers(char, p):
 
 
 def _lie_layers(layers, amount):
+    """Xoay mọi lớp quanh chân (nằm ngửa khi chết) trên canvas có lề 32 px rồi cắt về 64x64: đáy chạm sàn, và
+    dịch ngang để không cắt mất mũ/tóc ở mép trái (bài học 2026-11-21: mũ pháp sư biến mất khi nằm)."""
     from PIL import Image
+    M = 32
     angle = 90 * amount
-    rotated = {k: cv.img.rotate(angle, resample=Image.NEAREST, center=(ROOT_X, FLOOR - 1))
-               for k, cv in layers.items()}
-    whole = Canvas(W, H)
+    rotated = {}
+    for k, cv in layers.items():
+        big = Image.new("RGBA", (W + 2 * M, H + 2 * M), (0, 0, 0, 0))
+        big.paste(cv.img, (M, M))
+        rotated[k] = big.rotate(angle, resample=Image.NEAREST, center=(ROOT_X + M, FLOOR - 1 + M))
+    whole = Image.new("RGBA", (W + 2 * M, H + 2 * M), (0, 0, 0, 0))
     for img in rotated.values():
-        whole.img.alpha_composite(img)
-    bb = whole.img.getchannel("A").getbbox()
-    shift = (FLOOR - 2) - bb[3] + 1 if bb else 0       # chừa hàng viền dưới cùng
+        whole.alpha_composite(img)
+    bb = whole.getchannel("A").getbbox()
+    cx, cy = M, M
+    if bb:
+        cy = bb[3] - (FLOOR - 1)                 # hàng đặc thấp nhất = FLOOR - 2, chừa hàng viền
+        cx = min(M, bb[0] - 1)                   # lề trái >= 1 px cho viền
+        cx = max(cx, bb[2] + 1 - W)              # nhưng không đẩy mép phải ra ngoài
     out = {}
     for k, img in rotated.items():
-        moved = Canvas(W, H)
-        moved.img.alpha_composite(img, (0, shift) if shift >= 0 else (0, 0),
-                                  (0, 0) if shift >= 0 else (0, -shift))
-        out[k] = moved
+        cv = Canvas(W, H)
+        cv.img = img.crop((cx, cy, cx + W, cy + H))
+        out[k] = cv
     return out

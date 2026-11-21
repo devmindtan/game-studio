@@ -1507,5 +1507,12 @@
       "player",
       "hd-40px"
     ]
+  },
+  "mage-hd": {
+    "cat": "character",
+    "tags": [
+      "player",
+      "hd-40px"
+    ]
   }
 }
