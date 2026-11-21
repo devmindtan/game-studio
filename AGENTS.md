@@ -88,6 +88,9 @@ xuất kéo dài thì khuyên người dùng mở phiên mới ở đó.
   thẻ cùng hàng cao bằng nhau theo nội dung dài nhất, khoảng cách đều, không gì bị cắt hay tràn khung, chữ đọc
   được trên nền. Vị trí
   chữ tính theo cỡ font (không gõ baseline tay). Ghi các lỗi tìm được rồi mới sửa (bài học 2026-11-17).
+- **Nhân vật/sprite mới: đưa 2–3 thiết kế khác nhau để chọn** (người dùng 2026-11-21): khác silhouette, tỉ lệ,
+  cách cầm vũ khí, dáng và nhịp animation, không chỉ đổi màu. Model AI (`gamekit art concept`) chỉ để lấy ý tưởng
+  ban đầu, không tham gia thiết kế. Chi tiết: skill `pixel-sprite` bước 0.
 - **Không đoán mò khi thiết kế** (người dùng 2026-11-17): màn hình, luồng menu, tính năng mới đều bắt đầu từ cách
   các game cùng thể loại đã làm (tìm trên mạng), ghi nguồn vào tài liệu thiết kế rồi mới code. Thiếu thông tin
   mà tham khảo không trả lời được thì hỏi người dùng. Từ ngữ của người dùng ứng với hơn một hệ thống của game

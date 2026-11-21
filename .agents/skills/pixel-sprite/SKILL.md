@@ -55,13 +55,16 @@ chọn nguồn `.poses.json` nếu sprite có file đó; sprite dùng `gen.py` t
 
 ## Quy trình (đủ các bước mới được báo xong)
 
-0. **Chốt ngoại hình bằng concept AI** (nhân vật/quái mới; người dùng 2026-11-21: AI chỉ để xác định ngoại hình,
-   **không** dùng model để làm animation): `gamekit art concept <tên> "<prompt tiếng Anh>" [--seeds 4] [--height 30]`
-   chạy SDXL trên máy GPU (`tools/gpuhost`, ~10 s/ảnh) và pixel hoá về đúng cỡ sprite →
-   `sprites/<tên>/concept/<seed>.png` (1x, nền trong) + `<seed>.json` (palette) + `sheet.png` (xem). Ảnh AI gốc
-   mờ, **không** dùng trực tiếp. Chọn một seed, ghi vào docstring `gen.py`, lấy palette từ `<seed>.json`, rồi
-   vẽ bằng `minifig` cùng chuẩn với nhân vật của game (48×48, neo (24,44), lớp đồ). Không có máy GPU thì bỏ
-   bước này và nói rõ. Sprite mới phải có dòng trong `sprite-lab/sprite-tags.json`, nếu không web chỉ hiện ở "Tất cả".
+0. **2–3 thiết kế khác nhau để người dùng chọn** (người dùng 2026-11-21, bắt buộc với mọi nhân vật/sprite mới).
+   Khác nhau **thật**: silhouette và tỉ lệ cơ thể, cách cầm/dùng vũ khí, dáng đứng và tính cách chuyển động
+   (nhịp idle/run, độ nảy, quán tính đồ bay), không chỉ đổi màu/đồ trên cùng một bộ tư thế. Bày các phương án
+   cạnh nhau (ảnh phóng to), hỏi người dùng chọn rồi mới làm đủ animation.
+   - **Model AI chỉ để lấy ý tưởng ban đầu**, không tham gia quy trình thiết kế: `gamekit art concept <tên>
+     "<prompt>"` (GPU, pixel hoá) cho gợi ý ngoại hình; tư thế, cách cầm vũ khí, animation, palette cuối do mình
+     thiết kế (tham khảo game thật qua skill `art-reference`).
+   - **Vũ khí cầm đúng thực tế** (bài học 2026-11-21: cung thủ nắm dây cung): cung nắm ở giữa thân (riser),
+     lưng cung về phía mục tiêu, dây cung phía thân người; kiếm/giáo nắm chuôi/cán, lưỡi liền tay. Không chắc
+     thì tra ảnh người thật/game rồi mới vẽ.
 1. **Chốt spec**: kích thước (16/24/32/48/64; nhân vật cao thì chừa khoảng trống phía trên cho nhảy), palette
    4–16 màu, hướng nhìn (mặc định quay phải), **điểm neo** (nhân vật đứng: giữa hai bàn chân trên mặt đất;
    vật bay: tâm thân; đạn/giọt: đầu va chạm), danh sách animation với số frame/fps/loop. Mơ hồ thì chọn mặc
