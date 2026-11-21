@@ -639,6 +639,8 @@ def build_game(slug):
 
     info = project_info(os.path.join(root, "project.godot"))
     return {
+        "vector_icons": {k: rel(os.path.join(root, "assets", "icons", "tree", v + ".svg"))
+                         for k, v in load(os.path.join(data, "card_icons.json")).get("vector", {}).items()},
         "slug": slug, "name": info.get("name") or slug, "version": info.get("version", ""),
         "brief": brief_pitch(root), "decisions": decisions(root), "ui": ui_set(root),
         "world": cfg.get("world", {}), "xp": cfg.get("xp", {}), "pickups": cfg.get("pickups", {}),

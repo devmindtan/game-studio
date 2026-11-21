@@ -174,7 +174,9 @@ function liveCanvas(w,h,f){const c=el('canvas',{width:w,height:h}); const g=c.ge
 
 /* ---------- icons (the game's own ui-icons sprite) ---------- */
 let iconSheet=null, gearIcons=null, cardIcons=null;   // ui-icons (16 px), gear-icons (24 px items), card-icons (24 px cards, read first like the game)
+let vecIcons={};   // stat card id -> loaded Image of its svg (game card_icons.json; the game draws these, user 2026-11-21)
 function iconCanvas(name,sc){sc=sc||1; const W=16*sc, c=el('canvas',{width:W,height:W}); const g=c.getContext('2d');
+  if(vecIcons[name]){ g.drawImage(vecIcons[name],0,0,W,W); return c; }
   if(cardIcons&&cardIcons.has(name)){ const k=Math.max(1,Math.floor(W/24)); cardIcons.draw(g,name,0,W/2,W/2,k); }
   else if(iconSheet&&iconSheet.has(name)) iconSheet.draw(g,name,0,8*sc,8*sc,sc); return c;}
 const RARITY_VI={common:'Thường',rare:'Hiếm',epic:'Sử thi',legendary:'Huyền thoại'};
@@ -204,6 +206,8 @@ async function selectGame(g){
   const ic=gameSprite('ui-icons'); iconSheet=ic?await sheetOf(ic):null;
   const gi=gameSprite('gear-icons'); gearIcons=gi?await sheetOf(gi):null;
   const ci=gameSprite('card-icons'); cardIcons=ci?await sheetOf(ci):null;
+  vecIcons={}; await Promise.all(Object.entries(g.vector_icons||{}).map(([k,u])=>new Promise(ok=>{
+    const im=new Image(); im.onload=()=>{vecIcons[k]=im; ok();}; im.onerror=()=>ok(); im.src=u; })));
   renderTabs(); render();
 }
 function renderTabs(){
