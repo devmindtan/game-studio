@@ -50,7 +50,7 @@ PAL = {   # của mage, thêm bậc tối/sáng
     "wrap": "#5a2f3a", "ring": "#e2bd5e", "metal": "#9aa6b8", "metal_d": "#5c6678",
     "boot": "#4a3157", "boot_d": "#2b1a33", "boot_l": "#6a4a7a",
     "pants": "#3a2a4a", "pants_d": "#241630",
-    "magic": "#7ef0ff", "magic_mid": "#37b9e8", "magic_deep": "#8b5cf6", "core": "#ffffff",
+    "magic": "#7ef0ff", "magic_mid": "#37b9e8", "magic_deep": "#8b5cf6", "core": "#effdff", "spark": "#b48cff",
     "eye": "#140d20", "eye_l": "#ffffff",
 }
 
@@ -152,19 +152,28 @@ def staff(c, p, g):
         hp(dx, dy, PAL["gnarl"])
     for dx, dy in ((2, -1), (3, -2), (4, -3), (4, -4), (4, -5), (3, -7), (2, -8)):
         hp(dx, dy, PAL["gnarl"])
-    # pha lê hình thoi 7 hàng: mặt tối trái, giữa, sáng phải, lõi trắng
-    for dy, half in ((-3, 0), (-2, 1), (-1, 2), (0, 2), (1, 2), (2, 1), (3, 0)):
+    # quả cầu tròn 7x7 (tròn thì không cần nghiêng theo dốc): tâm đặt trên trục kéo dài của thân
+    ox, oy = tx + 1 + 5 // SLOPE, ty - 5
+    for dy in range(-3, 4):
+        half = 2 if abs(dy) == 3 else 3
         for dx in range(-half, half + 1):
-            hp(1 + dx, -5 + dy, PAL["magic_deep"] if dx < 0 else PAL["magic_mid"] if dx == 0 else PAL["magic"])
-    hp(1, -6, PAL["core"])
-    hp(2, -7, PAL["core"])
+            if dx * dx + dy * dy > 11:
+                continue
+            col = PAL["magic_mid"]
+            if dx + dy >= 3:
+                col = PAL["magic_deep"]                         # bóng phía dưới-phải
+            elif dx - dy >= 3 or (dx >= 1 and dy <= -1):
+                col = PAL["magic"]                              # sáng phía trên-phải
+            put(c, ox + dx, oy + dy, col)
+    put(c, ox + 1, oy - 2, PAL["core"])
+    put(c, ox + 2, oy - 1, PAL["core"])
     for dx, dy in ((-4, -11), (7, -9), (2, -16)):             # đốm phép (đặc, để ghép lớp khớp)
-        hp(dx, dy, PAL["magic_deep"])
+        hp(dx, dy, PAL["spark"])
 
 
 def check_staff(min_gem=12):
-    """Mọi frame đứng: thân trượng (màu wood + ring + wrap ở cột chính) là đường dốc 1:3 đều: mỗi hàng đúng
-    một pixel chính, cột chỉ tăng 1 sau đúng SLOPE hàng; viên pha lê thấy được (>= min_gem px)."""
+    """Mọi frame đứng: thân trượng (wood + ring + wrap, cột trái nhất) là đường dốc 1:3 đều; quả cầu tròn 7x7 có tâm trên trục thân;
+    quả cầu thấy được (>= min_gem px)."""
     from PIL import Image
     im = Image.open(HERE / f"{NAME}_strip.png").convert("RGBA")
     main = {hd._rgb(PAL[k]) for k in ("wood", "wrap", "ring")}
@@ -182,14 +191,18 @@ def check_staff(min_gem=12):
         ok = n_gem >= min_gem and len(rows) >= 10 and any(
             len({v[0] + (y + phi) // SLOPE for y, v in rows.items()}) == 1 for phi in range(SLOPE))
         if ok:
-            # đầu trượng nghiêng CÙNG dốc với thân: tâm pha lê mỗi hàng + y/SLOPE gần như không đổi
-            # (bài học 2026-11-21: đầu vẽ thẳng đứng trên thân nghiêng, trông bị gãy)
-            cen = []
-            for y in range(64):
-                xs = [x for x in range(64) if fr[x, y][3] and fr[x, y][:3] in gem]
-                if len(xs) >= 2:
-                    cen.append((min(xs) + max(xs)) / 2 + y / SLOPE)
-            ok = len(cen) >= 4 and max(cen) - min(cen) <= 1.0
+            # quả cầu tròn (khung bao vuông, mỗi hàng đối xứng quanh tâm) và tâm nằm trên trục kéo dài của thân
+            # (bài học 2026-11-21: đầu vẽ lệch trục thân trông bị gãy)
+            pts = [(x, y) for y in range(64) for x in range(64) if fr[x, y][3] and fr[x, y][:3] in gem]
+            ys = [y for _, y in pts]
+            bx = [x for x, _ in pts]
+            by = ys
+            w, h = max(bx) - min(bx) + 1, max(by) - min(by) + 1
+            xc, yc = (max(bx) + min(bx)) / 2, (max(by) + min(by)) / 2
+            phis = [phi for phi in range(SLOPE) if len({v[0] + (y + phi) // SLOPE for y, v in rows.items()}) == 1]
+            axis = min(abs(xc - (rows[min(rows)][0] + (min(rows) + phi) // SLOPE - (yc + phi) / SLOPE))
+                       for phi in phis) if phis else 99
+            ok = w == h == 7 and axis <= 1.5
         if not ok:
             bad.append((f, n_gem))
     if bad:
