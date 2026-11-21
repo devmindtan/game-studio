@@ -152,34 +152,6 @@ def workflow_animate(reference_name: str, control_name: str, prompt: str,
     }
 
 
-def workflow_motion(prompt: str, negative: str = "", seed: int = 7, steps: int = 20, width: int = 480,
-                    height: int = 480, length: int = 17, shift: float = 8.0,
-                    filename_prefix: str = "gameart/motion") -> dict:
-    """Wan 2.1 T2V 1.3B: clip tham khảo CHUYỂN ĐỘNG (nhịp, quán tính, đồ bay), không dùng làm frame game.
-
-    Text encoder umt5-xxl bản GGUF Q4 (ComfyUI-GGUF) để vừa 12 GB RAM của WSL; length = 4n+1.
-    """
-    neg = negative or "static, blurry, low quality, text, watermark, multiple people, cropped, camera motion"
-    return {
-        "unet": {"class_type": "UNETLoader", "inputs": {"unet_name": "wan2.1_t2v_1.3B_fp16.safetensors",
-                                                        "weight_dtype": "default"}},
-        "clip": {"class_type": "CLIPLoaderGGUF", "inputs": {"clip_name": "umt5-xxl-encoder-Q4_K_M.gguf",
-                                                            "type": "wan"}},
-        "vae": {"class_type": "VAELoader", "inputs": {"vae_name": "wan_2.1_vae.safetensors"}},
-        "pos": {"class_type": "CLIPTextEncode", "inputs": {"text": prompt, "clip": ["clip", 0]}},
-        "neg": {"class_type": "CLIPTextEncode", "inputs": {"text": neg, "clip": ["clip", 0]}},
-        "shift": {"class_type": "ModelSamplingSD3", "inputs": {"model": ["unet", 0], "shift": shift}},
-        "latent": {"class_type": "EmptyHunyuanLatentVideo", "inputs": {
-            "width": width, "height": height, "length": length, "batch_size": 1}},
-        "sample": {"class_type": "KSampler", "inputs": {
-            "model": ["shift", 0], "positive": ["pos", 0], "negative": ["neg", 0], "latent_image": ["latent", 0],
-            "seed": seed, "steps": steps, "cfg": 6.0, "sampler_name": "uni_pc", "scheduler": "simple",
-            "denoise": 1.0}},
-        "decode": {"class_type": "VAEDecode", "inputs": {"samples": ["sample", 0], "vae": ["vae", 0]}},
-        "save": {"class_type": "SaveImage", "inputs": {"images": ["decode", 0], "filename_prefix": filename_prefix}},
-    }
-
-
 # --- minifig openpose control image -------------------------------------------
 
 OPENPOSE_COLORS = {
@@ -412,36 +384,6 @@ def cmd_concept(args):
     print(f"ok {len(tiles)} concept -> {out / 'sheet.png'} (chọn một seed, dùng palette trong <seed>.json)")
 
 
-def cmd_motion(args):
-    """Clip tham khảo chuyển động -> <dir>/frame_XX.png, sheet.png (lưới frame), motion.gif (xem nhịp)."""
-    from PIL import Image
-    out = Path(args.dir)
-    out.mkdir(parents=True, exist_ok=True)
-    wf = workflow_motion(args.prompt, seed=args.seed, steps=args.steps, width=args.width, height=args.height,
-                         length=args.length, filename_prefix="gameart/motion")
-    t0 = time.time()
-    imgs = extract_images(run_prompt(args.api, wf, timeout=args.timeout))
-    if not imgs:
-        raise SystemExit("không có frame output")
-    frames = []
-    for i, im in enumerate(imgs):
-        dest = download_image(args.api, im, out / f"frame_{i:02d}.png")
-        frames.append(Image.open(dest).convert("RGB"))
-    secs = round(time.time() - t0, 1)
-    cols = min(6, len(frames))
-    tw = 160
-    th = round(tw * frames[0].height / frames[0].width)
-    rows = (len(frames) + cols - 1) // cols
-    sheet = Image.new("RGB", (cols * tw, rows * th), (40, 42, 54))
-    for i, f in enumerate(frames):
-        sheet.paste(f.resize((tw, th)), ((i % cols) * tw, (i // cols) * th))
-    sheet.save(out / "sheet.png")
-    frames[0].save(out / "motion.gif", save_all=True, append_images=frames[1:], duration=1000 // 16, loop=0)
-    (out / "motion.json").write_text(json.dumps({"prompt": args.prompt, "seed": args.seed, "frames": len(frames),
-                                                 "size": [args.width, args.height], "seconds": secs}, indent=2) + "\n")
-    print(f"ok {len(frames)} frame {secs}s -> {out / 'sheet.png'} (THAM KHẢO nhịp chuyển động, không dùng làm frame)")
-
-
 def cmd_workflow(args):
     if args.kind == "keyframe":
         wf = workflow_keyframe("PROMPT", filename_prefix="gameart/keyframe")
@@ -482,14 +424,6 @@ def main(argv=None):
     p.add_argument("--size", type=int, default=768)
     p.add_argument("--height", type=int, default=30, help="chiều cao nhân vật (px) trong sprite")
     p.add_argument("--colors", type=int, default=12)
-    p = sub.add_parser("motion", help="Wan 1.3B: clip tham khảo chuyển động (không phải frame game)")
-    p.add_argument("--prompt", required=True)
-    p.add_argument("--dir", required=True)
-    p.add_argument("--seed", type=int, default=7)
-    p.add_argument("--steps", type=int, default=20)
-    p.add_argument("--width", type=int, default=480)
-    p.add_argument("--height", type=int, default=480)
-    p.add_argument("--length", type=int, default=17)
     p = sub.add_parser("workflow")
     p.add_argument("kind", choices=["keyframe", "animate"])
     a = ap.parse_args(argv)
@@ -501,10 +435,6 @@ def main(argv=None):
         cmd_animate(a)
     elif a.cmd == "concept":
         cmd_concept(a)
-    elif a.cmd == "motion":
-        if (a.length - 1) % 4:
-            raise SystemExit("--length phải là 4n+1 (17, 21, 33…)")
-        cmd_motion(a)
     elif a.cmd == "workflow":
         cmd_workflow(a)
 
