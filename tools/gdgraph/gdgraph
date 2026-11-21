@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+# Thin launcher: run gdgraph.py with the venv next to it (see README.md).
+set -euo pipefail
+here="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+exec "$here/.venv/bin/python" "$here/gdgraph.py" "$@"

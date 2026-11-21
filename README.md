@@ -12,6 +12,7 @@ Cursor, Aider…
 | `sprite-lab/` | **Sprite Lab**: nơi làm và thử mọi sprite (xem cả animation, thử di chuyển) trước khi đưa vào game. Xem [README](sprite-lab/README.md) |
 | `templates/claude-code-game-studios/` | Bản gốc của framework để tạo game mới (không sửa trực tiếp) |
 | `tools/gamekit/` | Bộ công cụ: CLI `gamekit`, pipeline sprite LPC, pixel art, build/export. Xem [README](tools/gamekit/README.md) |
+| `tools/gdgraph/` | Index GDScript cho `graphify` (graphify không đọc `.gd`). Xem [README](tools/gdgraph/README.md) |
 | `tools/lpc-generator/` | Bộ tạo nhân vật LPC (web app) |
 
 Game hiện có: **dom-dom-dem-mua** (Đom Đóm Đêm Mưa).
