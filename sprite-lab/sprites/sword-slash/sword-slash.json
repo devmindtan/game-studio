@@ -1,14 +1,14 @@
 {
   "frames": 20,
   "frame_size": [
-    48,
-    48
+    96,
+    96
   ],
   "fps": 16.0,
   "loop": false,
   "anchor": [
-    20.0,
-    26.0
+    40.0,
+    52.0
   ],
   "anchor_source": "explicit",
   "animations": [
@@ -28,17 +28,17 @@
       "hitbox": {
         "shape": "arc",
         "center": [
-          20.0,
-          26.0
+          40.0,
+          52.0
         ],
         "active": [
           1,
           2
         ],
-        "radius": 20.0,
-        "inner": 15.0,
+        "radius": 40.0,
+        "inner": 30.0,
         "dir_deg": 0.0,
-        "half_angle_deg": 68.0
+        "half_angle_deg": 70.0
       }
     },
     {
@@ -57,17 +57,17 @@
       "hitbox": {
         "shape": "arc",
         "center": [
-          20.0,
-          26.0
+          40.0,
+          52.0
         ],
         "active": [
           1,
           2
         ],
-        "radius": 19.0,
-        "inner": 7.0,
+        "radius": 37.0,
+        "inner": 14.0,
         "dir_deg": 180.0,
-        "half_angle_deg": 92.0
+        "half_angle_deg": 94.0
       }
     },
     {
@@ -86,17 +86,17 @@
       "hitbox": {
         "shape": "arc",
         "center": [
-          20.0,
-          26.0
+          40.0,
+          52.0
         ],
         "active": [
           1,
           2
         ],
-        "radius": 25.0,
-        "inner": 11.0,
+        "radius": 49.0,
+        "inner": 23.0,
         "dir_deg": -90.0,
-        "half_angle_deg": 70.0
+        "half_angle_deg": 72.0
       }
     },
     {
@@ -115,18 +115,19 @@
       "hitbox": {
         "shape": "arc",
         "center": [
-          20.0,
-          26.0
+          40.0,
+          52.0
         ],
         "active": [
           1,
           2
         ],
-        "radius": 21.0,
-        "inner": 9.0,
+        "radius": 41.0,
+        "inner": 18.0,
         "dir_deg": 90.0,
-        "half_angle_deg": 86.0
+        "half_angle_deg": 88.0
       }
     }
-  ]
+  ],
+  "px_scale": 0.5
 }

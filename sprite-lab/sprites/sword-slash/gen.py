@@ -11,6 +11,7 @@ Hitbox: hình quạt quanh neo, đo tự động từ pixel của frame gây sá
 quầng sáng mờ (alpha < 96) không tính. Chạy: gamekit art run sword-slash
 """
 
+import json
 import math
 import sys
 from pathlib import Path
@@ -32,8 +33,9 @@ from spritekit import Canvas  # noqa: E402
 from sheet import export  # noqa: E402
 
 NAME = "sword-slash"
-SIZE = 48
-PIVOT = (20.0, 26.0)
+D = 2   # double density (px_scale 0.5): same size on screen, finer pixels (review 2026-11-21)
+SIZE = 48 * D
+PIVOT = (20.0 * D, 26.0 * D)
 ANCHOR = PIVOT
 CORE = "#ffffff"
 EDGE = "#e8f0f6"   # swordsman blade
@@ -42,7 +44,7 @@ FADE = "#9fb3c8b0"
 GLOW = "#cfe6ff50"  # haze, alpha < 96: not part of the hit area
 
 A_START, A_END = -70.0, 60.0   # swing from up-front to down-front (0 = right, + = down)
-R_OUT = 20.0                    # hand + 10 px blade
+R_OUT = 20.0 * D                # hand + 10 px blade
 
 
 def crescent(c, a0, a1, r_out, thick_max, col, taper=True):
@@ -58,32 +60,33 @@ def crescent(c, a0, a1, r_out, thick_max, col, taper=True):
                 continue
             u = (a - a0) / max(1e-6, a1 - a0)
             th = thick_max * (math.sin(math.pi * u) if taper else 1.0)
-            if r_out - max(1.0, th) <= d <= r_out:
+            if r_out - max(float(D), th) <= d <= r_out:
                 c.pixel(x, y, col)
 
 
 def frame(i):
     c = Canvas(SIZE, SIZE)
     if i == 0:      # anticipation: a thin streak where the blade starts
-        crescent(c, A_START, A_START + 30, R_OUT, 1.6, EDGE)
+        crescent(c, A_START, A_START + 30, R_OUT, 1.6 * D, EDGE)
     elif i == 1:    # the cut, front half
-        crescent(c, A_START, 10, R_OUT + 1, 6.0, GLOW, taper=True)
-        crescent(c, A_START, 10, R_OUT, 4.0, STEEL)
-        crescent(c, A_START, 10, R_OUT, 2.4, EDGE)
-        crescent(c, A_START + 8, 2, R_OUT, 1.2, CORE)
+        crescent(c, A_START, 10, R_OUT + 1 * D, 6.0 * D, GLOW, taper=True)
+        crescent(c, A_START, 10, R_OUT, 4.0 * D, STEEL)
+        crescent(c, A_START, 10, R_OUT, 2.4 * D, EDGE)
+        crescent(c, A_START + 8, 2, R_OUT, 1.2 * D, CORE)
     elif i == 2:    # full crescent
-        crescent(c, A_START, A_END, R_OUT + 1, 7.0, GLOW)
-        crescent(c, A_START, A_END, R_OUT, 5.0, STEEL)
-        crescent(c, A_START, A_END, R_OUT, 3.2, EDGE)
-        crescent(c, A_START + 20, A_END - 10, R_OUT, 1.5, CORE)
+        crescent(c, A_START, A_END, R_OUT + 1 * D, 7.0 * D, GLOW)
+        crescent(c, A_START, A_END, R_OUT, 5.0 * D, STEEL)
+        crescent(c, A_START, A_END, R_OUT, 3.2 * D, EDGE)
+        crescent(c, A_START + 20, A_END - 10, R_OUT, 1.5 * D, CORE)
     elif i == 3:    # trail fading from the start of the swing
-        crescent(c, -15, A_END, R_OUT, 3.0, FADE)
-        crescent(c, 10, A_END, R_OUT, 1.4, EDGE)
+        crescent(c, -15, A_END, R_OUT, 3.0 * D, FADE)
+        crescent(c, 10, A_END, R_OUT, 1.4 * D, EDGE)
     else:           # dissolving sparks along the end of the arc
         cx, cy = PIVOT
         for a in (15, 32, 50):
-            r = R_OUT - 1
-            c.pixel(round(cx + math.cos(math.radians(a)) * r - 0.5), round(cy + math.sin(math.radians(a)) * r - 0.5), FADE)
+            r = R_OUT - D
+            x0, y0 = round(cx + math.cos(math.radians(a)) * r - 0.5), round(cy + math.sin(math.radians(a)) * r - 0.5)
+            c.rect(x0, y0, x0 + D - 1, y0 + D - 1, FADE)
     return c
 
 
@@ -111,4 +114,8 @@ ANIMATIONS = [
 
 if __name__ == "__main__":
     export(HERE, NAME, ANIMATIONS, anchor=ANCHOR)
+    meta = HERE / f"{NAME}.json"
+    m = json.loads(meta.read_text())
+    m["px_scale"] = 1.0 / D
+    meta.write_text(json.dumps(m, indent=2) + "\n")
     print(f"OK {NAME}")

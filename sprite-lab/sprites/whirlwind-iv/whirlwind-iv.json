@@ -1,14 +1,14 @@
 {
   "frames": 8,
   "frame_size": [
-    60,
-    60
+    108,
+    108
   ],
   "fps": 14.0,
   "loop": true,
   "anchor": [
-    30.0,
-    30.0
+    54.0,
+    54.0
   ],
   "anchor_source": "explicit",
   "animations": [
@@ -21,16 +21,17 @@
       "hitbox": {
         "shape": "circle",
         "center": [
-          30.0,
-          30.0
+          54.0,
+          54.0
         ],
         "active": [
           0,
           7
         ],
-        "radius": 29.0,
-        "inner": 4.0
+        "radius": 51.0,
+        "inner": 13.0
       }
     }
-  ]
+  ],
+  "px_scale": 0.5
 }

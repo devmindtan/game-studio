@@ -172,3 +172,8 @@ def build(here: Path, base: str, tier: int, light: str, glow: str, export_fn, th
         anims.append((a["name"], out, a["fps"], a["loop"], extra))
     ax, ay = meta["anchor"]
     export_fn(here, here.name, anims, anchor=(ax + PAD, ay + PAD))
+    if "px_scale" in meta:   # a double-density base keeps its density in every tier
+        out = here / f"{here.name}.json"
+        m = json.loads(out.read_text())
+        m["px_scale"] = meta["px_scale"]
+        out.write_text(json.dumps(m, indent=2) + "\n")

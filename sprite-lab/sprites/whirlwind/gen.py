@@ -8,6 +8,7 @@ Neo (24, 24) tại tâm (sprite 48x48) để đặt quanh nhân vật.
 Chạy:  gamekit art run whirlwind
 """
 
+import json
 import math
 import sys
 from pathlib import Path
@@ -25,8 +26,9 @@ sys.path.insert(0, str(_workspace() / "tools/gamekit/pipeline"))
 from spritekit import Canvas, gif, preview, strip, write_anim_meta  # noqa: E402
 
 NAME = "whirlwind"
-SIZE = 48
-CX, CY = 24, 24
+D = 2   # double density (px_scale 0.5), review 2026-11-21
+SIZE = 48 * D
+CX, CY = 24 * D, 24 * D
 ANCHOR = (float(CX), float(CY))
 HERE = Path(__file__).resolve().parent
 OUT = HERE
@@ -68,7 +70,7 @@ def blade(c, a_head, span, r0, r1):
             inner = r0 + (r1 - r0) * (t ** 0.7)        # thick at the head, a thin hook at the tail
             if r < inner:
                 continue
-            rim = r > r1 - 1.6                         # the outer cutting edge catches the light
+            rim = r > r1 - 1.6 * D                         # the outer cutting edge catches the light
             if rim and t < 0.7:
                 col = CORE
             elif t < 0.25:
@@ -84,12 +86,13 @@ def spin(i):
     c = Canvas(SIZE, SIZE)
     base = i * 45
     for k in (0, 180):                        # two blades opposite each other
-        blade(c, base + k + 120, 160, 9, 20)
+        blade(c, base + k + 120, 160, 9 * D, 20 * D)
     for k in (0, 180):                        # a thin outer gust trailing each blade
         arc = base + k + 60
-        for d in range(0, 70, 2):
+        for d in range(0, 70, 1):
             rad = math.radians(arc - d)
-            p(c, round(CX + math.cos(rad) * 21.5), round(CY + math.sin(rad) * 21.5), WIND if d < 40 else WIND_D)
+            for w in range(D):
+                p(c, round(CX + math.cos(rad) * (21.5 * D + w)), round(CY + math.sin(rad) * (21.5 * D + w)), WIND if d < 40 else WIND_D)
     return c.outline("#1b2a40")
 
 
@@ -115,6 +118,9 @@ def main() -> None:
                       "hitbox": {"shape": "circle", "center": list(ANCHOR), "active": [0, len(f) - 1]}}
                      for n, f, fps, loop in ANIMATIONS],
                     anchor=ANCHOR)
+    m = json.loads((OUT / f"{NAME}.json").read_text())
+    m["px_scale"] = 1.0 / D
+    (OUT / f"{NAME}.json").write_text(json.dumps(m, indent=2) + "\n")
     print(f"strip:   {OUT / f'{NAME}_strip.png'}")
     print(f"preview: {HERE / 'preview.png'}")
 
