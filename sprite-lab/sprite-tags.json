@@ -1480,5 +1480,12 @@
       "melee",
       "slash"
     ]
+  },
+  "ronin": {
+    "cat": "character",
+    "tags": [
+      "player",
+      "concept-ai"
+    ]
   }
 }

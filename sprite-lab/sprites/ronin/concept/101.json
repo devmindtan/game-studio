@@ -1,0 +1,55 @@
+{
+  "seed": 101,
+  "prompt": "pixel art game sprite, wandering swordsman, full body, side view facing right, long dark navy coat to the knees, grey steel shoulder pauldron, short crimson cape, black hair tied in a topknot, brown boots, long straight steel sword, plain light grey background",
+  "height": 30,
+  "palette": [
+    {
+      "hex": "#582b22",
+      "count": 56
+    },
+    {
+      "hex": "#292b35",
+      "count": 56
+    },
+    {
+      "hex": "#323845",
+      "count": 52
+    },
+    {
+      "hex": "#394551",
+      "count": 50
+    },
+    {
+      "hex": "#51565f",
+      "count": 17
+    },
+    {
+      "hex": "#677885",
+      "count": 16
+    },
+    {
+      "hex": "#cee2e9",
+      "count": 15
+    },
+    {
+      "hex": "#f7c598",
+      "count": 8
+    },
+    {
+      "hex": "#8a3435",
+      "count": 7
+    },
+    {
+      "hex": "#73878d",
+      "count": 6
+    },
+    {
+      "hex": "#9e5f55",
+      "count": 4
+    },
+    {
+      "hex": "#939ca1",
+      "count": 1
+    }
+  ]
+}
