@@ -67,7 +67,7 @@ xuất kéo dài thì khuyên người dùng mở phiên mới ở đó.
 | "Chơi thử / chạy xem" | `gamekit run <g>` (người chơi), `gamekit shot <g> [scene] [frames] [-- args]` (agent tự nhìn; nhiều thời điểm thì một lần chạy `frames=300,600,900`, tua nhanh bằng cờ của game như `--sim-steps`) |
 | "Giờ làm gì tiếp?", "dự án tới đâu rồi?" | `/next-step`, `/project-stage-detect` |
 | "Xuất game", "build", "phát hành" | tăng `config/version` trong `project.godot` → `gamekit export <g>` → `gamekit smoke-web <g>` → `/release-checklist`, `/patch-notes` |
-| "Cập nhật framework" | `gamekit update-template`; với từng game, làm theo `UPGRADING.md` của template |
+| "Cập nhật framework" | `gamekit update-template`; với từng game, làm theo `UPGRADING.md` của template, rồi `gamekit tidy <g>` (bỏ lại agent của engine khác) |
 | Thư mục game lẫn file của framework (README/CHANGELOG/.github của tool) | `gamekit tidy <g>` (gamekit new đã tự chạy) |
 | "Thêm/sửa skill hoặc cấu hình agent" | sửa `.agents/skills/` hoặc `AGENTS.md` → `gamekit agents-link` → `gamekit doctor` |
 | "Sửa/mở rộng bộ công cụ" | sửa `tools/gamekit` → tăng `tools/gamekit/VERSION` → `gamekit install <g>` cho mỗi game → `gamekit test <g>` |
