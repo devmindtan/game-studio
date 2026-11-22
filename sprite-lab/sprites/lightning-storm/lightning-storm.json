@@ -1,5 +1,5 @@
 {
-  "frames": 12,
+  "frames": 20,
   "frame_size": [
     128,
     128
@@ -42,10 +42,30 @@
           3,
           6
         ],
-        "radius": 37.0,
+        "radius": 36.0,
         "inner": 14.0
       },
       "hit_mask": true
+    },
+    {
+      "name": "linger",
+      "start": 12,
+      "frames": 8,
+      "fps": 12.0,
+      "loop": true,
+      "hitbox": {
+        "shape": "circle",
+        "center": [
+          64.0,
+          64.0
+        ],
+        "active": [
+          0,
+          7
+        ],
+        "radius": 69.0,
+        "inner": 17.0
+      }
     }
   ],
   "px_scale": 0.5

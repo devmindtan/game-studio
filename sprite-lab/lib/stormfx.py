@@ -65,6 +65,44 @@ STORM_MS = [80, 80, 80, 55, 55, 55, 55, 80, 100, 110, 120, 130]
 STONE_D = "#4a4038"
 
 
+COLUMNS = [2, 2, 3, 3, 4]   # bolt columns of each tier = the lingering pulses (bach-ai storm zone "pulses")
+
+
+def storm_spots(tier, size, radius, seed=11):
+    cx = cy = size / 2
+    rng = random.Random(seed)
+    n = COLUMNS[min(tier, 5) - 1]
+    return [(cx + math.cos(a) * radius * d, cy + math.sin(a) * radius * d * 0.8)
+            for a, d in ((rng.uniform(0, math.tau), rng.uniform(0.1, 0.8)) for _ in range(n))]
+
+
+def storm_linger(tier, size, radius, seed=11, frames=8):
+    """The 2 s lingering storm (user 2026-11-22): one small dark cloud over each bolt column, its bolt flickering
+    on alternate frames with a spark burst at its foot; looped by the game while the pulse zone lives."""
+    import boltfx
+    import fxkit as fk
+    rng = random.Random(seed + 7)
+    spots = storm_spots(tier, size, radius, seed)
+    out = []
+    for f in range(frames):
+        c = Canvas(size, size)
+        lay = Canvas(size, size)
+        for i, (x, y) in enumerate(spots):
+            top = max(8.0, y - size * 0.55)
+            if (i + f) % 2 == 0:
+                boltfx.thin_bolt(lay, x + rng.uniform(-2, 2), top + 5, x, y, rng, tier)
+            boltfx.dark_cloud(lay, x, top, 5 + tier * 0.6, flash=(i + f) % 2 == 0)
+        fk.stack(c, lay, None)
+        for i, (x, y) in enumerate(spots):
+            if (i + f) % 2 == 0:
+                fk.glow(c, x, y, 4 + tier, [GLOW, BOLT_M, BOLT], density=0.8)
+                fk.rays(c, x, y, 2, 6 + tier, 5, BOLT_M, BOLT, rot=f)
+            else:
+                fk.sparkle(c, int(x), int(y), 2, BOLT, GLOW)
+        out.append(c)
+    return out
+
+
 def storm(tier, size, radius, seed=11):
     """No dithered veil over the area (user 2026-11-21: the purple wash hid the field).
     12 frames: cloud gathers, four strike frames (outlined bolts, flash, sparkles),
@@ -72,7 +110,7 @@ def storm(tier, size, radius, seed=11):
     import fxkit as fk
     cx = cy = size / 2
     rng = random.Random(seed)
-    n = 2 + (tier + 1) // 2
+    n = COLUMNS[min(tier, 5) - 1]   # bolt columns by tier (user 2026-11-22: I/II 2, III/IV 3, V 4)
     spots = [(cx + math.cos(a) * radius * d, cy + math.sin(a) * radius * d * 0.8)
              for a, d in ((rng.uniform(0, math.tau), rng.uniform(0.1, 0.8)) for _ in range(n))]
     out = []

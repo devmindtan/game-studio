@@ -35,7 +35,8 @@ SIZE = 152
 RADIUS = _V[0]
 C = SIZE / 2
 ANIM = [("spell", stormfx.storm(_V[1], SIZE, RADIUS), 12, False,
-         {"durations_ms": stormfx.STORM_MS, "hitbox": {"shape": "circle", "center": [C, C], "active": [3, 6], "radius": float(RADIUS), "inner": 0.0}})]
+         {"durations_ms": stormfx.STORM_MS, "hitbox": {"shape": "circle", "center": [C, C], "active": [3, 6], "radius": float(RADIUS), "inner": 0.0}}),
+        ("linger", stormfx.storm_linger(_V[1], SIZE, RADIUS), 12, True, {"hitbox": {"shape": "circle", "center": [C, C], "active": [0, 7]}})]   # the 2 s pulse zone (user 2026-11-22; damage from the zone, the box is for the data rules)
 
 if __name__ == "__main__":
     export(HERE, NAME, ANIM, anchor=(C, C), preview_scale=2, gif_scale=2)
