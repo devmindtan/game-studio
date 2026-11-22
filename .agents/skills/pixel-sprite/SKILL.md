@@ -92,6 +92,8 @@ chọn nguồn `.poses.json` nếu sprite có file đó; sprite dùng `gen.py` t
    có thể dùng `write_meta`. **Nhân vật đứng trên đất** gọi `write_anim_meta(..., ground=True)`, đánh dấu
    animation rời đất bằng `"airborne": True` (nhảy). Khi đó mọi frame còn lại phải có hàng pixel thấp nhất
    (kể cả viền) nằm ngay trên điểm neo; lơ lửng hay lún đều bị `art run` từ chối (bài học 2026-11-16).
+   **Cỡ nhân vật đã chốt là minifig 48×48 (thân ~26 px)** (người dùng 2026-11-22); `hdfig` (~40 px, 64×64) và các
+   sprite `*-hd` chỉ là thử nghiệm, không dùng cho game.
    Nhân vật nhỏ kiểu tối giản dựng nhanh bằng `sprite-lab/lib/minifig.py` (tư thế bằng số, tỉ lệ giữ nguyên;
    xem `sprites/swordsman/gen.py`, `sprites/mage/gen.py`).
 4. **Xem tĩnh**: mở `sprite-lab/sprites/<tên>/preview.png` bằng công cụ đọc ảnh của agent. Mỗi animation một

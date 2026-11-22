@@ -92,6 +92,10 @@ xuất kéo dài thì khuyên người dùng mở phiên mới ở đó.
   cách cầm vũ khí, dáng và nhịp animation, không chỉ đổi màu. Model AI (`gamekit art concept`) chỉ để lấy ý tưởng
   ban đầu, không tham gia thiết kế. Chi tiết: skill `pixel-sprite` bước 0.
 - **Chỉ sửa đúng cái người dùng chỉ ra** (người dùng 2026-11-22): một nhận xét chung đi kèm yêu cầu cụ thể (ví dụ "game 2D nên thiết kế kiểu 2D") chỉ áp cho những thứ được chỉ; thứ khác có thể liên quan thì liệt kê và hỏi trước, không tự sửa (đã lỡ vẽ lại ấn Cột thánh quang, phải hoàn tác).
+- **Cỡ nhân vật chốt: nhỏ, minifig 48×48 (thân ~26 px)** (người dùng 2026-11-22, sau khi thử bản ~40 px trong
+  64×64): nhân vật mới và nhân vật hiện có giữ cỡ này. `sprite-lab/lib/hdfig.py` và các sprite `*-hd` chỉ là
+  thử nghiệm, không dùng cho game. Thay đổi duy nhất được giữ là bước đầu: dùng model AI (`gamekit art concept`)
+  để lấy ý tưởng ngoại hình, rồi thiết kế/vẽ như cũ.
 - **Không đoán mò khi thiết kế** (người dùng 2026-11-17): màn hình, luồng menu, tính năng mới đều bắt đầu từ cách
   các game cùng thể loại đã làm (tìm trên mạng), ghi nguồn vào tài liệu thiết kế rồi mới code. Thiếu thông tin
   mà tham khảo không trả lời được thì hỏi người dùng. Từ ngữ của người dùng ứng với hơn một hệ thống của game
