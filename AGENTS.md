@@ -91,6 +91,7 @@ xuất kéo dài thì khuyên người dùng mở phiên mới ở đó.
 - **Nhân vật/sprite mới: đưa 2–3 thiết kế khác nhau để chọn** (người dùng 2026-11-21): khác silhouette, tỉ lệ,
   cách cầm vũ khí, dáng và nhịp animation, không chỉ đổi màu. Model AI (`gamekit art concept`) chỉ để lấy ý tưởng
   ban đầu, không tham gia thiết kế. Chi tiết: skill `pixel-sprite` bước 0.
+- **Chỉ sửa đúng cái người dùng chỉ ra** (người dùng 2026-11-22): một nhận xét chung đi kèm yêu cầu cụ thể (ví dụ "game 2D nên thiết kế kiểu 2D") chỉ áp cho những thứ được chỉ; thứ khác có thể liên quan thì liệt kê và hỏi trước, không tự sửa (đã lỡ vẽ lại ấn Cột thánh quang, phải hoàn tác).
 - **Không đoán mò khi thiết kế** (người dùng 2026-11-17): màn hình, luồng menu, tính năng mới đều bắt đầu từ cách
   các game cùng thể loại đã làm (tìm trên mạng), ghi nguồn vào tài liệu thiết kế rồi mới code. Thiếu thông tin
   mà tham khảo không trả lời được thì hỏi người dùng. Từ ngữ của người dùng ứng với hơn một hệ thống của game
