@@ -309,3 +309,70 @@ def flame_ring(size=128, radius=52, frames=10, n=22):
         out.append(c)
         masks.append(m)
     return FxFrames(out, masks)
+
+
+ICE_W = "#f4feff"
+ICE_L = "#c8f6ff"
+ICE_M = "#6fe0ff"
+ICE_D = "#2a8fd6"
+ICE_X = "#1c4f8a"
+
+
+def ice_nova(size=144, radius=60, frames=13, n=18):
+    """Băng ấn: frost swirls in at the feet (0-2), a ring of solid faceted ice spikes bursts up at the reach
+    (3-7, the freeze), they stand, then shatter into shards flying out (8-12). Hit mask = the disc they ring."""
+    import fxkit as fk
+    c0 = size / 2
+    sq = 0.55
+    out, masks = [], []
+    for f in range(frames):
+        c = Canvas(size, size)
+        m = Canvas(size, size)
+        if f < 3:                                                     # frost gathering at the feet
+            for i in range(10):
+                a = i * math.tau / 10 + f * 0.6
+                rr = radius * (0.5 - f * 0.13)
+                for s in range(6):
+                    t = a + s * 0.06
+                    _put(c, c0 + math.cos(t) * rr, c0 + 8 + math.sin(t) * rr * sq, (200, 246, 255), 200 - s * 25)
+        elif f < 8:
+            grow = min(1.0, (f - 2) / 2.0)
+            for k in range(int(radius * 7)):                          # a frosted band joining the spikes
+                a = k / (radius * 7) * math.tau
+                x, y = c0 + math.cos(a) * radius, c0 + 8 + math.sin(a) * radius * sq
+                for w, col in ((0, (244, 254, 255)), (1, (160, 226, 250)), (2, (90, 170, 220))):
+                    _put(c, x, y + w, col, int(255 * grow))
+            lay = Canvas(size, size)
+            pts = sorted(((i * math.tau / n, i) for i in range(n)), key=lambda p: math.sin(p[0]))
+            for ang, i in pts:                                        # back spikes first
+                x = c0 + math.cos(ang) * radius
+                y = c0 + 8 + math.sin(ang) * radius * sq
+                h = (20 + (i % 3) * 7) * grow
+                lean = math.cos(ang) * 0.35
+                fk.crystal(lay, x, y, -math.pi / 2 + lean, h, 5.5, ICE_L, ICE_M, ICE_D, ICE_W)
+            fk.stack(c, lay, ICE_X)
+            if f == 3:                                                # the freeze flash along the ring
+                for k in range(int(radius * 6)):
+                    a = k / (radius * 6) * math.tau
+                    _put(c, c0 + math.cos(a) * radius, c0 + 8 + math.sin(a) * radius * sq, (244, 254, 255))
+            m.ellipse(int(c0 - radius), int(c0 + 8 - radius * sq), int(c0 + radius), int(c0 + 8 + radius * sq), "#ffffff", fill=True)
+        else:                                                         # shatter: shards fly outward and fade
+            k = f - 8
+            a_out = int(255 * (1 - k / 5))
+            lay = Canvas(size, size)
+            for i in range(n * 2):
+                ang = i * math.tau / (n * 2) + 0.2
+                d = radius + 4 + k * 6 + (i % 3) * 3
+                x = c0 + math.cos(ang) * d
+                y = c0 + 8 + math.sin(ang) * d * sq - (6 - k) * 1.5
+                fk.crystal(lay, x, y, ang + k * 0.7, 5 - k * 0.6, 1.6, ICE_L, ICE_M, ICE_D, ICE_W)
+            fk.stack(c, lay, ICE_X)
+            px = c.img.load()
+            for yy in range(size):
+                for xx in range(size):
+                    p = px[xx, yy]
+                    if p[3]:
+                        px[xx, yy] = (p[0], p[1], p[2], min(p[3], a_out))
+        out.append(c)
+        masks.append(m)
+    return FxFrames(out, masks)
