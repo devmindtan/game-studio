@@ -926,8 +926,9 @@ function skillPane(pane,s){
   // active (dash): the hero dashes right with its dash animation and slashes the dummy
   function moveScene(lv,fx,hero,sl,how){
     const dash=how==='active', shot=how==='projectile', time=Number(s.params.time||0.18), speed=Number(s.params.speed||300);
-    const fly=shot?'fly_right':'sweep_right';
-    const travel=dash?Number(s.params.distance||130):shot?Math.min(speed*Number(s.params.duration||1),260):speed*fx.duration(fly);
+    // the flight anim the sheet has: fly_right (4-way), fly_000 (16 directions drawn per angle), sweep_right (old wave)
+    const fly=['fly_right','fly_000','sweep_right'].find(n=>fx.has(n))||'fly_right';
+    const travel=dash?Number(s.params.distance||130):shot?Math.min(speed*Number(s.params.duration||1),260):Math.min(speed*Number(s.params.duration||fx.duration(fly)),420);
     setView(); fitView(fx,lv);
     FEET={x:60,y:VH/2+24};
     const hb0=hero.meta.body, hc={x:FEET.x+(hb0?(hb0.center[0]-hero.anchor[0])*2:0),y:FEET.y+(hb0?(hb0.center[1]-hero.anchor[1])*2:-26)};
@@ -937,7 +938,8 @@ function skillPane(pane,s){
     const hitAt=dash?time*0.5:dist/speed;
     // the hit's explosion: the level's impact sprite (impact_tiers) like the game, else the shot's own
     const boom=lv.impact&&sheets[lv.impact]?sheets[lv.impact]:(fx.has('impact')?fx:null);
-    const lead=0.3, dur=dash?time+0.35:shot?hitAt+(boom?boom.duration('impact'):0.2):fx.duration(fly);
+    // a wave flies for its own duration (its anim loops), not one pass of the anim
+    const lead=0.3, dur=dash?time+0.35:shot?hitAt+(boom?boom.duration('impact'):0.2):Number(s.params.duration||fx.duration(fly));
     return {fx,boom,hero,sl,kind:dash?'dash':shot?'shot':'wave',anim:dash?'dash':fly,sc:2*lv.size,hb:null,lead,dur,a0:hitAt,a1:hitAt+0.1,
       hits:[lead+hitAt],fxAt:{x:hc.x,y:hc.y},hcx:hc.x,hcy:hc.y,slFeet,target,ssc,sb,hc,period:lead+dur+0.8,time,speed,travel};
   }
