@@ -110,11 +110,11 @@ def frame(i):
     return c
 
 
-frames = [frame(i) for i in range(16)]
-masks = [fk.mask_art(f, C, C,
-                     RADIUS * 0.35 if i < 2 else RADIUS * (0.28 + 0.72 * min(1.0, (i - 2) / 7.0)) + 4)
-         for i, f in enumerate(frames)]
-ANIM = [("shock", fk.FxFrames(frames, masks), 13, False,
+import specialfx  # noqa: E402
+
+# Redrawn 2026-11-22 (bach-ai design/special-fx-redesign.md H1): solid stone-gold ring, shards, flash; no dither
+fx = specialfx.retaliate_shock(W, RADIUS, 16)
+ANIM = [("shock", fx, 13, False,
          {"durations_ms": MS,
           "hitbox": {"shape": "circle", "center": [C, C], "active": [2, 6],
                      "radius": float(RADIUS), "inner": 0.0}})]
