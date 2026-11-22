@@ -836,6 +836,16 @@ cmd_templates() { GODOT="$GODOT" "$KIT/build/install_export_templates.sh"; }
 
 cmd_export() {
   local g; g="$(resolve_game "${1:-}")"; shift || true
+  # the current UI set must not be older than the game (lesson 2026-11-22: web builds 0.6.16-0.6.18 went out
+  # with 15 stale screens); recapture with `gamekit ui-shots <g>` first
+  if [[ -f "$g/production/ui/screens.json" && -z "${GK_UI_STALE_OK:-}" ]]; then
+    local newest oldest
+    newest="$(find "$g/src" "$g/assets/data" "$g/assets/sprites" -type f ! -name '*.import' ! -name '*.uid' -printf '%T@\n' 2>/dev/null | sort -n | tail -1)"
+    oldest="$(find "$g/production/ui" -name '*.png' -printf '%T@\n' 2>/dev/null | sort -n | head -1)"
+    if [[ -n "$newest" && -n "$oldest" ]] && awk -v a="$oldest" -v b="$newest" 'BEGIN{exit !(a < b)}'; then
+      die "production/ui is older than src/ or assets/: run 'gamekit ui-shots $(basename "$g")' and commit it before exporting (GK_UI_STALE_OK=1 to skip)"
+    fi
+  fi
   GODOT="$GODOT" "$KIT/build/export.sh" "$g" "$@"
 }
 
