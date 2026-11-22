@@ -3,7 +3,8 @@
   const body = document.body;
   const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
 
-  const variant = params.get("variant") === "b" ? "b" : "a";
+  const variantParam = params.get("variant");
+  const variant = ["a", "b", "c"].includes(variantParam) ? variantParam : "a";
   let state = params.get("state") === "menu" ? "menu" : "gate";
   body.dataset.variant = variant;
   body.dataset.state = state;

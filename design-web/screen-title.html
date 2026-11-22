@@ -17,29 +17,49 @@
   <div class="mist"></div>
   <div class="fog"></div>
   <div class="ground"></div>
+  <div class="road"></div>
   <div class="vignette"></div>
 </div>
 
-<header class="logo-wrap">
+<!-- A · Cổng ải: stone gate that frames the menu -->
+<div class="gate-frame" aria-hidden="true">
+  <div class="gate-stone"></div>
+  <div class="lintel"></div>
+  <div class="opening"></div>
+  <div class="arch-steps"><i></i><i></i><i></i></div>
+  <div class="brazier left"><i></i></div>
+  <div class="brazier right"><i></i></div>
+</div>
+
+<!-- C · Cuộn giấy: parchment panel that holds the menu -->
+<div class="scroll-panel" aria-hidden="true">
+  <div class="rod top"></div>
+  <div class="paper"></div>
+  <div class="scroll-mark"><i class="post l"></i><i class="post r"></i><i class="beam top"></i><i class="beam mid"></i></div>
+  <div class="rod bottom"></div>
+</div>
+
+<header class="brand">
   <h1 class="logo">BÁCH ẢI</h1>
   <div class="logo-rule"><span></span><i></i><span></span></div>
   <div class="tagline">Vượt trăm ải</div>
 </header>
 
-<div class="hero-slot left" aria-hidden="true">
-  <div class="hero-shadow"></div>
-  <div class="pedestal"></div>
-  <div class="rune-ring"></div>
-  <div class="hero"></div>
-  <div class="hero-name">Kiếm sĩ</div>
-</div>
-
-<div class="hero-slot right" aria-hidden="true">
-  <div class="hero-shadow"></div>
-  <div class="pedestal"></div>
-  <div class="rune-ring"></div>
-  <div class="hero"></div>
-  <div class="hero-name">Pháp sư</div>
+<div class="heroes">
+  <div class="hero-slot left">
+    <div class="hero-shadow"></div>
+    <div class="pedestal"></div>
+    <div class="rune-ring"></div>
+    <div class="hero"></div>
+    <div class="hero-name">Kiếm sĩ</div>
+  </div>
+  <div class="hero-slot right">
+    <div class="hero-shadow"></div>
+    <div class="pedestal"></div>
+    <div class="rune-ring"></div>
+    <div class="hero"></div>
+    <div class="hero-name">Pháp sư</div>
+  </div>
 </div>
 
 <div class="sigil" aria-hidden="true"></div>
@@ -48,7 +68,7 @@
   <button class="btn primary" type="button" data-action="Tiếp tục · Sảnh chuẩn bị" aria-label="Tiếp tục, Nhân vật 1, Kiếm sĩ, đã vượt ải 10">
     <span class="caret" aria-hidden="true"></span>
     <span class="btn-title">Tiếp tục</span>
-    <span class="btn-sub">Nhân vật 1 · Kiếm sĩ · đã vượt ải 10</span>
+    <span class="btn-sub">Nhân vật 1 · Kiếm sĩ · ải 10</span>
   </button>
   <button class="btn" type="button" data-action="Chọn nhân vật" aria-label="Chọn nhân vật">
     <span class="caret" aria-hidden="true"></span>
@@ -70,8 +90,8 @@
 </div>
 
 <div class="hud-bottom">
-  <div>Phiên bản 0.6.21</div>
-  <div class="right">
+  <div class="hud-version">Phiên bản 0.6.21</div>
+  <div class="hud-keys">
     <span class="hint-menu">↑ ↓ chọn · Enter xác nhận · Esc quay lại</span>
     <span class="hint-gate">Bản thiết kế giao diện · 1280×720</span>
   </div>
