@@ -1,9 +1,11 @@
 #!/usr/bin/env python3
-"""ward-heal — hiệu ứng riêng cho Huyết quyền (kỹ năng trang bị).
+"""ward-heal: Huyết quyền (special card), redrawn 2026-11-22 (bach-ai design/special-fx-redesign.md H6).
 
-Vẽ bằng sprite-lab/lib/itemprocfx.py: 12 frame, khung/neo như nhân vật,
-animation "cast" để game spawn đúng chỗ. Chạy: gamekit art run ward-heal
+Blood drops fly in from all round, gather into a glowing crimson fist at the hero with a ring of light, red
+heal crosses rise (lib/specialfx.blood_fist). The old one was a flat green cross. Drawn at the hero, no area.
+Double density (px_scale 0.5). Chạy: gamekit art run ward-heal
 """
+import json
 import sys
 from pathlib import Path
 
@@ -18,9 +20,17 @@ def _ws():
 HERE = Path(__file__).resolve().parent
 sys.path.insert(0, str(_ws() / "tools/gamekit/pipeline"))
 sys.path.insert(0, str(HERE.parents[1] / "lib"))
-import itemprocfx  # noqa: E402
+import specialfx  # noqa: E402
 from sheet import export  # noqa: E402
 
+S = 112
+ANIM = [("cast", specialfx.blood_fist(S, 13), 14, False,
+         {"hitbox": {"shape": "circle", "center": [S / 2, S / 2], "active": [5, 8]}})]
+
 if __name__ == "__main__":
-    itemprocfx.build(HERE, HERE.name, "heal", export)
+    export(HERE, HERE.name, ANIM, anchor=(S / 2, S / 2))
+    meta = HERE / f"{HERE.name}.json"
+    m = json.loads(meta.read_text())
+    m["px_scale"] = 0.5
+    meta.write_text(json.dumps(m, indent=2) + "\n")
     print("OK", HERE.name)

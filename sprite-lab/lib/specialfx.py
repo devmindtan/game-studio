@@ -376,3 +376,83 @@ def ice_nova(size=144, radius=60, frames=13, n=18):
         out.append(c)
         masks.append(m)
     return FxFrames(out, masks)
+
+
+BLOOD_D = (110, 10, 24)
+BLOOD = (196, 28, 44)
+BLOOD_L = (246, 92, 98)
+BLOOD_W = (255, 214, 214)
+
+FIST = [   # a clenched fist seen from the front: four fingers (dark gaps), the thumb across, the wrist below
+    ".kkkkkkkkkk.",
+    "kwlkwlkwlkwk",
+    "kllkllkllklk",
+    "krrkrrkrrkrk",
+    "kkkkkkkkkkrk",
+    "klllllllllrk",
+    "krrrrrrrrrrk",
+    ".krrrrrrrrk.",
+    "..krrrrrrk..",
+    "..krrrrrrk..",
+    "..kkkkkkkk..",
+]
+
+
+def _blood_drop(c, x, y, r, a=255):
+    """A solid blood drop: round body, a point on top, a lit highlight."""
+    for yy in range(int(-r * 2), int(r) + 1):
+        for xx in range(int(-r), int(r) + 1):
+            if yy >= 0:
+                inside = xx * xx + yy * yy <= r * r
+            else:
+                inside = abs(xx) <= r * (1 + yy / (2 * r)) + 0.3
+            if inside:
+                col = BLOOD_D if (xx > r * 0.4 or yy > r * 0.6) else BLOOD
+                if xx < -r * 0.2 and -r * 0.6 < yy < r * 0.2:
+                    col = BLOOD_L
+                _put(c, x + xx, y + yy, col, a)
+
+
+def blood_fist(size=112, frames=13):
+    """Huyết quyền: blood drops fly in from all round (0-4), gather into a glowing crimson fist at the hero (5-8)
+    with a ring of light, then red heal crosses rise as it fades (9-12). Drawn at the hero (no area)."""
+    c0 = size / 2
+    out = []
+    for f in range(frames):
+        c = Canvas(size, size)
+        if f < 5:
+            t = f / 4
+            for i in range(8):
+                a = i * math.tau / 8 + 0.3
+                d = 46 * (1 - t) + 6
+                _blood_drop(c, c0 + math.cos(a) * d, c0 + math.sin(a) * d * 0.8, 3)
+        else:
+            k = f - 5
+            fade = 255 if f < frames - 3 else int(255 * (frames - f) / 4)
+            sc = 3
+            fy = int(c0 - len(FIST) * sc / 2 - min(k, 3) * 2)   # whole pixels: a half-pixel origin striped the 3x blocks
+            fx = int(c0 - len(FIST[0]) * sc / 2)
+            keys = {"k": (60, 6, 14), "r": BLOOD, "l": BLOOD_L, "w": BLOOD_W}
+            for ry, row in enumerate(FIST):
+                for rx, ch in enumerate(row):
+                    if ch != ".":
+                        for dy in range(sc):
+                            for dx in range(sc):
+                                _put(c, fx + rx * sc + dx, fy + ry * sc + dy, keys[ch], fade)
+            # the ring after the fist: _put keeps the first colour, so it sits behind the fist
+            if k <= 3:                                               # ring of light bursting out
+                rr = 10 + k * 9
+                for s in range(int(rr * 7)):
+                    a = s / (rr * 7) * math.tau
+                    for w, col in ((0, BLOOD_W), (1, BLOOD_L), (2, BLOOD)):
+                        _put(c, c0 + math.cos(a) * (rr - w), c0 + math.sin(a) * (rr - w) * 0.8, col, 255 - k * 50)
+            if f >= 8:                                               # heal crosses rising
+                for i in range(3):
+                    x = c0 - 18 + i * 18
+                    y = c0 - 10 - (f - 8) * 5 - (i % 2) * 6
+                    for d in range(-3, 4):
+                        _put(c, x + d, y, BLOOD_L, fade)
+                        _put(c, x, y + d, BLOOD_L, fade)
+                    _put(c, x, y, BLOOD_W, fade)
+        out.append(c)
+    return out
