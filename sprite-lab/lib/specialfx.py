@@ -643,3 +643,65 @@ def hourglass(size=112, frames=14):
                     _put(c, x, y + d, SAND, fade)
         out.append(c)
     return out
+
+
+# --- buff auras, 2D (user 2026-11-22: no 2.5D ground ellipses / front-back orbits) -----------------------------
+AURA_FEET = (48, 88)      # anchor: the hero's feet (the run draws auras at player_pos)
+AURA_BODY = (48, 68)      # the hero's body centre: ~20 world px above the feet (measured on the run shot)
+
+
+def haste_ring(size=96, frames=8):
+    """Rune tốc độ: a round ring of gold speed chevrons turning round the hero's body (loop)."""
+    cx, cy = AURA_BODY
+    out = []
+    for f in range(frames):
+        c = Canvas(size, size)
+        for i in range(6):
+            a = i * math.tau / 6 + f * math.tau / 24
+            x, y = cx + math.cos(a) * 22, cy + math.sin(a) * 22
+            tx, ty = -math.sin(a), math.cos(a)                       # chevron points along the turn
+            for k in range(-4, 5):
+                for w, col in ((0, STAR_W), (1, STAR_Y), (2, STAR_O)):
+                    bx = x - tx * abs(k) * 0.9 + (math.cos(a) * k * 0.5)
+                    by = y - ty * abs(k) * 0.9 + (math.sin(a) * k * 0.5)
+                    _put(c, bx - tx * w, by - ty * w, col, 230)
+        for s in range(int(22 * 7)):                                  # a faint broken track
+            a = s / (22 * 7) * math.tau
+            if (s + f * 2) % 14 < 9:
+                _put(c, cx + math.cos(a) * 22, cy + math.sin(a) * 22, STAR_O, 120)
+        out.append(c)
+    return out
+
+
+SHIELD_L = (236, 226, 190)
+SHIELD = (196, 170, 110)
+SHIELD_D = (120, 96, 52)
+SHIELD_G = (255, 214, 92)
+
+
+def _small_shield(c, x, y, a=255):
+    rows = ["kkkkkkk", "klwllgk", "kllgllk", "kllgllk", ".kllgk.", "..kmk..", "...k..."]
+    keys = {"k": (60, 40, 20), "l": SHIELD_L, "w": (255, 255, 240), "g": SHIELD_G, "m": SHIELD}
+    for ry, row in enumerate(rows):
+        for rx, ch in enumerate(row):
+            if ch != ".":
+                _put(c, x - 3 + rx, y - 3 + ry, keys[ch], a)
+
+
+def aegis_orbit(size=96, form=4, loop=8, n=3):
+    """Thần hộ: three small gold shields orbit the hero's body on one round path (2D, one layer; the old 3D orbit
+    split into front/back halves). Returns (form frames, loop frames)."""
+    cx, cy = AURA_BODY
+    def frame(r, ang0, a):
+        c = Canvas(size, size)
+        for s in range(int(r * 7)):                                   # the orbit track, faint gold
+            t = s / (r * 7) * math.tau
+            if s % 6 < 4:
+                _put(c, cx + math.cos(t) * r, cy + math.sin(t) * r, SHIELD_G, int(a * 0.45))
+        for i in range(n):
+            t = ang0 + i * math.tau / n
+            _small_shield(c, cx + math.cos(t) * r, cy + math.sin(t) * r, a)
+        return c
+    forms = [frame(8 + 22 * (k + 1) / form, k * 0.4, int(255 * (k + 1) / form)) for k in range(form)]
+    loops = [frame(30, form * 0.4 + k * math.tau / (n * loop), 255) for k in range(loop)]
+    return forms, loops
