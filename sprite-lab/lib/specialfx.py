@@ -530,3 +530,116 @@ def shooting_stars(size=112, frames=12, n=3):
                     _put(c, x + q[0], y + q[1], STAR_Y, fade)
         out.append(c)
     return out
+
+
+HEART_D = (150, 30, 70)
+HEART = (232, 72, 120)
+HEART_L = (255, 160, 190)
+HEART_W = (255, 236, 244)
+
+
+def _heart(c, cx, cy, r, crack=0, a=255):
+    """A solid heart (lit upper left, dark rim); crack > 0 opens a jagged split down the middle."""
+    for y in range(int(-r * 1.1), int(r * 1.2) + 1):
+        for x in range(int(-r * 1.2), int(r * 1.2) + 1):
+            nx, ny = x / r, -y / r
+            v = (nx * nx + ny * ny - 1) ** 3 - nx * nx * ny ** 3
+            if v <= 0:
+                if crack and abs(x - (2 if (y // 3) % 2 else -2) * (crack / 3)) < crack * 0.6:
+                    continue
+                edge = (nx * nx + ny * ny - 1) ** 3 - nx * nx * ny ** 3 > -0.02
+                col = HEART_D if edge else (HEART_L if (nx < -0.2 and ny > 0.1) else HEART)
+                if nx < -0.35 and 0.25 < ny < 0.55:
+                    col = HEART_W
+                _put(c, cx + x, cy + y, col, a)
+
+
+def revive_heart(size=112, frames=14):
+    """Tim bất diệt: a heart appears and beats (0-3), cracks and bursts (4-6) into a short column of light (6-9),
+    white feathers drift down while it fades (8-13). Drawn at the hero."""
+    c0 = size / 2
+    out = []
+    for f in range(frames):
+        c = Canvas(size, size)
+        fade = 255 if f < frames - 4 else int(255 * (frames - f) / 5)
+        if f < 4:
+            _heart(c, c0, c0 - 36, 9 + (2 if f % 2 else 0))
+        elif f < 7:
+            k = f - 3
+            _heart(c, c0 - k * 3, c0 - 36 + k, 9, crack=k * 2)          # the two halves part
+            for i in range(8):
+                ang = i * math.tau / 8
+                for s in range(6, 10 + k * 4):
+                    _put(c, c0 + math.cos(ang) * s, c0 - 36 + math.sin(ang) * s, HEART_L, 220)
+        if 5 <= f < 11:                                                  # a short column of light
+            w = 7 - abs(f - 7) * 1.5
+            for y in range(int(c0 - 54), int(c0 + 20)):
+                for x in range(int(c0 - w), int(c0 + w) + 1):
+                    d = abs(x - c0) / max(1.0, w)
+                    _put(c, x, y, HEART_W if d < 0.4 else (HEART_L if d < 0.8 else HEART), fade if d < 0.8 else int(fade * 0.7))
+        if f >= 7:                                                       # feathers drifting down
+            for i in range(5):
+                x = c0 - 24 + i * 12 + math.sin(f * 0.8 + i) * 3
+                y = c0 - 50 + (f - 7) * 6 + (i % 2) * 8
+                for k in range(5):
+                    _put(c, x + k * 0.6, y + k, (250, 250, 255), fade)
+                    _put(c, x + k * 0.6 + 1, y + k, (200, 206, 224), fade)
+        out.append(c)
+    return out
+
+
+SAND = (240, 200, 110)
+SAND_D = (190, 140, 60)
+GLASS = (210, 236, 255)
+FRAME = (150, 100, 40)
+FRAME_L = (230, 180, 90)
+TIME_B = (140, 200, 255)
+
+
+def hourglass(size=112, frames=14):
+    """Vĩnh cửu: a glowing hourglass appears over the hero, its sand runs down (0-6), it flips (7-8) and bursts
+    into a ring of blue light: every cooldown is reset (9-13). Drawn at the hero."""
+    c0 = size / 2
+    out = []
+    for f in range(frames):
+        c = Canvas(size, size)
+        fade = 255 if f < frames - 3 else int(255 * (frames - f) / 4)
+        cx, cy = c0, c0 - 38   # above the head (anchor = the body centre)
+        if f < 9:
+            flip = f in (7, 8)
+            h, w = 14, 10
+            for y in range(-h, h + 1):                                   # the glass: two cones meeting at the waist
+                half = 1 + (w - 1) * abs(y) / h
+                for x in range(int(-half), int(half) + 1):
+                    top = y < 0
+                    level = f / 7                                       # sand left in the top bulb
+                    filled = (top and abs(y) / h < (1 - level) * 0.9 + 0.05) if not flip else (not top and abs(y) / h < 0.9)
+                    filled = filled or (not top and not flip and abs(y) / h > 1 - level * 0.85)
+                    if abs(x) >= half - 0.8:
+                        col = (120, 170, 210)
+                    else:
+                        col = (SAND if not flip else SAND_D) if filled else GLASS
+                    _put(c, cx + x, cy + (-y if flip else y), col, fade)
+            if not flip and f < 7:                                       # the falling stream
+                for y in range(0, h):
+                    if (y + f) % 2 == 0:
+                        _put(c, cx, cy + y, SAND, fade)
+            for x in range(-w - 2, w + 3):                               # wooden caps
+                for dy, col in ((0, FRAME_L), (1, FRAME)):
+                    _put(c, cx + x, cy - h - 2 + dy, col, fade)
+                    _put(c, cx + x, cy + h + 1 + dy, col, fade)
+        else:                                                            # the burst: a ring of blue light
+            k = f - 9
+            rr = 10 + k * 9
+            for s in range(int(rr * 7)):
+                ang = s / (rr * 7) * math.tau
+                for wdt, col in ((0, (240, 250, 255)), (1, TIME_B), (2, (80, 140, 220))):
+                    _put(c, c0 + math.cos(ang) * (rr - wdt), c0 - 6 + math.sin(ang) * (rr - wdt) * 0.7, col, fade)
+            for i in range(6):
+                ang = i * math.tau / 6 + k
+                x, y = c0 + math.cos(ang) * rr, c0 - 6 + math.sin(ang) * rr * 0.7
+                for d in range(-3, 4):
+                    _put(c, x + d, y, SAND, fade)
+                    _put(c, x, y + d, SAND, fade)
+        out.append(c)
+    return out

@@ -1,23 +1,37 @@
 {
-  "frames": 12,
+  "frames": 14,
   "frame_size": [
-    48,
-    48
+    112,
+    112
   ],
-  "fps": 15.0,
+  "fps": 14.0,
   "loop": false,
   "anchor": [
-    24.0,
-    44.0
+    56.0,
+    56.0
   ],
   "anchor_source": "explicit",
   "animations": [
     {
       "name": "cast",
       "start": 0,
-      "frames": 12,
-      "fps": 15.0,
-      "loop": false
+      "frames": 14,
+      "fps": 14.0,
+      "loop": false,
+      "hitbox": {
+        "shape": "circle",
+        "center": [
+          56.0,
+          56.0
+        ],
+        "active": [
+          4,
+          9
+        ],
+        "radius": 55.0,
+        "inner": 0.0
+      }
     }
-  ]
+  ],
+  "px_scale": 0.5
 }
