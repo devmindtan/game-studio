@@ -171,3 +171,79 @@ def holy_blades(size=144, radius=60, frames=14, n=6):
         out.append(c)
         masks.append(m)
     return FxFrames(out, masks)
+
+
+BOLT_W = (250, 252, 255)
+BOLT_B = (150, 210, 255)
+BOLT_D = (60, 110, 200)
+
+
+def shock_rune(size=96, frames=10):
+    """Lôi ấn at the hero: a lightning rune (a zigzag glyph in a diamond) rises over the head, flashes white, and
+    throws sparks; anchor = the hero's body centre (the frame's centre)."""
+    import random
+    rng = random.Random(5)
+    c0 = size / 2
+    out = []
+    for f in range(frames):
+        c = Canvas(size, size)
+        lift = -18 - min(f, 3) * 3
+        a = 255 if f < frames - 3 else int(255 * (frames - f) / 4)
+        cy = c0 + lift
+        r = 9 + (2 if f == 3 else 0)
+        for k in range(-r, r + 1):                                       # diamond frame, 2 px
+            w = r - abs(k)
+            for s in (-w, w):
+                _put(c, c0 + s, cy + k, BOLT_B, a)
+                _put(c, c0 + s + (1 if s < 0 else -1), cy + k, BOLT_D, a)
+        for (x0, y0, x1, y1) in ((2, -6, -2, 0), (-2, 0, 2, 0), (2, 0, -2, 6)):   # the zigzag glyph
+            for t in range(9):
+                x = x0 + (x1 - x0) * t / 8
+                y = y0 + (y1 - y0) * t / 8
+                _put(c, c0 + x, cy + y, BOLT_W if f in (3, 4) else (255, 240, 150), a)
+                _put(c, c0 + x + 1, cy + y, BOLT_B, a)
+        if f in (3, 4, 5):                                               # the flash and sparks as it fires
+            for i in range(8):
+                ang = i * math.tau / 8 + f
+                for s in range(r + 2, r + 6 + (f - 3) * 3):
+                    _put(c, c0 + math.cos(ang) * s, cy + math.sin(ang) * s, BOLT_W if s < r + 5 else BOLT_B, a)
+        for i in range(3):                                               # small sparks drifting up
+            x = c0 + rng.uniform(-14, 14)
+            y = cy + 10 - f * 2 - rng.uniform(0, 6)
+            _put(c, x, y, BOLT_B, a // 2)
+        out.append(c)
+    return out
+
+
+def shock_strike(w=48, h=112, frames=9):
+    """Lôi ấn on a struck monster: a jagged bolt falls from above to its feet (anchor at the bottom centre),
+    flashes, and its foot throws sparks; then the bolt thins and fades."""
+    import random
+    import boltfx
+    out = []
+    for f in range(frames):
+        c = Canvas(w, h)
+        rng = random.Random(11 + f // 2)
+        x, foot = w / 2, h - 6
+        if f == 0:                                                       # a thin warning spark at the top
+            for y in range(4, 22):
+                _put(c, x + (y % 3) - 1, y, BOLT_B, 200)
+        elif f < frames - 2:
+            boltfx.thin_bolt(c, x + rng.uniform(-4, 4), 2, x, foot, rng, 3, core="#fbfdff", glow="#8fd0ff")
+            if f <= 3:                                                   # flash at the foot
+                for yy in range(int(foot - 5), int(foot + 4)):
+                    for xx in range(int(x - 10), int(x + 11)):
+                        e = ((xx - x) / 10) ** 2 + ((yy - foot) / 4) ** 2
+                        if e <= 1:
+                            _put(c, xx, yy, BOLT_W if e < 0.4 else BOLT_B)
+            for i in range(6):                                           # sparks at the foot
+                ang = -math.pi * (0.1 + 0.8 * i / 5)
+                s = 4 + f * 2
+                _put(c, x + math.cos(ang) * s, foot + math.sin(ang) * s * 0.6, BOLT_W)
+                _put(c, x + math.cos(ang) * (s + 1), foot + math.sin(ang) * (s + 1) * 0.6, BOLT_B)
+        else:                                                            # outro: a fading line
+            a = int(255 * (frames - f) / 3)
+            for y in range(int(foot * 0.4), int(foot)):
+                _put(c, x, y, BOLT_B, a)
+        out.append(c)
+    return out
