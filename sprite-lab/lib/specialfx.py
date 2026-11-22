@@ -67,8 +67,8 @@ def retaliate_shock(size=112, radius=52, frames=16):
     for f in range(frames):
         c = Canvas(size, size)
         m = Canvas(size, size)
-        if f < 2:                                                       # the trigger: a flash at the feet
-            _flash(c, c0, c0, 6 + f * 4)
+        if f < 2:   # the trigger: a small see-through flash at the feet (scaled with the ring, a big one hid the hero)
+            _flash(c, c0, c0 + 4, 3 + f * 2, 170)
         else:
             t = min(1.0, (f - 2) / 7.0)
             ease = 1 - (1 - t) ** 3                                     # fast out, slows to full reach
@@ -77,8 +77,7 @@ def retaliate_shock(size=112, radius=52, frames=16):
             width = max(2.0, 9 - 0.5 * max(0, f - 6))                  # thins as it slows
             _ring(c, c0, c0, r, width, [(255, 246, 210), GOLD, GOLD_D, EARTH], fade)
             _ring(c, c0, c0, r + 1.5, 1.5, [INK], fade)           # dark outer rim keeps it readable
-            if f <= 4:                                                  # ground flash and rays while it bursts
-                _flash(c, c0, c0, 10 - f * 2, 230)
+            if f <= 4:                                                  # ground rays while it bursts (no centre flash)
                 for i in range(10):
                     a = i * math.tau / 10 + f * 0.2
                     for s in range(int(r * 0.5), int(r * 0.85)):
