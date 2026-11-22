@@ -6,7 +6,7 @@ few numbers). Each tier folder's gen.py runs this file with its own __file__; TI
 change per tier. First tier's original notes:
 holy-column-ii
 
-Chuẩn fx_craft (2026-11-18): sprite-lab/lib/burstfx.py, mật độ gấp đôi ("px_scale": 0.5), >= 12 frame, mở đầu ->
+Vẽ lại 2026-11-22: sprite-lab/lib/holyfx.py (ấn thánh báo trước, cột mép thẳng, không đám chấm). Chuẩn fx_craft, mật độ gấp đôi ("px_scale": 0.5), >= 12 frame, mở đầu ->
 trúng (chớp + tia) -> đọng lại -> tan. Bậc 2.  Chạy: gamekit art run holy-column-ii
 """
 TIER_FILE = globals().get("TIER_FILE", __file__)   # the tier folder's gen.py, set by its stub
@@ -27,7 +27,7 @@ HERE = Path(TIER_FILE).resolve().parent
 _V = TIERS[HERE.name]   # this tier's numbers (the rest is shared by the family)
 sys.path.insert(0, str(_ws() / "tools/gamekit/pipeline"))
 sys.path.insert(0, str(Path(TIER_FILE).resolve().parents[2] / "lib"))
-import burstfx  # noqa: E402
+import holyfx  # noqa: E402
 from sheet import export  # noqa: E402
 
 NAME = HERE.name
@@ -35,8 +35,8 @@ W, H = _V[0], 256
 GROUND = 226.0
 RADIUS = _V[1]
 ANCHOR = (W / 2, GROUND)
-ANIM = [("descend", burstfx.holy_column(_V[2], W, H, GROUND, RADIUS), 12, False,
-         {"durations_ms": burstfx.HOLY_MS, "hitbox": {"shape": "rect", "center": [W / 2, GROUND - _V[3]], "half_w": _V[4], "half_h": _V[5], "active": [3, 6]}})]
+ANIM = [("descend", holyfx.holy_column(_V[2], W, H, GROUND, RADIUS), 12, False,
+         {"durations_ms": holyfx.MS, "hitbox": {"shape": "rect", "center": [W / 2, GROUND], "active": [3, 6]}})]
 
 if __name__ == "__main__":
     export(HERE, NAME, ANIM, anchor=ANCHOR, preview_scale=1, gif_scale=1)

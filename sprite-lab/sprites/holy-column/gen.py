@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """holy-column
 
-Chuẩn fx_craft (2026-11-18): sprite-lab/lib/burstfx.py, mật độ gấp đôi ("px_scale": 0.5), >= 12 frame, mở đầu ->
+Vẽ lại 2026-11-22: sprite-lab/lib/holyfx.py (ấn thánh báo trước, cột mép thẳng, không đám chấm). Chuẩn fx_craft, mật độ gấp đôi ("px_scale": 0.5), >= 12 frame, mở đầu ->
 trúng (chớp + tia) -> đọng lại -> tan. Bậc 1.  Chạy: gamekit art run holy-column
 """
 import json
@@ -19,7 +19,7 @@ def _ws():
 HERE = Path(__file__).resolve().parent
 sys.path.insert(0, str(_ws() / "tools/gamekit/pipeline"))
 sys.path.insert(0, str(Path(__file__).resolve().parents[2] / "lib"))
-import burstfx  # noqa: E402
+import holyfx  # noqa: E402
 from sheet import export  # noqa: E402
 
 NAME = HERE.name
@@ -27,8 +27,8 @@ W, H = 170, 256
 GROUND = 226.0
 RADIUS = 33
 ANCHOR = (W / 2, GROUND)
-ANIM = [("descend", burstfx.holy_column(1, W, H, GROUND, RADIUS), 12, False,
-         {"durations_ms": burstfx.HOLY_MS, "hitbox": {"shape": "rect", "center": [W / 2, GROUND - 48.0], "half_w": 33.0, "half_h": 56.0, "active": [3, 6]}})]
+ANIM = [("descend", holyfx.holy_column(1, W, H, GROUND, RADIUS), 12, False,
+         {"durations_ms": holyfx.MS, "hitbox": {"shape": "rect", "center": [W / 2, GROUND], "active": [3, 6]}})]
 
 if __name__ == "__main__":
     export(HERE, NAME, ANIM, anchor=ANCHOR, preview_scale=1, gif_scale=1)
