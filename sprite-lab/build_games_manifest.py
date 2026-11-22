@@ -234,9 +234,12 @@ def progression_of(data, classes):
         milestones.append({"level": int(lv), "rewards": out})
     return {"count": len(curve), "boss_every": every, "scale": k, "rewards": rw, "curve": curve,
             "regions": [{"id": r.get("id"), "name": r.get("name"), "from": r.get("from"), "to": r.get("to"),
-                         "waves": r.get("waves"), "boss_waves": r.get("boss_waves"), "ground": r.get("ground", {})}
+                         "waves": r.get("waves"), "boss_waves": r.get("boss_waves"), "ground": r.get("ground", {}),
+                         # 2026-11-22 (user: the map tab was wrong and incomplete): events, growth, props
+                         "events": r.get("events", []), "time_scale": r.get("time_scale", {}),
+                         "obstacles": r.get("obstacles", {})}
                         for r in regions],
-            "milestones": milestones}
+            "milestones": milestones, "offer_count": int(ms.get("offer_count", 3))}
 
 
 def level_values(upgrade, level):
@@ -656,7 +659,7 @@ def build_game(slug):
         "stages": stages, "progression": progression_of(data, classes), "heroes": heroes,
         "skill_tree": load(os.path.join(data, "skill_tree.json")), "challenges": load(os.path.join(data, "challenges.json")), "monsters": mons, "skills": skills, "stat_ups": stat_ups,
         "specials": specials, "deck": deck_cfg, "card_rarity": rarity_cfg,
-        "balance": cfg.get("balance", {}), "time_scale": cfg.get("time_scale", {}),
+        "balance": cfg.get("balance", {}), "time_scale": cfg.get("time_scale", {}), "events_cfg": {"min_stage": cfg.get("events", {}).get("min_stage", 1), "names": cfg.get("events", {}).get("source_names", {})},
         "cooldown_floor": cfg.get("player", {}).get("cooldown_floor", 0),
         "sprites": sprites,
         "rules": rules_doc, "rule_doc": rel(os.path.join(root, "design", "gameplay-rules.md")),

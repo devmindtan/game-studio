@@ -317,19 +317,34 @@ const GRASS=['#2f4a2c','#33502f','#2c4629'],TUFT='#3f6136',FLOWER='#b8b06a',OUTS
 const MON_COL=['#4cc9a0','#9b7bd9','#e0a33a','#e05d5d','#5db0e0','#c9e05d'];
 function tileHash(x,y){ // RunGround._hash with 64-bit ints, like GDScript
   let h=(BigInt(x)*73856093n)^(BigInt(y)*19349663n); if(h<0n) h=-h; return h;}
-function drawGround(g,cx,cy,sc,half,w,h){ // world (0,0) at canvas (cx,cy), sc canvas px per world px
+function drawGround(g,cx,cy,sc,half,w,h,reg){ // world (0,0) at canvas (cx,cy), sc canvas px per world px; reg: the stage's region
   const T=64; g.fillStyle=OUTSIDE; g.fillRect(0,0,w,h);
+  const grd=(reg&&reg.ground)||{}, GR=(grd.grass||[]).length?grd.grass.map(x=>'#'+x):GRASS;
   const x0=Math.floor((-cx/sc)/T)-1,x1=Math.ceil(((w-cx)/sc)/T)+1,y0=Math.floor((-cy/sc)/T)-1,y1=Math.ceil(((h-cy)/sc)/T)+1;
   for(let ty=y0;ty<y1;ty++) for(let tx=x0;tx<x1;tx++){
     const px=tx*T,py=ty*T; if(Math.abs(px+T/2)>=half||Math.abs(py+T/2)>=half) continue;
     const hh=tileHash(tx,ty); const sx=cx+px*sc,sy=cy+py*sc;
-    g.fillStyle=GRASS[Number(hh%3n)]; g.fillRect(Math.floor(sx),Math.floor(sy),Math.ceil(T*sc)+1,Math.ceil(T*sc)+1);
+    g.fillStyle=GR[Number(hh%BigInt(GR.length))]; g.fillRect(Math.floor(sx),Math.floor(sy),Math.ceil(T*sc)+1,Math.ceil(T*sc)+1);
     if(sc>=0.5){ if(hh%5n===0n){ const qx=8+Number((hh>>4n)%44n),qy=8+Number((hh>>8n)%44n); g.fillStyle=TUFT;
         g.fillRect(sx+qx*sc,sy+qy*sc,2*sc,6*sc); g.fillRect(sx+(qx+4)*sc,sy+(qy+2)*sc,2*sc,4*sc); g.fillRect(sx+(qx-4)*sc,sy+(qy+2)*sc,2*sc,4*sc);}
       else if(hh%23n===1n){ const fx=10+Number((hh>>5n)%40n),fy=10+Number((hh>>9n)%40n); g.fillStyle=FLOWER; g.fillRect(sx+fx*sc,sy+fy*sc,4*sc,4*sc);} }
   }
+  // region props (illustrative spots, seeded per region: the game scatters them with its own seed)
+  const ob=(reg&&reg.obstacles)||{}; let seed=0; for(const ch of String(reg&&reg.name||'')) seed=(seed*31+ch.charCodeAt(0))>>>0;
+  const rnd=()=>{ seed=(seed*1664525+1013904223)>>>0; return seed/4294967296; };
+  const clear=Number(ob.clear_start||200);
+  const spot=()=>{ for(let k=0;k<20;k++){ const x=(rnd()*2-1)*(half-60),y=(rnd()*2-1)*(half-60); if(Math.hypot(x,y)>clear) return [x,y]; } return [half/2,half/2]; };
+  ((ob.pools||{}).count?[ob.pools]:[]).forEach(p=>{ for(let i=0;i<p.count;i++){ const [x,y]=spot(), r=Number(p.radius||40);
+    g.fillStyle='rgba(122,208,74,.55)'; g.beginPath(); g.ellipse(cx+x*sc,cy+y*sc,r*sc,r*0.6*sc,0,0,7); g.fill(); g.strokeStyle='#4f8a2a'; g.lineWidth=1; g.stroke(); }});
+  (ob.solid||[]).forEach(o=>{ const tree=String(o.sprite||'').includes('tree'); for(let i=0;i<(o.count||0);i++){ const [x,y]=spot(), r=Math.max(2,Number(o.radius||14)*sc*(tree?1.6:1.1));
+    g.fillStyle=tree?'#1f3d22':'#8a8f99'; g.beginPath(); g.arc(cx+x*sc,cy+y*sc,r,0,7); g.fill();
+    g.fillStyle=tree?'#2f5a30':'#b4b8c0'; g.beginPath(); g.arc(cx+x*sc-r*0.25,cy+y*sc-r*0.3,r*0.55,0,7); g.fill(); }});
   g.strokeStyle=EDGE; g.lineWidth=Math.max(2,6*sc); g.strokeRect(cx-half*sc,cy-half*sc,half*2*sc,half*2*sc);
 }
+const EV_VI={ring:'Vòng thử thách',collect:'Thu thập sao',hunt:'Săn tinh anh',tornado:'Lốc cỏ',falling_trees:'Cây đổ',poison_tide:'Nước độc dâng',meteor:'Mưa thiên thạch'};
+const EV_COL={ring:'#f2c14e',collect:'#ffe27a',hunt:'#e05d5d',tornado:'#9ad45a',falling_trees:'#a8703a',poison_tide:'#7ad04a'};
+function monName(mid){ const [id,tag]=String(mid).split('@'); const m=(game.monsters||[]).find(x=>x.id===id); return (m&&((m.stats&&m.stats.name)||m.name)||id)+(tag==='elite'?' (tinh anh)':''); }
+function regionOfFile(pr,file){ const c=(pr.curve||[]).find(x=>x.waves===file); return c?(pr.regions||[]).find(r=>r.name===c.region):null; }
 /* 30 stages: difficulty curve by region, rewards, milestone rewards (stages.json, milestones.json) */
 function progression(m,pr){
   m.appendChild(el('h3',{},'Tiến trình '+pr.count+' ải'));
@@ -357,11 +372,19 @@ function progression(m,pr){
   m.appendChild(lg);
   const rw=pr.rewards||{};
   const t=el('table',{style:'margin-top:10px'});
-  t.appendChild(el('tr',{},el('th',{},'Vùng'),el('th',{},'Ải'),el('th',{},'Lịch quái (thường / boss)'),el('th',{},'Màu nền'),el('th',{class:'num'},'Máu quái ×'),el('th',{class:'num'},'Vàng khi thắng')));
+  const tsg=game.time_scale||{}, evc=game.events_cfg||{};
+  t.appendChild(el('tr',{},el('th',{},'Vùng'),el('th',{},'Ải'),el('th',{},'Lịch quái (thường / boss)'),el('th',{},'Màu nền'),el('th',{class:'num'},'Máu quái ×'),
+    el('th',{},'Quái mạnh dần / phút (từ ải '+(tsg.min_stage||1)+')'),el('th',{},'Sự kiện trong trận (từ ải '+(evc.min_stage||1)+')'),el('th',{},'Vật cản'),el('th',{class:'num'},'Vàng khi thắng')));
   pr.regions.forEach(r=>{ const a=pr.curve[r.from-1], b=pr.curve[r.to-1]; const sw=el('span',{});
     ((r.ground&&r.ground.grass)||[]).forEach(g=>sw.appendChild(el('i',{class:'sw',style:'background:#'+g+';margin-right:3px'})));
+    const rts=Object.assign({hp:tsg.hp,damage:tsg.damage},r.time_scale||{});
+    const evs=(r.events||[]).slice().sort((x,y)=>x.t-y.t).map(e=>(EV_VI[e.kind]||e.kind)+' '+mmss(e.t)).join(' · ');
+    const ob=r.obstacles||{}; const obt=[...(ob.solid||[]).map(x=>(x.count||0)+' '+String(x.sprite||'').replace('obstacle-','')),
+      ob.pools&&ob.pools.count?ob.pools.count+' vũng độc ('+(ob.pools.dps||0)+' máu/s)':''].filter(Boolean).join(', ')||'—';
     t.appendChild(el('tr',{},el('td',{},r.name),el('td',{},r.from+'–'+r.to),el('td',{},r.waves+'.json / '+r.boss_waves+'.json'),el('td',{},sw),
-      el('td',{class:'num'},a.hp.toFixed(2)+' → '+b.hp.toFixed(2)),el('td',{class:'num'},a.gold+' → '+b.gold))); });
+      el('td',{class:'num'},a.hp.toFixed(2)+' → '+b.hp.toFixed(2)),
+      el('td',{},'+'+Math.round((rts.hp||0)*100)+'% máu · +'+Math.round((rts.damage||0)*100)+'% sát thương'),
+      el('td',{class:'small'},evs||'—'),el('td',{class:'small'},obt),el('td',{class:'num'},a.gold+' → '+b.gold))); });
   m.appendChild(t);
   m.appendChild(el('p',{class:'muted small'},'Thắng ải n: vàng '+(rw.gold_base||0)+' + '+(rw.gold_per_stage||0)+'·n (cộng vàng nhặt trong trận); đá lần đầu '+(rw.gems_first||0)+' (ải boss '+(rw.gems_boss_first||0)+'), các lần sau '+(rw.gems_repeat||0)+'. Thua: giữ vàng đã nhặt.'));
   // challenge mode (design/challenge.md)
@@ -376,13 +399,13 @@ function progression(m,pr){
   }
   // milestone rewards
   m.appendChild(el('h3',{style:'margin-top:18px'},'Phần thưởng mốc cấp (trong trận)'));
-  m.appendChild(el('p',{class:'muted small'},'Lên cấp 10, 20, 30 trong một trận → chọn 1 trong 3 (chiêu độc nhất của class mình + nội tại + luật), chỉ có tác dụng tới hết trận đó. Chiêu độc nhất vào ở cấp 1 rồi lên cấp bằng thẻ.'));
-  const KIND={skill:'Chiêu độc nhất',passive:'Nội tại mới',rule:'Luật mới'};
+  m.appendChild(el('p',{class:'muted small'},'Lên cấp '+pr.milestones.map(x=>x.level).join(', ')+' trong một trận → rút ngẫu nhiên '+(pr.offer_count||4)+' phần thưởng từ kho chung bên dưới (hợp class, chưa có), chọn 1; chỉ có tác dụng tới hết trận đó (2026-11-22: không còn cố định theo mốc). Các nhóm dưới là nguồn gốc của kho, không phải mốc ra.'));
+  const KIND={skill:'Chiêu độc nhất',passive:'Nội tại mới',rule:'Luật mới',card:'Thẻ đặc biệt'};
   pr.milestones.forEach(ms=>{
-    m.appendChild(el('div',{class:'row',style:'margin:10px 0 6px'},el('b',{},'Mốc cấp '+ms.level)));
+    m.appendChild(el('div',{class:'row',style:'margin:10px 0 6px'},el('b',{},'Kho phần thưởng · nhóm cấp '+ms.level)));
     const grid=el('div',{class:'grid g4'});
     ms.rewards.forEach(r=>{
-      const ic=liveCanvas(48,48,(g)=>{ g.clearRect(0,0,48,48); if(iconSheet&&iconSheet.has(r.icon)) iconSheet.draw(g,r.icon,0,24,24,3); });
+      const ic=iconCanvas(r.icon||r.id,3);   // card icons (vector / card sheet) too, not only ui-icons
       const who=r.class?' · '+((game.heroes.find(h=>h.id===r.class)||{}).name||r.class):'';
       // icon on top, then name, kind, text: the same layout for short and long texts
       grid.appendChild(el('div',{class:'card'},ic,
@@ -401,7 +424,7 @@ function map(m){
       ['Số quái sinh ra','×'+(b.spawn_mul||1)],['Sát thương người chơi','×'+(b.player_damage_mul||1)],
       ['Vùng đánh người chơi','×'+(b.player_area_mul||1)],['Kinh nghiệm mỗi quái','×'+(b.xp_mul||1)],
       ['Quái thường rơi kinh nghiệm',Math.round((b.xp_drop_chance??1)*100)+'% (tinh anh, boss: luôn)'],
-      ['Quái mạnh dần',ts.every?('mỗi '+ts.every+' s: +'+Math.round((ts.hp||0)*100)+'% máu (quái sinh sau, không tính boss), +'+Math.round((ts.damage||0)*100)+'% sát thương'):'tắt'],
+      ['Quái mạnh dần',ts.every?('âm thầm, từ ải '+(ts.min_stage||1)+', mỗi '+ts.every+' s theo mức của từng vùng (bảng Tiến trình); quái sinh sau mạnh hơn, boss không tính'):'tắt'],
       ['Giảm hồi chiêu tối đa',game.cooldown_floor?Math.round((1-game.cooldown_floor)*100)+'%':'không giới hạn']];
     const t=el('table',{class:'mid'}); rows.forEach(([k,v])=>t.appendChild(el('tr',{},el('td',{},k),el('td',{class:'num'},String(v)))));
     m.appendChild(el('div',{class:'card',style:'margin-bottom:12px'},el('h3',{},'Cân bằng (run_config.json)'),t)); }
@@ -419,7 +442,7 @@ function map(m){
     const grid=el('div',{class:'side2'});
     // whole arena
     const S=420, sc=S/(half*2+400); const arena=el('canvas',{width:S,height:S}); const g=arena.getContext('2d');
-    drawGround(g,S/2,S/2,sc,half,S,S);
+    const reg=regionOfFile(pr,st.file); drawGround(g,S/2,S/2,sc,half,S,S,reg);
     g.strokeStyle='rgba(255,170,60,.8)'; g.setLineDash([4,4]); g.lineWidth=1.5;
     [ring[0],ring[1]].forEach(r=>{g.beginPath(); g.arc(S/2,S/2,r*sc,0,Math.PI*2); g.stroke();}); g.setLineDash([]);
     g.strokeStyle='rgba(255,255,255,.85)'; g.lineWidth=1; g.strokeRect(S/2-640*sc,S/2-360*sc,1280*sc,720*sc);
@@ -428,7 +451,7 @@ function map(m){
     // close-up at game scale (what the player sees around the hero)
     const zoom=el('canvas',{width:420,height:236}); const zg=zoom.getContext('2d'); zg.imageSmoothingEnabled=false;
     const heroInfo=game.heroes[0]&&game.heroes[0].sprite; const zsc=420/1280;
-    drawGround(zg,210,118,zsc,half,420,236);
+    drawGround(zg,210,118,zsc,half,420,236,reg);
     if(heroInfo) sheetOf(heroInfo).then(sh=>{ if(sh) sh.draw(zg,'idle',0,210,118+20*zsc,(w.sprite_scale||2)*zsc*1.0001); });
     left.appendChild(el('div',{class:'stage',style:'padding:0;margin-top:8px'},zoom));
     left.appendChild(el('div',{class:'muted small',style:'margin-top:4px'},'Một màn hình 1280×720 thu nhỏ: nhân vật đúng tỉ lệ so với nền.'));
@@ -446,13 +469,17 @@ function map(m){
       vals.forEach((v,i)=>{const x=P+(W-P-PR)*st.times[i]/st.duration, y=H-22-(H-34)*v/maxR; i?c.lineTo(x,y):c.moveTo(x,y);}); c.stroke();});
     st.bursts.forEach(b=>{const x=P+(W-P-PR)*b.t/st.duration; c.fillStyle=col(b.monster); c.fillRect(x-2,14,4,H-36);
       c.font='bold 11px system-ui'; c.fillText('+'+b.count,x+4,24);});
+    const regE=regionOfFile(pr,st.file); const evList=(regE&&regE.events)||[];
+    c.setLineDash([5,4]); evList.slice().sort((p,q)=>p.t-q.t).forEach((e,ei,arr)=>{ const x=P+(W-P-PR)*e.t/st.duration; c.strokeStyle=EV_COL[e.kind]||'#fff'; c.lineWidth=2;
+      c.beginPath(); c.moveTo(x,10); c.lineTo(x,H-22); c.stroke(); c.fillStyle=EV_COL[e.kind]||'#fff'; c.font='bold 10px system-ui'; c.fillText(EV_VI[e.kind]||e.kind,x+3,H-28-(ei%2)*13); }); c.setLineDash([]);
     right.appendChild(el('div',{class:'stage',style:'padding:0;background:#121720'},ch));
     const lg=el('div',{class:'legend',style:'margin-top:6px'});
-    mons.forEach(mid=>lg.appendChild(el('span',{},el('i',{class:'sw',style:'background:'+col(mid)}),mid+' · ~'+(st.expected_spawns[mid]||0)+' con')));
+    if(evList.length) lg.appendChild(el('span',{class:'muted'},'vạch đứt = sự kiện vùng (từ ải '+((game.events_cfg||{}).min_stage||1)+')'));
+    mons.forEach(mid=>lg.appendChild(el('span',{},el('i',{class:'sw',style:'background:'+col(mid)}),monName(mid)+' · ~'+(st.expected_spawns[mid]||0)+' con')));
     lg.appendChild(el('span',{class:'muted'},'vạch đứng = đợt dồn (burst)'));
     right.appendChild(lg);
     const t=el('table',{style:'margin-top:10px'}); t.appendChild(el('tr',{},el('th',{},'Quái'),el('th',{},'Từ'),el('th',{},'Đến'),el('th',{class:'num'},'Nhịp (con/s)'),el('th',{class:'num'},'Dồn')));
-    st.waves.forEach(wv=>t.appendChild(el('tr',{},el('td',{},el('i',{class:'sw',style:'background:'+col(wv.monster)+';margin-right:6px'}),wv.monster),
+    st.waves.forEach(wv=>t.appendChild(el('tr',{},el('td',{},el('i',{class:'sw',style:'background:'+col(wv.monster)+';margin-right:6px'}),monName(wv.monster)),
       el('td',{},mmss(wv.t_from||0)),el('td',{},mmss(wv.t_to||0)),el('td',{class:'num'},wv.burst?'—':(wv.rate+' → '+(wv.rate_end??wv.rate))),el('td',{class:'num'},wv.burst||''))));
     right.appendChild(t);
     grid.appendChild(right); card.appendChild(grid);
