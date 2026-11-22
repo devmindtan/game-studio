@@ -16,6 +16,19 @@ if grep -qE '^sprite-lab/(sprites|lib)/' <<<"$staged"; then
     exit 1
   fi
 fi
+# A sprite folder in the commit must not keep generated files untracked (lesson 2026-11-22: three new
+# *_hitmask.png were left out twice; a path-limited commit only takes files already tracked).
+dirs="$(grep -oE '^sprite-lab/sprites/[^/]+/' <<<"$staged" | sort -u)"
+if [[ -n "$dirs" ]]; then
+  # shellcheck disable=SC2086
+  loose="$(git ls-files --others --exclude-standard -- $dirs | grep -vE '\.import$' || true)"
+  if [[ -n "$loose" ]]; then
+    echo "pre-commit: untracked files in the sprite folders being committed:" >&2
+    sed 's/^/  /' <<<"$loose" >&2
+    echo "pre-commit: refused - git add them (or ignore them) and commit again" >&2
+    exit 1
+  fi
+fi
 # The dashboard is one HTML file of plain JS: a syntax error blanks every tab
 # (lesson 2026-11-18: a second "const st" in one scope left it on "Đang tải…").
 if grep -qE '^sprite-lab/games\.html$' <<<"$staged" && command -v node >/dev/null; then
