@@ -94,3 +94,80 @@ def retaliate_shock(size=112, radius=52, frames=16):
         out.append(c)
         masks.append(m)
     return FxFrames(out, masks)
+
+
+STEEL_L = (240, 246, 255)
+STEEL = (178, 192, 214)
+STEEL_D = (96, 108, 136)
+GRIP = (110, 70, 40)
+TRAIL = (255, 224, 120)
+
+
+def _sword(c, cx, cy, ang, r0, r1, a=255):
+    """A sword lying along the radius at angle [param ang]: grip near r0, point at r1, guard, 2 px blade with a
+    lit edge and a shaded edge, gold guard, dark point."""
+    dx, dy = math.cos(ang), math.sin(ang)
+    nx, ny = -dy, dx
+    length = r1 - r0
+    for k in range(int(length) + 1):
+        t = r0 + k
+        x, y = cx + dx * t, cy + dy * t
+        if k < length * 0.22:                                              # grip
+            _put(c, x, y, GRIP, a)
+        elif k < length * 0.3:                                             # guard: a cross bar
+            for s in range(-4, 5):
+                _put(c, x + nx * s, y + ny * s, GOLD if abs(s) < 4 else GOLD_D, a)
+        else:                                                              # blade, tapering to the point
+            half = 2 if k < length * 0.85 else 1
+            for s in range(-half, half + 1):
+                col = STEEL_L if s < 0 else (STEEL if s == 0 else STEEL_D)
+                _put(c, x + nx * s, y + ny * s, col, a)
+    _put(c, cx + dx * r1, cy + dy * r1, INK, a)
+
+
+def holy_blades(size=144, radius=60, frames=14, n=6):
+    """Thánh kiếm: n bright swords point outward and sweep one turn round the hero, each leaving a gold arc
+    trail; frames 3..9 hit (the ring they sweep); they flare and dissolve into rays at the end."""
+    c0 = size / 2
+    sq = 0.62                                                              # flat on the ground like the rings
+    out, masks = [], []
+    for f in range(frames):
+        c = Canvas(size, size)
+        m = Canvas(size, size)
+        grow = min(1.0, (f + 1) / 3)                                       # 0-2: swords slide out from the hero
+        turn = f / (frames - 4) * math.tau if f < frames - 3 else math.tau
+        fade = 255 if f < frames - 3 else int(255 * (frames - f) / 4)
+        for i in range(n):
+            a0 = i * math.tau / n + turn
+            if 1 <= f < frames - 3:                                        # gold trail behind each sword
+                for s in range(48):                                         # a solid 3 px arc, fading back
+                    ta = a0 - s * 0.012
+                    rr = radius * grow * 0.92
+                    al = int(240 * (1 - s / 48))
+                    for w, col in ((0, (255, 246, 200)), (1, TRAIL), (2, GOLD)):
+                        _put(c, c0 + math.cos(ta) * (rr - w), c0 + math.sin(ta) * (rr - w) * sq, col, al)
+            if f < frames - 3:
+                lay = Canvas(size, size)
+                _sword(lay, c0, c0, a0, radius * grow * 0.35, radius * grow, fade)
+                # squash the sword layer onto the ground plane
+                img = lay.img
+                for y in range(size):
+                    for x in range(size):
+                        p = img.getpixel((x, y))
+                        if p[3]:
+                            _put(c, x, c0 + (y - c0) * sq, p[:3], p[3])
+            else:                                                          # outro: each sword flares into rays
+                k = f - (frames - 3)
+                x, y = c0 + math.cos(a0) * radius, c0 + math.sin(a0) * radius * sq
+                for s in range(5 + k * 3):                                 # a gold 4-point flare
+                    col = (255, 250, 220) if s < 3 else GOLD
+                    for d in (-1, 1):
+                        _put(c, x + d * s, y, col, fade)
+                        _put(c, x, y + d * s * 0.6, col, fade)
+                        if s < 3:
+                            _put(c, x + d * s, y + 1, col, fade)
+        if 3 <= f <= 9:
+            m.ellipse(int(c0 - radius), int(c0 - radius * sq), int(c0 + radius), int(c0 + radius * sq), "#ffffff", fill=True)
+        out.append(c)
+        masks.append(m)
+    return FxFrames(out, masks)
