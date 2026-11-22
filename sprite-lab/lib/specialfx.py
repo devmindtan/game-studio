@@ -455,3 +455,78 @@ def blood_fist(size=112, frames=13):
                     _put(c, x, y, BLOOD_W, fade)
         out.append(c)
     return out
+
+
+WIND_W = (236, 255, 248)
+WIND_L = (150, 236, 214)
+WIND = (70, 190, 170)
+WIND_D = (30, 120, 116)
+LEAF = (150, 210, 90)
+LEAF_D = (80, 140, 50)
+
+
+def wind_ribbons(size=112, frames=12, n=3):
+    """Phong hành: three solid wind ribbons (white edge, sea-green body, dark tail) curl round the hero's feet and
+    stream off behind, leaves whirling with them; the speed rune's look. Drawn at the hero."""
+    c0 = size / 2
+    out = []
+    for f in range(frames):
+        c = Canvas(size, size)
+        fade = 255 if f < frames - 3 else int(255 * (frames - f) / 4)
+        for i in range(n):
+            base = i * math.tau / n + f * 0.45
+            rr = 30 + 6 * math.sin(f * 0.5 + i)
+            for s in range(56):                                   # the ribbon: a thick arc fading to its tail
+                t = base - s * 0.028
+                x = c0 + math.cos(t) * rr
+                y = c0 + 14 + math.sin(t) * rr * 0.45 - s * 0.25
+                w = max(1, 5 - s // 12)
+                a = int(fade * (1 - s / 56) ** 0.6)
+                for k in range(w):
+                    col = WIND_W if k == 0 else (WIND_L if k < 2 else (WIND if k < 4 else WIND_D))
+                    _put(c, x, y + k, col, a)
+        for i in range(4):                                        # leaves
+            t = i * math.tau / 4 + f * 0.6
+            x = c0 + math.cos(t) * 36
+            y = c0 + 8 + math.sin(t) * 16 - (f % 4)
+            for dx, dy, col in ((0, 0, LEAF), (1, 0, LEAF), (0, 1, LEAF_D), (1, 1, LEAF_D), (2, 0, LEAF)):
+                _put(c, x + dx, y + dy, col, fade)
+        out.append(c)
+    return out
+
+
+STAR_W = (255, 252, 230)
+STAR_Y = (255, 224, 110)
+STAR_O = (240, 160, 60)
+
+
+def shooting_stars(size=112, frames=12, n=3):
+    """Lưu tinh: three small shooting stars orbit the hero with solid gold trails, then flare (the speed rune's
+    look on a kill streak). Drawn at the hero."""
+    c0 = size / 2
+    out = []
+    for f in range(frames):
+        c = Canvas(size, size)
+        fade = 255 if f < frames - 3 else int(255 * (frames - f) / 4)
+        for i in range(n):
+            base = i * math.tau / n + f * 0.55
+            rr = 34
+            for s in range(30):                                   # trail
+                t = base - s * 0.035
+                x = c0 + math.cos(t) * rr
+                y = c0 + math.sin(t) * rr * 0.6
+                a = int(fade * (1 - s / 30))
+                col = STAR_W if s < 4 else (STAR_Y if s < 16 else STAR_O)
+                for k in range(3 if s < 12 else (2 if s < 22 else 1)):
+                    _put(c, x, y + k - 1, col if k == 1 else STAR_O, a)
+            x = c0 + math.cos(base) * rr
+            y = c0 + math.sin(base) * rr * 0.6
+            big = 6 if f >= frames - 4 else 4                     # the star: a solid diamond with 4 rays
+            for dy in range(-3, 4):
+                for dx in range(-3 + abs(dy), 4 - abs(dy)):
+                    _put(c, x + dx, y + dy, STAR_W if abs(dx) + abs(dy) < 2 else STAR_Y, fade)
+            for d in range(4, big + 2):
+                for q in ((d, 0), (-d, 0), (0, d), (0, -d)):
+                    _put(c, x + q[0], y + q[1], STAR_Y, fade)
+        out.append(c)
+    return out
