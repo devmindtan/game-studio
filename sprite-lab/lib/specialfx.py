@@ -247,3 +247,65 @@ def shock_strike(w=48, h=112, frames=9):
                 _put(c, x, y, BOLT_B, a)
         out.append(c)
     return out
+
+
+FIRE_D = (150, 30, 20)
+FIRE_R = (226, 70, 30)
+FIRE_O = (255, 150, 40)
+FIRE_Y = (255, 222, 90)
+FIRE_W = (255, 250, 214)
+
+
+def _flame(c, x, y, h, w, a=255):
+    """One solid low flame standing on (x, y): dark red base, orange body, yellow tip, white core; a teardrop
+    that narrows to its tip (no dots)."""
+    for k in range(int(h) + 1):
+        t = k / max(1.0, h)                                   # 0 at the base, 1 at the tip
+        half = w * (1 - t) ** 0.8 * (0.7 + 0.3 * math.sin(math.pi * min(1.0, t * 1.6)))
+        for s in range(-int(half), int(half) + 1):
+            d = abs(s) / max(1.0, half)
+            if t < 0.15 and d > 0.5:
+                col = FIRE_D
+            elif d > 0.75:
+                col = FIRE_R
+            elif t > 0.7 or d > 0.45:
+                col = FIRE_O if t < 0.85 else FIRE_Y
+            else:
+                col = FIRE_Y if t > 0.35 else FIRE_W
+            _put(c, x + s, y - k, col, a)
+
+
+def flame_ring(size=128, radius=52, frames=10, n=22):
+    """Hoả y: a low ring of solid flames round the hero, flickering out of step, embers rising; frames ~ the
+    card's 0.76 s cadence so back-to-back pulses read as one steady fire. Hit mask = the ring's disc."""
+    import random
+    c0 = size / 2
+    sq = 0.55
+    out, masks = [], []
+    for f in range(frames):
+        rng = random.Random(f)
+        c = Canvas(size, size)
+        m = Canvas(size, size)
+        a = 255 if 1 <= f <= frames - 2 else 200
+        for k in range(int(radius * 7)):                      # a thin band of glowing coals joining the flames
+            ang = k / (radius * 7) * math.tau
+            x, y = c0 + math.cos(ang) * radius, c0 + math.sin(ang) * radius * sq + 8
+            hot = (k + f * 3) % 9 < 3
+            _put(c, x, y, FIRE_O if hot else FIRE_R, a)
+            _put(c, x, y + 1, FIRE_D, a)
+        pts = sorted(((i * math.tau / n, i) for i in range(n)), key=lambda p: math.sin(p[0]))   # back flames first
+        for ang, i in pts:
+            x = c0 + math.cos(ang) * radius
+            y = c0 + math.sin(ang) * radius * sq + 8
+            flick = 0.6 + 0.4 * abs(math.sin(f * 1.7 + i * 2.3))
+            _flame(c, x, y, (16 + (i % 3) * 4) * flick, 5 + (i % 2), a)
+        for e in range(6):                                    # embers drifting up
+            ang = rng.uniform(0, math.tau)
+            x = c0 + math.cos(ang) * radius * rng.uniform(0.8, 1.05)
+            y = c0 + math.sin(ang) * radius * sq + 8 - 14 - rng.uniform(0, 14)
+            _put(c, x, y, FIRE_Y, 220)
+            _put(c, x, y + 1, FIRE_O, 160)
+        m.ellipse(int(c0 - radius), int(c0 + 8 - radius * sq), int(c0 + radius), int(c0 + 8 + radius * sq), "#ffffff", fill=True)
+        out.append(c)
+        masks.append(m)
+    return FxFrames(out, masks)
