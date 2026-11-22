@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=1280, height=720">
+<title>BÁCH ẢI · màn hình chờ (bản thiết kế)</title>
+<link rel="stylesheet" href="screen-title.css">
+</head>
+<body data-variant="a" data-state="gate">
+<div class="bg" aria-hidden="true">
+  <div class="sky-glow"></div>
+  <div class="moon"></div>
+  <svg class="mountains" viewBox="0 0 1280 268" preserveAspectRatio="none">
+    <path d="M0 206 L86 124 L154 174 L258 92 L342 164 L432 112 L524 182 L642 68 L762 168 L862 102 L962 172 L1084 96 L1180 162 L1280 118 L1280 268 L0 268 Z" fill="#0d1a17"/>
+    <path d="M0 236 L122 174 L222 218 L332 152 L432 208 L562 142 L692 212 L822 162 L942 218 L1062 166 L1182 212 L1280 182 L1280 268 L0 268 Z" fill="#091310" opacity="0.92"/>
+  </svg>
+  <div class="mist"></div>
+  <div class="fog"></div>
+  <div class="ground"></div>
+  <div class="vignette"></div>
+</div>
+
+<header class="logo-wrap">
+  <h1 class="logo">BÁCH ẢI</h1>
+  <div class="logo-rule"><span></span><i></i><span></span></div>
+  <div class="tagline">Vượt trăm ải</div>
+</header>
+
+<div class="hero-slot left" aria-hidden="true">
+  <div class="hero-shadow"></div>
+  <div class="pedestal"></div>
+  <div class="rune-ring"></div>
+  <div class="hero"></div>
+  <div class="hero-name">Kiếm sĩ</div>
+</div>
+
+<div class="hero-slot right" aria-hidden="true">
+  <div class="hero-shadow"></div>
+  <div class="pedestal"></div>
+  <div class="rune-ring"></div>
+  <div class="hero"></div>
+  <div class="hero-name">Pháp sư</div>
+</div>
+
+<div class="sigil" aria-hidden="true"></div>
+
+<nav class="menu" aria-label="Menu chính">
+  <button class="btn primary" type="button" data-action="Tiếp tục · Sảnh chuẩn bị" aria-label="Tiếp tục, Nhân vật 1, Kiếm sĩ, đã vượt ải 10">
+    <span class="caret" aria-hidden="true"></span>
+    <span class="btn-title">Tiếp tục</span>
+    <span class="btn-sub">Nhân vật 1 · Kiếm sĩ · đã vượt ải 10</span>
+  </button>
+  <button class="btn" type="button" data-action="Chọn nhân vật" aria-label="Chọn nhân vật">
+    <span class="caret" aria-hidden="true"></span>
+    <span class="btn-title">Chọn nhân vật</span>
+  </button>
+  <button class="btn" type="button" data-action="Cài đặt" aria-label="Cài đặt">
+    <span class="caret" aria-hidden="true"></span>
+    <span class="btn-title">Cài đặt</span>
+  </button>
+  <button class="btn" type="button" data-action="Thoát" aria-label="Thoát">
+    <span class="caret" aria-hidden="true"></span>
+    <span class="btn-title">Thoát</span>
+  </button>
+</nav>
+
+<div class="gate">
+  <div class="gate-prompt">NHẤN PHÍM BẤT KỲ</div>
+  <div class="gate-sub">hoặc bấm chuột để bắt đầu</div>
+</div>
+
+<div class="hud-bottom">
+  <div>Phiên bản 0.6.21</div>
+  <div class="right">
+    <span class="hint-menu">↑ ↓ chọn · Enter xác nhận · Esc quay lại</span>
+    <span class="hint-gate">Bản thiết kế giao diện · 1280×720</span>
+  </div>
+</div>
+
+<div class="corner tl" aria-hidden="true"></div>
+<div class="corner tr" aria-hidden="true"></div>
+<div class="corner bl" aria-hidden="true"></div>
+<div class="corner br" aria-hidden="true"></div>
+
+<div class="overlay overlay-safe" aria-hidden="true"></div>
+<div class="overlay overlay-grid" aria-hidden="true"></div>
+<div class="toast" role="status" aria-live="polite"></div>
+
+<script src="screen-title.js"></script>
+</body>
+</html>

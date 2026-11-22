@@ -10,6 +10,7 @@ Cursor, Aider…
 | `LESSONS.md` | Lỗi đã gặp và chỗ đã chặn chúng. Mỗi lần sai, agent sửa rule/công cụ và ghi thêm một dòng |
 | `.agents/skills/` | Skill dùng chung (ví dụ `pixel-sprite`). `.claude/skills/` chỉ chứa symlink trỏ về đây |
 | `sprite-lab/` | **Sprite Lab**: nơi làm và thử mọi sprite (xem cả animation, thử di chuyển) trước khi đưa vào game. Xem [README](sprite-lab/README.md) |
+| `design-web/` | **Design Lab**: dựng và soát màn hình game trên web (1280×720, bàn phím) trước khi port sang Godot. Xem [README](design-web/README.md) |
 | `templates/claude-code-game-studios/` | Bản gốc của framework để tạo game mới (không sửa trực tiếp) |
 | `tools/gamekit/` | Bộ công cụ: CLI `gamekit`, pipeline sprite LPC, pixel art, build/export. Xem [README](tools/gamekit/README.md) |
 | `tools/gdgraph/` | Index GDScript cho `graphify` (graphify không đọc `.gd`). Xem [README](tools/gdgraph/README.md) |
@@ -30,6 +31,9 @@ cd games/space-miner                    # mở agent ở đây (claude / opencod
 gamekit run dom-dom-dem-mua             # chơi
 gamekit test dom-dom-dem-mua            # chạy test
 gamekit export dom-dom-dem-mua          # build Linux + Windows + Web → games/<g>/builds/dist/
+
+design-web/setup.sh                     # lần đầu: font + tool tham khảo cho Design Lab
+design-web/serve.sh                     # http://localhost:8770/design-web/index.html
 ```
 
 Trong một thư mục game có thể bỏ tên game (`gamekit test`) hoặc dùng `make help`.
@@ -45,6 +49,7 @@ Ví dụ:
   sửa `gen.py`, `gamekit art run <tên>`, thử bằng `gamekit art shot <tên> sheet|move` (mọi animation + bản thử
   di chuyển). Khi game cần mới `gamekit art promote <tên> <game>`.
 - "Game khó quá": chỉnh `assets/data/*.json`, rồi test và chụp màn hình.
+- "Thiết kế lại menu/màn hình": dựng bản thử ở `design-web/` trước, chốt bằng ảnh 1280×720, rồi mới port sang Godot.
 - "Xuất bản web để đưa lên itch.io": `gamekit export <g> Web` rồi `gamekit smoke-web`.
 
 Muốn làm việc sâu với một game (thiết kế, sprint, review), nên mở agent **ngay trong** `games/<slug>/`.

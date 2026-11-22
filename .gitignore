@@ -39,3 +39,6 @@ __pycache__/
 /.gpu/
 # ảnh AI gốc của concept (768², mờ): chỉ commit bản pixel + palette + sheet
 /sprite-lab/sprites/*/concept/raw_*.png
+
+# Design Lab reference tools (setup.sh clones them, not committed)
+/design-web/vendor/

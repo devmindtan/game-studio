@@ -1,0 +1,360 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>BÁCH ẢI · Design Lab</title>
+<style>
+  :root {
+    --bg: #0b0d11;
+    --panel: #12151b;
+    --panel-2: #171b23;
+    --line: #262c38;
+    --text: #e8e4d8;
+    --muted: #8c94a3;
+    --gold: #e8c574;
+    --gold-deep: #8a713d;
+  }
+  * { box-sizing: border-box; }
+  html, body { height: 100%; }
+  body {
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    background: var(--bg);
+    color: var(--text);
+    font: 13px/1.45 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    overflow: hidden;
+  }
+  header {
+    flex: 0 0 auto;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    height: 54px;
+    padding: 0 18px;
+    border-bottom: 1px solid var(--line);
+    background: var(--panel);
+  }
+  .brand {
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+  }
+  .brand b { color: var(--gold); font-size: 15px; }
+  .brand span { color: var(--muted); font-weight: 500; font-size: 12px; letter-spacing: 0; }
+  .tag {
+    padding: 2px 8px;
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    color: var(--muted);
+    font-size: 11px;
+  }
+  header .spacer { flex: 1; }
+  header a {
+    color: var(--muted);
+    text-decoration: none;
+    padding: 5px 10px;
+    border: 1px solid var(--line);
+    border-radius: 6px;
+  }
+  header a:hover { color: var(--text); border-color: #3a4354; }
+
+  main { flex: 1; display: flex; min-height: 0; }
+
+  aside {
+    flex: 0 0 238px;
+    border-right: 1px solid var(--line);
+    background: var(--panel);
+    padding: 14px 14px 18px;
+    overflow-y: auto;
+  }
+  aside h2 {
+    margin: 0 0 8px;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+  aside section { margin-bottom: 18px; }
+  .choice { display: grid; gap: 6px; }
+  .choice button {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    width: 100%;
+    padding: 8px 10px;
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    background: var(--panel-2);
+    color: var(--text);
+    font: inherit;
+    text-align: left;
+    cursor: pointer;
+  }
+  .choice button small { color: var(--muted); font-size: 11px; }
+  .choice button:hover { border-color: #3a4354; }
+  .choice button.on {
+    border-color: var(--gold-deep);
+    box-shadow: inset 0 0 0 1px rgba(232, 197, 116, 0.22);
+    background: #1c1a15;
+  }
+  .choice button.on small { color: var(--gold); }
+  label.check {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 5px 2px;
+    color: var(--text);
+    cursor: pointer;
+  }
+  label.check input { accent-color: var(--gold); }
+  select {
+    width: 100%;
+    padding: 7px 8px;
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    background: var(--panel-2);
+    color: var(--text);
+    font: inherit;
+  }
+  .note {
+    margin: 0;
+    padding: 10px;
+    border-left: 2px solid var(--gold-deep);
+    background: #14130f;
+    color: #b9b29c;
+    font-size: 11.5px;
+    line-height: 1.5;
+  }
+  .note b { color: var(--gold); }
+
+  .stage-wrap {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+  }
+  .stage-area {
+    flex: 1;
+    min-height: 0;
+    display: flex;
+    overflow: auto;
+    padding: 22px;
+    background:
+      conic-gradient(from 90deg, #0e1116 25%, #0b0d11 0 50%, #0e1116 0 75%, #0b0d11 0) 0 0 / 24px 24px;
+  }
+  .stage {
+    position: relative;
+    flex: 0 0 auto;
+    margin: auto;
+    box-shadow: 0 0 0 1px #313849, 0 18px 50px rgba(0, 0, 0, 0.55);
+    background: #000;
+  }
+  .stage iframe {
+    display: block;
+    width: 1280px;
+    height: 720px;
+    border: 0;
+    transform-origin: top left;
+  }
+  .statusbar {
+    flex: 0 0 auto;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    height: 36px;
+    padding: 0 18px;
+    border-top: 1px solid var(--line);
+    background: var(--panel);
+    color: var(--muted);
+    font-size: 11.5px;
+  }
+  .statusbar b { color: var(--text); font-weight: 600; }
+  .statusbar .dot {
+    width: 6px; height: 6px; border-radius: 50%;
+    background: #5fbf7f; box-shadow: 0 0 8px #5fbf7f;
+  }
+  kbd {
+    padding: 1px 5px;
+    border: 1px solid var(--line);
+    border-bottom-width: 2px;
+    border-radius: 4px;
+    background: var(--panel-2);
+    color: var(--text);
+    font: 11px/1.4 ui-monospace, monospace;
+  }
+
+  @media (max-width: 860px) {
+    body { overflow: auto; }
+    header { gap: 10px; padding: 0 12px; }
+    .brand span, header .tag { display: none; }
+    header a { padding: 4px 8px; font-size: 11px; }
+    main { flex-direction: column; min-height: 0; }
+    aside {
+      flex: 0 0 auto;
+      display: flex;
+      align-items: flex-start;
+      gap: 18px;
+      width: 100%;
+      padding: 10px 12px;
+      border-right: 0;
+      border-bottom: 1px solid var(--line);
+      overflow-x: auto;
+    }
+    aside section { margin: 0; min-width: max-content; }
+    aside .note { display: none; }
+    .stage-wrap { min-height: 0; }
+    .stage-area { padding: 12px; }
+    .statusbar { height: auto; min-height: 36px; flex-wrap: wrap; padding: 7px 12px; gap: 8px; }
+  }
+
+  @media (max-width: 600px) {
+    header a { display: none; }
+    .choice button small { display: none; }
+  }
+</style>
+</head>
+<body>
+<header>
+  <div class="brand"><b>BÁCH ẢI</b><span>Design Lab</span></div>
+  <span class="tag">màn hình game · 1280×720</span>
+  <div class="spacer"></div>
+  <a id="open" href="screen-title.html" target="_blank" rel="noopener">Mở màn hình riêng ↗</a>
+  <a href="../games/bach-ai/production/ui/00-title.png" target="_blank" rel="noopener">So với bản trong game ↗</a>
+</header>
+
+<main>
+  <aside>
+    <section>
+      <h2>Màn hình</h2>
+      <div class="choice" id="states">
+        <button data-state="gate" class="on">Màn chờ <small>nhấn phím</small></button>
+        <button data-state="menu">Màn tiêu đề <small>menu chính</small></button>
+      </div>
+    </section>
+
+    <section>
+      <h2>Biến thể</h2>
+      <div class="choice" id="variants">
+        <button data-variant="a" class="on">A · Cổ điển <small>logo giữa</small></button>
+        <button data-variant="b">B · Điện ảnh <small>menu trái</small></button>
+      </div>
+    </section>
+
+    <section>
+      <h2>Lớp kiểm tra</h2>
+      <label class="check"><input type="checkbox" id="safe"> Vùng an toàn 64 px</label>
+      <label class="check"><input type="checkbox" id="grid"> Lưới 64 px</label>
+    </section>
+
+    <section>
+      <h2>Hiển thị</h2>
+      <select id="zoom">
+        <option value="fit">Vừa khung</option>
+        <option value="1">100% (1280×720)</option>
+        <option value="0.75">75%</option>
+        <option value="0.5">50%</option>
+      </select>
+    </section>
+
+    <p class="note">
+      Đây là <b>màn hình game</b>, không phải trang web: khung 16:9 cố định, điều khiển bằng bàn phím,
+      không cuộn, không thanh điều hướng. Bấm vào màn hình rồi dùng <b>↑ ↓ Enter Esc</b>.
+    </p>
+  </aside>
+
+  <div class="stage-wrap">
+    <div class="stage-area" id="area">
+      <div class="stage" id="stage">
+        <iframe id="frame" title="Màn hình game BÁCH ẢI" scrolling="no"></iframe>
+      </div>
+    </div>
+    <div class="statusbar">
+      <span class="dot"></span>
+      <span><b id="statusState">Màn chờ</b> · biến thể <b id="statusVariant">A</b></span>
+      <span>1280×720 · 16:9</span>
+      <span><kbd>↑</kbd><kbd>↓</kbd> chọn · <kbd>Enter</kbd> xác nhận · <kbd>Esc</kbd> quay lại</span>
+    </div>
+  </div>
+</main>
+
+<script>
+(() => {
+  const frame = document.getElementById("frame");
+  const stage = document.getElementById("stage");
+  const area = document.getElementById("area");
+  const zoom = document.getElementById("zoom");
+  const safe = document.getElementById("safe");
+  const grid = document.getElementById("grid");
+  const open = document.getElementById("open");
+  const statusState = document.getElementById("statusState");
+  const statusVariant = document.getElementById("statusVariant");
+
+  const ui = { state: "gate", variant: "a" };
+
+  function query() {
+    const p = new URLSearchParams({ state: ui.state, variant: ui.variant });
+    if (safe.checked) p.set("safe", "1");
+    if (grid.checked) p.set("grid", "1");
+    return p.toString();
+  }
+
+  function render() {
+    frame.src = "screen-title.html?" + query();
+    open.href = "screen-title.html?" + query();
+    statusState.textContent = ui.state === "gate" ? "Màn chờ" : "Màn tiêu đề";
+    statusVariant.textContent = ui.variant.toUpperCase();
+    document.querySelectorAll("#states button").forEach((b) =>
+      b.classList.toggle("on", b.dataset.state === ui.state));
+    document.querySelectorAll("#variants button").forEach((b) =>
+      b.classList.toggle("on", b.dataset.variant === ui.variant));
+    fit();
+  }
+
+  function fit() {
+    const mode = zoom.value;
+    const scale = mode === "fit"
+      ? Math.min((area.clientWidth - 44) / 1280, (area.clientHeight - 44) / 720)
+      : Number(mode);
+    const s = Math.max(0.2, Math.min(scale, 1));
+    frame.style.transform = "scale(" + s + ")";
+    stage.style.width = Math.round(1280 * s) + "px";
+    stage.style.height = Math.round(720 * s) + "px";
+  }
+
+  document.getElementById("states").addEventListener("click", (e) => {
+    const b = e.target.closest("button[data-state]");
+    if (!b) return;
+    ui.state = b.dataset.state;
+    render();
+  });
+
+  document.getElementById("variants").addEventListener("click", (e) => {
+    const b = e.target.closest("button[data-variant]");
+    if (!b) return;
+    ui.variant = b.dataset.variant;
+    render();
+  });
+
+  safe.addEventListener("change", render);
+  grid.addEventListener("change", render);
+  zoom.addEventListener("change", fit);
+  addEventListener("resize", fit);
+  frame.addEventListener("load", () => {
+    frame.contentWindow?.focus();
+    fit();
+  });
+
+  area.addEventListener("pointerdown", () => frame.contentWindow?.focus());
+
+  render();
+})();
+</script>
+</body>
+</html>
