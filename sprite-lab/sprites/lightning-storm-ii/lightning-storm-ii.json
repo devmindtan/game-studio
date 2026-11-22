@@ -43,7 +43,8 @@
           6
         ],
         "radius": 38.0,
-        "inner": 14.0
+        "inner": 0.0,
+        "swept": true
       },
       "hit_mask": true
     },
@@ -63,8 +64,8 @@
           0,
           7
         ],
-        "radius": 81.0,
-        "inner": 17.0
+        "radius": 82.0,
+        "inner": 23.0
       }
     }
   ],

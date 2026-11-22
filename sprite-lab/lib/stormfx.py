@@ -72,8 +72,15 @@ def storm_spots(tier, size, radius, seed=11):
     cx = cy = size / 2
     rng = random.Random(seed)
     n = COLUMNS[min(tier, 5) - 1]
-    return [(cx + math.cos(a) * radius * d, cy + math.sin(a) * radius * d * 0.8)
-            for a, d in ((rng.uniform(0, math.tau), rng.uniform(0.1, 0.8)) for _ in range(n))]
+    out = []
+    for _ in range(400):   # columns kept apart (user 2026-11-22: overlapping bolts looked messy)
+        a, d = rng.uniform(0, math.tau), rng.uniform(0.15, 0.85)
+        p = (cx + math.cos(a) * radius * d, cy + math.sin(a) * radius * d * 0.8)
+        if all(abs(p[0] - q[0]) >= radius * 0.42 for q in out):   # apart sideways: the bolts fall straight down
+            out.append(p)
+            if len(out) == n:
+                break
+    return out
 
 
 def storm_linger(tier, size, radius, seed=11, frames=8):
@@ -93,10 +100,14 @@ def storm_linger(tier, size, radius, seed=11, frames=8):
                 boltfx.thin_bolt(lay, x + rng.uniform(-2, 2), top + 5, x, y, rng, tier)
             boltfx.dark_cloud(lay, x, top, 5 + tier * 0.6, flash=(i + f) % 2 == 0)
         fk.stack(c, lay, None)
-        for i, (x, y) in enumerate(spots):
+        for i, (x, y) in enumerate(spots):   # the same compact flash as the strike (no dithered glow)
             if (i + f) % 2 == 0:
-                fk.glow(c, x, y, 4 + tier, [GLOW, BOLT_M, BOLT], density=0.8)
-                fk.rays(c, x, y, 2, 6 + tier, 5, BOLT_M, BOLT, rot=f)
+                r = 3 + tier * 0.4
+                for yy in range(int(y - r), int(y + r) + 1):
+                    for xx in range(int(x - r * 1.3), int(x + r * 1.3) + 1):
+                        e = ((xx - x) / (r * 1.3)) ** 2 + ((yy - y) / r) ** 2
+                        if e <= 1:
+                            c.img.putpixel((xx, yy), (255, 255, 250, 255) if e < 0.45 else (170, 220, 255, 255))
             else:
                 fk.sparkle(c, int(x), int(y), 2, BOLT, GLOW)
         out.append(c)
@@ -111,8 +122,7 @@ def storm(tier, size, radius, seed=11):
     cx = cy = size / 2
     rng = random.Random(seed)
     n = COLUMNS[min(tier, 5) - 1]   # bolt columns by tier (user 2026-11-22: I/II 2, III/IV 3, V 4)
-    spots = [(cx + math.cos(a) * radius * d, cy + math.sin(a) * radius * d * 0.8)
-             for a, d in ((rng.uniform(0, math.tau), rng.uniform(0.1, 0.8)) for _ in range(n))]
+    spots = storm_spots(tier, size, radius, seed)   # the same, spaced columns as the lingering loop
     out = []
     masks = []   # hit masks: the damaging core (spritekit measures the hitbox from these)
     for f in range(12):
@@ -127,25 +137,37 @@ def storm(tier, size, radius, seed=11):
             if f == 2:
                 fk.sparkle(c, int(cx), int(cy - 6), 3, BOLT, GLOW)
         elif f < 7:
-            lay = Canvas(size, size)
+            # clean strike (user 2026-11-22: the impact looked messy): every column keeps its cloud, strikes once
+            # on frames 3-4 with one clear bolt, a compact solid flash and four short sparks, then a small scorch
             import boltfx
+            lay = Canvas(size, size)
             for i, (x, y) in enumerate(spots):
-                if (i + f) % 2 == 0 or f == 4:   # thin bolt from its own small dark cloud (user 2026-11-18)
-                    top = max(8.0, y - size * 0.55)
-                    boltfx.thin_bolt(lay, x + rng.uniform(-2, 2), top + 5, x, y, rng, tier)
-                    boltfx.dark_cloud(lay, x, top, 5 + tier * 0.6, flash=f == 4)
+                top = max(8.0, y - size * 0.55)
+                if f <= 4:
+                    boltfx.thin_bolt(lay, x + (i % 3 - 1), top + 5, x, y, random.Random(seed + i), tier)
+                boltfx.dark_cloud(lay, x, top, 5 + tier * 0.6, flash=f <= 4)
             fk.stack(c, lay, None)
-            for i, (x, y) in enumerate(spots):
-                if (i + f) % 2 == 0 or f == 4:
-                    fk.glow(c, x, y, 6 + tier, [GLOW, BOLT_M, BOLT], density=0.8)
-                    fk.rays(c, x, y, 3, 8 + tier, 6, BOLT_M, BOLT, rot=f)
-            if tier >= 4:
-                fk.ring_band(c, cx, cy, radius * (0.6 + 0.08 * (f - 3)), [GLOW, SPARK])
+            for x, y in spots:
+                if f <= 4:                                   # the flash: white core, pale blue rim
+                    r = 4 + tier * 0.5 - (f - 3)
+                    for yy in range(int(y - r), int(y + r) + 1):
+                        for xx in range(int(x - r * 1.3), int(x + r * 1.3) + 1):
+                            e = ((xx - x) / (r * 1.3)) ** 2 + ((yy - y) / r) ** 2
+                            if e <= 1:
+                                c.img.putpixel((xx, yy), (255, 255, 250, 255) if e < 0.45 else (170, 220, 255, 255))
+                    for q in range(4):                       # four short sparks
+                        a = q * math.pi / 2 + 0.6
+                        for s_ in range(int(r) + 1, int(r) + 4):
+                            c.img.putpixel((int(x + math.cos(a) * s_), int(y + math.sin(a) * s_ * 0.8)), (230, 245, 255, 255))
+                else:                                        # a small scorch where it struck
+                    for a10 in range(10):
+                        a = a10 * math.tau / 10
+                        c.img.putpixel((int(x + math.cos(a) * 4), int(y + math.sin(a) * 3)), (90, 130, 190, 220))
         else:
             k = f - 7
             for x, y in spots:
-                for s_ in range(4 + tier):
-                    a = s_ * 1.7 + k
+                for s_ in range(3):   # a few sparks crawl off (was 4 + tier: cluttered)
+                    a = s_ * 2.1 + k
                     r = 2 + k * 2 + (s_ % 3)
                     fk.streak(c, x + math.cos(a) * r, y + math.sin(a) * r, math.cos(a), math.sin(a), 3, SPARK, GLOW)
                 if k < 2:
