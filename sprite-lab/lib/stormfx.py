@@ -72,15 +72,9 @@ def storm_spots(tier, size, radius, seed=11):
     cx = cy = size / 2
     rng = random.Random(seed)
     n = COLUMNS[min(tier, 5) - 1]
-    out = []
-    for _ in range(400):   # columns kept apart (user 2026-11-22: overlapping bolts looked messy)
-        a, d = rng.uniform(0, math.tau), rng.uniform(0.15, 0.85)
-        p = (cx + math.cos(a) * radius * d, cy + math.sin(a) * radius * d * 0.8)
-        if all(abs(p[0] - q[0]) >= radius * 0.42 for q in out):   # apart sideways: the bolts fall straight down
-            out.append(p)
-            if len(out) == n:
-                break
-    return out
+    # the original cluster (user 2026-11-22: keep it a cluster, only the impact was to be cleaned up)
+    return [(cx + math.cos(a) * radius * d, cy + math.sin(a) * radius * d * 0.8)
+            for a, d in ((rng.uniform(0, math.tau), rng.uniform(0.1, 0.8)) for _ in range(n))]
 
 
 def storm_linger(tier, size, radius, seed=11, frames=8):

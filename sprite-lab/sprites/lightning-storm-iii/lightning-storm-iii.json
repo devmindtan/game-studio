@@ -42,7 +42,7 @@
           3,
           6
         ],
-        "radius": 39.0,
+        "radius": 40.0,
         "inner": 0.0,
         "swept": true
       },
@@ -64,8 +64,8 @@
           0,
           7
         ],
-        "radius": 83.0,
-        "inner": 4.0
+        "radius": 82.0,
+        "inner": 18.0
       }
     }
   ],
