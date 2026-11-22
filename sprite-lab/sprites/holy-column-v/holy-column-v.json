@@ -8,7 +8,7 @@
   "loop": false,
   "anchor": [
     96.0,
-    226.0
+    197.0
   ],
   "anchor_source": "explicit",
   "animations": [
@@ -36,14 +36,14 @@
         "shape": "rect",
         "center": [
           96.5,
-          226.0
+          197.5
         ],
         "active": [
           3,
           6
         ],
         "half_w": 53.5,
-        "half_h": 23.0
+        "half_h": 53.5
       },
       "hit_mask": true
     }

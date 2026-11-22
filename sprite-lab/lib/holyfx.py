@@ -1,4 +1,4 @@
-"""Cột thánh quang (holy-column) redrawn (bach-ai design/holy-column-redesign.md, user 2026-11-21: "ugly, weak").
+"""Cột thánh quang (holy-column) redrawn; 2D since 2026-11-22 (round sigil, user: not 2.5D) (bach-ai design/holy-column-redesign.md, user 2026-11-21: "ugly, weak").
 
 The old column was a soft wobbly white tube wrapped in a dithered speck cloud (the same mistake as the old
 burn). Here, at double density (px_scale 0.5), 12 frames:
@@ -48,14 +48,14 @@ def _ring(c, cx, cy, r, squash, col, a=255, frac=1.0, rot=0.0, width=1):
 
 def _sigil(c, cx, cy, r, tier, draw, a=255, rot=0.0):
     """Holy sigil flat on the ground; draw 0..1 = how much of it is drawn (lead-in)."""
-    _ring(c, cx, cy, r, 0.42, SIGIL, a, frac=draw, rot=rot, width=2)
-    _ring(c, cx, cy, r - 3, 0.42, SIGIL_D, a, frac=draw, rot=rot)
+    _ring(c, cx, cy, r, 1.0, SIGIL, a, frac=draw, rot=rot, width=2)
+    _ring(c, cx, cy, r - 3, 1.0, SIGIL_D, a, frac=draw, rot=rot)
     if tier >= 3:
-        _ring(c, cx, cy, r * 0.62, 0.42, SIGIL, a, frac=draw, rot=-rot)
+        _ring(c, cx, cy, r * 0.62, 1.0, SIGIL, a, frac=draw, rot=-rot)
     if draw > 0.5:   # four cross ticks at the quarters
         for q in range(4):
             t = rot + q * math.pi / 2
-            x, y = cx + math.cos(t) * r, cy + math.sin(t) * r * 0.42
+            x, y = cx + math.cos(t) * r, cy + math.sin(t) * r * 1.0
             for d in range(-3, 4):
                 _put(c, x + d, y, WHITE, a)
                 _put(c, x, y + d * 0.5, WHITE, a)
@@ -124,7 +124,7 @@ def _rays(c, cx, cy, r0, r1, n, rot, a=255):
     for i in range(n):
         t = rot + i * math.tau / n
         for s in range(int(r0), int(r1)):
-            _put(c, cx + math.cos(t) * s, cy + math.sin(t) * s * 0.42, GOLD if s < (r0 + r1) / 2 else AMBER, a)
+            _put(c, cx + math.cos(t) * s, cy + math.sin(t) * s * 1.0, GOLD if s < (r0 + r1) / 2 else AMBER, a)
 
 
 def _sparkle(c, x, y, r, a=255):
@@ -154,12 +154,12 @@ def holy_column(tier, w, h, ground, radius, seed=41):
             wid = half * (1.35 if k == 0 else 1.0 - 0.04 * k)
             _sigil(c, cx, ground, radius, tier, 1.0, rot=rot)
             _rays(c, cx, ground, radius * 0.5, radius * (1.3 + 0.15 * k), 10 + tier * 2, rot, 230)
-            _ring(c, cx, ground, radius * (0.9 + 0.25 * k), 0.42, WHITE if k < 2 else CORE, 255 - k * 40, width=2)
+            _ring(c, cx, ground, radius * (0.9 + 0.25 * k), 1.0, WHITE if k < 2 else CORE, 255 - k * 40, width=2)
             _beam(c, cx, belly, ground, wid, tier, f)
             _cloud(c, cx, cloud_y, cloud_s, glow=1.0)
-            for yy in range(int(ground - wid * 0.5), int(ground + wid * 0.5) + 1):   # bright splash at the foot
+            for yy in range(int(ground - wid * 1.5), int(ground + wid * 1.5) + 1):   # bright round splash at the foot (2D)
                 for xx in range(int(cx - wid * 1.5), int(cx + wid * 1.5) + 1):
-                    e = ((xx - cx) / (wid * 1.5)) ** 2 + ((yy - ground) / (wid * 0.5)) ** 2
+                    e = ((xx - cx) / (wid * 1.5)) ** 2 + ((yy - ground) / (wid * 1.5)) ** 2
                     if e <= 1.0:
                         _put(c, xx, yy, WHITE if e < 0.35 else (CORE if e < 0.7 else GOLD))
             if tier >= 5:                                            # a crown of rays at the top
@@ -186,6 +186,6 @@ def holy_column(tier, w, h, ground, radius, seed=41):
         out.append(c.outline(OUTLINE) if 3 <= f < 7 else c)
         m = Canvas(w, h)
         if 3 <= f < 7:
-            m.ellipse(int(cx - radius), int(ground - radius * 0.42), int(cx + radius), int(ground + radius * 0.42), "#ffffff", fill=True)
+            m.ellipse(int(cx - radius), int(ground - radius * 1.0), int(cx + radius), int(ground + radius * 1.0), "#ffffff", fill=True)
         masks.append(m)
     return FxFrames(out, masks)
