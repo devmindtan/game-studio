@@ -479,16 +479,16 @@ def wind_ribbons(size=112, frames=12, n=3):
             for s in range(56):                                   # the ribbon: a thick arc fading to its tail
                 t = base - s * 0.028
                 x = c0 + math.cos(t) * rr
-                y = c0 + math.sin(t) * rr   # 2D: round the body (user 2026-11-22)
+                y = c0 + 6 + math.sin(t) * rr * 0.38   # a tilted 2.5D orbit round the body (user 2026-11-22)
                 w = max(1, 5 - s // 12)
-                a = int(fade * (1 - s / 56) ** 0.6)
+                a = int(fade * (1 - s / 56) ** 0.6 * (0.45 if math.sin(t) < 0 else 1.0))   # far side dimmer
                 for k in range(w):
                     col = WIND_W if k == 0 else (WIND_L if k < 2 else (WIND if k < 4 else WIND_D))
                     _put(c, x, y + k, col, a)
         for i in range(4):                                        # leaves
             t = i * math.tau / 4 + f * 0.6
             x = c0 + math.cos(t) * 36
-            y = c0 + math.sin(t) * 36
+            y = c0 + 6 + math.sin(t) * 36 * 0.38
             for dx, dy, col in ((0, 0, LEAF), (1, 0, LEAF), (0, 1, LEAF_D), (1, 1, LEAF_D), (2, 0, LEAF)):
                 _put(c, x + dx, y + dy, col, fade)
         out.append(c)
@@ -514,13 +514,13 @@ def shooting_stars(size=112, frames=12, n=3):
             for s in range(30):                                   # trail
                 t = base - s * 0.035
                 x = c0 + math.cos(t) * rr
-                y = c0 + math.sin(t) * rr
-                a = int(fade * (1 - s / 30))
+                y = c0 + 6 + math.sin(t) * rr * 0.38   # tilted 2.5D orbit (user 2026-11-22)
+                a = int(fade * (1 - s / 30) * (0.45 if math.sin(t) < 0 else 1.0))
                 col = STAR_W if s < 4 else (STAR_Y if s < 16 else STAR_O)
                 for k in range(3 if s < 12 else (2 if s < 22 else 1)):
                     _put(c, x, y + k - 1, col if k == 1 else STAR_O, a)
             x = c0 + math.cos(base) * rr
-            y = c0 + math.sin(base) * rr
+            y = c0 + 6 + math.sin(base) * rr * 0.38
             big = 6 if f >= frames - 4 else 4                     # the star: a solid diamond with 4 rays
             for dy in range(-3, 4):
                 for dx in range(-3 + abs(dy), 4 - abs(dy)):

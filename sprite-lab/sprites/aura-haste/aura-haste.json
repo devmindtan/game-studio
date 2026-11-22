@@ -1,14 +1,14 @@
 {
   "frames": 8,
   "frame_size": [
-    96,
-    96
+    48,
+    48
   ],
   "fps": 12.0,
   "loop": true,
   "anchor": [
-    48,
-    88
+    24.0,
+    44.0
   ],
   "anchor_source": "explicit",
   "animations": [
@@ -19,6 +19,5 @@
       "fps": 12.0,
       "loop": true
     }
-  ],
-  "px_scale": 0.5
+  ]
 }
