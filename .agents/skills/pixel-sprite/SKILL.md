@@ -240,6 +240,7 @@ Thêm bậc: thêm một dòng vào `TIERS` và một thư mục có stub giốn
   nó làm dày mỗi nét về một phía khác nhau; đặt từng pixel trên trục 45°, mọi phần dày về cùng một phía. Soát ảnh phóng to: lưỡi phải mọc từ
   giữa chắn tay.
 - Nền trong suốt (`RGBA`), không viền quanh cả canvas.
+- **Game 2D nhìn thẳng, không 2.5D** (người dùng 2026-11-22): vòng, ấn, sóng chấn là **hình tròn** (không ép dẹt elip giả mặt đất); hiệu ứng quanh nhân vật có **tâm ở tâm thân** (điểm game vẽ: `player_pos + _hit_center`), không lệch xuống chân; hiệu ứng báo hiệu (tim, nắm đấm, đồng hồ) đặt **trên đầu**. Xem trong trận bằng `--show-special-fx=T`.
 - **Hiệu ứng chiêu không phủ màn/lớp mờ lên cả vùng** (đĩa chấm lưới, nền màu bán trong suốt): người dùng 2026-11-21 bỏ màn tím của Bão sét vì che sân. Vùng tác dụng thể hiện bằng chính hiệu ứng (tia, nổ, vòng mảnh), không bằng lớp phủ.
 - **Quái nhảy phải có animation nhảy** (người dùng 2026-11-18): `crouch` (lấy đà, nén) và `jump` (bật → đỉnh →
   rơi → đáp), mọi tư thế đặt chân ở hàng đất trong khung; game nâng sprite theo `hop_height` và giữ bóng.

@@ -21,7 +21,7 @@ def _put(c, x, y, col, a=255):
             c.img.putpixel((x, y), (col[0], col[1], col[2], a))
 
 
-def _ring(c, cx, cy, r, width, bands, a=255, squash=0.62):
+def _ring(c, cx, cy, r, width, bands, a=255, squash=1.0):   # 2D (user 2026-11-22): round, not a 2.5D ellipse
     """A solid flat ring [r - width, r]: bands = colours from the outer edge inward (lit -> shaded)."""
     w, h = c.img.size
     for y in range(max(0, int(cy - r * squash - 2)), min(h, int(cy + r * squash + 3))):
@@ -81,15 +81,15 @@ def retaliate_shock(size=112, radius=52, frames=16):
                 for i in range(10):
                     a = i * math.tau / 10 + f * 0.2
                     for s in range(int(r * 0.5), int(r * 0.85)):
-                        _put(c, c0 + math.cos(a) * s, c0 + math.sin(a) * s * 0.62, (255, 236, 170), 200)
+                        _put(c, c0 + math.cos(a) * s, c0 + math.sin(a) * s, (255, 236, 170), 200)
             for i in range(9):                                          # shards thrown outward
                 a = i * math.tau / 9 + 0.3
                 d = r * (0.75 + 0.15 * (i % 3)) + (f - 2) * 1.5
                 if d < radius + 6:
-                    _shard(c, c0 + math.cos(a) * d, c0 + math.sin(a) * d * 0.62 - (8 - abs(f - 7)) * 0.8,
+                    _shard(c, c0 + math.cos(a) * d, c0 + math.sin(a) * d,
                            a + f * 0.5, 3 + i % 2, STONE_L, STONE_D, fade)
             if 2 <= f <= 6:                                             # hit area: the disc the ring swept
-                m.ellipse(int(c0 - r), int(c0 - r * 0.62), int(c0 + r), int(c0 + r * 0.62), "#ffffff", fill=True)
+                m.ellipse(int(c0 - r), int(c0 - r), int(c0 + r), int(c0 + r), "#ffffff", fill=True)
         out.append(c)
         masks.append(m)
     return FxFrames(out, masks)
@@ -128,7 +128,7 @@ def holy_blades(size=144, radius=60, frames=14, n=6):
     """Thánh kiếm: n bright swords point outward and sweep one turn round the hero, each leaving a gold arc
     trail; frames 3..9 hit (the ring they sweep); they flare and dissolve into rays at the end."""
     c0 = size / 2
-    sq = 0.62                                                              # flat on the ground like the rings
+    sq = 1.0                                                               # 2D: a round sweep (user 2026-11-22)
     out, masks = [], []
     for f in range(frames):
         c = Canvas(size, size)
@@ -279,7 +279,7 @@ def flame_ring(size=128, radius=52, frames=10, n=22):
     card's 0.76 s cadence so back-to-back pulses read as one steady fire. Hit mask = the ring's disc."""
     import random
     c0 = size / 2
-    sq = 0.55
+    sq = 1.0   # 2D (user 2026-11-22)
     out, masks = [], []
     for f in range(frames):
         rng = random.Random(f)
@@ -288,23 +288,23 @@ def flame_ring(size=128, radius=52, frames=10, n=22):
         a = 255 if 1 <= f <= frames - 2 else 200
         for k in range(int(radius * 7)):                      # a thin band of glowing coals joining the flames
             ang = k / (radius * 7) * math.tau
-            x, y = c0 + math.cos(ang) * radius, c0 + math.sin(ang) * radius * sq + 8
+            x, y = c0 + math.cos(ang) * radius, c0 + math.sin(ang) * radius * sq
             hot = (k + f * 3) % 9 < 3
             _put(c, x, y, FIRE_O if hot else FIRE_R, a)
             _put(c, x, y + 1, FIRE_D, a)
         pts = sorted(((i * math.tau / n, i) for i in range(n)), key=lambda p: math.sin(p[0]))   # back flames first
         for ang, i in pts:
             x = c0 + math.cos(ang) * radius
-            y = c0 + math.sin(ang) * radius * sq + 8
+            y = c0 + math.sin(ang) * radius * sq
             flick = 0.6 + 0.4 * abs(math.sin(f * 1.7 + i * 2.3))
             _flame(c, x, y, (16 + (i % 3) * 4) * flick, 5 + (i % 2), a)
         for e in range(6):                                    # embers drifting up
             ang = rng.uniform(0, math.tau)
             x = c0 + math.cos(ang) * radius * rng.uniform(0.8, 1.05)
-            y = c0 + math.sin(ang) * radius * sq + 8 - 14 - rng.uniform(0, 14)
+            y = c0 + math.sin(ang) * radius * sq - 6 - rng.uniform(0, 10)
             _put(c, x, y, FIRE_Y, 220)
             _put(c, x, y + 1, FIRE_O, 160)
-        m.ellipse(int(c0 - radius), int(c0 + 8 - radius * sq), int(c0 + radius), int(c0 + 8 + radius * sq), "#ffffff", fill=True)
+        m.ellipse(int(c0 - radius), int(c0 - radius * sq), int(c0 + radius), int(c0 + radius * sq), "#ffffff", fill=True)
         out.append(c)
         masks.append(m)
     return FxFrames(out, masks)
@@ -322,7 +322,7 @@ def ice_nova(size=144, radius=60, frames=13, n=18):
     (3-7, the freeze), they stand, then shatter into shards flying out (8-12). Hit mask = the disc they ring."""
     import fxkit as fk
     c0 = size / 2
-    sq = 0.55
+    sq = 1.0   # 2D (user 2026-11-22)
     out, masks = [], []
     for f in range(frames):
         c = Canvas(size, size)
@@ -333,28 +333,28 @@ def ice_nova(size=144, radius=60, frames=13, n=18):
                 rr = radius * (0.5 - f * 0.13)
                 for s in range(6):
                     t = a + s * 0.06
-                    _put(c, c0 + math.cos(t) * rr, c0 + 8 + math.sin(t) * rr * sq, (200, 246, 255), 200 - s * 25)
+                    _put(c, c0 + math.cos(t) * rr, c0 + math.sin(t) * rr * sq, (200, 246, 255), 200 - s * 25)
         elif f < 8:
             grow = min(1.0, (f - 2) / 2.0)
             for k in range(int(radius * 7)):                          # a frosted band joining the spikes
                 a = k / (radius * 7) * math.tau
-                x, y = c0 + math.cos(a) * radius, c0 + 8 + math.sin(a) * radius * sq
+                x, y = c0 + math.cos(a) * radius, c0 + math.sin(a) * radius * sq
                 for w, col in ((0, (244, 254, 255)), (1, (160, 226, 250)), (2, (90, 170, 220))):
                     _put(c, x, y + w, col, int(255 * grow))
             lay = Canvas(size, size)
             pts = sorted(((i * math.tau / n, i) for i in range(n)), key=lambda p: math.sin(p[0]))
             for ang, i in pts:                                        # back spikes first
                 x = c0 + math.cos(ang) * radius
-                y = c0 + 8 + math.sin(ang) * radius * sq
-                h = (20 + (i % 3) * 7) * grow
+                y = c0 + math.sin(ang) * radius * sq
+                h = (14 + (i % 3) * 5) * grow   # round ring: shorter spikes stay inside the frame
                 lean = math.cos(ang) * 0.35
                 fk.crystal(lay, x, y, -math.pi / 2 + lean, h, 5.5, ICE_L, ICE_M, ICE_D, ICE_W)
             fk.stack(c, lay, ICE_X)
             if f == 3:                                                # the freeze flash along the ring
                 for k in range(int(radius * 6)):
                     a = k / (radius * 6) * math.tau
-                    _put(c, c0 + math.cos(a) * radius, c0 + 8 + math.sin(a) * radius * sq, (244, 254, 255))
-            m.ellipse(int(c0 - radius), int(c0 + 8 - radius * sq), int(c0 + radius), int(c0 + 8 + radius * sq), "#ffffff", fill=True)
+                    _put(c, c0 + math.cos(a) * radius, c0 + math.sin(a) * radius * sq, (244, 254, 255))
+            m.ellipse(int(c0 - radius), int(c0 - radius * sq), int(c0 + radius), int(c0 + radius * sq), "#ffffff", fill=True)
         else:                                                         # shatter: shards fly outward and fade
             k = f - 8
             a_out = int(255 * (1 - k / 5))
@@ -363,7 +363,7 @@ def ice_nova(size=144, radius=60, frames=13, n=18):
                 ang = i * math.tau / (n * 2) + 0.2
                 d = radius + 4 + k * 6 + (i % 3) * 3
                 x = c0 + math.cos(ang) * d
-                y = c0 + 8 + math.sin(ang) * d * sq - (6 - k) * 1.5
+                y = c0 + math.sin(ang) * d * sq - (6 - k) * 1.5
                 fk.crystal(lay, x, y, ang + k * 0.7, 5 - k * 0.6, 1.6, ICE_L, ICE_M, ICE_D, ICE_W)
             fk.stack(c, lay, ICE_X)
             px = c.img.load()
@@ -423,13 +423,13 @@ def blood_fist(size=112, frames=13):
             t = f / 4
             for i in range(8):
                 a = i * math.tau / 8 + 0.3
-                d = 46 * (1 - t) + 6
-                _blood_drop(c, c0 + math.cos(a) * d, c0 + math.sin(a) * d * 0.8, 3)
+                d = 30 * (1 - t) + 4
+                _blood_drop(c, c0 + math.cos(a) * d, c0 - 36 + math.sin(a) * d, 3)   # gather above the head
         else:
             k = f - 5
             fade = 255 if f < frames - 3 else int(255 * (frames - f) / 4)
             sc = 3
-            fy = int(c0 - len(FIST) * sc / 2 - min(k, 3) * 2)   # whole pixels: a half-pixel origin striped the 3x blocks
+            fy = int(c0 - 36 - len(FIST) * sc / 2 - min(k, 3) * 2)   # above the head (user 2026-11-22); whole pixels
             fx = int(c0 - len(FIST[0]) * sc / 2)
             keys = {"k": (60, 6, 14), "r": BLOOD, "l": BLOOD_L, "w": BLOOD_W}
             for ry, row in enumerate(FIST):
@@ -440,15 +440,15 @@ def blood_fist(size=112, frames=13):
                                 _put(c, fx + rx * sc + dx, fy + ry * sc + dy, keys[ch], fade)
             # the ring after the fist: _put keeps the first colour, so it sits behind the fist
             if k <= 3:                                               # ring of light bursting out
-                rr = 10 + k * 9
+                rr = 12 + k * 5
                 for s in range(int(rr * 7)):
                     a = s / (rr * 7) * math.tau
                     for w, col in ((0, BLOOD_W), (1, BLOOD_L), (2, BLOOD)):
-                        _put(c, c0 + math.cos(a) * (rr - w), c0 + math.sin(a) * (rr - w) * 0.8, col, 255 - k * 50)
+                        _put(c, c0 + math.cos(a) * (rr - w), c0 - 36 + math.sin(a) * (rr - w), col, 255 - k * 50)
             if f >= 8:                                               # heal crosses rising
                 for i in range(3):
                     x = c0 - 18 + i * 18
-                    y = c0 - 10 - (f - 8) * 5 - (i % 2) * 6
+                    y = c0 - 50 - (f - 8) * 4 - (i % 2) * 6
                     for d in range(-3, 4):
                         _put(c, x + d, y, BLOOD_L, fade)
                         _put(c, x, y + d, BLOOD_L, fade)
@@ -479,7 +479,7 @@ def wind_ribbons(size=112, frames=12, n=3):
             for s in range(56):                                   # the ribbon: a thick arc fading to its tail
                 t = base - s * 0.028
                 x = c0 + math.cos(t) * rr
-                y = c0 + 14 + math.sin(t) * rr * 0.45 - s * 0.25
+                y = c0 + math.sin(t) * rr   # 2D: round the body (user 2026-11-22)
                 w = max(1, 5 - s // 12)
                 a = int(fade * (1 - s / 56) ** 0.6)
                 for k in range(w):
@@ -488,7 +488,7 @@ def wind_ribbons(size=112, frames=12, n=3):
         for i in range(4):                                        # leaves
             t = i * math.tau / 4 + f * 0.6
             x = c0 + math.cos(t) * 36
-            y = c0 + 8 + math.sin(t) * 16 - (f % 4)
+            y = c0 + math.sin(t) * 36
             for dx, dy, col in ((0, 0, LEAF), (1, 0, LEAF), (0, 1, LEAF_D), (1, 1, LEAF_D), (2, 0, LEAF)):
                 _put(c, x + dx, y + dy, col, fade)
         out.append(c)
@@ -514,13 +514,13 @@ def shooting_stars(size=112, frames=12, n=3):
             for s in range(30):                                   # trail
                 t = base - s * 0.035
                 x = c0 + math.cos(t) * rr
-                y = c0 + math.sin(t) * rr * 0.6
+                y = c0 + math.sin(t) * rr
                 a = int(fade * (1 - s / 30))
                 col = STAR_W if s < 4 else (STAR_Y if s < 16 else STAR_O)
                 for k in range(3 if s < 12 else (2 if s < 22 else 1)):
                     _put(c, x, y + k - 1, col if k == 1 else STAR_O, a)
             x = c0 + math.cos(base) * rr
-            y = c0 + math.sin(base) * rr * 0.6
+            y = c0 + math.sin(base) * rr
             big = 6 if f >= frames - 4 else 4                     # the star: a solid diamond with 4 rays
             for dy in range(-3, 4):
                 for dx in range(-3 + abs(dy), 4 - abs(dy)):
@@ -634,10 +634,10 @@ def hourglass(size=112, frames=14):
             for s in range(int(rr * 7)):
                 ang = s / (rr * 7) * math.tau
                 for wdt, col in ((0, (240, 250, 255)), (1, TIME_B), (2, (80, 140, 220))):
-                    _put(c, c0 + math.cos(ang) * (rr - wdt), c0 - 6 + math.sin(ang) * (rr - wdt) * 0.7, col, fade)
+                    _put(c, c0 + math.cos(ang) * (rr - wdt), c0 + math.sin(ang) * (rr - wdt), col, fade)
             for i in range(6):
                 ang = i * math.tau / 6 + k
-                x, y = c0 + math.cos(ang) * rr, c0 - 6 + math.sin(ang) * rr * 0.7
+                x, y = c0 + math.cos(ang) * rr, c0 + math.sin(ang) * rr
                 for d in range(-3, 4):
                     _put(c, x + d, y, SAND, fade)
                     _put(c, x, y + d, SAND, fade)

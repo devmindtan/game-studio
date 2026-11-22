@@ -25,8 +25,8 @@ from sheet import export  # noqa: E402
 
 S = 144
 C = S / 2
-ANIM = [("cast", specialfx.ice_nova(S, 60, 13), 14, False,
-         {"hitbox": {"shape": "circle", "center": [C, C + 8], "active": [3, 7], "inner": 0.0}})]
+ANIM = [("cast", specialfx.ice_nova(S, 50, 13), 14, False,
+         {"hitbox": {"shape": "circle", "center": [C, C], "active": [3, 7], "inner": 0.0}})]
 
 if __name__ == "__main__":
     export(HERE, HERE.name, ANIM, anchor=(C, C))

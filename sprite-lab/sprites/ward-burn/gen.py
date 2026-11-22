@@ -27,7 +27,7 @@ from sheet import export  # noqa: E402
 S = 128
 C = S / 2
 ANIM = [("cast", specialfx.flame_ring(S, 52, 10), 13, False,
-         {"hitbox": {"shape": "circle", "center": [C, C + 8], "active": [0, 9], "inner": 0.0}})]
+         {"hitbox": {"shape": "circle", "center": [C, C], "active": [0, 9], "inner": 0.0}})]
 
 if __name__ == "__main__":
     export(HERE, HERE.name, ANIM, anchor=(C, C))

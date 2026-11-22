@@ -618,7 +618,7 @@ function itemEffects(m){
       const bi=all.find(x=>x.id===sp.buff);
       if(bi){ auraInfo=bi.aura||null; auraBackInfo=bi.aura_back||null; auraFront=(bi.aura_layer||'front')!=='back';
         breakInfo=bi.break_sprite||null; } }
-    const ring=!buff&&['pulse','freeze_nova','retaliate'].includes(kind);
+    const ring=!buff&&['pulse','freeze_nova','retaliate','burn_aura'].includes(kind);   // same set as the run's _ring_fx
     const ringSprite=ring?anySprite((sp&&sp.fx)||'stomp-i'):null;
     let ringScale=0;   // world px per art px - the sprite's TRUE scale, never shrunk
     const status=!buff?({chain_shock:'shock',burn_aura:'burn',freeze_nova:'freeze'}[kind]||null):null;
@@ -648,13 +648,15 @@ function itemEffects(m){
     // a 6-15 s cooldown would leave the effect invisible most of the time.
     const period=2.4,lead=0.25,dur=ring?1.55:(breakInfo?0.95:1.0);
     const visual=!!(auraInfo||ring||status||kind==='burn_aura'||(!ring&&sp&&sp.fx));
+    // effects sit on the hero's body centre like the run (player_pos + _hit_center), not on the feet (user 2026-11-22)
+    const bodyY=()=>{ const b=sh.hero&&sh.hero.meta.body; return b?hy+(b.center[1]-sh.hero.anchor[1])*2:hy-26; };
     const cv=liveCanvas(W,H,(g,t)=>{
       const u=t%period,on=u>=lead&&u<lead+dur;
       const active=sh.wardBreak?(u>=0.45&&u<1.35):on;
       g.setTransform(1,0,0,1,0,0); g.clearRect(0,0,W,H);
       g.setTransform(Z,0,0,Z,0,0);
       drawGround(g,hx,hy,1,1e9,VW,VH);
-      if(visual) drawHb(g,{shape:'circle',radius:R},hx,hy,1,active);
+      if(visual) drawHb(g,{shape:'circle',radius:R},hx,bodyY(),1,active);
       if(sh.scorch) sh.scorch.draw(g,'loop',t,dx,hy,1);
       if(sh.auraBack) sh.auraBack.draw(g,'loop',t,hx,hy,2);
       if(sh.aura&&!auraFront) sh.aura.draw(g,'loop',t,hx,hy,2);
@@ -673,10 +675,10 @@ function itemEffects(m){
         }
       }
       if(sh.ring&&on&&ringScale>0){
-        const ra=sh.ring.has('shock')?'shock':'burst';
-        sh.ring.draw(g,ra,u-lead,hx,hy,ringScale);   // true scale; the view is what shrank
+        const ra=sh.ring.has('shock')?'shock':(sh.ring.has('cast')?'cast':'burst');
+        sh.ring.draw(g,ra,u-lead,hx,bodyY(),ringScale);   // true scale; the view is what shrank
       }
-      if(sh.proc&&u<1.2) sh.proc.draw(g,'cast',u,hx,hy,2);   // one-shot item proc
+      if(sh.proc&&u<1.2) sh.proc.draw(g,'cast',u,hx,bodyY(),2);   // one-shot item proc, at the body centre
       if(!visual){ g.setTransform(1,0,0,1,0,0); g.fillStyle='#e9eef8'; g.font='12px system-ui';
         g.textAlign='center'; g.fillText('Không có hiệu ứng hình ảnh riêng',W/2,H-12); }
     });
