@@ -32,8 +32,8 @@ from sheet import export  # noqa: E402
 
 NAME = HERE.name
 W, H = _V[0], 256
+GROUND = 226.0
 RADIUS = _V[1]
-GROUND = H - RADIUS - 6.0   # 2D round sigil (2026-11-22): the ground sits so the circle fits the frame
 ANCHOR = (W / 2, GROUND)
 ANIM = [("descend", holyfx.holy_column(_V[2], W, H, GROUND, RADIUS), 12, False,
          {"durations_ms": holyfx.MS, "hitbox": {"shape": "rect", "center": [W / 2, GROUND], "active": [3, 6]}})]
