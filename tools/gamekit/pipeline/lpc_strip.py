@@ -8,7 +8,8 @@ For each <game>/assets/sprites/characters/<name>/standard/*.png, writes
 frames, animations, anchor at the feet, body circle, px_scale 0.5 so it draws at its own pixel size where the run
 scales world sprites x2). Only the right-facing row is used: the run flips for left.
 
-Game animation <- LPC:  idle <- idle,  run <- walk 1-8,  dash <- run,  hurt <- idle (the run tints it),
+Game animation <- LPC:  idle / hurt <- walk 0 (standing),  run <- walk 1-8,  dash <- walk 2,4,6,8 (LPC weapons and
+shields have no idle / run rows),
 death <- hurt (LPC's fall),  shoot / slash / spellcast / thrust <- same name.
 """
 from __future__ import annotations
@@ -24,10 +25,12 @@ RIGHT = 3          # row of the right-facing frames in a 4-direction LPC sheet
 
 # (game name, LPC file, columns, fps, loop)
 MAP = [
-    ("idle", "idle", [0, 1], 3, True),
+    # idle / hurt / dash come from walk: LPC weapons and shields have no idle or run rows, so frames from those rows
+    # lose them (user 2026-11-23: the knight's shield vanished standing still). walk col 0 is the standing pose.
+    ("idle", "walk", [0], 3, True),
     ("run", "walk", [1, 2, 3, 4, 5, 6, 7, 8], 10, True),
-    ("hurt", "idle", [0], 10, False),
-    ("dash", "run", [0, 2, 4, 6], 14, False),
+    ("hurt", "walk", [0], 10, False),
+    ("dash", "walk", [2, 4, 6, 8], 14, False),
     ("death", "hurt", [0, 1, 2, 3, 4, 5], 8, False),
     ("shoot", "shoot", list(range(13)), 16, False),
     ("slash", "slash", list(range(6)), 12, False),
