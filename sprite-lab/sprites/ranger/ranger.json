@@ -27,14 +27,14 @@
       "hitbox": {
         "shape": "rect",
         "center": [
-          23.0,
+          27.0,
           31.0
         ],
         "active": [
           0,
           3
         ],
-        "half_w": 9.0,
+        "half_w": 13.0,
         "half_h": 13.0
       }
     },
@@ -47,14 +47,14 @@
       "hitbox": {
         "shape": "rect",
         "center": [
-          24.5,
+          30.0,
           31.0
         ],
         "active": [
           0,
           7
         ],
-        "half_w": 8.5,
+        "half_w": 13.0,
         "half_h": 13.0
       }
     },
@@ -72,14 +72,14 @@
       "hitbox": {
         "shape": "rect",
         "center": [
-          22.0,
+          26.0,
           31.0
         ],
         "active": [
           0,
           2
         ],
-        "half_w": 10.0,
+        "half_w": 14.0,
         "half_h": 13.0
       }
     },
@@ -99,14 +99,14 @@
       "hitbox": {
         "shape": "rect",
         "center": [
-          24.0,
+          28.5,
           31.5
         ],
         "active": [
           0,
           4
         ],
-        "half_w": 9.0,
+        "half_w": 13.5,
         "half_h": 12.5
       }
     },
@@ -126,14 +126,14 @@
       "hitbox": {
         "shape": "rect",
         "center": [
-          16.0,
+          19.0,
           31.5
         ],
         "active": [
           0,
           4
         ],
-        "half_w": 15.0,
+        "half_w": 18.0,
         "half_h": 12.5
       }
     }
@@ -142,21 +142,21 @@
   "body": {
     "anim": "idle",
     "center": [
-      23.0,
-      31.5
+      25.5,
+      32.0
     ],
-    "radius": 10.0
+    "radius": 11.0
   },
   "layers": [
     "legs_back",
     "feet_back",
     "arms_back",
-    "weapon_back",
     "chest",
     "legs_front",
     "feet_front",
     "body",
     "head",
+    "weapon",
     "arms_front"
   ],
   "outline": "#1b1726",
@@ -180,7 +180,7 @@
       "feet_front"
     ],
     "weapon": [
-      "weapon_back"
+      "weapon"
     ]
   },
   "base": [
