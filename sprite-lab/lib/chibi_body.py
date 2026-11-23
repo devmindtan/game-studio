@@ -29,6 +29,7 @@ PROPORTIONS = {
 }
 
 ANIMS = {"idle": 2, "walk": 9}
+STANDARD = "B"         # user 2026-11-23 chose B (chibi, 2.3 heads tall)
 
 # walk: per frame (front foot dx, back foot dx, front lift, back lift, body bob)
 _WALK = [(0, 0, 0, 0, 0),
@@ -46,7 +47,7 @@ def skeleton(anim: str, f: int, pr: dict) -> dict:
     elif anim == "walk":
         fd, bd, fl, bl, bob = _WALK[f]
         feet = [(bd - 2, bl), (fd + 2, fl)]          # two lanes (back / front leg): they pass, never cross into an X
-    hip_y = GROUND - pr["leg_h"] + bob
+    hip_y = GROUND - 2 - pr["leg_h"] + bob
     hip = (ROOT_X, hip_y)
     neck = (ROOT_X, hip_y - pr["torso_h"])
     head = (ROOT_X + 1, neck[1] - pr["head_r"] + 1)
@@ -54,9 +55,10 @@ def skeleton(anim: str, f: int, pr: dict) -> dict:
     sh = (ROOT_X, neck[1] + 2)
     hand_f = (sh[0] + 1 + swing, sh[1] + pr["arm_l"] - abs(swing) // 2)
     hand_b = (sh[0] - 1 - swing, sh[1] + pr["arm_l"] - abs(swing) // 2)
-    foot_b = (ROOT_X + feet[0][0], GROUND - feet[0][1])
-    foot_f = (ROOT_X + feet[1][0], GROUND - feet[1][1])
-    return {"hip": hip, "neck": neck, "head": head, "shoulder": sh, "hand_front": hand_f, "hand_back": hand_b,
+    foot_b = (ROOT_X + feet[0][0], GROUND - 2 - feet[0][1])   # sole + outline end on the ground line
+    foot_f = (ROOT_X + feet[1][0], GROUND - 2 - feet[1][1])
+    hips = ((ROOT_X - 2, hip_y), (ROOT_X + 2, hip_y))   # back / front hip: the legs start apart
+    return {"hip": hip, "hip_back": hips[0], "hip_front": hips[1], "neck": neck, "head": head, "shoulder": sh, "hand_front": hand_f, "hand_back": hand_b,
             "foot_back": foot_b, "foot_front": foot_f}
 
 
@@ -80,7 +82,7 @@ def draw_bare(j: dict, pr: dict, pal: dict) -> Canvas:
     """The bare base body (skin, simple shorts) on joints j: the layer every outfit is drawn over."""
     c = Canvas(S, S)
     # back limbs (darker)
-    _line(c, j["hip"], j["foot_back"], pal["skin_d"], 3)
+    _line(c, j["hip_back"], j["foot_back"], pal["skin_d"], 3)
     _line(c, j["shoulder"], j["hand_back"], pal["skin_d"], 2)
     # torso
     hx, hy = j["hip"]
@@ -92,7 +94,7 @@ def draw_bare(j: dict, pr: dict, pal: dict) -> Canvas:
         for x in range(-half, half + 1):
             _p(c, nx + x, y, pal["shirt"] if y < hy - 2 else pal["shorts"])
     # front limbs
-    _line(c, j["hip"], j["foot_front"], pal["skin"], 3)
+    _line(c, j["hip_front"], j["foot_front"], pal["skin"], 3)
     for foot, col in ((j["foot_back"], pal["shoe_d"]), (j["foot_front"], pal["shoe"])):
         for x in range(-1, 3):
             _p(c, foot[0] + x, foot[1], col)
