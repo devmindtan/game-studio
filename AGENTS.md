@@ -95,10 +95,10 @@ xuất kéo dài thì khuyên người dùng mở phiên mới ở đó.
   ban đầu, không tham gia thiết kế. Chi tiết: skill `pixel-sprite` bước 0.
 - **Chỉ sửa đúng cái người dùng chỉ ra** (người dùng 2026-11-22): một nhận xét chung đi kèm yêu cầu cụ thể (ví dụ "game 2D nên thiết kế kiểu 2D") chỉ áp cho những thứ được chỉ; thứ khác có thể liên quan thì liệt kê và hỏi trước, không tự sửa (đã lỡ vẽ lại ấn Cột thánh quang, phải hoàn tác).
 - **Việc "tạm dừng" / "tuỳ chọn" trong tài liệu không phải việc còn dở** (người dùng 2026-11-23): không đưa vào danh sách việc cần làm và không làm tiếp khi chưa hỏi; khi báo việc còn lại, ghi rõ "tuỳ chọn, chỉ làm khi bạn muốn" (đã lỡ vẽ lại Chém kiếm, vốn chỉ là nhầm tên với Sóng kiếm).
-- **Cỡ nhân vật (người dùng 2026-11-23, thay quyết định 48×48 ngày 2026-11-22): khung 64×64 kiểu LPC, phong cách
-  chibi dễ thương**, các lớp (thân, đầu, tóc, áo, vũ khí) là tấm riêng khớp một khung xương chuẩn; chuyển động học nhịp
-  của LPC nhưng tự vẽ, không dùng ảnh LPC. Kế hoạch: `sprite-lab/BODY_PLAN.md`. Nhân vật cũ (48×48) giữ nguyên tới khi
-  được chuyển. AI (`gamekit art concept`) chỉ để lấy ý tưởng ngoại hình.
+- **Nhân vật dạng người dùng LPC adult** (người dùng 2026-11-23, sau khi thử tự vẽ chibi: "xấu quá", "sử dụng của lpc
+  luôn", thân "tất nhiên là adult"): phối trong `gamekit lpc`, xuất ZIP "split animations" vào
+  `games/<g>/assets/source/lpc/<tên>.zip` (đường dẫn URL đã dựng sẵn và script xuất ghi ở `sprite-lab/BODY_PLAN.md`),
+  `gamekit sprites <g>`, vẽ bằng `LpcCharacter`; credit LPC bắt buộc. Nhân vật minifig 48×48 cũ thay dần.
 - **Không đoán mò khi thiết kế** (người dùng 2026-11-17): màn hình, luồng menu, tính năng mới đều bắt đầu từ cách
   các game cùng thể loại đã làm (tìm trên mạng), ghi nguồn vào tài liệu thiết kế rồi mới code. Thiếu thông tin
   mà tham khảo không trả lời được thì hỏi người dùng. Từ ngữ của người dùng ứng với hơn một hệ thống của game
