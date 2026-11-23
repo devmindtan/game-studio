@@ -1,0 +1,7 @@
+{"standard": "creature-v1", "size": "small",
+ "frames": {
+  "move": ["cánh xuôi, bay thấp", "cánh dựng, nhích lên", "cánh mở, chúi đầu, cao nhất", "cánh dựng", "cánh xuôi, hạ xuống", "cánh mở, ngẩng đầu"],
+  "attack": ["gồng: vọt lên, chổng đuôi, sừng dựng, mắt đỏ", "gồng: lên cao hơn, cánh dựng", "lao chúi xuống", "chạm đáy cú lao", "bật lên, cánh mở", "về nhịp bay"],
+  "hurt": ["khựng, chớp trắng", "giật ngửa lên", "hồi lại"],
+  "death": ["trúng đòn, mắt x", "chao xuống", "rơi, cánh xếp", "lật ngửa dưới thấp", "mờ dần", "gần tan hết"]
+ }}

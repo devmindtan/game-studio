@@ -1,0 +1,89 @@
+{
+  "frames": 21,
+  "frame_size": [
+    32,
+    32
+  ],
+  "fps": 8.0,
+  "loop": true,
+  "anchor": [
+    16.0,
+    30.0
+  ],
+  "anchor_source": "explicit",
+  "animations": [
+    {
+      "name": "move",
+      "start": 0,
+      "frames": 6,
+      "fps": 8.0,
+      "loop": true
+    },
+    {
+      "name": "attack",
+      "start": 6,
+      "frames": 6,
+      "fps": 10.0,
+      "loop": false,
+      "durations_ms": [
+        140.0,
+        160.0,
+        60.0,
+        90.0,
+        100.0,
+        120.0
+      ],
+      "hitbox": {
+        "shape": "arc",
+        "center": [
+          26.0,
+          20.0
+        ],
+        "active": [
+          2,
+          3
+        ],
+        "radius": 22.0,
+        "inner": 0.0,
+        "dir_deg": 0.0,
+        "half_angle_deg": 178.0
+      }
+    },
+    {
+      "name": "hurt",
+      "start": 12,
+      "frames": 3,
+      "fps": 12.0,
+      "loop": false,
+      "durations_ms": [
+        80.0,
+        110.0,
+        120.0
+      ]
+    },
+    {
+      "name": "death",
+      "start": 15,
+      "frames": 6,
+      "fps": 8.0,
+      "loop": false,
+      "durations_ms": [
+        90.0,
+        110.0,
+        90.0,
+        200.0,
+        150.0,
+        150.0
+      ]
+    }
+  ],
+  "ground": true,
+  "body": {
+    "anim": "move",
+    "center": [
+      17.0,
+      17.0
+    ],
+    "radius": 11.0
+  }
+}

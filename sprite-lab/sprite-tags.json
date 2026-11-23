@@ -1514,5 +1514,29 @@
       "player",
       "hd-40px"
     ]
+  },
+  "vo-sinh": {
+    "cat": "character",
+    "tags": [
+      "player"
+    ]
+  },
+  "chuot-doi": {
+    "cat": "character",
+    "tags": [
+      "enemy"
+    ]
+  },
+  "bo-sim": {
+    "cat": "character",
+    "tags": [
+      "enemy"
+    ]
+  },
+  "moc-nhan": {
+    "cat": "character",
+    "tags": [
+      "enemy"
+    ]
   }
 }

@@ -1,0 +1,7 @@
+{"standard": "creature-v1", "size": "small",
+ "frames": {
+  "move": ["bước chân trái, thân thẳng", "thân hạ, tai cụp, đuôi lắc", "bước chân phải, đầu chúi", "thân nhổm, tai dựng", "thân hạ, tai cụp", "đầu ngả sau, đuôi vẫy về"],
+  "attack": ["gồng: lùi người, tai dựng, nhe răng, giơ que dựng trước mõm", "gồng sâu: que dựng cao, nheo mắt", "bổ que xuống trước, bước tới", "que chạm thấp phía trước", "thu que về", "về dáng đứng"],
+  "hurt": ["khựng, chớp trắng, tai cụp", "giật lùi, đầu ngửa", "hồi lại"],
+  "death": ["trúng đòn, mắt x", "lảo đảo, que chĩa lên", "ngã ngửa nửa chừng", "nằm ngửa chạm đất", "mờ dần", "gần tan hết"]
+ }}

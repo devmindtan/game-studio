@@ -1,0 +1,59 @@
+{
+  "frames": 11,
+  "frame_size": [
+    32,
+    32
+  ],
+  "fps": 2.0,
+  "loop": true,
+  "anchor": [
+    16.0,
+    30.0
+  ],
+  "anchor_source": "explicit",
+  "animations": [
+    {
+      "name": "idle",
+      "start": 0,
+      "frames": 2,
+      "fps": 2.0,
+      "loop": true
+    },
+    {
+      "name": "hurt",
+      "start": 2,
+      "frames": 4,
+      "fps": 14.0,
+      "loop": false,
+      "durations_ms": [
+        60.0,
+        70.0,
+        70.0,
+        90.0
+      ]
+    },
+    {
+      "name": "death",
+      "start": 6,
+      "frames": 5,
+      "fps": 8.0,
+      "loop": false,
+      "durations_ms": [
+        80.0,
+        90.0,
+        90.0,
+        300.0,
+        200.0
+      ]
+    }
+  ],
+  "ground": true,
+  "body": {
+    "anim": "idle",
+    "center": [
+      16.5,
+      16.0
+    ],
+    "radius": 10.5
+  }
+}
