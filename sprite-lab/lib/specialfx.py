@@ -764,22 +764,51 @@ def fire_band(size=128, radius=52, frames=10):
 
 
 def fire_orbit(size=128, radius=52, frames=10):
-    """Option B: three fire comets circling the hero at the burn radius, each with a long tapering tail."""
+    """Option B (chosen 2026-11-23): three fireballs circling the hero at the burn radius. Tails redrawn the same
+    day (user: "vệt lửa trông giả"): each tail is filled pixel by pixel (no gaps), its width and centre line
+    wobble with smooth waves that move every frame, flame licks bulge outward, the colour follows heat (white at
+    the head, yellow, orange, red, dark red at the tip and the edges); a few embers fall behind."""
+    import random
     c0 = size / 2
+    L = 1.45                                   # tail length in radians
     out, masks = [], []
+    heat = [FIRE_W, FIRE_Y, FIRE_O, FIRE_R, FIRE_D]
     for f in range(frames):
+        rng = random.Random(f * 31 + 5)
+        ph = f / frames * math.tau
         c = Canvas(size, size)
-        for i in range(3):
-            head = f / frames * math.tau + i * math.tau / 3
-            for t in range(28):
-                ang = head - t * 0.045
-                w = 5.5 * (1 - t / 28) + 0.6
-                col = FIRE_W if t < 2 else (FIRE_Y if t < 6 else (FIRE_O if t < 14 else (FIRE_R if t < 22 else FIRE_D)))
-                _fdisk(c, c0 + math.cos(ang) * radius, c0 + math.sin(ang) * radius, w, col)
-        for k in range(0, 360, 6):
-            ang = k / 360 * math.tau
-            if (k // 6 + f) % 3 == 0:
-                _put(c, c0 + math.cos(ang) * radius, c0 + math.sin(ang) * radius, FIRE_R, 200)
+        heads = [ph + i * math.tau / 3 for i in range(3)]
+        for y in range(size):
+            for x in range(size):
+                dx, dy = x - c0, y - c0
+                r = math.hypot(dx, dy)
+                if abs(r - radius) > 12:
+                    continue
+                a = math.atan2(dy, dx)
+                for i, hd in enumerate(heads):
+                    back = (hd - a) % math.tau                 # how far behind this head
+                    if back > L:
+                        continue
+                    u = back / L
+                    wave = math.sin(u * 13 - f * 2.4 + i * 2) * 0.5 + math.sin(u * 5 + f * 1.3 + i) * 0.5
+                    w = 6.0 * (1 - u) ** 0.7 + 0.8 + wave * 1.4 * u
+                    lick = max(0.0, math.sin(u * 9 - f * 1.7 + i * 3)) ** 3 * 4.0 * u    # tongues outward
+                    mid = math.sin(u * 7 - f * 2.0 + i) * 2.2 * u                         # the tail sways
+                    off = r - radius - mid
+                    if -w <= off <= w + lick:
+                        edge = abs(off) / (w + (lick if off > 0 else 0) + 0.01)
+                        k = int(u * 3.2 + edge * 1.6)
+                        _put(c, x, y, heat[min(k, len(heat) - 1)])
+                        break
+        for i, hd in enumerate(heads):
+            hx, hy = c0 + math.cos(hd) * radius, c0 + math.sin(hd) * radius
+            _fdisk(c, hx, hy, 6.0, FIRE_O)
+            _fdisk(c, hx, hy, 4.6, FIRE_Y)
+            _fdisk(c, hx, hy, 2.8, FIRE_W)
+            for e in range(3):                                  # embers falling behind
+                back = rng.uniform(0.5, 1.7)
+                d = radius + rng.uniform(-9, 9)
+                _put(c, c0 + math.cos(hd - back) * d, c0 + math.sin(hd - back) * d, FIRE_Y if e % 2 else FIRE_O)
         out.append(c)
         masks.append(_fmask(size, radius))
     return FxFrames(out, masks)
