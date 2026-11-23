@@ -630,7 +630,7 @@ def build_game(slug):
                                  "levels": [level_values(u, lv) for lv in range(1, (int(u.get("max_level", 1)) or 5) + 1)]})
 
     mons = [{"id": mid, "stats": m, "sprite": sprite_info(root, str(m.get("sprite", mid)))}
-            for mid, m in monsters.items()]
+            for mid, m in monsters.items() if isinstance(m, dict)]   # skip format keys (version, drops tables)
 
     rules_doc = load(os.path.join(data, "gameplay_rules.json"))
     scale = float(cfg.get("world", {}).get("sprite_scale", 2))
@@ -673,13 +673,18 @@ def build_game(slug):
 
 def build():
     games = []
+    errors = []
     if os.path.isdir(GAMES):
         for slug in sorted(os.listdir(GAMES)):
             if os.path.isfile(os.path.join(GAMES, slug, "project.godot")):
-                games.append(build_game(slug))
+                try:
+                    games.append(build_game(slug))
+                except Exception as e:   # one game's odd data must not freeze every game's page (2026-11-23)
+                    errors.append(f"{slug}: {type(e).__name__}: {e}")
+                    print(f"games manifest: {slug} skipped: {e}", file=sys.stderr)
     with open(OUT, "w", encoding="utf-8") as f:
         # a visible build stamp lets anyone confirm the web is showing fresh data
-        json.dump({"games": games, "built": time.strftime("%Y-%m-%d %H:%M")}, f,
+        json.dump({"games": games, "errors": errors, "built": time.strftime("%Y-%m-%d %H:%M")}, f,
                   ensure_ascii=False, indent=1)
     return len(games), sum(len(g["skills"]) for g in games)
 

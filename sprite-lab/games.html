@@ -195,7 +195,8 @@ async function init(){
   $('dataBuilt').textContent=dataBuilt?('Dữ liệu web: '+dataBuilt):'';
   const sel=$('gameSel'); sel.innerHTML='';
   games.forEach(g=>sel.appendChild(el('option',{value:g.slug},g.name)));
-  const [slug,t]=decodeURIComponent(location.hash.slice(1)).split('/');
+  const [slug,t,sub]=decodeURIComponent(location.hash.slice(1)).split('/');
+  if(t==='heroes'&&sub) curClass=sub;   // #game/heroes/<class>: open that class (link or shot)
   const first=games.find(g=>g.slug===slug)||games.find(g=>g.skills.length)||games[0];
   if(TABS.some(x=>x[0]===t)) tab=t;
   sel.onchange=()=>selectGame(games.find(g=>g.slug===sel.value));
