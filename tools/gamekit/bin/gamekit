@@ -493,6 +493,8 @@ cmd_sprites() {
   local g; g="$(resolve_game "${1:-}")"
   say "ingest assets/source/lpc"
   python3 "$KIT/pipeline/lpc_ingest.py" --game "$g"
+  say "side-view strips (lpc-<name>) for the run"
+  python3 "$KIT/pipeline/lpc_strip.py" --game "$g"
   say "import"
   godot_import "$g"
   say "build SpriteFrames"
