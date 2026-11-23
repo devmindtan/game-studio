@@ -4,7 +4,9 @@ The old wave rotated one crescent image 16 ways (dirs16), so diagonals broke up,
 the same picture. Here every direction is drawn from geometry at double pixel density ("px_scale" 0.5):
 a crescent air blade (white leading edge, sea-green body, deep back edge), 3 trailing bands that waver frame to
 frame, wind specks peeling off the tips. Its own colour, so it never reads as Chém kiếm's steel slash.
-Tiers: II brighter core, III blue rim, IV more specks + longer trail, V gold core and two small side blades.
+Tiers (each a different silhouette, user 2026-11-23: II-IV looked the same): II an afterimage blade behind,
+III a wide blue back band and longer hooked tips, IV two afterimages + serrated back edge + longer trail, V gold core
+and two small side blades.
 No veil over an area (pixel-sprite rule).
 """
 import math
@@ -30,7 +32,11 @@ def _put(c, x, y, col, a=255):
             c.img.putpixel((x, y), (col[0], col[1], col[2], a))
 
 
-def _crescent(c, deg, tier, scale=1.0, shift=(0.0, 0.0), k=0):
+GHOST = {EDGE: (150, 235, 220), CORE: (110, 210, 192), BODY: (60, 170, 156), DEEP: (30, 110, 110),
+         SHADE: (18, 70, 76), RIM3: (80, 140, 220), GOLD: (200, 170, 80)}
+
+
+def _crescent(c, deg, tier, scale=1.0, shift=(0.0, 0.0), k=0, ghost=0):
     """The blade: outer arc radius R round a centre behind the anchor, inner arc offset further back, so the
     blade is thick in the middle and sharp at the tips. Colour by depth from the leading edge."""
     d = (math.cos(math.radians(deg)), math.sin(math.radians(deg)))
@@ -39,7 +45,7 @@ def _crescent(c, deg, tier, scale=1.0, shift=(0.0, 0.0), k=0):
     thick = (13.0 + tier * 0.8) * scale
     ox, oy = C + shift[0] - d[0] * back, C + shift[1] - d[1] * back            # outer arc centre
     ix, iy = ox - d[0] * thick, oy - d[1] * thick                              # inner arc centre
-    half = math.radians(66 + tier * 2)
+    half = math.radians(66 + tier * 2 + (8 if tier >= 3 else 0))   # III+: longer, hooked tips
     lo = int(min(ox, ix) - R - 2)
     hi = int(max(ox, ix) + R + 2)
     loy = int(min(oy, iy) - R - 2)
@@ -70,9 +76,14 @@ def _crescent(c, deg, tier, scale=1.0, shift=(0.0, 0.0), k=0):
                 col = SHADE
             if tier >= 5 and 2.5 <= depth < 4.0 and span > 0.25:
                 col = GOLD
-            if tier >= 3 and col in (SHADE, DEEP) and depth >= 9 + span * 4:   # III+: the whole back edge rimmed blue
+            if tier >= 3 and col in (BODY, SHADE, DEEP) and depth >= 6.5 + span * 3:   # III+: a wide blue back band
                 col = RIM3
-            _put(c, x, y, col)
+            if tier >= 4 and depth >= 10.5 + span * 4 and int((ang * 40) % 5) < 2:   # IV+: notched back edge
+                continue
+            if ghost:
+                _put(c, x, y, GHOST.get(col, col), 200 - ghost * 50)
+            else:
+                _put(c, x, y, col)
 
 
 def _trail(c, deg, tier, k):
@@ -119,6 +130,10 @@ def _specks(c, deg, tier, k):
 def fly_frame(deg, tier, k):
     c = Canvas(S, S)
     _trail(c, deg, tier, k)
+    d0 = (math.cos(math.radians(deg)), math.sin(math.radians(deg)))
+    echoes = 0 if tier <= 1 else (1 if tier <= 3 else 2)        # II-III: one afterimage, IV-V: two
+    for e in range(echoes, 0, -1):
+        _crescent(c, deg, min(tier, 2), scale=1.0 - 0.1 * e, shift=(-d0[0] * 13 * e, -d0[1] * 13 * e), k=k, ghost=e)
     _crescent(c, deg, tier, k=k)
     if tier >= 5:                                                             # two small side blades
         d = (math.cos(math.radians(deg)), math.sin(math.radians(deg)))
