@@ -78,7 +78,7 @@ def _hook_root(c, x0, h, bend, w0):
 
 
 def root_hooks(frames=11):
-    """A: thorny hooked roots, dark bark with moss, bursting up in a ragged row."""
+    """Thorny hooked roots (option A, chosen 2026-11-23 over braided vines and wooden stakes), dark bark with moss, bursting up in a ragged row."""
     out = []
     for f in range(frames):
         c = Canvas(S, S)
@@ -92,66 +92,6 @@ def root_hooks(frames=11):
             grow = {4: 0.45, 5: 0.85, 6: 1.1, 7: 1.0, 8: 1.0, 9: 0.6, 10: 0.25}[f]
             for x0, h, bend, w in ((-14, 26, -1, 3.2), (-3, 34, 1, 4.0), (9, 28, 1, 3.4), (18, 20, -1, 2.6)):
                 _hook_root(c, GX + x0, h * grow, bend, w)
-        _rim(c)
-        out.append(c)
-    return out
-
-
-def root_vines(frames=11):
-    """B: thick braided vines twisting up around each other, leaves sprouting at the top."""
-    out = []
-    for f in range(frames):
-        c = Canvas(S, S)
-        if f <= 2:
-            _crack(c, (f + 1) / 3)
-        elif f == 3:
-            _crack(c, 1.0)
-            _soil(c, 1.0)
-        else:
-            _soil(c, 0.6)
-            grow = {4: 0.4, 5: 0.8, 6: 1.1, 7: 1.0, 8: 1.0, 9: 0.6, 10: 0.25}[f]
-            for cx in (GX - 12, GX + 10):
-                h = int(32 * grow)
-                for t in range(h):
-                    for strand in (0, 1):
-                        x = cx + math.sin(t * 0.35 + strand * math.pi) * 4
-                        col = MOSS if strand == 0 else "#3f6e2a"
-                        for s in (-1, 0, 1):
-                            _p(c, x + s, GY - t, col)
-                if grow > 0.7:
-                    for lx, ly in ((-4, -h), (3, -h + 2), (-1, -h - 3)):
-                        for s in range(3):
-                            _p(c, cx + lx + s, GY + ly + s // 2, LEAF)
-        _rim(c)
-        out.append(c)
-    return out
-
-
-def root_stakes(frames=11):
-    """C: sharp wooden stakes stabbing straight up, splinters flying on the burst."""
-    out = []
-    for f in range(frames):
-        c = Canvas(S, S)
-        if f <= 2:
-            _crack(c, (f + 1) / 3)
-        elif f == 3:
-            _crack(c, 1.0)
-            _soil(c, 1.0)
-        else:
-            _soil(c, 0.6)
-            grow = {4: 0.6, 5: 1.15, 6: 1.0, 7: 1.0, 8: 1.0, 9: 0.55, 10: 0.2}[f]
-            for x0, h, lean in ((-15, 22, -0.25), (-5, 32, -0.08), (6, 36, 0.06), (16, 24, 0.22)):
-                hh = int(h * grow)
-                for t in range(hh):
-                    w = 3.0 * (1 - t / max(1, hh)) + 0.4
-                    x = GX + x0 + lean * t
-                    for s in range(-int(round(w)), int(round(w)) + 1):
-                        _p(c, x + s, GY - t, BARK3 if s < 0 else BARK2)
-            if f in (4, 5):
-                for k in range(6):
-                    a = -math.pi / 2 + (k - 2.5) * 0.4
-                    d = 18 + f * 4
-                    _p(c, GX + math.cos(a) * d, GY - 10 + math.sin(a) * d, BARK3)
         _rim(c)
         out.append(c)
     return out

@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
-"""root-snare-opts: three options for Rễ trói (bach-ai design/region-events-plan.md §4B, 2026-11-23):
-opt_a thorny hooked roots, opt_b braided vines, opt_c wooden stakes. One root cluster each (crack telegraph,
-soil bulge, burst, hold, sink). Chạy: gamekit art run root-snare-opts
+"""root-snare: Rễ trói (bach-ai design/region-events-plan.md §4B, 2026-11-23):
+option A (thorny hooked roots) chosen by the user 2026-11-23. One root cluster each (crack telegraph,
+soil bulge, burst, hold, sink). Chạy: gamekit art run root-snare
 """
 import json
 import sys
@@ -21,8 +21,7 @@ sys.path.insert(0, str(HERE.parents[1] / "lib"))
 import rootfx  # noqa: E402
 from sheet import export  # noqa: E402
 
-ANIM = [("opt_a", rootfx.root_hooks(), 10, False, {}), ("opt_b", rootfx.root_vines(), 10, False, {}),
-        ("opt_c", rootfx.root_stakes(), 10, False, {})]
+ANIM = [("snare", rootfx.root_hooks(), 10, False, {})]
 
 if __name__ == "__main__":
     export(HERE, HERE.name, ANIM, anchor=(rootfx.GX, rootfx.GY))

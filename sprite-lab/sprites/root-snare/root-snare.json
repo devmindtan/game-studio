@@ -1,5 +1,5 @@
 {
-  "frames": 33,
+  "frames": 11,
   "frame_size": [
     64,
     64
@@ -13,22 +13,8 @@
   "anchor_source": "explicit",
   "animations": [
     {
-      "name": "opt_a",
+      "name": "snare",
       "start": 0,
-      "frames": 11,
-      "fps": 10.0,
-      "loop": false
-    },
-    {
-      "name": "opt_b",
-      "start": 11,
-      "frames": 11,
-      "fps": 10.0,
-      "loop": false
-    },
-    {
-      "name": "opt_c",
-      "start": 22,
       "frames": 11,
       "fps": 10.0,
       "loop": false
