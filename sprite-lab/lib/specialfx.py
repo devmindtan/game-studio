@@ -705,3 +705,115 @@ def aegis_orbit(size=96, form=4, loop=8, n=3):
     forms = [frame(8 + 22 * (k + 1) / form, k * 0.4, int(255 * (k + 1) / form)) for k in range(form)]
     loops = [frame(30, form * 0.4 + k * math.tau / (n * loop), 255) for k in range(loop)]
     return forms, loops
+
+
+# ---- Hoả y redesign options (user 2026-11-23: "chưa ưng ý"), each a full disc of radius `radius` ----
+
+def _fdisk(c, cx, cy, r, col, a=255):
+    ri = int(math.ceil(r))
+    for y in range(-ri, ri + 1):
+        for x in range(-ri, ri + 1):
+            if x * x + y * y <= r * r:
+                _put(c, cx + x, cy + y, col, a)
+
+
+def _fmask(size, radius):
+    m = Canvas(size, size)
+    c0 = size / 2
+    m.ellipse(int(c0 - radius), int(c0 - radius), int(c0 + radius), int(c0 + radius), "#ffffff", fill=True)
+    return m
+
+
+def fire_band(size=128, radius=52, frames=10):
+    """Option A: a thick band of fire (dark rim, red, orange, yellow core line) with tongues licking outward,
+    the bright bands rotating round it."""
+    c0 = size / 2
+    out, masks = [], []
+    for f in range(frames):
+        c = Canvas(size, size)
+        R = int(radius + 14)
+        for y in range(-R, R + 1):
+            for x in range(-R, R + 1):
+                d = math.hypot(x, y)
+                ang = math.atan2(y, x)
+                wav = math.sin(ang * 9 + f * 0.9) * 2 + math.sin(ang * 4 - f * 0.6) * 1.5
+                off = d - radius
+                outer = 6 + max(0.0, wav)
+                if off < -6 or off > outer:
+                    continue
+                hot = ((ang / math.tau * 360 + f * 12) % 90) < 30
+                if abs(off) < 1:
+                    col = FIRE_W if hot else FIRE_Y
+                elif abs(off) < 3 or (off > 0 and off < outer - 3):
+                    col = FIRE_O
+                elif off < outer - 1.5 and off > -5:
+                    col = FIRE_R
+                else:
+                    col = FIRE_D
+                _put(c, c0 + x, c0 + y, col)
+        for i in range(12):
+            ang = i / 12 * math.tau + f * 0.21
+            ln = 6 + 4 * abs(math.sin(f * 1.3 + i * 2.1))
+            for t in range(int(ln)):
+                rr = radius + 5 + t
+                col = FIRE_O if t < ln * 0.5 else FIRE_Y
+                _put(c, c0 + math.cos(ang) * rr, c0 + math.sin(ang) * rr, col)
+        out.append(c)
+        masks.append(_fmask(size, radius))
+    return FxFrames(out, masks)
+
+
+def fire_orbit(size=128, radius=52, frames=10):
+    """Option B: three fire comets circling the hero at the burn radius, each with a long tapering tail."""
+    c0 = size / 2
+    out, masks = [], []
+    for f in range(frames):
+        c = Canvas(size, size)
+        for i in range(3):
+            head = f / frames * math.tau + i * math.tau / 3
+            for t in range(28):
+                ang = head - t * 0.045
+                w = 5.5 * (1 - t / 28) + 0.6
+                col = FIRE_W if t < 2 else (FIRE_Y if t < 6 else (FIRE_O if t < 14 else (FIRE_R if t < 22 else FIRE_D)))
+                _fdisk(c, c0 + math.cos(ang) * radius, c0 + math.sin(ang) * radius, w, col)
+        for k in range(0, 360, 6):
+            ang = k / 360 * math.tau
+            if (k // 6 + f) % 3 == 0:
+                _put(c, c0 + math.cos(ang) * radius, c0 + math.sin(ang) * radius, FIRE_R, 200)
+        out.append(c)
+        masks.append(_fmask(size, radius))
+    return FxFrames(out, masks)
+
+
+def burning_ground(size=128, radius=52, frames=10):
+    """Option C: the ground inside the radius smoulders: a ring of glowing lava cracks at the edge and flames
+    bursting up at changing spots inside, embers rising."""
+    import random
+    c0 = size / 2
+    out, masks = [], []
+    for f in range(frames):
+        rng = random.Random(f * 7 + 1)
+        c = Canvas(size, size)
+        for k in range(10):
+            ang = k / 10 * math.tau + 0.15
+            x, y = c0 + math.cos(ang) * radius, c0 + math.sin(ang) * radius
+            for s in range(4):
+                nx = x - math.cos(ang + (0.6 if s % 2 else -0.6)) * 5
+                ny = y - math.sin(ang + (0.6 if s % 2 else -0.6)) * 5
+                c.line(int(x), int(y), int(nx), int(ny), "#3a120c", 3)
+                c.line(int(x), int(y), int(nx), int(ny), "#ff9a2a" if (k + f) % 3 else "#ffe05a", 1)
+                x, y = nx, ny
+        for k in range(360):
+            ang = k / 360 * math.tau
+            _put(c, c0 + math.cos(ang) * radius, c0 + math.sin(ang) * radius, FIRE_R if (k // 8 + f) % 2 else FIRE_O)
+        for i in range(7):
+            ang = rng.uniform(0, math.tau)
+            d = rng.uniform(radius * 0.35, radius * 0.9)
+            _flame(c, c0 + math.cos(ang) * d, c0 + math.sin(ang) * d, 10 + rng.uniform(0, 8), 5)
+        for e in range(8):
+            ang = rng.uniform(0, math.tau)
+            d = rng.uniform(0, radius)
+            _put(c, c0 + math.cos(ang) * d, c0 + math.sin(ang) * d - rng.uniform(0, 10), FIRE_Y)
+        out.append(c)
+        masks.append(_fmask(size, radius))
+    return FxFrames(out, masks)

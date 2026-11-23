@@ -1,0 +1,38 @@
+{
+  "frames": 30,
+  "frame_size": [
+    128,
+    128
+  ],
+  "fps": 13.0,
+  "loop": true,
+  "anchor": [
+    64.0,
+    64.0
+  ],
+  "anchor_source": "explicit",
+  "animations": [
+    {
+      "name": "opt_a",
+      "start": 0,
+      "frames": 10,
+      "fps": 13.0,
+      "loop": true
+    },
+    {
+      "name": "opt_b",
+      "start": 10,
+      "frames": 10,
+      "fps": 13.0,
+      "loop": true
+    },
+    {
+      "name": "opt_c",
+      "start": 20,
+      "frames": 10,
+      "fps": 13.0,
+      "loop": true
+    }
+  ],
+  "px_scale": 0.5
+}
