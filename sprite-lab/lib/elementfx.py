@@ -340,3 +340,56 @@ def dark_burst_c(size=96, frames=10):
         _rim(c, D_X)
         out.append(c)
     return out
+
+
+# ---------- elite / boss-buff marks (bach-ai roadmap F, 2026-11-23), drawn white so the game tints them ----------
+E_W = "#ffffff"
+E_1 = "#e6e6ee"
+E_2 = "#b4b4c4"
+E_X = "#2a2a36"
+
+
+def elite_crest(size=32, frames=8):
+    """Option B: a small faceted gem crest floating over the head, bobbing, a glint crossing it."""
+    out = []
+    c0 = size / 2
+    for f in range(frames):
+        c = Canvas(size, size)
+        bob = round(math.sin(f / frames * math.tau) * 1.5)
+        cy = c0 + bob
+        for y in range(-8, 9):
+            wd = 6 - abs(y) * 6 // 8
+            for x in range(-wd, wd + 1):
+                col = E_1 if x < 0 else E_2
+                if y < -3:
+                    col = E_W
+                _p(c, c0 + x, cy + y, col)
+        g = f % frames - 3
+        for k in range(-2, 3):
+            if 0 <= g <= 4:
+                _p(c, c0 - 4 + g + k, cy - 2 - k, E_W)
+        _rim(c, E_X)
+        out.append(c)
+    return out
+
+
+def elite_wisps(size=64, frames=10):
+    """Option C: tongues of energy rising round the body from the feet (Diablo IV-like champion aura), behind
+    the monster; solid tongues that sway and grow in turn; drawn white, see-through in game."""
+    out = []
+    for f in range(frames):
+        c = Canvas(size, size)
+        base = size - 6
+        for k in range(6):
+            x0 = size / 2 - 16 + k * 6.4
+            grow = 0.55 + 0.45 * abs(math.sin(f / frames * math.pi * 2 + k * 1.3))
+            h = (22 + (k % 3) * 6) * grow
+            for t in range(int(h)):
+                u = t / h
+                x = x0 + math.sin(u * 4 + f * 0.8 + k) * 2.5 * u
+                w = 3.2 * (1 - u) ** 0.6
+                col = E_2 if u > 0.7 else (E_1 if u > 0.35 else E_W)
+                for sx in range(-int(round(w)), int(round(w)) + 1):
+                    _p(c, x + sx, base - t, col)
+        out.append(c)
+    return out

@@ -1,0 +1,24 @@
+{
+  "frames": 10,
+  "frame_size": [
+    64,
+    64
+  ],
+  "fps": 10.0,
+  "loop": true,
+  "anchor": [
+    32.0,
+    58
+  ],
+  "anchor_source": "explicit",
+  "animations": [
+    {
+      "name": "loop",
+      "start": 0,
+      "frames": 10,
+      "fps": 10.0,
+      "loop": true
+    }
+  ],
+  "px_scale": 0.5
+}
