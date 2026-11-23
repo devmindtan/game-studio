@@ -1,4 +1,9 @@
-# Nhân vật: dùng LPC adult (chốt 2026-11-23)
+# Nhân vật: thử LPC adult — KHÔNG dùng (người dùng 2026-11-23: "giữ cái cũ đi")
+
+Kết luận: giữ nhân vật minifig 48×48 gốc. Bản LPC còn trong bach-ai sau công tắc `run_config.json` `hero_art`
+("minifig" mặc định); các bước dưới chỉ là ghi chép của lần thử.
+
+## Lần thử LPC adult
 
 Người dùng 2026-11-23: thử tự vẽ chibi 64×64 bằng code → "xấu quá"; quyết định "sử dụng của LPC luôn", thân **adult**.
 (Thân child gần chibi nhưng không có vũ khí, bắn cung, phép; teen bị bỏ qua.) Bản chibi tự vẽ (`lib/chibi_body.py`,
