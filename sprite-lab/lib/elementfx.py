@@ -387,7 +387,7 @@ def elite_wisps(size=64, frames=10):
             for t in range(int(h)):
                 u = t / h
                 x = x0 + math.sin(u * 4 + f * 0.8 + k) * 2.5 * u
-                w = 3.2 * (1 - u) ** 0.6
+                w = 2.2 * (1 - u) ** 0.6 * min(1.0, 0.4 + u * 3)   # narrow at the root too: tongues, not a block
                 col = E_2 if u > 0.7 else (E_1 if u > 0.35 else E_W)
                 for sx in range(-int(round(w)), int(round(w)) + 1):
                     _p(c, x + sx, base - t, col)
