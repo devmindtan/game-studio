@@ -1,0 +1,112 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<title>HUD – Thất Tinh Ấn (thiết kế)</title>
+<!-- 1280×720 = game 640×360 ×2. Mobile cảm ứng: joystick trái, nút phải. Đặc tả: screens/tta-hud.md -->
+<style>
+@font-face { font-family: "VT323"; src: url("fonts/VT323-Regular.ttf") format("truetype"); font-display: block; }
+:root { --ink:#0b1016; --panel:#121a22; --gold:#e0b250; --gold-d:#8a6a2a; --jade:#3a7866; --jade-l:#7fd6c0;
+  --hp:#e05050; --hp-d:#4a1818; --ki:#4a8ad8; --ki-d:#16283e; --parch:#f2e6c9; --muted:#a9a38f; }
+* { box-sizing: border-box; }
+html, body { width:1280px; height:720px; margin:0; overflow:hidden; }
+body { position:relative; font-family:"VT323",monospace; color:var(--parch); font-size:24px; line-height:1;
+  -webkit-font-smoothing:none; user-select:none; background:#2d4a33; }
+img { image-rendering:pixelated; position:absolute; }
+/* --- thế giới (giả lập, ×2) --- */
+#world { position:absolute; inset:0; background:
+  radial-gradient(circle at 70% 60%, #35553b 0, #2d4a33 60%); }
+.house { position:absolute; left:120px; top:150px; width:140px; height:100px; background:#6b4a32; border:4px solid #1b1726; }
+.roof { position:absolute; left:104px; top:104px; width:0; height:0; border-left:86px solid transparent; border-right:86px solid transparent; border-bottom:50px solid #8c3b2e; }
+.shadow { position:absolute; width:28px; height:8px; border-radius:50%; background:rgba(0,0,0,.3); }
+.label { position:absolute; font-size:18px; color:#fff; text-shadow:2px 2px 0 #000; white-space:nowrap; transform:translateX(-50%); }
+/* --- panel kiểu game: vuông, viền dày, góc ấn --- */
+.plate { position:absolute; background:rgba(11,16,22,.86); border:3px solid var(--gold-d); box-shadow: inset 0 0 0 2px #000; }
+.plate::before, .plate::after { content:""; position:absolute; width:6px; height:6px; background:var(--gold); top:-5px; left:-5px; }
+.plate::after { left:auto; right:-5px; }
+/* trên trái: chân dung + HP/KI + Sức mạnh */
+#who { left:24px; top:24px; width:372px; height:104px; }
+#face { left:8px; top:8px; width:84px; height:84px; background:#1d2a33; border:3px solid var(--gold); overflow:hidden; position:absolute; }
+#face img { width:192px; height:192px; left:-54px; top:-56px; }   /* ảnh ×4: đầu nhân vật vào giữa khung */
+.bar { position:absolute; left:106px; width:250px; height:18px; border:2px solid #000; }
+.bar i { display:block; height:100%; }
+.bar b { position:absolute; right:6px; top:0; height:100%; display:flex; align-items:center; padding-bottom:3px; font-weight:normal; font-size:18px; color:#fff; text-shadow:1px 1px 0 #000; }
+#hp { top:12px; background:var(--hp-d); } #hp i { width:92%; background:var(--hp); box-shadow: inset 0 -5px 0 #a83232; }
+#ki { top:36px; background:var(--ki-d); } #ki i { width:70%; background:var(--ki); box-shadow: inset 0 -5px 0 #2f5f9c; }
+#pw { position:absolute; left:106px; top:62px; width:250px; font-size:20px; color:var(--parch); }
+#pw .track { position:absolute; left:0; top:24px; width:250px; height:6px; background:#22202a; }
+#pw .track i { display:block; width:27%; height:100%; background:var(--gold); }
+/* tài nguyên dưới chân dung */
+#res { left:24px; top:140px; height:38px; padding:0 12px; display:flex; gap:18px; align-items:center; font-size:22px; }
+.dot { display:inline-block; width:12px; height:12px; margin-right:6px; vertical-align:-1px; }
+/* 7 ấn */
+#seals { left:24px; top:190px; width:318px; height:44px; display:flex; align-items:center; gap:6px; padding-left:10px; }
+#seals span { font-size:20px; color:var(--muted); margin-right:4px; }
+.seal { width:24px; height:24px; border:2px solid var(--gold-d); background:#1a1a22; transform:rotate(45deg); margin:0 3px; }
+.seal.on { background:var(--gold); border-color:#fff3c4; box-shadow:0 0 0 2px #000; }
+/* trên phải: vùng + nhiệm vụ */
+#zone { right:24px; top:24px; width:300px; height:48px; text-align:center; font-size:32px; color:var(--gold); padding-top:7px; }
+#quest { right:24px; top:84px; width:300px; height:80px; padding:10px 14px; }
+#quest .t { font-size:20px; color:var(--jade-l); }
+#quest .g { font-size:24px; margin-top:8px; }
+#quest .g em { font-style:normal; color:var(--gold); }
+/* dưới trái: joystick (luôn hiện mờ để người mới biết chỗ) */
+#joy { position:absolute; left:84px; bottom:72px; width:168px; height:168px; border-radius:50%; border:3px solid rgba(255,255,255,.28);
+  background:rgba(0,0,0,.18); }
+#joy i { position:absolute; left:52px; top:52px; width:64px; height:64px; border-radius:50%; background:rgba(255,255,255,.3); border:3px solid rgba(255,255,255,.45); }
+/* dưới phải: cụm nút */
+.btn { position:absolute; border-radius:50%; border:4px solid #000; display:flex; align-items:center; justify-content:center; flex-direction:column;
+  color:#fff; text-shadow:2px 2px 0 #000; }
+.btn small { font-size:16px; color:#e8e0c8; margin-top:2px; }
+#atk { right:56px; bottom:56px; width:132px; height:132px; background:radial-gradient(circle at 40% 35%, #c8463c, #8a2620); box-shadow: inset 0 0 0 4px #e8806e; font-size:30px; }
+#talk { right:204px; bottom:40px; width:88px; height:88px; background:radial-gradient(circle at 40% 35%, #3f8a74, #23503f); box-shadow: inset 0 0 0 3px #7fd6c0; font-size:22px; }
+#stat { right:76px; bottom:206px; width:88px; height:88px; background:radial-gradient(circle at 40% 35%, #a8843f, #6a5020); box-shadow: inset 0 0 0 3px #e0b250; font-size:22px; }
+/* hộp thoại: giữa đáy, nằm giữa joystick và cụm nút */
+#dlg { left:300px; bottom:28px; width:600px; height:132px; display:none; padding:14px 18px; }
+body.dialog #dlg { display:block; }
+#dlg .who { position:absolute; left:14px; top:-20px; background:var(--jade); border:3px solid #000; padding:4px 12px; font-size:22px; }
+#dlg p { margin:14px 0 0; font-size:26px; line-height:1.15; }
+#dlg .next { position:absolute; right:16px; bottom:10px; font-size:20px; color:var(--gold); }
+.float { position:absolute; font-size:26px; text-shadow:2px 2px 0 #000; }
+</style>
+</head>
+<body>
+<div id="world">
+  <div class="roof"></div><div class="house"></div>
+  <div class="shadow" style="left:386px;top:352px"></div>
+  <div style="position:absolute;left:380px;top:300px;width:40px;height:52px;background:#d8d0c0;border:4px solid #1b1726"></div>
+  <div class="label" style="left:400px;top:272px">Cụ Hạc</div>
+  <div class="label" style="left:400px;top:244px;color:var(--gold);font-size:30px">?</div>
+  <div class="shadow" style="left:550px;top:404px"></div>
+  <img src="../sprite-lab/sprites/vo-sinh/vo-sinh.png" style="left:516px;top:320px;width:96px;height:96px">
+  <div class="shadow" style="left:836px;top:450px"></div>
+  <img src="../sprite-lab/sprites/moc-nhan/moc-nhan.png" style="left:818px;top:392px;width:64px;height:64px">
+  <div class="label" style="left:850px;top:378px">Bù nhìn rơm</div>
+  <div class="float" style="left:820px;top:340px">28</div>
+</div>
+
+<div class="plate" id="who">
+  <div id="face"><img src="../sprite-lab/sprites/vo-sinh/vo-sinh.png"></div>
+  <div class="bar" id="hp"><i></i><b>184/200</b></div>
+  <div class="bar" id="ki"><i></i><b>70/100</b></div>
+  <div id="pw">Sức mạnh 540<span style="color:var(--muted)"> / 2.000</span><div class="track"><i></i></div></div>
+</div>
+<div class="plate" id="res"><span><i class="dot" style="background:var(--jade-l)"></i>Linh khí 62</span><span><i class="dot" style="background:var(--gold)"></i>Vàng 10</span></div>
+<div class="plate" id="seals"><span>Ấn</span><i class="seal on"></i><i class="seal"></i><i class="seal"></i><i class="seal"></i><i class="seal"></i><i class="seal"></i><i class="seal"></i></div>
+
+<div class="plate" id="zone">Làng Hạc</div>
+<div class="plate" id="quest"><div class="t">◆ Ấn đầu tiên</div><div class="g">Hạ quái <em>5/5</em> · về gặp Cụ Hạc</div></div>
+
+<div id="joy"><i></i></div>
+<div class="btn" id="stat">Chỉ số</div>
+<div class="btn" id="talk">Nói</div>
+<div class="btn" id="atk">Đánh<small>J</small></div>
+
+<div class="plate" id="dlg"><div class="who">Cụ Hạc</div>
+  <p>Giỏi lắm. Mảnh ấn này là của ngươi — Ấn Tinh Tú thứ nhất.</p><div class="next">Chạm để tiếp ▸</div></div>
+<script>
+if (new URLSearchParams(location.search).get("state") === "dialog") document.body.classList.add("dialog");
+addEventListener("keydown", e => { if (e.key === "k" || e.key === "K") document.body.classList.toggle("dialog"); });
+</script>
+</body>
+</html>
