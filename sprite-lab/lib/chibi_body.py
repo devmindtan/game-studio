@@ -28,7 +28,7 @@ PROPORTIONS = {
     "C": {"name": "Chibi cao (2,6 đầu)", "head_r": 8, "torso_h": 12, "torso_w": 9, "leg_h": 11, "arm_l": 10},
 }
 
-ANIMS = {"idle": 2, "walk": 9, "hurt": 3, "death": 6, "dash": 4, "shoot": 13}
+ANIMS = {"idle": 2, "walk": 9, "hurt": 3, "death": 6, "dash": 4, "shoot": 13, "slash": 6, "spellcast": 7}
 STANDARD = "B"         # user 2026-11-23 chose B (chibi, 2.3 heads tall)
 
 # walk: per frame (front foot dx, back foot dx, front lift, back lift, body bob)
@@ -44,6 +44,14 @@ _SHOOT = [((1, 8), (-1, 8)), ((4, 7), (-1, 8)), ((7, 5), (0, 7)), ((10, 3), (2, 
 # chibi: the big head covers the shoulders, so the drawn bow arm is held at chest height (y +3), reaching far forward
 
 
+# slash (6, LPC): stand, wind up behind (low, then high), swing through, reach forward, follow through high;
+# the body leans into it. (front hand, back hand, lean)
+_SLASH = [((1, 8), (-1, 8), 0), ((-6, 6), (-2, 7), -1), ((-9, 1), (-2, 6), -1), ((6, 2), (0, 6), 1),
+          ((11, 3), (1, 6), 2), ((11, -7), (1, 6), 2)]
+# chibi: raised hands must clear the big head (radius 9 above the shoulders) or the head hides them
+# spellcast (7, LPC): stand, hands gather at the chest, open back, spread wide, raised high, lower.
+_SPELL = [((1, 8), (-1, 8)), ((4, 5), (3, 5)), ((5, 4), (4, 4)), ((2, 4), (-7, 4)), ((10, 2), (-9, 2)),
+          ((11, -8), (-10, -8)), ((3, 6), (-2, 6))]
 # hurt (3): flinch back, hold, recover. (lean x of the upper body, bob)
 _HURT = [(-2, 1), (-2, 1), (-1, 0)]
 # death (6, LPC's fall: knees give, sink, then lie): hip drop px; frames 4-5 lie (drawn upright, turned 90 deg)
@@ -71,6 +79,14 @@ def skeleton(anim: str, f: int, pr: dict) -> dict:
     elif anim == "shoot":
         feet = [(-5, 0), (4, 0)]                     # side-on stance, feet apart
         hands = _SHOOT[f]
+    elif anim == "slash":
+        hf, hb, lean = _SLASH[f]
+        hands = (hf, hb)
+        feet = [(-4, 0), (4 + (1 if f >= 3 else 0), 0)]   # step into the swing
+    elif anim == "spellcast":
+        hands = _SPELL[f]
+        feet = [(-4, 0), (4, 0)]
+        bob = 1 if f in (1, 2) else (-1 if f == 5 else 0)   # gather low, rise on the cast
     elif anim == "hurt":
         lean, bob = _HURT[f]
         hands = ((-1, 6), (-3, 6))

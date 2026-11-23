@@ -1,5 +1,5 @@
 {
-  "frames": 36,
+  "frames": 49,
   "frame_size": [
     64,
     64
@@ -128,8 +128,48 @@
       }
     },
     {
-      "name": "death",
+      "name": "slash",
       "start": 30,
+      "frames": 6,
+      "fps": 12.0,
+      "loop": false,
+      "hitbox": {
+        "shape": "rect",
+        "center": [
+          34.0,
+          38.5
+        ],
+        "active": [
+          0,
+          5
+        ],
+        "half_w": 14.0,
+        "half_h": 19.5
+      }
+    },
+    {
+      "name": "spell",
+      "start": 36,
+      "frames": 7,
+      "fps": 10.0,
+      "loop": false,
+      "hitbox": {
+        "shape": "rect",
+        "center": [
+          33.0,
+          38.0
+        ],
+        "active": [
+          0,
+          6
+        ],
+        "half_w": 13.0,
+        "half_h": 20.0
+      }
+    },
+    {
+      "name": "death",
+      "start": 43,
       "frames": 6,
       "fps": 8.0,
       "loop": false,

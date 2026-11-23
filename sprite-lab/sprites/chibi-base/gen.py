@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """chibi-base: the standard 64x64 chibi body, proportions B (user 2026-11-23), sprite-lab/BODY_PLAN.md step 1.
-Bare body (skin, plain shirt and shorts) on lib/chibi_body joints: idle 2, walk 8, hurt 3, dash 4, shoot 13, death 6
+Bare body (skin, plain shirt and shorts) on lib/chibi_body joints: idle 2, walk 8, hurt 3, dash 4, shoot 13, slash 6, spell 7, death 6
 (LPC rhythm and frame counts, our own drawing).
 Every outfit layer is drawn on the same joints. Anchor: between the feet on the ground line.
 Chạy: gamekit art run chibi-base  ·  thử: gamekit art shot chibi-base sheet|move
@@ -41,6 +41,8 @@ ANIM = [("idle", frames("idle"), 3, True, {"durations_ms": [500, 500], "hitbox":
         ("hurt", frames("hurt"), 12, False, {"durations_ms": [90, 110, 120], "hitbox": dict(HB, active=[0, 2])}),
         ("dash", frames("dash"), 14, False, {"durations_ms": [60, 70, 70, 90], "hitbox": dict(HB, active=[0, 3])}),
         ("shoot", frames("shoot"), 14, False, {"hitbox": dict(HB, active=[0, 12])}),
+        ("slash", frames("slash"), 12, False, {"hitbox": dict(HB, active=[0, 5])}),
+        ("spell", frames("spellcast"), 10, False, {"hitbox": dict(HB, active=[0, 6])}),
         ("death", frames("death"), 8, False, {"durations_ms": [120, 120, 120, 120, 120, 500], "hitbox": dict(HB, active=[0, 5])})]
 
 if __name__ == "__main__":
