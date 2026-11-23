@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """chibi-base: the standard 64x64 chibi body, proportions B (user 2026-11-23), sprite-lab/BODY_PLAN.md step 1.
-Bare body (skin, plain shirt and shorts) on lib/chibi_body joints: idle 2, walk 9 (LPC rhythm, our own drawing).
+Bare body (skin, plain shirt and shorts) on lib/chibi_body joints: idle 2, walk 8, hurt 3, dash 4, shoot 13, death 6
+(LPC rhythm and frame counts, our own drawing).
 Every outfit layer is drawn on the same joints. Anchor: between the feet on the ground line.
 Chạy: gamekit art run chibi-base  ·  thử: gamekit art shot chibi-base sheet|move
 """
@@ -28,11 +29,19 @@ HB = {"shape": "rect", "center": [32.0, 44.0]}
 
 
 def frames(anim):
-    return [cb.draw_bare(cb.skeleton(anim, i, PR), PR, PAL) for i in range(cb.ANIMS[anim])]
+    out = []
+    for i in range(cb.ANIMS[anim]):
+        c = cb.draw_bare(cb.skeleton(anim, i, PR), PR, PAL)
+        out.append(cb.lay_down(c) if cb.lying(anim, i) else c)
+    return out
 
 
 ANIM = [("idle", frames("idle"), 3, True, {"durations_ms": [500, 500], "hitbox": dict(HB, active=[0, 1])}),
-        ("walk", frames("walk")[1:], 10, True, {"hitbox": dict(HB, active=[0, 7])})]   # frame 0 (stand) is idle
+        ("walk", frames("walk")[1:], 10, True, {"hitbox": dict(HB, active=[0, 7])}),   # frame 0 (stand) is idle
+        ("hurt", frames("hurt"), 12, False, {"durations_ms": [90, 110, 120], "hitbox": dict(HB, active=[0, 2])}),
+        ("dash", frames("dash"), 14, False, {"durations_ms": [60, 70, 70, 90], "hitbox": dict(HB, active=[0, 3])}),
+        ("shoot", frames("shoot"), 14, False, {"hitbox": dict(HB, active=[0, 12])}),
+        ("death", frames("death"), 8, False, {"durations_ms": [120, 120, 120, 120, 120, 500], "hitbox": dict(HB, active=[0, 5])})]
 
 if __name__ == "__main__":
     export(HERE, HERE.name, ANIM, anchor=(float(cb.ROOT_X), float(cb.GROUND)), ground=True)

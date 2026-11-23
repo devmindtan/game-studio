@@ -1,5 +1,5 @@
 {
-  "frames": 10,
+  "frames": 36,
   "frame_size": [
     64,
     64
@@ -54,6 +54,105 @@
         ],
         "half_w": 10.5,
         "half_h": 20.0
+      }
+    },
+    {
+      "name": "hurt",
+      "start": 10,
+      "frames": 3,
+      "fps": 12.0,
+      "loop": false,
+      "durations_ms": [
+        90.0,
+        110.0,
+        120.0
+      ],
+      "hitbox": {
+        "shape": "rect",
+        "center": [
+          32.0,
+          38.5
+        ],
+        "active": [
+          0,
+          2
+        ],
+        "half_w": 11.0,
+        "half_h": 19.5
+      }
+    },
+    {
+      "name": "dash",
+      "start": 13,
+      "frames": 4,
+      "fps": 14.0,
+      "loop": false,
+      "durations_ms": [
+        60.0,
+        70.0,
+        70.0,
+        90.0
+      ],
+      "hitbox": {
+        "shape": "rect",
+        "center": [
+          35.5,
+          39.0
+        ],
+        "active": [
+          0,
+          3
+        ],
+        "half_w": 11.5,
+        "half_h": 19.0
+      }
+    },
+    {
+      "name": "shoot",
+      "start": 17,
+      "frames": 13,
+      "fps": 14.0,
+      "loop": false,
+      "hitbox": {
+        "shape": "rect",
+        "center": [
+          34.5,
+          38.5
+        ],
+        "active": [
+          0,
+          12
+        ],
+        "half_w": 11.5,
+        "half_h": 19.5
+      }
+    },
+    {
+      "name": "death",
+      "start": 30,
+      "frames": 6,
+      "fps": 8.0,
+      "loop": false,
+      "durations_ms": [
+        120.0,
+        120.0,
+        120.0,
+        120.0,
+        120.0,
+        500.0
+      ],
+      "hitbox": {
+        "shape": "rect",
+        "center": [
+          40.0,
+          39.0
+        ],
+        "active": [
+          0,
+          5
+        ],
+        "half_w": 18.0,
+        "half_h": 19.0
       }
     }
   ],

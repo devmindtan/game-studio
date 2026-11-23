@@ -28,7 +28,7 @@ PROPORTIONS = {
     "C": {"name": "Chibi cao (2,6 đầu)", "head_r": 8, "torso_h": 12, "torso_w": 9, "leg_h": 11, "arm_l": 10},
 }
 
-ANIMS = {"idle": 2, "walk": 9}
+ANIMS = {"idle": 2, "walk": 9, "hurt": 3, "death": 6, "dash": 4, "shoot": 13}
 STANDARD = "B"         # user 2026-11-23 chose B (chibi, 2.3 heads tall)
 
 # walk: per frame (front foot dx, back foot dx, front lift, back lift, body bob)
@@ -36,30 +36,80 @@ _WALK = [(0, 0, 0, 0, 0),
          (2, -2, 0, 1, 0), (4, -3, 0, 0, 1), (2, -1, 0, 2, 0), (0, 0, 1, 0, -1),
          (-1, 2, 1, 0, 0), (-3, 4, 0, 0, 1), (-1, 2, 2, 0, 0), (0, 0, 0, 1, -1)]
 
+# shoot (13, LPC's rhythm): 0 stand; 1-3 the bow arm rises level; 4 the back hand nocks at the bow; 5-8 draw to the
+# cheek and hold; 9 release (back hand flies back); 10-12 lower. Hands relative to the shoulder (front, back).
+_SHOOT = [((1, 8), (-1, 8)), ((4, 7), (-1, 8)), ((7, 5), (0, 7)), ((10, 3), (2, 5)), ((11, 3), (8, 3)),
+          ((11, 3), (5, 3)), ((11, 3), (2, 2)), ((11, 3), (1, 2)), ((11, 3), (1, 2)), ((11, 3), (-4, 1)),
+          ((10, 3), (-2, 4)), ((6, 5), (-1, 6)), ((2, 7), (-1, 8))]
+# chibi: the big head covers the shoulders, so the drawn bow arm is held at chest height (y +3), reaching far forward
+
+
+# hurt (3): flinch back, hold, recover. (lean x of the upper body, bob)
+_HURT = [(-2, 1), (-2, 1), (-1, 0)]
+# death (6, LPC's fall: knees give, sink, then lie): hip drop px; frames 4-5 lie (drawn upright, turned 90 deg)
+_DEATH_DROP = [1, 3, 5, 6, 6, 6]
+# dash (4): crouch, lunge, glide, recover. (lean, bob, front foot dx, back foot dx)
+_DASH = [(1, 2, 3, -3), (3, 2, 6, -6), (3, 2, 6, -6), (1, 1, 3, -3)]
+
+
+def lying(anim: str, f: int) -> bool:
+    """True for frames drawn upright then turned 90 degrees onto the ground (death 4-5)."""
+    return anim == "death" and f >= 4
+
 
 def skeleton(anim: str, f: int, pr: dict) -> dict:
     """Joint positions (pixels) for frame f of anim with proportions pr."""
     bob = 0
-    feet = [(-3, 0, 0), (3, 0, 0)]   # (dx, lift) back, front
+    lean = 0                       # upper body x shift (head, neck, shoulders)
+    feet = [(-3, 0), (3, 0)]       # (dx, lift) back, front
+    hands = None                   # explicit (front, back) hand offsets from the shoulder
     if anim == "idle":
         bob = (0, 1)[f % 2]
-        feet = [(-3, 0), (3, 0)]
     elif anim == "walk":
         fd, bd, fl, bl, bob = _WALK[f]
         feet = [(bd - 2, bl), (fd + 2, fl)]          # two lanes (back / front leg): they pass, never cross into an X
+    elif anim == "shoot":
+        feet = [(-5, 0), (4, 0)]                     # side-on stance, feet apart
+        hands = _SHOOT[f]
+    elif anim == "hurt":
+        lean, bob = _HURT[f]
+        hands = ((-1, 6), (-3, 6))
+    elif anim == "death":
+        bob = _DEATH_DROP[f]
+        lean = -1
+        feet = [(-4, 0), (4, 0)]
+        hands = ((1, 7), (-2, 7))
+    elif anim == "dash":
+        lean, bob, fd, bd = _DASH[f]
+        feet = [(bd, 1 if f in (1, 2) else 0), (fd, 0)]
+        hands = ((-2, 6), (-5, 5))                   # arms trail back
     hip_y = GROUND - 2 - pr["leg_h"] + bob
     hip = (ROOT_X, hip_y)
-    neck = (ROOT_X, hip_y - pr["torso_h"])
-    head = (ROOT_X + 1, neck[1] - pr["head_r"] + 1)
-    swing = 0 if anim == "idle" else -feet[1][0] // 2   # arms opposite the legs
-    sh = (ROOT_X, neck[1] + 2)
-    hand_f = (sh[0] + 1 + swing, sh[1] + pr["arm_l"] - abs(swing) // 2)
-    hand_b = (sh[0] - 1 - swing, sh[1] + pr["arm_l"] - abs(swing) // 2)
+    neck = (ROOT_X + lean, hip_y - pr["torso_h"])
+    head = (ROOT_X + 1 + lean, neck[1] - pr["head_r"] + 1)
+    sh = (ROOT_X + lean, neck[1] + 2)
+    if hands is None:
+        swing = 0 if anim == "idle" else -feet[1][0] // 2   # arms opposite the legs
+        hands = ((1 + swing, pr["arm_l"] - abs(swing) // 2), (-1 - swing, pr["arm_l"] - abs(swing) // 2))
+    hand_f = (sh[0] + hands[0][0], sh[1] + hands[0][1])
+    hand_b = (sh[0] + hands[1][0], sh[1] + hands[1][1])
     foot_b = (ROOT_X + feet[0][0], GROUND - 2 - feet[0][1])   # sole + outline end on the ground line
     foot_f = (ROOT_X + feet[1][0], GROUND - 2 - feet[1][1])
     hips = ((ROOT_X - 2, hip_y), (ROOT_X + 2, hip_y))   # back / front hip: the legs start apart
-    return {"hip": hip, "hip_back": hips[0], "hip_front": hips[1], "neck": neck, "head": head, "shoulder": sh, "hand_front": hand_f, "hand_back": hand_b,
-            "foot_back": foot_b, "foot_front": foot_f}
+    return {"hip": hip, "hip_back": hips[0], "hip_front": hips[1], "neck": neck, "head": head, "shoulder": sh,
+            "hand_front": hand_f, "hand_back": hand_b, "foot_back": foot_b, "foot_front": foot_f}
+
+
+def lay_down(c: Canvas) -> Canvas:
+    """Turns an upright frame 90 degrees (pixel exact) so the body lies on the ground, head toward the back."""
+    from PIL import Image
+    img = c.img.rotate(90, expand=False)
+    bbox = img.getbbox()
+    out = Canvas(S, S)
+    if bbox:
+        dy = GROUND - bbox[3]                      # rest on the ground line
+        out.img.alpha_composite(img, (0, dy))
+    return out
 
 
 def _line(c, a, b, col, w=1):
