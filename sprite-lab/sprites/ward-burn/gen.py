@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""ward-burn: Hoả y (special card), redrawn 2026-11-22 (bach-ai design/special-fx-redesign.md H4).
+"""ward-burn: Hoả y (special card), redrawn 2026-11-22, then option B "fire comets" (user 2026-11-23) (bach-ai design/special-fx-redesign.md H4).
 
 A low ring of solid flames round the hero, flickering out of step, embers rising (lib/specialfx.flame_ring).
 The old one was dotted dashes in a 48 px frame drawn at scale 1 (about 24 px on a 100 px burn). Double density
@@ -26,7 +26,7 @@ from sheet import export  # noqa: E402
 
 S = 128
 C = S / 2
-ANIM = [("cast", specialfx.flame_ring(S, 52, 10), 13, False,
+ANIM = [("cast", specialfx.fire_orbit(S, 52, 10), 13, False,
          {"hitbox": {"shape": "circle", "center": [C, C], "active": [0, 9], "inner": 0.0}})]
 
 if __name__ == "__main__":
