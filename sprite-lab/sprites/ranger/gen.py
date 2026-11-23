@@ -31,8 +31,10 @@ OUT = HERE
 ANCHOR = (float(mf.ROOT_X), float(mf.FLOOR))
 
 PAL = {"skin": "#f0c4a0", "skin_d": "#c98f72", "eye": "#1b1726", "hair": "#c26a2a", "hair_d": "#8e4a1e",
-       "tunic": "#d8cfb0", "tunic_d": "#a89e80", "tunic_l": "#f0e8cc", "sleeve": "#2f5f6e", "sleeve_d": "#1f4050",
-       "belt": "#2f5f6e", "buckle": "#e0b250", "pants": "#2f5f6e", "pants_d": "#1f4050",
+       # forest-green leather jerkin, brown sleeves and breeches (user 2026-11-23: the cream tunic with blue sleeves read
+       # as a stray blue stripe across the body)
+       "tunic": "#4f7a3a", "tunic_d": "#36572a", "tunic_l": "#6f9a4e", "sleeve": "#7a5634", "sleeve_d": "#5a3d24",
+       "belt": "#5a3d24", "buckle": "#e0b250", "pants": "#4a3a2a", "pants_d": "#33281c",
        "boot": "#5a3d28", "boot_d": "#3d2919", "wood": "#c08a4a", "wood_d": "#7a5228", "string": "#e8e2d0"}
 
 
@@ -44,14 +46,22 @@ def head(c, p, g):
 
 
 def hair(c, p, g):
-    """Orange ponytail swinging with the run (head slot)."""
+    """Orange hair like the swordsman's cut (full back of the head, a fringe), and a ponytail tied at the nape that
+    hangs down behind the shoulder and swings with the run (head slot). User 2026-11-23: the old tail stuck out flat
+    from the crown like a cap brim and the thin back hair left the face a bare block."""
     hx, hy = g["head"]
     rect(c, hx - 4, hy - 8, hx + 3, hy - 6, PAL["hair"])
-    rect(c, hx - 4, hy - 6, hx - 3, hy - 4, PAL["hair"])
+    rect(c, hx - 4, hy - 6, hx - 2, hy - 2, PAL["hair"])
+    put(c, hx + 4, hy - 6, PAL["hair"])                       # fringe over the brow
     put(c, hx + 3, hy - 6, PAL["hair_d"])
-    for k in range(4):
-        y = hy - 6 + k // 2 + round(math.sin(p["phase"] + k * 0.6) * p["speed"]) + (1 if p["tilt"] < 0 else 0)
-        put(c, hx - 5 - k, y, PAL["hair"] if k < 3 else PAL["hair_d"])
+    put(c, hx - 1, hy - 8, PAL["hair_d"])
+    put(c, hx - 5, hy - 4, PAL["hair_d"])                     # the tie at the nape
+    sway = math.sin(p["phase"]) * p["speed"]
+    for k in range(5):                                        # the tail: down and back, swinging when running
+        x = hx - 6 - k // 2 - round(sway * k / 4)
+        y = hy - 4 + k + (1 if p["tilt"] < 0 else 0)
+        put(c, x, y, PAL["hair"] if k < 4 else PAL["hair_d"])
+        put(c, x + 1, y, PAL["hair"] if k < 3 else PAL["hair_d"])
 
 
 def longbow(c, p, g):
@@ -60,6 +70,7 @@ def longbow(c, p, g):
     in the fist, the limbs bowing forward, the straight string behind them. The lower limb is cut short above
     the floor in low poses."""
     hx, hy = g["hand_front"]
+    hx += 2                                        # in front of the body, not across it (user 2026-11-23)
     up, down = 13, 8                               # a longbow: the upper tip at the shoulder
     down = min(down, mf.FLOOR - 3 - hy)            # string + outline stay above the floor
     for dy in range(-up, down + 1):
