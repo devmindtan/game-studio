@@ -774,6 +774,129 @@ def ev_poison_tide():
     return done(c)
 
 
+# --- Cung thủ (design/archer.md, 2026-11-23) -------------------------------------------------------------------
+
+def _arrow(c, x0, y0, x1, y1, shaft=None, head=None):
+    """An arrow from tail (x0, y0) to head (x1, y1) on a 45-degree axis: wood shaft, steel head, white fletching."""
+    dx, dy = (1 if x1 > x0 else -1), (1 if y1 > y0 else -1)
+    c.line(x0, y0, x1, y1, (shaft or WOOD)["m"], 1)
+    c.line(x0 + 1, y0, x1, y1 - dy, (shaft or WOOD)["d"], 1)
+    h = head or STEEL
+    c.polygon([(x1 + dx, y1 + dy), (x1 - 3 * dx, y1), (x1, y1 - 3 * dy)], h["m"])
+    c.pixel(x1, y1, h["l"])
+    for k in range(3):
+        c.pixel(x0 + dx * k - dx, y0 + dy * k + dy, FEATHER["l"])
+        c.pixel(x0 + dx * k + dx, y0 + dy * k - dy, FEATHER["m"])
+
+
+def quick_arrow():
+    """Tên nhanh: one arrow flying up-right with two speed lines."""
+    c = new()
+    _arrow(c, 3, 20, 19, 4)
+    c.line(2, 14, 7, 9, WIND["m"], 1)
+    c.line(9, 22, 14, 17, WIND["m"], 1)
+    return done(c)
+
+
+def steady_hand():
+    """Tay vững: a drawn bow, string pulled tight, arrow nocked and level."""
+    c = new()
+    c.ellipse(6, 2, 22, 22, WOOD["m"], fill=False)
+    c.rect(4, 0, 13, 24, (0, 0, 0, 0))
+    c.line(14, 3, 8, 12, FEATHER["l"], 1)
+    c.line(8, 12, 14, 21, FEATHER["l"], 1)
+    c.line(6, 12, 21, 12, WOOD["d"], 1)
+    c.polygon([(23, 12), (19, 9), (19, 15)], STEEL["m"])
+    c.pixel(22, 12, STEEL["l"])
+    return done(c)
+
+
+def sharp_arrows():
+    """Tên sắc: a big steel arrowhead with a gleam."""
+    c = new()
+    c.polygon([(12, 1), (21, 14), (14, 12), (14, 22), (10, 22), (10, 12), (3, 14)], STEEL["d"])
+    c.polygon([(12, 3), (18, 12), (12, 10)], STEEL["l"])
+    c.polygon([(12, 3), (6, 12), (12, 10)], STEEL["m"])
+    c.rect(10, 13, 13, 21, WOOD["m"])
+    c.pixel(17, 4, "#ffffff")
+    c.pixel(18, 3, "#ffffff")
+    return done(c)
+
+
+def extra_arrow():
+    """Thêm tên: two arrows side by side and a gold plus."""
+    c = new()
+    _arrow(c, 2, 20, 14, 8)
+    _arrow(c, 8, 22, 20, 10)
+    c.rect(17, 1, 18, 8, GOLD["m"])
+    c.rect(14, 4, 21, 5, GOLD["m"])
+    return done(c)
+
+
+def sp_ranger_boots():
+    """Gió đuổi (hit: speed rune): a light boot with wind lines behind."""
+    c = new()
+    c.polygon([(10, 3), (16, 3), (16, 15), (22, 18), (22, 21), (9, 21)], LEAF["d"])
+    c.polygon([(11, 4), (15, 4), (15, 15), (20, 18), (11, 18)], LEAF["m"])
+    c.rect(9, 19, 22, 21, EARTH["d"])
+    for y, x0 in ((7, 2), (12, 1), (17, 3)):
+        c.line(x0, y, x0 + 5, y, WIND["m"], 1)
+    return done(c)
+
+
+def sp_ranger_gloves():
+    """Nhịp săn (kills heal): a leather bracer and a small heart."""
+    c = new()
+    c.rect(4, 9, 15, 20, EARTH["m"])
+    c.rect(4, 9, 15, 11, EARTH["d"])
+    c.rect(4, 17, 15, 18, EARTH["d"])
+    c.ellipse(13, 2, 18, 7, HEART["m"])
+    c.ellipse(17, 2, 22, 7, HEART["m"])
+    c.polygon([(13, 5), (22, 5), (17, 11)], HEART["m"])
+    c.pixel(15, 3, HEART["l"])
+    return done(c)
+
+
+def sp_ranger_cloak():
+    """Áo lá (shield): a leaf-green hooded cloak shaped like a shield."""
+    c = new()
+    c.polygon([(12, 1), (21, 6), (19, 18), (12, 23), (5, 18), (3, 6)], LEAF["d"])
+    c.polygon([(12, 3), (19, 7), (17, 17), (12, 21), (7, 17), (5, 7)], LEAF["m"])
+    c.line(12, 4, 12, 20, LEAF["d"], 1)
+    c.ellipse(9, 6, 15, 11, LEAF["l"])
+    return done(c)
+
+
+def sp_ranger_ring():
+    """Vòng tên (pulse): a ring with four arrowheads pointing out."""
+    c = new()
+    c.ellipse(5, 5, 18, 18, GOLD["d"], fill=False)
+    c.ellipse(6, 6, 17, 17, GOLD["m"], fill=False)
+    for pts in (((12, 0), (9, 4), (15, 4)), ((12, 23), (9, 19), (15, 19)), ((0, 12), (4, 9), (4, 15)), ((23, 12), (19, 9), (19, 15))):
+        c.polygon(list(pts), STEEL["m"])
+    return done(c)
+
+
+def sp_ranger_hood():
+    """Tên sấm (chain shock): an arrow wrapped by a lightning bolt."""
+    c = new()
+    _arrow(c, 3, 21, 18, 6)
+    c.polygon([(14, 1), (8, 11), (12, 11), (8, 20), (17, 8), (13, 8), (17, 1)], BOLT["m"])
+    c.line(14, 2, 10, 10, BOLT["l"], 1)
+    return done(c)
+
+
+def sp_ranger_bow():
+    """Mắt thần (reset cooldowns): a hawk's golden eye."""
+    c = new()
+    c.polygon([(1, 12), (8, 5), (16, 5), (23, 12), (16, 19), (8, 19)], GOLD["d"])
+    c.polygon([(3, 12), (9, 7), (15, 7), (21, 12), (15, 17), (9, 17)], GOLD["l"])
+    c.ellipse(8, 7, 16, 17, GOLD["m"])
+    c.ellipse(10, 9, 14, 15, OUTLINE)
+    c.pixel(13, 10, "#ffffff")
+    return done(c)
+
+
 ICONS = {f.__name__: f for f in (blade_arc, whirlwind, earth_strike, ground_slam, cleave_wave, holy_column, dash,
                                  earthquake, solar_ray, god_hammer, arcane_bolt, fireball, frost_nova, lightning,
                                  thunder_javelin, meteor, void_orb, blizzard, storm, back_slash, sharpen, haste, reach,
@@ -782,7 +905,8 @@ ICONS = {f.__name__: f for f in (blade_arc, whirlwind, earth_strike, ground_slam
                                  sp_aegis_gauntlets, sp_aegis_boots, sp_aegis_blade, sp_star_hat, sp_star_robe,
                                  sp_star_pants, sp_star_bracer, sp_star_shoes, sp_star_staff, nav_character, nav_deck,
                                  nav_gacha, nav_missions, nav_settings, nav_title, nav_tree, nav_equipment, nav_stages, ev_tornado, ev_falling_tree,
-                                 ev_poison_tide)}
+                                 ev_poison_tide, quick_arrow, steady_hand, sharp_arrows, extra_arrow, sp_ranger_boots,
+                                 sp_ranger_gloves, sp_ranger_cloak, sp_ranger_ring, sp_ranger_hood, sp_ranger_bow)}
 
 if __name__ == "__main__":
     anims = [(n, [f()], 1, False, {}) for n, f in ICONS.items()]

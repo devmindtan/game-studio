@@ -1,5 +1,5 @@
 {
-  "frames": 58,
+  "frames": 68,
   "frame_size": [
     24,
     24
@@ -414,6 +414,76 @@
     {
       "name": "ev_poison_tide",
       "start": 57,
+      "frames": 1,
+      "fps": 1.0,
+      "loop": false
+    },
+    {
+      "name": "quick_arrow",
+      "start": 58,
+      "frames": 1,
+      "fps": 1.0,
+      "loop": false
+    },
+    {
+      "name": "steady_hand",
+      "start": 59,
+      "frames": 1,
+      "fps": 1.0,
+      "loop": false
+    },
+    {
+      "name": "sharp_arrows",
+      "start": 60,
+      "frames": 1,
+      "fps": 1.0,
+      "loop": false
+    },
+    {
+      "name": "extra_arrow",
+      "start": 61,
+      "frames": 1,
+      "fps": 1.0,
+      "loop": false
+    },
+    {
+      "name": "sp_ranger_boots",
+      "start": 62,
+      "frames": 1,
+      "fps": 1.0,
+      "loop": false
+    },
+    {
+      "name": "sp_ranger_gloves",
+      "start": 63,
+      "frames": 1,
+      "fps": 1.0,
+      "loop": false
+    },
+    {
+      "name": "sp_ranger_cloak",
+      "start": 64,
+      "frames": 1,
+      "fps": 1.0,
+      "loop": false
+    },
+    {
+      "name": "sp_ranger_ring",
+      "start": 65,
+      "frames": 1,
+      "fps": 1.0,
+      "loop": false
+    },
+    {
+      "name": "sp_ranger_hood",
+      "start": 66,
+      "frames": 1,
+      "fps": 1.0,
+      "loop": false
+    },
+    {
+      "name": "sp_ranger_bow",
+      "start": 67,
       "frames": 1,
       "fps": 1.0,
       "loop": false
