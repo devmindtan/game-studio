@@ -1,5 +1,5 @@
 {
-  "frames": 24,
+  "frames": 8,
   "frame_size": [
     96,
     96
@@ -13,22 +13,8 @@
   "anchor_source": "explicit",
   "animations": [
     {
-      "name": "opt_a",
+      "name": "burst",
       "start": 0,
-      "frames": 8,
-      "fps": 12.0,
-      "loop": false
-    },
-    {
-      "name": "opt_b",
-      "start": 8,
-      "frames": 8,
-      "fps": 12.0,
-      "loop": false
-    },
-    {
-      "name": "opt_c",
-      "start": 16,
       "frames": 8,
       "fps": 12.0,
       "loop": false

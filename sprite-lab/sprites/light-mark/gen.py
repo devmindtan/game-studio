@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """light-mark: Ánh sáng: dấu Thánh ấn trên đầu quái (bach-ai design/species.md E5/E6, 2026-11-23).
 
-Three options to choose from (user rule: 2-3 different designs): opt_a, opt_b, opt_c (lib/elementfx.light_mark_a/b/c).
-Double density (px_scale 0.5). Once one is chosen the others are removed.
+Option B chosen (user 2026-11-23) of three drawn (lib/elementfx.light_mark_a/b/c).
+Double density (px_scale 0.5). 
 Chạy: gamekit art run light-mark
 """
 import json
@@ -25,7 +25,7 @@ from sheet import export  # noqa: E402
 
 S = 48
 C = S / 2
-ANIM = [(f"opt_{k}", getattr(elementfx, f"light_mark_{k}")(S), 12, True, {}) for k in "abc"]
+ANIM = [("loop", elementfx.light_mark_b(S), 12, True, {})]   # option B chosen by the user 2026-11-23
 
 if __name__ == "__main__":
     export(HERE, HERE.name, ANIM, anchor=(C, C))
