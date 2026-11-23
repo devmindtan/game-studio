@@ -1,0 +1,49 @@
+#!/usr/bin/env bash
+# Craft Anything wrapper: keeps its config, projects and binary inside this folder.
+#
+#   ./ca doctor
+#   ./ca rebuild - "Mô tả prototype" --rounds 1 --unattended --allow-run \
+#       --backend "Claude Code" --build-with godot
+#
+# Binary comes from install.sh (a release .deb extracted here, no sudo). The
+# extracted app/ and everything it writes (state/, projects/) are gitignored.
+set -euo pipefail
+
+HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+CLI="$HERE/app/usr/bin/craft-anything-cli"
+
+if [[ ! -x "$CLI" ]]; then
+  echo "Craft Anything chưa cài. Chạy: $HERE/install.sh" >&2
+  exit 1
+fi
+
+# Keep every bit of state beside the tool, never in $HOME.
+export XDG_CONFIG_HOME="${XDG_CONFIG_HOME:-$HERE/state/config}"
+export XDG_DATA_HOME="${XDG_DATA_HOME:-$HERE/state/data}"
+export XDG_CACHE_HOME="${XDG_CACHE_HOME:-$HERE/state/cache}"
+mkdir -p "$XDG_CONFIG_HOME" "$XDG_DATA_HOME" "$XDG_CACHE_HOME"
+
+# Projects (throwaway prototypes) live in the workspace unless told otherwise.
+PROJECTS_DIR="${CA_PROJECTS_DIR:-$HERE/projects}"
+mkdir -p "$PROJECTS_DIR"
+
+args=("$@")
+
+# Only `rebuild` takes --projects-dir; other subcommands reject unknown flags.
+subcommand=""
+for a in "${args[@]:-}"; do
+  [[ "$a" == -* ]] || { subcommand="$a"; break; }
+done
+if [[ "$subcommand" == "rebuild" ]]; then
+  has_projects_dir=0
+  for a in "${args[@]}"; do
+    [[ "$a" == "--projects-dir" || "$a" == --projects-dir=* ]] && has_projects_dir=1
+  done
+  [[ $has_projects_dir -eq 1 ]] || args+=("--projects-dir" "$PROJECTS_DIR")
+fi
+
+# Heavy jobs (Godot builds, agent turns) go through `limited` to keep CPU/RAM free.
+if command -v limited >/dev/null 2>&1; then
+  exec limited "$CLI" "${args[@]}"
+fi
+exec "$CLI" "${args[@]}"

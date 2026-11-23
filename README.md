@@ -15,6 +15,7 @@ Cursor, Aider…
 | `tools/gamekit/` | Bộ công cụ: CLI `gamekit`, pipeline sprite LPC, pixel art, build/export. Xem [README](tools/gamekit/README.md) |
 | `tools/gdgraph/` | Index GDScript cho `graphify` (graphify không đọc `.gd`). Xem [README](tools/gdgraph/README.md) |
 | `tools/gpuhost/` | Kết nối máy GPU `desktop-kndgm60` qua SSH tunnel để chạy ComfyUI/art nặng. Xem [README](tools/gpuhost/README.md) |
+| `tools/craft-anything/` | (tùy chọn) Lò prototype vứt đi: dựng project mới từ mô tả, tự build + self-test + ảnh. Xem [README](tools/craft-anything/README.md) |
 | `tools/lpc-generator/` | Bộ tạo nhân vật LPC (web app) |
 
 Game hiện có: **dom-dom-dem-mua** (Đom Đóm Đêm Mưa).

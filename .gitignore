@@ -42,3 +42,8 @@ __pycache__/
 
 # Design Lab reference tools (setup.sh clones them, not committed)
 /design-web/vendor/
+
+# Craft Anything (tools/craft-anything/install.sh giải nén .deb vào app/; project prototype vào projects/)
+/tools/craft-anything/app/
+/tools/craft-anything/state/
+/tools/craft-anything/projects/

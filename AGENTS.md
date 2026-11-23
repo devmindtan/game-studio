@@ -23,6 +23,7 @@ game-studio/
     ├── gamekit/                  bộ công cụ của workspace: CLI, addon Godot, pipeline sprite, pixel art, build/export
     ├── gdgraph/                  index GDScript cho graphify (graphify không đọc .gd)
     ├── gpuhost/                  kết nối máy GPU desktop-kndgm60 qua SSH tunnel để chạy ComfyUI/art nặng
+    ├── craft-anything/           (tùy chọn) lò prototype vứt đi: dựng project mới từ mô tả, tự build + self-test + ảnh
     └── lpc-generator/            Universal LPC Spritesheet Character Generator (clone upstream, CHỈ ĐỌC)
 ```
 
@@ -59,6 +60,7 @@ xuất kéo dài thì khuyên người dùng mở phiên mới ở đó.
 | Sửa pipeline Python (sprite-lab, gamekit pipeline, dashboard) | `tools/free-tools/venv/bin/ruff check <path> --select F401,F841,F821,F541` (bắt bug nhẹ); toàn bộ linter ở `tools/free-tools/README.md` |
 | Kiểm GDScript khác ngoài gamekit test | `tools/free-tools/venv/bin/gdlint src/` trong game (chỉ đọc; không `--fix` hàng loạt) |
 | Tạo art bằng AI / ComfyUI / diffusion | `tools/gpuhost/gpuhost` (GPU `desktop-kndgm60`, SSH tunnel, không chạy local). Cài/chạy: `gpuhost init` → `gpuhost start comfyui` → dùng API `127.0.0.1:8190`; xong `gpuhost release comfyui`. Model/output ở `~/gameart-gpu` trên máy GPU, không tải model nặng về laptop, không đụng `~/imagegen-gpu` |
+| Thử cảm giác một cơ chế mới (prototype vứt đi, không vào repo game) | `tools/craft-anything/ca rebuild - "<mô tả>" --rounds 1 --unattended --allow-run --backend "Claude Code" --build-with godot` (cài một lần: `tools/craft-anything/install.sh`). Dùng **Claude Code của bạn** nên tốn quota, không tốn tiền mới. Chỉ để thử: **không** copy asset của game khác, **không** copy code sinh ra vào `games/<g>/`, xoá `tools/craft-anything/projects/<slug>/` khi xong. Chi tiết + kết quả đo: `tools/craft-anything/README.md` |
 | Thiết kế art trước khi vẽ (tránh thiết kế mò) | skill **`.agents/skills/art-reference/SKILL.md`**: tra `art-refs/palettes/` và LPC `spritesheets/`; **bắt buộc** thêm tra Internet (game cùng thể loại / phong cách pixel gần): xem mẫu chính thống công khai, ghi lại 3 dòng (học gì / tránh gì / quyết định của mình), không có Internet thì nói rõ đã bỏ bước này. Tuân `art-refs/ATTRIBUTIONS.md` |
 | "Thêm tính năng" (lớn, nhiều hệ thống) | `/quick-design` (thay đổi nhỏ) hoặc `/design-system` → `/create-stories` → `/dev-story` → `/story-done` |
 | "Game khó/dễ quá", "chỉnh tốc độ…" | sửa `assets/data/*.json` (không hardcode trong code) → `/balance-check` → `gamekit test` + `gamekit shot` |
@@ -101,6 +103,14 @@ xuất kéo dài thì khuyên người dùng mở phiên mới ở đó.
   các game cùng thể loại đã làm (tìm trên mạng), ghi nguồn vào tài liệu thiết kế rồi mới code. Thiếu thông tin
   mà tham khảo không trả lời được thì hỏi người dùng. Từ ngữ của người dùng ứng với hơn một hệ thống của game
   (ví dụ "mốc 10/20/30": ải hay cấp trong trận?) cũng là thiếu thông tin: hỏi lại trước khi làm.
+- **Đánh giá tool/dependency mới: đọc `--help`, chạy một thử nghiệm nhỏ rồi mới kết luận** (2026-11-23):
+  kết luận "vô dụng" chỉ từ README đã suýt loại `craft-anything`, trong khi nó có nhánh dựng-từ-mô-tả.
+  Một thử nghiệm 12 phút rẻ hơn một quyết định sai.
+- **Prototype bằng `tools/craft-anything` là để thử, không để ship** (người dùng 2026-11-23): nó dựng một
+  project mới từ mô tả (không addon gamekit, art placeholder, chỉ self-test của nó) trong
+  `tools/craft-anything/projects/` (gitignored). Thử cảm giác xong thì xoá; tính năng thật làm trong
+  `games/<g>` theo pipeline thường. Không copy asset của game khác, không dùng Deep mode trên game mình
+  không sở hữu. Chi tiết: `tools/craft-anything/README.md`.
 - **Giao diện hiện tại** của game là `production/ui/` (danh sách màn hình trong `production/ui/screens.json`):
   đổi thứ người chơi thấy thì chạy `gamekit ui-shots <g>`, xem ảnh, commit `production/ui`. Dashboard (`games.html`)
   chỉ hiện bộ này và báo khi nó cũ hơn code; ảnh trong `production/qa/evidence/` là bằng chứng lịch sử, không phải
