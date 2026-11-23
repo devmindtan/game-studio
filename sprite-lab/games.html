@@ -341,8 +341,8 @@ function drawGround(g,cx,cy,sc,half,w,h,reg){ // world (0,0) at canvas (cx,cy), 
     g.fillStyle=tree?'#2f5a30':'#b4b8c0'; g.beginPath(); g.arc(cx+x*sc-r*0.25,cy+y*sc-r*0.3,r*0.55,0,7); g.fill(); }});
   g.strokeStyle=EDGE; g.lineWidth=Math.max(2,6*sc); g.strokeRect(cx-half*sc,cy-half*sc,half*2*sc,half*2*sc);
 }
-const EV_VI={ring:'Vòng thử thách',collect:'Thu thập sao',hunt:'Săn tinh anh',tornado:'Lốc cỏ',falling_trees:'Cây đổ',poison_tide:'Nước độc dâng',meteor:'Mưa thiên thạch'};
-const EV_COL={ring:'#f2c14e',collect:'#ffe27a',hunt:'#e05d5d',tornado:'#9ad45a',falling_trees:'#a8703a',poison_tide:'#7ad04a'};
+const EV_VI={ring:'Vòng thử thách',collect:'Thu thập sao',hunt:'Săn tinh anh',tornado:'Lốc cỏ',root_snare:'Rễ trói',poison_tide:'Nước độc dâng',meteor:'Mưa thiên thạch'};
+const EV_COL={ring:'#f2c14e',collect:'#ffe27a',hunt:'#e05d5d',tornado:'#9ad45a',root_snare:'#9fe07a',poison_tide:'#7ad04a'};
 function monName(mid){ const [id,tag]=String(mid).split('@'); const m=(game.monsters||[]).find(x=>x.id===id); return (m&&((m.stats&&m.stats.name)||m.name)||id)+(tag==='elite'?' (tinh anh)':''); }
 function regionOfFile(pr,file){ const c=(pr.curve||[]).find(x=>x.waves===file); return c?(pr.regions||[]).find(r=>r.name===c.region):null; }
 /* 30 stages: difficulty curve by region, rewards, milestone rewards (stages.json, milestones.json) */
