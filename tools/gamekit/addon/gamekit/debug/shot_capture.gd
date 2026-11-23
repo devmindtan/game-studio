@@ -46,6 +46,7 @@ func _initialize() -> void:
 		if int(ProjectSettings.get_setting("rendering/textures/canvas_textures/default_texture_filter", 1)) == 0 \
 		else Viewport.DEFAULT_CANVAS_ITEM_TEXTURE_FILTER_LINEAR
 	root.add_child(_view)
+	_mirror_project_stretch()
 	var packed: PackedScene = load(scene)
 	if packed == null:
 		push_error("shot_capture: cannot load %s" % scene)
@@ -83,3 +84,19 @@ func _process(_delta: float) -> bool:
 	if _count >= _frames[-1]:
 		quit()
 	return false
+
+
+# A game with a small design size (mobile 640x360) and window/stretch/mode = canvas_items is scaled up to
+# the window by the engine; the capture SubViewport is not, so the shot showed the scene at 1:1 in one
+# corner (lesson 2026-11-23, that-tinh-an). Lay the capture out at the logical size the player gets.
+func _mirror_project_stretch() -> void:
+	if str(ProjectSettings.get_setting("display/window/stretch/mode", "disabled")) == "disabled":
+		return
+	var base := Vector2(float(ProjectSettings.get_setting("display/window/size/viewport_width", _size.x)),
+		float(ProjectSettings.get_setting("display/window/size/viewport_height", _size.y)))
+	var s := minf(_size.x / base.x, _size.y / base.y)
+	var logical := Vector2i((Vector2(_size) / s).round()) \
+		if str(ProjectSettings.get_setting("display/window/stretch/aspect", "keep")) == "expand" else Vector2i(base)
+	if logical != _size:
+		_view.size_2d_override = logical
+		_view.size_2d_override_stretch = true
