@@ -6,7 +6,7 @@ gem (kinh nghiệm), star (cấp), clock (thời gian), sword (sát thương), b
 và 12 icon thẻ nâng cấp với tên trùng upgrade id: blade_arc, back_slash, whirlwind, sharpen,
 haste, reach, vitality, swift, magnet, regen, frost_nova, earth_strike; Đợt 2: ground_slam,
 cleave_wave, holy_column, dash, toughness; pháp sư: arcane_bolt, fireball, lightning, thunder_javelin, meteor;
-nội tại: unyielding (kiếm sĩ), elemental_resonance (pháp sư).
+nội tại: unyielding (kiếm sĩ), elemental_resonance (pháp sư), hawk_eye (cung thủ).
 Viền tối 1 px như mọi sprite; neo (8, 8) = tâm ô. Game vẽ bằng SpriteSheet theo tên animation.
 Chạy: gamekit art run ui-icons
 """
@@ -440,6 +440,20 @@ ICONS = {
         ".vyyywyyyyyv.",
         "..vyyyyyyyv..",
         "....vvvvv....",
+    ]),
+    # hawk_eye (archer passive Mắt ưng): a hawk's golden eye with a green feather mark
+    "hawk_eye": ({"d": "#7a4a10", "g": "#f2c14e", "l": "#fff4b0", "k": "#14111c", "w": "#ffffff", "e": "#5ab83a"}, [
+        "......e......",
+        ".....eee.....",
+        "...ddddddd...",
+        "..dgllllggd..",
+        ".dglggggglgd.",
+        "dglggkkkgglgd",
+        "dlggkkwkkggld",
+        "dglggkkkgglgd",
+        ".dglggggglgd.",
+        "..dgllllggd..",
+        "...ddddddd...",
     ]),
     # arcane_power (mage, damage): a violet orb with a rising arrow
     "arcane_power": ({"w": "#ffffff", "l": "#e0c8ff", "v": "#a070f0", "d": "#5a2a9a", "y": "#ffe14a"}, [
