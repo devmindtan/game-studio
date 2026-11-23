@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """Generator cho sprite "ranger": Cung thủ (Du hiệp) của Bách Ải, phương án C người dùng chọn 2026-11-23
 (sprite-lab/designs/cung-thu/variants.py). Nhìn nghiêng, quay phải; frame 48x48, neo giữa hai bàn chân.
-Dấu hiệu: tóc đuôi ngựa cam bay theo nhịp, áo chẽn sáng, cung dài cầm tay trước, nằm ngang dưới tay
-(lớp weapon, người dùng 2026-11-23: không đeo sau lưng; trang bị thay được). Bắn là sprite hiệu ứng riêng, nên chỉ có: idle 4, run 8, hurt 3, dash 5, death 5.
+Dấu hiệu: tóc đuôi ngựa cam bay theo nhịp, áo chẽn sáng, cung dài dựng đứng trong tay trước buông
+bên hông, dây quay về phía lưng (lớp weapon; người dùng 2026-11-23 kèm ảnh tham khảo). Bắn là sprite hiệu ứng riêng, nên chỉ có: idle 4, run 8, hurt 3, dash 5, death 5.
 Chạy:  gamekit art run ranger  ·  thử: gamekit art shot ranger sheet|move
 """
 
@@ -55,20 +55,21 @@ def hair(c, p, g):
 
 
 def longbow(c, p, g):
-    """The longbow held in the front hand, lying level below it (user 2026-11-23: not slung on the back): the grip
-    in the hand, both limbs curving down to the tips, the string straight under them."""
+    """The longbow carried as archers walk with it (user 2026-11-23, with a reference photo; carrying guides, e.g. battlbox.com
+    "how to carry bow while hunting": hold the riser, bow vertical, arm down at the side, string toward the back): upright in the front hand, the grip
+    in the fist, the limbs bowing forward, the straight string behind them. The lower limb is cut short above
+    the floor in low poses."""
     hx, hy = g["hand_front"]
-    hx += 2                                        # most of the bow ahead of the body
-    half = 7
-    hy = min(hy, mf.FLOOR - 3 - (half * half) // 14)   # low hands (a fall): string + its outline stay above the floor
-    for dx in range(-half, half + 1):
-        y = hy + (dx * dx) // 14                      # limbs bend down from the grip
-        put(c, hx + dx, y, PAL["wood"] if abs(dx) > 1 else PAL["wood_d"])
-    tip_y = hy + (half * half) // 14
-    for dx in range(-half + 1, half):
-        put(c, hx + dx, tip_y + 1, PAL["string"])
-    put(c, hx - half, tip_y + 1, PAL["wood_d"])
-    put(c, hx + half, tip_y + 1, PAL["wood_d"])
+    up, down = 13, 8                               # a longbow: the upper tip at the shoulder
+    down = min(down, mf.FLOOR - 3 - hy)            # string + outline stay above the floor
+    for dy in range(-up, down + 1):
+        half = up if dy < 0 else max(1, down)
+        bulge = round(2.5 * (1 - (dy / half) ** 2))   # limbs bow forward, most at the grip
+        put(c, hx + bulge, hy + dy, PAL["wood_d"] if abs(dy) <= 1 else PAL["wood"])
+    for dy in range(-up + 1, down):
+        put(c, hx - 1, hy + dy, PAL["string"])       # the string, straight, on the body side
+    put(c, hx, hy - up, PAL["wood_d"])
+    put(c, hx, hy + down, PAL["wood_d"])
 
 
 CHAR = {"pal": PAL, "body": "tunic", "head": head, "hair": hair, "held": longbow}
@@ -79,22 +80,22 @@ def frame(**kw):
 
 
 def idle(i):
-    return frame(bob=[0, 0, 1, 1][i], lean=-1, feet=((-4, 0), (4, 0)), hands=((-2, 6), (5, 3)), phase=i * 0.8,
+    return frame(bob=[0, 0, 1, 1][i], lean=-1, feet=((-4, 0), (4, 0)), hands=((-2, 6), (3, 6)), phase=i * 0.8,
                  eyes="closed" if i == 3 else "open")
 
 
 def run(i):
-    return mf.draw_layers(CHAR, run_pose(i, bob=[1, 1, 1, 0, 1, 1, 1, 0][i], lean=2, hands=((-2, 5), (5, 3))))
+    return mf.draw_layers(CHAR, run_pose(i, bob=[1, 1, 1, 0, 1, 1, 1, 0][i], lean=2, hands=((-2, 5), (3, 6))))
 
 
 def dash(i):
     """Dash: crouch, launch, two glide frames, recover; the ponytail streams back."""
     return [
-        frame(bob=2, lean=1, feet=((-4, 0), (3, 0)), hands=((-3, 5), (4, 3)), speed=0.4),
-        frame(bob=2, lean=3, feet=((-6, 1), (5, 0)), hands=((-6, 4), (-1, 3)), speed=1.0, phase=0.6),
-        frame(bob=2, lean=3, feet=((-7, 2), (5, 0)), hands=((-7, 3), (-2, 3)), speed=1.0, phase=1.4),
-        frame(bob=2, lean=3, feet=((-6, 1), (5, 0)), hands=((-7, 4), (-2, 3)), speed=1.0, phase=2.2),
-        frame(bob=1, lean=1, feet=((-3, 0), (3, 0)), hands=((-2, 6), (5, 3)), speed=0.5, phase=3.0),
+        frame(bob=2, lean=1, feet=((-4, 0), (3, 0)), hands=((-3, 5), (2, 6)), speed=0.4),
+        frame(bob=2, lean=3, feet=((-6, 1), (5, 0)), hands=((-6, 4), (-1, 6)), speed=1.0, phase=0.6),
+        frame(bob=2, lean=3, feet=((-7, 2), (5, 0)), hands=((-7, 3), (-2, 6)), speed=1.0, phase=1.4),
+        frame(bob=2, lean=3, feet=((-6, 1), (5, 0)), hands=((-7, 4), (-2, 6)), speed=1.0, phase=2.2),
+        frame(bob=1, lean=1, feet=((-3, 0), (3, 0)), hands=((-2, 6), (3, 6)), speed=0.5, phase=3.0),
     ][i]
 
 
@@ -104,7 +105,7 @@ def hurt(i):
               eyes="wince", flash=0.75, speed=0.6, tilt=-1),
         frame(bob=1, lean=-2, head=(-1, 0), feet=((-4, 0), (2, 0)), hands=((-4, 4), (3, 4)),
               eyes="wince", speed=0.4, phase=1.0, tilt=-1),
-        frame(bob=0, lean=-1, feet=((-4, 0), (4, 0)), hands=((-2, 6), (5, 3))),
+        frame(bob=0, lean=-1, feet=((-4, 0), (4, 0)), hands=((-2, 6), (3, 6))),
     ][i]
 
 

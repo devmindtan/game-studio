@@ -81,6 +81,10 @@ chọn nguồn `.poses.json` nếu sprite có file đó; sprite dùng `gen.py` t
    - **Soát logic trước khi báo xong** (người dùng 2026-11-21: "sửa cái là ok luôn vậy"): phóng to từng bộ phận và
      tự hỏi có hợp lý không (phần gắn có ôm/khớp nhau, có mảnh lơ lửng, có đè lên mặt, tư thế chết có tự nhiên);
      ghi các lỗi tìm được trước, rồi mới báo.
+0b. **Vũ khí/đồ cầm: tra cách người thật cầm nó khi ĐỨNG và khi DI CHUYỂN** (người dùng 2026-11-23, sau hai lần
+   vẽ sai cung: đeo sau lưng, rồi cầm ngang "như đưa đồ cho ai"): tìm ảnh/hướng dẫn thật (cách mang, cách cầm, chiều
+   của dây/lưỡi), ghi 1 dòng nguồn + quyết định vào docstring `gen.py` trước khi vẽ. Ví dụ cung: cầm ở tay cầm giữa
+   thân, dựng đứng, tay buông bên hông, dây về phía lưng.
 1. **Chốt spec**: kích thước (16/24/32/48/64; nhân vật cao thì chừa khoảng trống phía trên cho nhảy), palette
    4–16 màu, hướng nhìn (mặc định quay phải), **điểm neo** (nhân vật đứng: giữa hai bàn chân trên mặt đất;
    vật bay: tâm thân; đạn/giọt: đầu va chạm), danh sách animation với số frame/fps/loop. Mơ hồ thì chọn mặc
