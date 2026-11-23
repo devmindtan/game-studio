@@ -95,10 +95,10 @@ xuất kéo dài thì khuyên người dùng mở phiên mới ở đó.
   ban đầu, không tham gia thiết kế. Chi tiết: skill `pixel-sprite` bước 0.
 - **Chỉ sửa đúng cái người dùng chỉ ra** (người dùng 2026-11-22): một nhận xét chung đi kèm yêu cầu cụ thể (ví dụ "game 2D nên thiết kế kiểu 2D") chỉ áp cho những thứ được chỉ; thứ khác có thể liên quan thì liệt kê và hỏi trước, không tự sửa (đã lỡ vẽ lại ấn Cột thánh quang, phải hoàn tác).
 - **Việc "tạm dừng" / "tuỳ chọn" trong tài liệu không phải việc còn dở** (người dùng 2026-11-23): không đưa vào danh sách việc cần làm và không làm tiếp khi chưa hỏi; khi báo việc còn lại, ghi rõ "tuỳ chọn, chỉ làm khi bạn muốn" (đã lỡ vẽ lại Chém kiếm, vốn chỉ là nhầm tên với Sóng kiếm).
-- **Cỡ nhân vật chốt: nhỏ, minifig 48×48 (thân ~26 px)** (người dùng 2026-11-22, sau khi thử bản ~40 px trong
-  64×64): nhân vật mới và nhân vật hiện có giữ cỡ này. `sprite-lab/lib/hdfig.py` và các sprite `*-hd` chỉ là
-  thử nghiệm, không dùng cho game. Thay đổi duy nhất được giữ là bước đầu: dùng model AI (`gamekit art concept`)
-  để lấy ý tưởng ngoại hình, rồi thiết kế/vẽ như cũ.
+- **Cỡ nhân vật (người dùng 2026-11-23, thay quyết định 48×48 ngày 2026-11-22): khung 64×64 kiểu LPC, phong cách
+  chibi dễ thương**, các lớp (thân, đầu, tóc, áo, vũ khí) là tấm riêng khớp một khung xương chuẩn; chuyển động học nhịp
+  của LPC nhưng tự vẽ, không dùng ảnh LPC. Kế hoạch: `sprite-lab/BODY_PLAN.md`. Nhân vật cũ (48×48) giữ nguyên tới khi
+  được chuyển. AI (`gamekit art concept`) chỉ để lấy ý tưởng ngoại hình.
 - **Không đoán mò khi thiết kế** (người dùng 2026-11-17): màn hình, luồng menu, tính năng mới đều bắt đầu từ cách
   các game cùng thể loại đã làm (tìm trên mạng), ghi nguồn vào tài liệu thiết kế rồi mới code. Thiếu thông tin
   mà tham khảo không trả lời được thì hỏi người dùng. Từ ngữ của người dùng ứng với hơn một hệ thống của game
