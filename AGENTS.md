@@ -71,6 +71,7 @@ xuất kéo dài thì khuyên người dùng mở phiên mới ở đó.
 | "Game bị lỗi…" | `/bug-report` → viết test hồi quy, **chạy cho thấy test fail trước** → sửa → `gamekit test` |
 | "Review code" | `/code-review` của game (bản scoped `games/<g>`), không dùng bản chung |
 | "Chơi thử / chạy xem" | `gamekit run <g>` (người chơi), `gamekit shot <g> [scene] [frames] [-- args]` (agent tự nhìn; nhiều thời điểm thì một lần chạy `frames=300,600,900`, tua nhanh bằng cờ của game như `--sim-steps`) |
+| "Chạy/chụp thử trên Android" (game mobile) | export APK → cài lên emulator → `adb exec-out screencap`: lệnh đầy đủ trong `games/<g>/README.md` mục "Build cho Android". Emulator **phải** `-gpu host` (swiftshader thiếu uniform cho shader canvas → chỉ ra nền xám). Ảnh lưu `production/qa/evidence/` |
 | "Giờ làm gì tiếp?", "dự án tới đâu rồi?" | `/next-step`, `/project-stage-detect` |
 | "Xuất game", "build", "phát hành" | tăng `config/version` trong `project.godot` → `gamekit export <g>` → `gamekit smoke-web <g>` → `/release-checklist`, `/patch-notes` |
 | "Cập nhật framework" | `gamekit update-template`; với từng game, làm theo `UPGRADING.md` của template, rồi `gamekit tidy <g>` (bỏ lại agent của engine khác) |
