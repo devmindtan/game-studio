@@ -97,7 +97,7 @@ const SK = [["blade_arc","Chém kiếm","Vật lý","Kiếm sĩ"],["whirlwind","
   ["solar_ray","Thái dương xạ","Ánh sáng","Kiếm sĩ"],["arcane_bolt","Tia phép","Phép","Pháp sư"],
   ["fireball","Cầu lửa","Lửa","Pháp sư"],["frost_nova","Băng nổ","Băng","Pháp sư"],["storm","Bão sét","Sét","Pháp sư"],
   ["void_orb","Cầu hư không","Bóng tối","Pháp sư"]];
-const TABS = [["Quái", MON], ["Boss", BOSS], ["Kỹ năng", SK], ["Vật phẩm", []]];
+const TABS = [["Quái", MON], ["Boss", BOSS], ["Kỹ năng", SK]];   // no Vật phẩm (user 2026-11-23)
 let tab = 0, sel = 0;
 const $ = id => document.getElementById(id);
 function icon(id, cls) { const i = ICONS.indexOf(id); return `<div class="ico ${cls||""}" style="background-position:${-i*(cls?96:48)}px 0"></div>`; }
