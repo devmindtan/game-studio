@@ -90,9 +90,10 @@ xuất kéo dài thì khuyên người dùng mở phiên mới ở đó.
   thẻ cùng hàng cao bằng nhau theo nội dung dài nhất, khoảng cách đều, không gì bị cắt hay tràn khung, chữ đọc
   được trên nền. Vị trí
   chữ tính theo cỡ font (không gõ baseline tay). Ghi các lỗi tìm được rồi mới sửa (bài học 2026-11-17).
-- **Nhân vật/sprite mới: đưa 2–3 thiết kế khác nhau để chọn** (người dùng 2026-11-21): khác silhouette, tỉ lệ,
-  cách cầm vũ khí, dáng và nhịp animation, không chỉ đổi màu. Model AI (`gamekit art concept`) chỉ để lấy ý tưởng
-  ban đầu, không tham gia thiết kế. Chi tiết: skill `pixel-sprite` bước 0.
+- **Nhân vật do người dùng tự thiết kế** (người dùng 2026-11-25, thay quy tắc "agent đưa 2–3 thiết kế"): bản vẽ của
+  người dùng lưu nguyên ở `sprite-lab/sources/user/` và là bản gốc. Agent chỉ dựng animation, chỉnh sửa hoặc nâng cấp
+  **trên chính bản vẽ đó**, không tự tạo nhân vật hay thiết kế mới; thấy cần đổi thiết kế thì hỏi trước. Sprite không
+  phải nhân vật (hiệu ứng, icon…) vẫn theo skill `pixel-sprite`.
 - **Chỉ sửa đúng cái người dùng chỉ ra** (người dùng 2026-11-22): một nhận xét chung đi kèm yêu cầu cụ thể (ví dụ "game 2D nên thiết kế kiểu 2D") chỉ áp cho những thứ được chỉ; thứ khác có thể liên quan thì liệt kê và hỏi trước, không tự sửa (đã lỡ vẽ lại ấn Cột thánh quang, phải hoàn tác).
 - **Việc "tạm dừng" / "tuỳ chọn" trong tài liệu không phải việc còn dở** (người dùng 2026-11-23): không đưa vào danh sách việc cần làm và không làm tiếp khi chưa hỏi; khi báo việc còn lại, ghi rõ "tuỳ chọn, chỉ làm khi bạn muốn" (đã lỡ vẽ lại Chém kiếm, vốn chỉ là nhầm tên với Sóng kiếm).
 - **Nhân vật giữ thiết kế minifig 48×48 gốc** (người dùng 2026-11-23, sau khi thử chibi tự vẽ rồi LPC adult:
