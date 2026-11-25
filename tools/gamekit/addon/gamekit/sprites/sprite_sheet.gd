@@ -216,8 +216,11 @@ func compose_layers(overrides := {}) -> void:
 		stacked.blend_rect(img, Rect2i(Vector2i.ZERO, img.get_size()), Vector2i.ZERO)
 	if stacked == null:
 		return
-	var outline := Color.html(String(meta.get("outline", "#1b1726")))
-	texture = ImageTexture.create_from_image(outline_frames(stacked, int(frame_size.x), int(frame_size.y), outline))
+	var outline_name := String(meta.get("outline", "#1b1726"))
+	if outline_name.to_lower() == "none":   # art with its own outline (the user's drawings): add none
+		texture = ImageTexture.create_from_image(stacked)
+	else:
+		texture = ImageTexture.create_from_image(outline_frames(stacked, int(frame_size.x), int(frame_size.y), Color.html(outline_name)))
 	hires_texture = null   # a hires copy was made from the bare strip: it would hide the worn layers
 	hires = 1
 

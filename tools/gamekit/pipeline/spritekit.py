@@ -586,11 +586,14 @@ def check_body(meta, strip_img):
 
 def compose_layers(layer_imgs, frame_w, frame_h, outline_color):
     """Stack layer strips (z order) and outline each frame like Canvas.outline.
-    The game does the same (SpriteSheet.compose) when equipment swaps layers."""
+    The game does the same (SpriteSheet.compose) when equipment swaps layers.
+    outline_color "none": no outline is added (art that carries its own, e.g. the user's drawings)."""
     w, h = layer_imgs[0].size
     stacked = Image.new("RGBA", (w, h), TRANSPARENT)
     for img in layer_imgs:
         stacked.alpha_composite(img.convert("RGBA"))
+    if str(outline_color).lower() == "none":
+        return stacked
     out = Image.new("RGBA", (w, h), TRANSPARENT)
     for i in range(w // frame_w):
         frame = Canvas(frame_w, frame_h)
