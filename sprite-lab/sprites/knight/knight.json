@@ -146,5 +146,38 @@
       32.5
     ],
     "radius": 10.5
-  }
+  },
+  "layers": [
+    "legs_back",
+    "feet_back",
+    "chest",
+    "body",
+    "head",
+    "arms_front",
+    "weapon"
+  ],
+  "outline": "none",
+  "slots": {
+    "head": [
+      "head"
+    ],
+    "chest": [
+      "chest"
+    ],
+    "legs": [
+      "legs_back"
+    ],
+    "arms": [
+      "arms_front"
+    ],
+    "feet": [
+      "feet_back"
+    ],
+    "weapon": [
+      "weapon"
+    ]
+  },
+  "base": [
+    "body"
+  ]
 }
