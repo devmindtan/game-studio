@@ -34,7 +34,8 @@ SIZE = 24
 OUTLINE = "#1b1726"
 RARITIES = ["common", "rare", "epic", "legendary"]
 SLOTS = ["head", "chest", "legs", "arms", "feet", "weapon"]
-CLASS_SLOTS = {"knight": ["head", "chest", "feet", "weapon", "shield"], "mage": ["head", "chest", "feet", "weapon"]}   # user 2026-11-25: knight set
+CLASS_SLOTS = {"knight": ["head", "chest", "feet", "weapon", "shield"], "mage": ["head", "chest", "feet", "weapon"],
+               "archer": ["quiver", "chest", "weapon", "feet", "arms"]}   # user 2026-11-25: knight set
 
 # --- palettes: class -> rarity -> role letter -> colour -------------------------
 _K = "#1b1726"
@@ -383,6 +384,11 @@ ITEMS = {
     ("knight", "feet"): ["iron_boots", "steel_boots", "dragon_boots", "aegis_boots"],
     ("knight", "weapon"): ["iron_sword", "steel_sword", "dragon_blade", "aegis_blade"],
     ("knight", "shield"): ["iron_shield", "steel_shield", "dragon_shield", "aegis_shield"],
+    ("archer", "quiver"): ["leather_quiver", "forest_quiver", "shadow_quiver", "sun_quiver"],
+    ("archer", "chest"): ["leather_armor", "forest_armor", "shadow_armor", "sun_armor"],
+    ("archer", "weapon"): ["hunting_bow", "forest_bow", "shadow_bow", "sun_bow"],
+    ("archer", "feet"): ["leather_boots", "forest_boots", "shadow_boots", "sun_boots"],
+    ("archer", "arms"): ["leather_gloves", "forest_gloves", "shadow_gloves", "sun_gloves"],
     ("mage", "head"): ["cloth_hat", "wizard_hat", "void_hat", "star_hat"],
     ("mage", "chest"): ["cloth_robe", "mage_robe", "void_robe", "star_robe"],
     ("mage", "feet"): ["cloth_shoes", "mage_shoes", "void_shoes", "star_shoes"],
@@ -401,7 +407,8 @@ def grid(cls, slot, rarity):
     return rows
 
 
-MADE_ICONS = {"knight": HERE.parent / "knight" / "icons", "mage": HERE.parent / "wizard" / "icons"}   # user's art
+MADE_ICONS = {"knight": HERE.parent / "knight" / "icons", "mage": HERE.parent / "wizard" / "icons",
+              "archer": HERE.parent / "bowman" / "icons"}   # user's art
 
 
 def icon(cls, slot, rarity):
@@ -426,10 +433,10 @@ def review(path):
     """Rows: class x rarity, columns: the 6 slots, x4, on the game's panel colour."""
     z = 4
     cell = SIZE * z + 8
-    img = Image.new("RGB", (len(SLOTS) * cell + 110, 8 * cell + 8), (24, 21, 34))
+    img = Image.new("RGB", (len(SLOTS) * cell + 110, 12 * cell + 8), (24, 21, 34))
     d = ImageDraw.Draw(img)
     r = 0
-    for cls in ["knight", "mage"]:
+    for cls in ["knight", "mage", "archer"]:
         for k, rarity in enumerate(RARITIES):
             d.text((6, r * cell + cell // 2 - 6), f"{cls[:6]} {rarity[:4]}", fill=(220, 220, 220))
             for s, slot in enumerate(CLASS_SLOTS[cls]):
@@ -440,7 +447,7 @@ def review(path):
 
 
 ANIMATIONS = [(ITEMS[(cls, slot)][k], [icon(cls, slot, rarity)], 1, False, {})
-              for cls in ["knight", "mage"] for slot in CLASS_SLOTS[cls] for k, rarity in enumerate(RARITIES)]
+              for cls in ["knight", "mage", "archer"] for slot in CLASS_SLOTS[cls] for k, rarity in enumerate(RARITIES)]
 
 if __name__ == "__main__":
     export(HERE, NAME, ANIMATIONS, anchor=(12.0, 12.0), preview_scale=4, gif_scale=4)

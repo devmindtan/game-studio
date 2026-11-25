@@ -1,5 +1,5 @@
 {
-  "frames": 36,
+  "frames": 56,
   "frame_size": [
     24,
     24
@@ -260,6 +260,146 @@
     {
       "name": "star_staff",
       "start": 35,
+      "frames": 1,
+      "fps": 1.0,
+      "loop": false
+    },
+    {
+      "name": "leather_quiver",
+      "start": 36,
+      "frames": 1,
+      "fps": 1.0,
+      "loop": false
+    },
+    {
+      "name": "forest_quiver",
+      "start": 37,
+      "frames": 1,
+      "fps": 1.0,
+      "loop": false
+    },
+    {
+      "name": "shadow_quiver",
+      "start": 38,
+      "frames": 1,
+      "fps": 1.0,
+      "loop": false
+    },
+    {
+      "name": "sun_quiver",
+      "start": 39,
+      "frames": 1,
+      "fps": 1.0,
+      "loop": false
+    },
+    {
+      "name": "leather_armor",
+      "start": 40,
+      "frames": 1,
+      "fps": 1.0,
+      "loop": false
+    },
+    {
+      "name": "forest_armor",
+      "start": 41,
+      "frames": 1,
+      "fps": 1.0,
+      "loop": false
+    },
+    {
+      "name": "shadow_armor",
+      "start": 42,
+      "frames": 1,
+      "fps": 1.0,
+      "loop": false
+    },
+    {
+      "name": "sun_armor",
+      "start": 43,
+      "frames": 1,
+      "fps": 1.0,
+      "loop": false
+    },
+    {
+      "name": "hunting_bow",
+      "start": 44,
+      "frames": 1,
+      "fps": 1.0,
+      "loop": false
+    },
+    {
+      "name": "forest_bow",
+      "start": 45,
+      "frames": 1,
+      "fps": 1.0,
+      "loop": false
+    },
+    {
+      "name": "shadow_bow",
+      "start": 46,
+      "frames": 1,
+      "fps": 1.0,
+      "loop": false
+    },
+    {
+      "name": "sun_bow",
+      "start": 47,
+      "frames": 1,
+      "fps": 1.0,
+      "loop": false
+    },
+    {
+      "name": "leather_boots",
+      "start": 48,
+      "frames": 1,
+      "fps": 1.0,
+      "loop": false
+    },
+    {
+      "name": "forest_boots",
+      "start": 49,
+      "frames": 1,
+      "fps": 1.0,
+      "loop": false
+    },
+    {
+      "name": "shadow_boots",
+      "start": 50,
+      "frames": 1,
+      "fps": 1.0,
+      "loop": false
+    },
+    {
+      "name": "sun_boots",
+      "start": 51,
+      "frames": 1,
+      "fps": 1.0,
+      "loop": false
+    },
+    {
+      "name": "leather_gloves",
+      "start": 52,
+      "frames": 1,
+      "fps": 1.0,
+      "loop": false
+    },
+    {
+      "name": "forest_gloves",
+      "start": 53,
+      "frames": 1,
+      "fps": 1.0,
+      "loop": false
+    },
+    {
+      "name": "shadow_gloves",
+      "start": 54,
+      "frames": 1,
+      "fps": 1.0,
+      "loop": false
+    },
+    {
+      "name": "sun_gloves",
+      "start": 55,
       "frames": 1,
       "fps": 1.0,
       "loop": false
