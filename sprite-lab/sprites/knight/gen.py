@@ -330,10 +330,18 @@ def _icon_art(slot):
     return [(sw, (24 - sw.width) // 2, (24 - sw.height) // 2)]
 
 
+BOOT_PAL = {"d": "#3d2919", "m": "#5a3d28", "l": "#784a32", "h": "#a06a48", "t": "#2a1a10"}   # the drawn brown boots
+
+
 def write_icons(folder):
     folder.mkdir(parents=True, exist_ok=True)
+    import drawnicons
     for slot, items in ITEMS.items():
         for tier, item in zip(TIER_ORDER, items):
+            if slot == "feet":   # drawn properly (user 2026-11-25: the boots are too small on the drawing)
+                pal = BOOT_PAL if tier == "iron" else TIERS[tier]
+                drawnicons.boots(pal).save(folder / f"{item}.png")
+                continue
             fn, _ = tier_fn(tier, slot)
             c = Image.new("RGBA", (24, 24))
             for im, x, y in _icon_art(slot):

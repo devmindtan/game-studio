@@ -251,6 +251,10 @@ def write_icons(folder):
                 knight = HERE.parent / "knight" / "icons" / f"{KNIGHT_BOOTS[TIER_ORDER.index(tier)]}.png"
                 Image.open(knight).save(folder / f"{item}.png")
                 continue
+            if slot in ("quiver", "arms"):   # drawn properly (user 2026-11-25), in the tier's colours
+                import drawnicons
+                (drawnicons.quiver if slot == "quiver" else drawnicons.gloves)(TIERS[tier]).save(folder / f"{item}.png")
+                continue
             fn = recolour(tier)
             im = art[slot]
             col = Image.new("RGBA", im.size)
