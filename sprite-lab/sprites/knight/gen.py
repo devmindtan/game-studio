@@ -263,9 +263,25 @@ HELM_EXTRA = {
 }
 
 
+def iron_plate(p):
+    """Giáp sắt (user 2026-11-25: the red tunic is the default shirt, the iron chest must look different): the
+    tunic's reds become the iron metal ramp, the belt keeps its trim, outlines stay."""
+    r, g, b, a = p
+    lum = 0.299 * r + 0.587 * g + 0.114 * b
+    if lum < 40:
+        return p
+    t = {k: _rgb(v) for k, v in TIERS["iron"].items()}
+    if r > g + 60 and r > b + 60:
+        return (*(t["l"] if lum >= 70 else (t["m"] if lum >= 45 else t["d"])), a)
+    return recolour("iron")(p)
+
+
 def tier_fn(tier, slot):
     """iron keeps the user's own colours; the other tiers recolour (and the helmet gets its details)."""
-    fn = (lambda p: p) if tier == "iron" else recolour(tier, armour=slot in ("legs", "arms", "feet"))
+    if tier == "iron" and slot == "chest":
+        fn = iron_plate                              # the red tunic is the bare body's: iron chest is a grey plate
+    else:
+        fn = (lambda p: p) if tier == "iron" else recolour(tier, armour=slot in ("legs", "arms", "feet"))
     return (fn, HELM_EXTRA[tier]) if slot == "head" else (fn, [])
 
 
