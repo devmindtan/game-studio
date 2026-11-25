@@ -138,5 +138,13 @@
       }
     }
   ],
-  "ground": true
+  "ground": true,
+  "body": {
+    "anim": "idle",
+    "center": [
+      25.5,
+      32.5
+    ],
+    "radius": 10.5
+  }
 }

@@ -108,5 +108,5 @@ ANIM = [("idle", IDLE, 5, True, {"durations_ms": [240, 160, 240, 160], "hitbox":
 
 if __name__ == "__main__":
     check_connected(ANIM, "knight")
-    export(HERE, HERE.name, ANIM, anchor=(24.0, float(FLOOR)), ground=True)
+    export(HERE, HERE.name, ANIM, anchor=(24.0, float(FLOOR)), ground=True, body="idle")
     print("OK", HERE.name)
