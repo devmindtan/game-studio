@@ -85,6 +85,10 @@ def frame(up=(0, 0), a=(0, 0), b=(0, 0), flash=False, gear=None):
     for k in LAYER_ORDER:
         fn = (gear or {}).get(SLOT_OF.get(k, ""))
         src = PARTS[k]
+        if fn and k == "head" and getattr(fn, "extra", None):   # tier details on the hood (user 2026-11-25)
+            src = src.copy()
+            for (ex, ey, col) in fn.extra:
+                src.putpixel((ex, ey), (*_rgb(col), 255))
         px = src.load()
         c = Canvas(S, S)
         for y in range(src.height):
@@ -144,7 +148,8 @@ def anims(gear=None):
 TIERS = {
     "cloth": {"d": "#5a4632", "m": "#8a6e4e", "l": "#b8976a", "h": "#e0c89a", "c": "#6e6e7e", "C": "#4a4a58",
               "b": "#6b4a2b", "B": "#4a321c", "g": "#6fd66a", "G": "#c8ffc0"},
-    "arcane": {"d": "#1f3a6e", "m": "#2f5fa8", "l": "#4f8ad8", "h": "#9cc8ff", "c": "#e8e2d0", "C": "#b9b2a0",
+    # arcane in teal: the blue of the icon ramp was too close to the default blue robe (user 2026-11-25)
+    "arcane": {"d": "#0f4a52", "m": "#1f7a80", "l": "#35aab0", "h": "#8ee0e0", "c": "#e8e2d0", "C": "#b9b2a0",
                "b": "#8a5a2e", "B": "#563418", "g": "#7ef0ff", "G": "#ffffff"},
     "void": {"d": "#2a1648", "m": "#4a2a80", "l": "#6e48b0", "h": "#a07ae0", "c": "#1b1030", "C": "#120a22",
              "b": "#3a2a4a", "B": "#241830", "g": "#e05aff", "G": "#ffc8ff"},
@@ -160,6 +165,13 @@ ITEMS = {"head": ["cloth_hat", "wizard_hat", "void_hat", "star_hat"],
 
 def _rgb(h):
     return tuple(int(h[i:i + 2], 16) for i in (1, 3, 5))
+
+
+# details on the hood surface, mirrored-crop coords (frame x - 14, y - 14): pixels inside the hood, so no outline
+# changes. void: a small violet gem; star: two gold stars.
+HOOD_EXTRA = {"cloth": [], "arcane": [],
+              "void": [(9, 8, "#e05aff")],
+              "star": [(7, 7, "#fff2a8"), (10, 8, "#fff2a8"), (11, 8, "#d9a63a")]}
 
 
 def recolour(tier):
@@ -182,6 +194,7 @@ def recolour(tier):
             return (*(t["c"] if lum > 150 else t["C"]), a)
         return p
 
+    fn.extra = HOOD_EXTRA[tier]
     return fn
 
 
@@ -192,6 +205,7 @@ def write_layers(anim_list, names, folder):
         strip([fr[k] for fr in every]).save(folder / f"{k}_strip.png")
 
 
+KNIGHT_BOOTS = ["iron_boots", "steel_boots", "dragon_boots", "aegis_boots"]
 PIECES = {"staff": (38, 5, 53, 29), "hat": (7, 34, 22, 53), "robe": (39, 42, 53, 52)}
 
 
@@ -200,9 +214,13 @@ def write_icons(folder):
     src = Image.open(SRC).convert("RGBA")
     up = lambda im, k: im.resize((im.width * k, im.height * k), Image.NEAREST)  # noqa: E731
     art = {"head": src.crop(PIECES["hat"]), "chest": src.crop(PIECES["robe"]), "weapon": src.crop(PIECES["staff"]),
-           "feet": up(src.crop((18, 27, 27, 30)), 2)}
+           "feet": None}   # shoes share the knight's boot icons (user 2026-11-25: too small, same picture, own name)
     for slot, items in ITEMS.items():
         for tier, item in zip(TIER_ORDER, items):
+            if slot == "feet":
+                knight = HERE.parent / "knight" / "icons" / f"{KNIGHT_BOOTS[TIER_ORDER.index(tier)]}.png"
+                Image.open(knight).save(folder / f"{item}.png")
+                continue
             fn = recolour(tier)
             im = art[slot]
             col = Image.new("RGBA", im.size)
