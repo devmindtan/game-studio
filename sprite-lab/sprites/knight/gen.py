@@ -36,9 +36,9 @@ FEET_Y = 28            # lowest row of the feet in the crop
 FLOOR = 44             # anchor y in the frame (like the swordsman)
 
 
-LAYER_ORDER = ["legs_back", "feet_back", "chest", "body", "head", "arms_front", "weapon"]
+LAYER_ORDER = ["legs_back", "feet_back", "chest", "body", "head", "arms_front", "weapon", "shield"]
 SLOT_OF = {"head": "head", "chest": "chest", "arms_front": "arms", "legs_back": "legs", "feet_back": "feet",
-           "weapon": "weapon"}
+           "weapon": "weapon", "shield": "shield"}   # user 2026-11-25: no gauntlets or greaves items (base only)
 
 
 BARE_DY = 36          # the bare figure (rows 36..66 of the sheet) lines up with the armed one shifted up 36 rows
@@ -55,8 +55,10 @@ def _armed_layer(x, y, rgb):
         return "legs_back"
     if (17 <= x <= 19 and 27 <= y <= 28) or (24 <= x <= 25 and y == 28):
         return "feet_back"
-    if (x <= 14 and y >= 14) or (x >= 23 and 20 <= y <= 27):
-        return "weapon"                                   # the sword, and the shield (sword and board)
+    if x >= 23 and 20 <= y <= 27:
+        return "shield"
+    if x <= 14 and y >= 14:
+        return "weapon"                                   # the sword
     if 15 <= x <= 16 and 21 <= y <= 24:
         return "arms_front"                               # the sword hand
     if 17 <= x <= 24 and 13 <= y <= 19 and not _grey(rgb):
@@ -209,10 +211,9 @@ TIERS = {
 }
 ITEMS = {"head": ["iron_cap", "steel_helm", "dragon_helm", "aegis_helm"],
          "chest": ["iron_chest", "steel_chest", "dragon_chest", "aegis_chest"],
-         "legs": ["iron_greaves", "steel_greaves", "dragon_greaves", "aegis_greaves"],
-         "arms": ["iron_gauntlets", "steel_gauntlets", "dragon_gauntlets", "aegis_gauntlets"],
          "feet": ["iron_boots", "steel_boots", "dragon_boots", "aegis_boots"],
-         "weapon": ["iron_sword", "steel_sword", "dragon_blade", "aegis_blade"]}
+         "weapon": ["iron_sword", "steel_sword", "dragon_blade", "aegis_blade"],
+         "shield": ["iron_shield", "steel_shield", "dragon_shield", "aegis_shield"]}
 TIER_ORDER = ["iron", "steel", "dragon", "aegis"]
 
 
@@ -306,8 +307,11 @@ def _icon_art(slot):
         hand = Image.open(SRC).convert("RGBA").crop((15, 21, 17, 25))
         g = up(hand, 4)
         return [(g, (24 - g.width) // 2, (24 - g.height) // 2)]
-    sw, sh = _piece("sword"), _piece("shield")
-    return [(sw, 1, 2), (sh, 15, 14)]
+    if slot == "shield":
+        sh = up(_piece("shield"), 2)
+        return [(sh, (24 - sh.width) // 2, (24 - sh.height) // 2)]
+    sw = _piece("sword")
+    return [(sw, (24 - sw.width) // 2, (24 - sw.height) // 2)]
 
 
 def write_icons(folder):

@@ -34,6 +34,7 @@ SIZE = 24
 OUTLINE = "#1b1726"
 RARITIES = ["common", "rare", "epic", "legendary"]
 SLOTS = ["head", "chest", "legs", "arms", "feet", "weapon"]
+CLASS_SLOTS = {"knight": ["head", "chest", "feet", "weapon", "shield"], "mage": SLOTS}   # user 2026-11-25: knight set
 
 # --- palettes: class -> rarity -> role letter -> colour -------------------------
 _K = "#1b1726"
@@ -379,10 +380,9 @@ OVER = {
 ITEMS = {
     ("knight", "head"): ["iron_cap", "steel_helm", "dragon_helm", "aegis_helm"],
     ("knight", "chest"): ["iron_chest", "steel_chest", "dragon_chest", "aegis_chest"],
-    ("knight", "legs"): ["iron_greaves", "steel_greaves", "dragon_greaves", "aegis_greaves"],
-    ("knight", "arms"): ["iron_gauntlets", "steel_gauntlets", "dragon_gauntlets", "aegis_gauntlets"],
     ("knight", "feet"): ["iron_boots", "steel_boots", "dragon_boots", "aegis_boots"],
     ("knight", "weapon"): ["iron_sword", "steel_sword", "dragon_blade", "aegis_blade"],
+    ("knight", "shield"): ["iron_shield", "steel_shield", "dragon_shield", "aegis_shield"],
     ("mage", "head"): ["cloth_hat", "wizard_hat", "void_hat", "star_hat"],
     ("mage", "chest"): ["cloth_robe", "mage_robe", "void_robe", "star_robe"],
     ("mage", "legs"): ["cloth_pants", "mage_pants", "void_pants", "star_pants"],
@@ -434,7 +434,7 @@ def review(path):
     for cls in ["knight", "mage"]:
         for k, rarity in enumerate(RARITIES):
             d.text((6, r * cell + cell // 2 - 6), f"{cls[:6]} {rarity[:4]}", fill=(220, 220, 220))
-            for s, slot in enumerate(SLOTS):
+            for s, slot in enumerate(CLASS_SLOTS[cls]):
                 ic = icon(cls, slot, rarity).img.resize((SIZE * z, SIZE * z), Image.NEAREST)
                 img.paste(ic, (110 + s * cell, r * cell + 4), ic)
             r += 1
@@ -442,7 +442,7 @@ def review(path):
 
 
 ANIMATIONS = [(ITEMS[(cls, slot)][k], [icon(cls, slot, rarity)], 1, False, {})
-              for cls in ["knight", "mage"] for slot in SLOTS for k, rarity in enumerate(RARITIES)]
+              for cls in ["knight", "mage"] for slot in CLASS_SLOTS[cls] for k, rarity in enumerate(RARITIES)]
 
 if __name__ == "__main__":
     export(HERE, NAME, ANIMATIONS, anchor=(12.0, 12.0), preview_scale=4, gif_scale=4)

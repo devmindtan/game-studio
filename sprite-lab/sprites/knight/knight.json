@@ -154,7 +154,8 @@
     "body",
     "head",
     "arms_front",
-    "weapon"
+    "weapon",
+    "shield"
   ],
   "outline": "none",
   "slots": {
@@ -164,17 +165,14 @@
     "chest": [
       "chest"
     ],
-    "legs": [
-      "legs_back"
-    ],
-    "arms": [
-      "arms_front"
-    ],
     "feet": [
       "feet_back"
     ],
     "weapon": [
       "weapon"
+    ],
+    "shield": [
+      "shield"
     ]
   },
   "base": [
