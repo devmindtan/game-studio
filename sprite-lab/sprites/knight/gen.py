@@ -26,6 +26,7 @@ sys.path.insert(0, str(HERE.parents[1] / "lib"))
 from PIL import Image  # noqa: E402
 from spritekit import Canvas  # noqa: E402
 from sheet import export  # noqa: E402
+from userart import check_connected  # noqa: E402
 
 SRC = WS / "sprite-lab/sources/user/knight-2026-11-25.png"
 S = 48
@@ -86,11 +87,12 @@ def lying(c):
 
 
 IDLE = [frame(), frame(), frame(up=(0, 1)), frame(up=(0, 1))]
-# run: feet alternate (lift 1, step 1), the body is up on the passing frames
-RUN = [frame(up=(0, 0), a=(1, 0), b=(-1, -1)), frame(up=(0, -1), a=(1, 0), b=(0, -1)),
-       frame(up=(0, -1), a=(0, 0), b=(1, 0)), frame(up=(0, 0), a=(-1, 0), b=(1, 0)),
-       frame(up=(0, 0), a=(-1, -1), b=(1, 0)), frame(up=(0, -1), a=(0, -1), b=(1, 0)),
-       frame(up=(0, -1), a=(1, 0), b=(0, 0)), frame(up=(0, 0), a=(1, 0), b=(-1, 0))]
+# run: feet alternate (lift 1, step 1). The body never rises off the 3 px legs (that left a gap, user 2026-11-25):
+# it dips 1 px on the contact frames instead, overlapping the feet.
+RUN = [frame(up=(0, 1), a=(1, 0), b=(-1, -1)), frame(up=(0, 0), a=(1, 0), b=(0, -1)),
+       frame(up=(0, 0), a=(0, 0), b=(1, 0)), frame(up=(0, 0), a=(-1, 0), b=(1, 0)),
+       frame(up=(0, 1), a=(-1, -1), b=(1, 0)), frame(up=(0, 0), a=(0, -1), b=(1, 0)),
+       frame(up=(0, 0), a=(1, 0), b=(0, 0)), frame(up=(0, 0), a=(1, 0), b=(-1, 0))]
 HURT = [frame(up=(-1, 0), flash=True), frame(up=(-1, 0)), frame()]
 DASH = [frame(up=(0, 1)), frame(up=(2, 1), a=(2, 0), b=(-2, 0)), frame(up=(2, 1), a=(2, 0), b=(-2, -1)),
         frame(up=(2, 1), a=(2, 0), b=(-2, 0)), frame(up=(1, 0))]
@@ -105,5 +107,6 @@ ANIM = [("idle", IDLE, 5, True, {"durations_ms": [240, 160, 240, 160], "hitbox":
         ("death", DEATH, 8, False, {"durations_ms": [120, 140, 140, 100, 400], "hitbox": dict(HB, active=[0, 4])})]
 
 if __name__ == "__main__":
+    check_connected(ANIM, "knight")
     export(HERE, HERE.name, ANIM, anchor=(24.0, float(FLOOR)), ground=True)
     print("OK", HERE.name)
