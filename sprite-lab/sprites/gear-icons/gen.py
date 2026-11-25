@@ -403,7 +403,16 @@ def grid(cls, slot, rarity):
     return rows
 
 
+KNIGHT_ICONS = HERE.parent / "knight" / "icons"   # user 2026-11-25: knight items drawn from the user's own pieces
+
+
 def icon(cls, slot, rarity):
+    if cls == "knight":
+        made = KNIGHT_ICONS / f"{ITEMS[(cls, slot)][RARITIES.index(rarity)]}.png"
+        if made.exists():                          # made by sprite-lab/sprites/knight/gen.py (user's art, recoloured)
+            c = Canvas(SIZE, SIZE)
+            c.img.alpha_composite(Image.open(made).convert("RGBA"))
+            return c
     pal = dict(PAL[cls][rarity])
     for role, fallback in {"n": "h", "N": "l", "w": "h", "W": "l", "c": "l", "C": "m"}.items():
         pal.setdefault(role, pal[fallback])

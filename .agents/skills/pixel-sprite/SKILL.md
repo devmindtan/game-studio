@@ -89,6 +89,8 @@ chọn nguồn `.poses.json` nếu sprite có file đó; sprite dùng `gen.py` t
    của người dùng (cắt phần, dịch theo pixel nguyên, lật), không vẽ lại. `gen.py` phải gọi
    `userart.check_connected(ANIM, tên)` trước `export`: mọi khung là một khối liền (thân nhấc khỏi chân ngắn đã làm
    hở 1 px khi chạy, người dùng 2026-11-25). Nhún thì hạ thân xuống chồng lên chân, không nâng lên.
+   Người dùng có vẽ thân trần thì nhân vật **không mặc gì** là thân trần đó; đồ lấy từ hình mặc đồ. Mọi lớp
+   đều ghi ra (kể cả lớp trống khi trần, như vũ khí), và kiểm liền khối cả khi mặc trọn từng bậc.
 1. **Chốt spec**: kích thước (16/24/32/48/64; nhân vật cao thì chừa khoảng trống phía trên cho nhảy), palette
    4–16 màu, hướng nhìn (mặc định quay phải), **điểm neo** (nhân vật đứng: giữa hai bàn chân trên mặt đất;
    vật bay: tâm thân; đạn/giọt: đầu va chạm), danh sách animation với số frame/fps/loop. Mơ hồ thì chọn mặc
