@@ -137,21 +137,22 @@ def lying(layers):
 
 def anims(gear=None):
     f = lambda **kw: frame(gear=gear, **kw)  # noqa: E731
-    # idle: breathe (body dips, the head nods a beat later), the staff leans and comes back
-    idle = [f(), f(hd=(0, 1)), f(up=(0, 1), wp=(1, 0)), f(hd=(0, 1), wp=(1, 0))]
-    # run: the head leads forward on the strides, the body dips on contact, the staff swings with the step
-    run = [f(up=(0, 1), a=(1, 0), b=(-1, -1), hd=(1, 0), wp=(-1, 0)),
-           f(a=(1, 0), b=(0, -1), hd=(1, 0), wp=(-1, 0)),
+    # idle: breathe (body dips, the head nods a beat later). The staff never moves apart from the hand holding it
+    # (user 2026-11-25: a staff swayed on its own slid out of the hand); it moves with the body
+    idle = [f(), f(hd=(0, 1)), f(up=(0, 1)), f(hd=(0, 1))]
+    # run: the head leads forward on the strides, the body (and the staff in its hand) dips on contact
+    run = [f(up=(0, 1), a=(1, 0), b=(-1, -1), hd=(1, 0)),
+           f(a=(1, 0), b=(0, -1), hd=(1, 0)),
            f(a=(0, 0), b=(1, 0), hd=(0, 1)),
-           f(a=(-1, 0), b=(1, 0), wp=(1, 0)),
-           f(up=(0, 1), a=(-1, -1), b=(1, 0), hd=(1, 0), wp=(1, 0)),
-           f(a=(0, -1), b=(1, 0), hd=(1, 0), wp=(1, 0)),
+           f(a=(-1, 0), b=(1, 0)),
+           f(up=(0, 1), a=(-1, -1), b=(1, 0), hd=(1, 0)),
+           f(a=(0, -1), b=(1, 0), hd=(1, 0)),
            f(a=(1, 0), b=(0, 0), hd=(0, 1)),
-           f(a=(1, 0), b=(-1, 0), wp=(-1, 0))]
-    hurt = [f(up=(-1, 0), flash=True, hd=(-1, 0), wp=(-1, 0)), f(up=(-1, 0), hd=(-1, 1)), f(hd=(0, 1))]
-    dash = [f(up=(0, 1), hd=(0, 1)), f(up=(2, 1), a=(2, 0), b=(-2, 0), hd=(1, 0), wp=(-2, 0)),
-            f(up=(2, 1), a=(2, 0), b=(-2, -1), hd=(1, 0), wp=(-2, 0)),
-            f(up=(2, 1), a=(2, 0), b=(-2, 0), hd=(1, 0), wp=(-1, 0)), f(up=(1, 0))]
+           f(a=(1, 0), b=(-1, 0))]
+    hurt = [f(up=(-1, 0), flash=True, hd=(-1, 0)), f(up=(-1, 0), hd=(-1, 1)), f(hd=(0, 1))]
+    dash = [f(up=(0, 1), hd=(0, 1)), f(up=(2, 1), a=(2, 0), b=(-2, 0), hd=(1, 0)),
+            f(up=(2, 1), a=(2, 0), b=(-2, -1), hd=(1, 0)),
+            f(up=(2, 1), a=(2, 0), b=(-2, 0), hd=(1, 0)), f(up=(1, 0))]
     death = [f(up=(-1, 0), flash=True), f(up=(0, 1)), f(up=(0, 1)), lying(f(up=(0, 1))), lying(f(up=(0, 1)))]
     hb = {"shape": "rect", "center": [24.0, 30.0]}
     return [("idle", idle, 5, True, {"durations_ms": [240, 160, 240, 160], "hitbox": dict(hb, active=[0, 3])}),

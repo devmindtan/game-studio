@@ -88,7 +88,8 @@ chọn nguồn `.poses.json` nếu sprite có file đó; sprite dùng `gen.py` t
 0c. **Nhân vật do người dùng vẽ** (từ 2026-11-25): bản gốc ở `sprite-lab/sources/user/`, chỉ dựng animation bằng pixel
    của người dùng (cắt phần, dịch theo pixel nguyên, lật), không vẽ lại. `gen.py` phải gọi
    `userart.check_connected(ANIM, tên)` trước `export`: mọi khung là một khối liền (thân nhấc khỏi chân ngắn đã làm
-   hở 1 px khi chạy, người dùng 2026-11-25). Nhún thì hạ thân xuống chồng lên chân, không nâng lên.
+   hở 1 px khi chạy, người dùng 2026-11-25). Nhún thì hạ thân xuống chồng lên chân, không nâng lên. Vật cầm trong tay (gậy, cung, kiếm) **luôn đi cùng bàn tay cầm nó**,
+   không cho đung đưa riêng (gậy Pháp sư trượt khỏi tay 1 px mà kiểm liền khối không bắt được vì viền vẫn chạm, 2026-11-25).
    Người dùng có vẽ thân trần thì nhân vật **không mặc gì** là thân trần đó; đồ lấy từ hình mặc đồ. Mọi lớp
    đều ghi ra (kể cả lớp trống khi trần, như vũ khí), và kiểm liền khối cả khi mặc trọn từng bậc.
 1. **Chốt spec**: kích thước (16/24/32/48/64; nhân vật cao thì chừa khoảng trống phía trên cho nhảy), palette
