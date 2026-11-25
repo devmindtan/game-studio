@@ -34,7 +34,7 @@ SIZE = 24
 OUTLINE = "#1b1726"
 RARITIES = ["common", "rare", "epic", "legendary"]
 SLOTS = ["head", "chest", "legs", "arms", "feet", "weapon"]
-CLASS_SLOTS = {"knight": ["head", "chest", "feet", "weapon", "shield"], "mage": SLOTS}   # user 2026-11-25: knight set
+CLASS_SLOTS = {"knight": ["head", "chest", "feet", "weapon", "shield"], "mage": ["head", "chest", "feet", "weapon"]}   # user 2026-11-25: knight set
 
 # --- palettes: class -> rarity -> role letter -> colour -------------------------
 _K = "#1b1726"
@@ -385,8 +385,6 @@ ITEMS = {
     ("knight", "shield"): ["iron_shield", "steel_shield", "dragon_shield", "aegis_shield"],
     ("mage", "head"): ["cloth_hat", "wizard_hat", "void_hat", "star_hat"],
     ("mage", "chest"): ["cloth_robe", "mage_robe", "void_robe", "star_robe"],
-    ("mage", "legs"): ["cloth_pants", "mage_pants", "void_pants", "star_pants"],
-    ("mage", "arms"): ["cloth_wraps", "arcane_bracer", "void_bracer", "star_bracer"],
     ("mage", "feet"): ["cloth_shoes", "mage_shoes", "void_shoes", "star_shoes"],
     ("mage", "weapon"): ["wood_staff", "crystal_staff", "void_staff", "star_staff"],
 }
@@ -403,12 +401,12 @@ def grid(cls, slot, rarity):
     return rows
 
 
-KNIGHT_ICONS = HERE.parent / "knight" / "icons"   # user 2026-11-25: knight items drawn from the user's own pieces
+MADE_ICONS = {"knight": HERE.parent / "knight" / "icons", "mage": HERE.parent / "wizard" / "icons"}   # user's art
 
 
 def icon(cls, slot, rarity):
-    if cls == "knight":
-        made = KNIGHT_ICONS / f"{ITEMS[(cls, slot)][RARITIES.index(rarity)]}.png"
+    if cls in MADE_ICONS:
+        made = MADE_ICONS[cls] / f"{ITEMS[(cls, slot)][RARITIES.index(rarity)]}.png"
         if made.exists():                          # made by sprite-lab/sprites/knight/gen.py (user's art, recoloured)
             c = Canvas(SIZE, SIZE)
             c.img.alpha_composite(Image.open(made).convert("RGBA"))
