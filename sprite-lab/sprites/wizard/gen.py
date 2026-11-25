@@ -55,10 +55,16 @@ def _layer_of(x, y, rgb):
     return "chest"                                        # the robe
 
 
-def _group(layer, x):
+def _group(layer, x, y=0):
+    """Motion group of a pixel (mirrored-crop coords): feet a / b, the head (hood, face, hair, beard above the
+    shoulders), the staff, and the body (robe, hands). user 2026-11-25: one rigid block looked stiff."""
     if layer == "feet_back":
         return "a" if x >= 10 else "b"                    # mirrored: the left foot is x >= 10
-    return "up"
+    if layer == "weapon":
+        return "wp"
+    if layer == "head" or (layer == "body" and y < 20):
+        return "hd"
+    return "ch"
 
 
 def _parts():
@@ -78,9 +84,11 @@ OX = 24 - 10            # after the mirror the feet are x 5..13: centre them on 
 OY = FLOOR - FEET_Y - 1
 
 
-def frame(up=(0, 0), a=(0, 0), b=(0, 0), flash=False, gear=None):
-    """One frame as {layer: Canvas}; gear maps a slot to a colour function (the item tier)."""
-    offs = {"up": up, "a": a, "b": b}
+def frame(up=(0, 0), a=(0, 0), b=(0, 0), flash=False, gear=None, hd=(0, 0), wp=(0, 0), ch=(0, 0)):
+    """One frame as {layer: Canvas}; gear maps a slot to a colour function (the item tier). up moves the whole upper
+    body; hd / ch / wp add to the head, the body and the staff on top of it."""
+    offs = {"a": a, "b": b, "hd": (up[0] + hd[0], up[1] + hd[1]), "ch": (up[0] + ch[0], up[1] + ch[1]),
+            "wp": (up[0] + wp[0], up[1] + wp[1])}
     out = {}
     for k in LAYER_ORDER:
         fn = (gear or {}).get(SLOT_OF.get(k, ""))
@@ -96,7 +104,7 @@ def frame(up=(0, 0), a=(0, 0), b=(0, 0), flash=False, gear=None):
                 p = px[x, y]
                 if not p[3]:
                     continue
-                dx, dy = offs[_group(k, x)]
+                dx, dy = offs[_group(k, x, y)]
                 col = fn(p) if fn else p
                 if flash:
                     col = (min(255, col[0] + 150), min(255, col[1] + 150), min(255, col[2] + 150), col[3])
@@ -129,12 +137,21 @@ def lying(layers):
 
 def anims(gear=None):
     f = lambda **kw: frame(gear=gear, **kw)  # noqa: E731
-    idle = [f(), f(), f(up=(0, 1)), f(up=(0, 1))]
-    run = [f(up=(0, 1), a=(1, 0), b=(-1, -1)), f(a=(1, 0), b=(0, -1)), f(a=(0, 0), b=(1, 0)), f(a=(-1, 0), b=(1, 0)),
-           f(up=(0, 1), a=(-1, -1), b=(1, 0)), f(a=(0, -1), b=(1, 0)), f(a=(1, 0), b=(0, 0)), f(a=(1, 0), b=(-1, 0))]
-    hurt = [f(up=(-1, 0), flash=True), f(up=(-1, 0)), f()]
-    dash = [f(up=(0, 1)), f(up=(2, 1), a=(2, 0), b=(-2, 0)), f(up=(2, 1), a=(2, 0), b=(-2, -1)),
-            f(up=(2, 1), a=(2, 0), b=(-2, 0)), f(up=(1, 0))]
+    # idle: breathe (body dips, the head nods a beat later), the staff leans and comes back
+    idle = [f(), f(hd=(0, 1)), f(up=(0, 1), wp=(1, 0)), f(hd=(0, 1), wp=(1, 0))]
+    # run: the head leads forward on the strides, the body dips on contact, the staff swings with the step
+    run = [f(up=(0, 1), a=(1, 0), b=(-1, -1), hd=(1, 0), wp=(-1, 0)),
+           f(a=(1, 0), b=(0, -1), hd=(1, 0), wp=(-1, 0)),
+           f(a=(0, 0), b=(1, 0), hd=(0, 1)),
+           f(a=(-1, 0), b=(1, 0), wp=(1, 0)),
+           f(up=(0, 1), a=(-1, -1), b=(1, 0), hd=(1, 0), wp=(1, 0)),
+           f(a=(0, -1), b=(1, 0), hd=(1, 0), wp=(1, 0)),
+           f(a=(1, 0), b=(0, 0), hd=(0, 1)),
+           f(a=(1, 0), b=(-1, 0), wp=(-1, 0))]
+    hurt = [f(up=(-1, 0), flash=True, hd=(-1, 0), wp=(-1, 0)), f(up=(-1, 0), hd=(-1, 1)), f(hd=(0, 1))]
+    dash = [f(up=(0, 1), hd=(0, 1)), f(up=(2, 1), a=(2, 0), b=(-2, 0), hd=(1, 0), wp=(-2, 0)),
+            f(up=(2, 1), a=(2, 0), b=(-2, -1), hd=(1, 0), wp=(-2, 0)),
+            f(up=(2, 1), a=(2, 0), b=(-2, 0), hd=(1, 0), wp=(-1, 0)), f(up=(1, 0))]
     death = [f(up=(-1, 0), flash=True), f(up=(0, 1)), f(up=(0, 1)), lying(f(up=(0, 1))), lying(f(up=(0, 1)))]
     hb = {"shape": "rect", "center": [24.0, 30.0]}
     return [("idle", idle, 5, True, {"durations_ms": [240, 160, 240, 160], "hitbox": dict(hb, active=[0, 3])}),
