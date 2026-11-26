@@ -1,5 +1,5 @@
 {
-  "frames": 94,
+  "frames": 95,
   "frame_size": [
     24,
     24
@@ -666,6 +666,13 @@
     {
       "name": "shadow_strike",
       "start": 93,
+      "frames": 1,
+      "fps": 1.0,
+      "loop": false
+    },
+    {
+      "name": "ricochet",
+      "start": 94,
       "frames": 1,
       "fps": 1.0,
       "loop": false

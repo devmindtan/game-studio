@@ -1171,6 +1171,17 @@ def shadow_strike():
     return done(c)
 
 
+def ricochet():
+    """Tên nảy: an arrow bouncing in a zig-zag between two monsters."""
+    c = new()
+    c.ellipse(1, 15, 7, 21, STONE["d"], fill=False)
+    c.ellipse(15, 15, 21, 21, STONE["d"], fill=False)
+    c.line(4, 15, 11, 4, WIND["m"], 1)
+    c.line(11, 4, 18, 15, WIND["m"], 1)
+    _arrow(c, 8, 22, 20, 10)
+    return done(c)
+
+
 ICONS = {f.__name__: f for f in (blade_arc, whirlwind, earth_strike, ground_slam, cleave_wave, holy_column, dash,
                                  earthquake, solar_ray, god_hammer, arcane_bolt, fireball, frost_nova, lightning,
                                  thunder_javelin, meteor, void_orb, blizzard, storm, back_slash, sharpen, haste, reach,
@@ -1185,7 +1196,7 @@ ICONS = {f.__name__: f for f in (blade_arc, whirlwind, earth_strike, ground_slam
                                  sp_shade_cloak, sp_shade_ring, sp_shade_hood, sp_shade_dagger, pierce_shot, fan_volley,
                                  fire_arrow, frost_arrow, thunder_arrow, fan_knives, piercing_knife, bleed_knife,
                                  venom_knife, fire_knife, arrow_rain, thorn_trap, hawk, smoke_bomb,
-                                 blade_ring, shadow_strike)}
+                                 blade_ring, shadow_strike, ricochet)}
 
 if __name__ == "__main__":
     anims = [(n, [f()], 1, False, {}) for n, f in ICONS.items()]
