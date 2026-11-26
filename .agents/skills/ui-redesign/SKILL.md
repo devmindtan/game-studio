@@ -49,4 +49,5 @@ Người dùng 2026-11-26: "bổ sung quy trình thiết kế giao diện trên 
   Chỉ chữ dọc xoay đúng 90° với toạ độ nguyên.
 - Toạ độ và kích thước khung là số nguyên (mẩu giấy có tâm thì bề rộng chẵn).
 - Nội dung trong vùng cuộn chừa lề phải ~18 px cho thanh cuộn; soi ×2 cột phải của mọi bảng cuộn.
-
+- Soát ảnh **nguyên trang** đến cả hai mép sổ (không cắt vùng trước khi nhìn toàn cảnh), và chụp **mọi trạng thái** của
+  nút chính (ví dụ Mặc / Bỏ ra, có / không thanh cuộn) — 2026-11-26 con dấu tràn khỏi trang lọt qua vì ảnh bị cắt.
