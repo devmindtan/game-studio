@@ -21,15 +21,14 @@ const Journal = {
   },
 };
 addEventListener("keydown", (ev) => { if (ev.key === "Escape") Journal.back(); });
-// "Trở lại" on every journal page (not the lobby: its ribbon already changes character). ?back=b shows direction B.
+// "Trở lại" on every journal page (not the lobby: its own tabs already go back): an icon tab like the lobby's corner tabs.
 addEventListener("DOMContentLoaded", () => {
-  const book = document.querySelector(".book");
-  if (!book || /screen-lobby/.test(location.pathname)) return;
-  const b = new URLSearchParams(location.search).get("back") === "b";
+  if (!document.querySelector(".book") || /screen-lobby/.test(location.pathname)) return;
   const el = document.createElement("div");
-  el.className = b ? "back-b" : "back-a";
-  el.innerHTML = b ? "◂ Trở lại <kbd>· Esc</kbd>" : "Trở lại";
+  el.className = "back-tab";
+  el.title = "Trở lại (Esc)";
+  el.innerHTML = '<img src="assets/lobby/back.svg" alt="Trở lại">';
   el.onclick = () => Journal.back();
-  (b ? document.getElementById("game") : document.getElementById("game")).appendChild(el);
-  if (b) document.body.classList.add("has-back-b");
+  document.getElementById("game").appendChild(el);
+  document.body.classList.add("has-back");
 });

@@ -325,15 +325,9 @@
      "chosen": true
     },
     {
-     "label": "Nút Trở lại: hướng B (giấy góc dưới)",
+     "label": "Nút Trở lại (thẻ icon như góc sảnh)",
      "page": "screen-settings-journal.html",
-     "query": "back=b",
-     "shot": "back-b.png"
-    },
-    {
-     "label": "Nút Trở lại: hướng A (dải mép trái)",
-     "page": "screen-settings-journal.html",
-     "shot": "back-a.png"
+     "shot": "back-tab.png"
     }
    ]
   },

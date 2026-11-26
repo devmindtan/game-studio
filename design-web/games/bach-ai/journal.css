@@ -39,14 +39,10 @@ img { image-rendering: pixelated; }
 .seal { position: absolute; background: var(--seal); color: #ffe0b0; font-size: 32px; text-align: center; border: 4px solid #5a0c08; box-shadow: 0 4px 0 #0006; }
 .seal.on { background: #d0402a; outline: 4px solid var(--gold); }
 .hint { position: absolute; left: 70px; bottom: 6px; font-size: 20px; color: #c8a878; }
-/* "Trở lại" (user 2026-11-26: every page lacked a back button). A: a bookmark out of the book's left edge;
-   B: a paper tag on the desk, bottom left, with its key. Both do what Esc does. */
-.back-a { position: absolute; left: 22px; top: 90px; width: 52px; min-height: 120px; padding: 10px 0; background: #6a4a3a; border: 3px solid #0006;
-  color: #f3e6c8; font-size: 20px; writing-mode: vertical-rl; text-align: center; line-height: 46px; cursor: pointer; }
-.back-a::before { content: "◀"; writing-mode: horizontal-tb; display: block; font-size: 18px; line-height: 26px; }
-.back-a:hover, .back-a.on { width: 66px; left: 8px; outline: 3px solid var(--gold); filter: brightness(1.15); }
-.back-b { position: absolute; left: 70px; bottom: 4px; height: 30px; padding: 0 12px; background: var(--paper); color: var(--ink); border: 3px solid var(--edge);
-  font-size: 20px; line-height: 24px; cursor: pointer; box-shadow: 0 3px 0 #0006; }
-.back-b:hover, .back-b.on { outline: 3px solid var(--gold); color: var(--ink-red); }
-.back-b kbd { font: inherit; color: var(--ink-soft); }
-body.has-back-b .hint { left: 240px; }
+/* "Trở lại" (user 2026-11-26: every page lacked a back button; "làm giống mấy cái thẻ bên góc"): an icon tab like the
+   lobby's settings / character / title tabs, at the top of the book's right edge; the text ribbons start under it. */
+.back-tab { position: absolute; left: 1184px; top: 96px; width: 54px; height: 52px; z-index: 2; background: #7a5a3a; border: 3px solid #0006;
+  display: grid; place-items: center; cursor: pointer; }
+.back-tab img { width: 30px; height: 30px; }
+.back-tab:hover, .back-tab.on { width: 68px; filter: brightness(1.15); outline: 3px solid var(--gold); }
+body.has-back .ribbons { top: 118px; }
