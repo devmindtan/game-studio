@@ -75,6 +75,13 @@
      "shot": "lobby-stats.png"
     },
     {
+     "label": "B · Dải đánh dấu (→)",
+     "note": "Cài đặt / Đổi nhân vật / Tiêu đề",
+     "page": "screen-lobby-journal.html",
+     "query": "rib=1",
+     "shot": "lobby-ribbon.png"
+    },
+    {
      "label": "C · Tối giản",
      "note": "danh sách chữ, nhân vật sáng",
      "page": "screen-lobby-stark.html",

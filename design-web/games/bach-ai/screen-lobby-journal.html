@@ -41,7 +41,7 @@ h1 { font-size: 54px; font-weight: normal; line-height: .9; }
 .apx td.up { color: #2a7a3a; }
 /* right page: the contents */
 .toc h2 { font-size: 40px; font-weight: normal; border-bottom: 3px solid #3a2414; padding-bottom: 2px; margin-bottom: 8px; }
-.row { display: flex; align-items: center; gap: 14px; font-size: 28px; padding: 1px 8px; cursor: pointer; }
+.row { display: flex; align-items: center; gap: 14px; font-size: 30px; padding: 5px 8px; cursor: pointer; }
 .row img { width: 32px; height: 32px; filter: brightness(0) saturate(100%) invert(14%) sepia(30%) saturate(1500%) hue-rotate(350deg); }
 .row.on img { filter: brightness(0) invert(92%) sepia(20%); }
 .row .dots { flex: 1; border-bottom: 2px dotted #a08060; margin: 0 6px; transform: translateY(-6px); }
@@ -53,7 +53,10 @@ h1 { font-size: 54px; font-weight: normal; line-height: .9; }
   font-size: 34px; text-align: center; line-height: 66px; border: 4px solid #5a0c08; box-shadow: 0 4px 0 #0006; }
 .seal.on { background: #d0402a; outline: 4px solid #ffd36b; }
 /* bookmark ribbons on the right edge: the chapters */
-.ribbon { position: absolute; right: -40px; width: 52px; height: 40px; border: 3px solid #0006; }
+/* the ribbons are the three book-keeping entries (user 2026-11-26): settings, change character, title */
+.ribbon { position: absolute; right: -44px; width: 56px; padding: 10px 0; border: 3px solid #0006; color: #f3e6c8; font-size: 20px;
+  writing-mode: vertical-rl; text-align: center; line-height: 50px; cursor: pointer; }
+.ribbon.on { right: -66px; width: 78px; filter: brightness(1.15); outline: 3px solid #ffd36b; }
 .hint { position: absolute; left: 70px; bottom: 6px; font-size: 20px; color: #c8a878; }
 </style>
 </head>
@@ -61,9 +64,7 @@ h1 { font-size: 54px; font-weight: normal; line-height: .9; }
 <div id="game">
   <div class="book">
     <div class="cover"></div>
-    <div class="ribbon" style="top:60px;background:#3a6a8a"></div>
-    <div class="ribbon" style="top:110px;background:#6a8a3a"></div>
-    <div class="ribbon" style="top:160px;background:#8a3a6a"></div>
+    <div id="ribbons"></div>
     <div class="page l">
       <h1>Nhân vật 1</h1>
       <div class="sub">Kiếm sĩ · cận chiến, lì đòn · đã qua Ải 10</div>
@@ -89,7 +90,7 @@ h1 { font-size: 54px; font-weight: normal; line-height: .9; }
       <div class="seal" id="seal">Lên đường ▶</div>
     </div>
   </div>
-  <div class="hint">↑ ↓ chọn chương · Enter mở · C chỉ số · Esc đổi nhân vật</div>
+  <div class="hint">↑ ↓ chọn chương · → dải đánh dấu · Enter mở · C chỉ số · Esc đổi nhân vật</div>
 </div>
 <script src="journal.js"></script>
 <script>
@@ -100,12 +101,17 @@ const R = [   // the same nine chapters as the game's lobby; [screen, icon, name
   ["gacha", "nav_gacha", "Quay đồ", "IV", "Dùng đá quay trang bị hiếm."],
   ["missions", "nav_missions", "Nhiệm vụ", "V", "Việc trong ngày và phần thưởng chờ nhận."],
   ["album", "nav_album", "Album", "VI", "Bách khoa: quái, boss và kỹ năng."],
-  ["settings", "nav_settings", "Cài đặt", "VII", "Âm thanh, hiển thị, phím."],
-  ["characters", "nav_character", "Đổi nhân vật", "VIII", "Chọn hoặc tạo nhân vật khác (Esc)."],
-  ["title", "nav_title", "Về tiêu đề", "IX", "Về màn hình tiêu đề."],
   ["stages", null, "Lên đường", "", "Mở bản đồ, chọn Ải 11 rồi vào trận."],
 ];
 let sel = R.length - 1;
+// the ribbons on the book's edge: → moves there, ↑ ↓ between them, ← back to the contents
+const RIB = [["settings", "Cài đặt", "#3a6a8a", "Âm thanh, hiển thị, phím."], ["characters", "Đổi nhân vật", "#6a8a3a", "Chọn hoặc tạo nhân vật khác (Esc)."],
+  ["title", "Tiêu đề", "#8a3a6a", "Về màn hình tiêu đề."]];
+let rib = +(new URLSearchParams(location.search).get("rib") ?? -1);   // -1: the focus is in the contents (?rib= for shots)
+function drawRibbons() {
+  document.getElementById("ribbons").innerHTML = RIB.map(([, n, c], i) =>
+    `<div class="ribbon ${i === rib ? "on" : ""}" style="top:${50 + i * 150}px;background:${c}" onclick="rib=${i};draw()">${n}</div>`).join("");
+}
 let apx = new URLSearchParams(location.search).get("view") === "stats";
 let rows;
 function rebuild() {   // the contents page (built again after the appendix turned the page)
@@ -119,10 +125,11 @@ function rebuild() {   // the contents page (built again after the appendix turn
   draw();
 }
 function draw() {
+  drawRibbons();
   if (apx || !rows) return;
-  [...rows.children].forEach((e, i) => e.classList.toggle("on", i === sel));
-  document.getElementById("seal").classList.toggle("on", sel === R.length - 1);
-  document.getElementById("desc").textContent = R[sel][4];
+  [...rows.children].forEach((e, i) => e.classList.toggle("on", rib < 0 && i === sel));
+  document.getElementById("seal").classList.toggle("on", rib < 0 && sel === R.length - 1);
+  document.getElementById("desc").textContent = rib >= 0 ? RIB[rib][3] : R[sel][4];
 }
 // C: the right page turns to the appendix of every stat (user 2026-11-26: more than the six basics need their own table)
 const APX = [["Máu tối đa", "100", "+15", "+3", "118"], ["Hồi máu", "0", "—", "—", "0/giây"], ["Giáp", "0", "+2", "—", "2 (−12%)"],
@@ -140,9 +147,13 @@ function drawApx() {
 addEventListener("keydown", (ev) => { if (ev.key === "c" || ev.key === "C") { apx = !apx; drawApx(); } });
 addEventListener("keydown", (ev) => {
   if (apx) return;
-  if (ev.key === "ArrowDown" || ev.key === "s") sel = (sel + 1) % R.length;
-  if (ev.key === "ArrowUp" || ev.key === "w") sel = (sel + R.length - 1) % R.length;
-  if (ev.key === "Enter") Journal.go(R[sel][0]);
+  if (ev.key === "ArrowRight" || ev.key === "d") rib = Math.max(rib, 0);
+  else if (ev.key === "ArrowLeft" || ev.key === "a") rib = -1;
+  else if (rib >= 0 && (ev.key === "ArrowDown" || ev.key === "s")) rib = (rib + 1) % RIB.length;
+  else if (rib >= 0 && (ev.key === "ArrowUp" || ev.key === "w")) rib = (rib + RIB.length - 1) % RIB.length;
+  else if (ev.key === "ArrowDown" || ev.key === "s") sel = (sel + 1) % R.length;
+  else if (ev.key === "ArrowUp" || ev.key === "w") sel = (sel + R.length - 1) % R.length;
+  else if (ev.key === "Enter") Journal.go(rib >= 0 ? RIB[rib][0] : R[sel][0]);
   draw();
 });
 rebuild();

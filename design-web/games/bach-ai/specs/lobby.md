@@ -41,3 +41,10 @@ chi tiết chỉ số khác nếu vượt quá 6 chỉ số cơ bản)". Sửa t
 - 6 chỉ số cơ bản: Máu, Sát thương, Giáp, Tốc độ, Chí mạng, Hồi chiêu; dòng "Xem đủ chỉ số (C) ▸".
 - Phím C lật trang phải thành **Phụ lục: chỉ số**: 11 chỉ số (Máu tối đa, Hồi máu, Giáp, Sát thương, Chí mạng, Sát thương
   chí mạng, Hồi chiêu, Vùng đánh, Số lượng, Tốc độ chạy, Tầm hút) với cột Gốc / Trang bị / Cây / Tổng; C lần nữa về Mục lục.
+
+## Góp ý 2026-11-26: dải đánh dấu
+
+3 dải màu ở mép sổ trước chỉ để trang trí. Người dùng: đưa Cài đặt, Về tiêu đề (tên ngắn hơn) và Đổi nhân vật lên đó.
+Giờ dải là ba mục "Cài đặt", "Đổi nhân vật", "Tiêu đề"; Mục lục còn 6 chương (Trang bị, Cây kỹ năng, Bộ thẻ, Quay đồ,
+Nhiệm vụ, Album) + con dấu Lên đường. → sang cột dải, ↑ ↓ giữa các dải, ← về Mục lục, Enter mở; dải đang chọn dài ra,
+viền vàng; dòng mô tả dưới Mục lục nói việc của dải.
