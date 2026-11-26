@@ -37,6 +37,8 @@ Người dùng 2026-11-26: "bổ sung quy trình thiết kế giao diện trên 
    vậy"): cùng bố cục trang, cùng tiêu đề/chữ, cùng loại điều khiển (dải đánh dấu là dải đánh dấu, không đổi thành tab;
    màn hai trang là hai trang, không đổi thành hộp nổi). Trước khi code một màn, mở file `screen-*.html` của nó, liệt kê
    từng khối (trang trái / phải / dải / con dấu / gợi ý phím) rồi làm đủ. Chỗ nào game cần mà web không có (nút của
-   tính năng cũ, dữ liệu thật dài hơn) thì **ghi ra và hỏi** trước, không tự thêm. Báo xong phải đặt ảnh game cạnh ảnh
+   tính năng cũ, dữ liệu thật dài hơn) thì **thiết kế nó trên web trước** (thêm vào `screen-*.html` / một hướng mới
+   trong `screens.json`), gửi link Design Lab, người dùng xem và duyệt rồi mới đưa vào game (người dùng 2026-11-26:
+   "Cái nào chưa có trên web thì thiết kế trên web cho tôi xem rồi mới đưa vào game"); không tự thêm vào game. Báo xong phải đặt ảnh game cạnh ảnh
    web của cùng màn và nêu khác biệt còn lại.
 8. **Commit**: repo gốc (`design-web/`), repo game (`src/`, `production/ui/`), kèm ảnh trước / sau.
