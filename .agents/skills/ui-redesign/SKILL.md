@@ -28,6 +28,9 @@ Người dùng 2026-11-26: "bổ sung quy trình thiết kế giao diện trên 
 4. **2–3 hướng** trên web: `design-web/screen-<màn>-<hướng>.html` (+ css/js), mỗi hướng khác nhau thật sự (ví dụ
    sổ tay da / bàn đá rune / bản đồ giấy), cùng dữ liệu thật của game. `design-web/serve.sh` để xem.
 5. **Chụp và soát** mỗi hướng 1280×720 vào `design-web/shots/`, soi từng vùng ×2 (căn chữ, tràn, khoảng cách).
-6. **Người dùng chọn** (hỏi kèm ảnh). Chưa chọn thì không port.
+6. **Người dùng xem trên web rồi chọn.** Chạy `design-web/serve.sh` (nền) và đưa **đường link** từng hướng
+   (`http://localhost:8770/design-web/screen-<màn>-<hướng>.html`) ngay trong tin nhắn, kèm ảnh. Không hỏi chọn chỉ
+   bằng đường dẫn file (bài học 2026-11-26: người dùng không xem được nên chọn mò, agent port luôn rồi phải hoàn tác).
+   Người dùng chưa nói đã xem và chọn thì không port.
 7. **Port** hướng đã chọn sang Godot (`UiKit` / theme của game), `gamekit ui-shots <g> <màn>`, so với ảnh web, soi ×2.
 8. **Commit**: repo gốc (`design-web/`), repo game (`src/`, `production/ui/`), kèm ảnh trước / sau.
