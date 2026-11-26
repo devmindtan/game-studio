@@ -1107,6 +1107,70 @@ def fire_knife():
     return done(c)
 
 
+def arrow_rain():
+    """Mưa tên: arrows falling onto a ring on the ground."""
+    c = new()
+    c.ellipse(3, 16, 21, 22, EARTH["d"], fill=False)
+    for x in (6, 12, 18):
+        c.line(x - 4, 1, x, 17, WOOD["m"], 1)
+        c.polygon([(x + 1, 19), (x - 2, 15), (x + 2, 15)], STEEL["m"])
+    return done(c)
+
+
+def thorn_trap():
+    """Bẫy gai: green thorns bursting from a patch of earth."""
+    c = new()
+    c.ellipse(2, 15, 21, 22, EARTH["m"])
+    for (x, h) in ((6, 9), (11, 14), (16, 10), (9, 6), (14, 7)):
+        c.polygon([(x - 2, 18), (x + 2, 18), (x, 18 - h)], LEAF["d"])
+        c.line(x, 17, x, 19 - h, LEAF["l"], 1)
+    return done(c)
+
+
+def hawk():
+    """Chim ưng: a hawk diving with wings swept back."""
+    c = new()
+    c.polygon([(4, 5), (18, 16), (14, 19), (2, 8)], EARTH["m"])
+    c.polygon([(8, 9), (2, 1), (13, 8)], EARTH["d"])
+    c.polygon([(9, 11), (3, 20), (14, 15)], EARTH["l"])
+    c.polygon([(18, 16), (22, 19), (16, 20)], GOLD["m"])
+    c.pixel(15, 15, OUTLINE)
+    return done(c)
+
+
+def smoke_bomb():
+    """Bom khói: a round bomb with a lit fuse in a puff of smoke."""
+    c = new()
+    for (x, y, r) in ((5, 8, 4), (18, 7, 4), (4, 17, 4), (19, 17, 4)):
+        c.ellipse(x - r, y - r, x + r, y + r, STONE["l"])
+    c.ellipse(7, 9, 17, 19, STONE["d"])
+    c.pixel(10, 12, STONE["l"])
+    c.line(14, 9, 17, 4, EARTH["m"], 1)
+    c.pixel(18, 3, FIRE["m"])
+    return done(c)
+
+
+def blade_ring():
+    """Vòng dao: daggers set round a violet ring."""
+    c = new()
+    c.ellipse(4, 4, 19, 19, VOID["m"], fill=False)
+    _knife(c, 2, 2, 9, 9)
+    _knife(c, 21, 2, 14, 9)
+    _knife(c, 2, 21, 9, 14)
+    _knife(c, 21, 21, 14, 14)
+    return done(c)
+
+
+def shadow_strike():
+    """Ám kích: two crossing violet slashes."""
+    c = new()
+    c.line(3, 3, 20, 20, VOID["d"], 3)
+    c.line(3, 3, 20, 20, VOID["l"], 1)
+    c.line(20, 3, 3, 20, VOID["d"], 3)
+    c.line(20, 3, 3, 20, VOID["l"], 1)
+    return done(c)
+
+
 ICONS = {f.__name__: f for f in (blade_arc, whirlwind, earth_strike, ground_slam, cleave_wave, holy_column, dash,
                                  earthquake, solar_ray, god_hammer, arcane_bolt, fireball, frost_nova, lightning,
                                  thunder_javelin, meteor, void_orb, blizzard, storm, back_slash, sharpen, haste, reach,
@@ -1120,7 +1184,8 @@ ICONS = {f.__name__: f for f in (blade_arc, whirlwind, earth_strike, ground_slam
                                  throw_knife, quick_hands, keen_blades, extra_knife, sp_shade_boots, sp_shade_gloves,
                                  sp_shade_cloak, sp_shade_ring, sp_shade_hood, sp_shade_dagger, pierce_shot, fan_volley,
                                  fire_arrow, frost_arrow, thunder_arrow, fan_knives, piercing_knife, bleed_knife,
-                                 venom_knife, fire_knife)}
+                                 venom_knife, fire_knife, arrow_rain, thorn_trap, hawk, smoke_bomb,
+                                 blade_ring, shadow_strike)}
 
 if __name__ == "__main__":
     anims = [(n, [f()], 1, False, {}) for n, f in ICONS.items()]

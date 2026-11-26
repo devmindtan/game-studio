@@ -1,5 +1,5 @@
 {
-  "frames": 88,
+  "frames": 94,
   "frame_size": [
     24,
     24
@@ -624,6 +624,48 @@
     {
       "name": "fire_knife",
       "start": 87,
+      "frames": 1,
+      "fps": 1.0,
+      "loop": false
+    },
+    {
+      "name": "arrow_rain",
+      "start": 88,
+      "frames": 1,
+      "fps": 1.0,
+      "loop": false
+    },
+    {
+      "name": "thorn_trap",
+      "start": 89,
+      "frames": 1,
+      "fps": 1.0,
+      "loop": false
+    },
+    {
+      "name": "hawk",
+      "start": 90,
+      "frames": 1,
+      "fps": 1.0,
+      "loop": false
+    },
+    {
+      "name": "smoke_bomb",
+      "start": 91,
+      "frames": 1,
+      "fps": 1.0,
+      "loop": false
+    },
+    {
+      "name": "blade_ring",
+      "start": 92,
+      "frames": 1,
+      "fps": 1.0,
+      "loop": false
+    },
+    {
+      "name": "shadow_strike",
+      "start": 93,
       "frames": 1,
       "fps": 1.0,
       "loop": false

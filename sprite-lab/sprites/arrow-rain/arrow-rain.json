@@ -1,36 +1,38 @@
 {
-  "frames": 10,
+  "frames": 12,
   "frame_size": [
-    48,
-    56
+    112,
+    112
   ],
   "fps": 12.0,
   "loop": false,
   "anchor": [
-    24.0,
-    52.0
+    56.0,
+    56.0
   ],
   "anchor_source": "explicit",
   "animations": [
     {
-      "name": "rain",
+      "name": "burst",
       "start": 0,
-      "frames": 10,
+      "frames": 12,
       "fps": 12.0,
       "loop": false,
       "hitbox": {
-        "shape": "rect",
+        "shape": "circle",
         "center": [
-          25.0,
-          27.0
+          56.0,
+          56.0
         ],
         "active": [
-          0,
-          9
+          3,
+          7
         ],
-        "half_w": 18.0,
-        "half_h": 27.0
-      }
+        "radius": 42.0,
+        "inner": 0.0
+      },
+      "hit_mask": true
     }
-  ]
+  ],
+  "px_scale": 0.5
 }
