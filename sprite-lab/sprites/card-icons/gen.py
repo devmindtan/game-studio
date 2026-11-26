@@ -897,6 +897,113 @@ def sp_ranger_bow():
     return done(c)
 
 
+def _knife(c, x0, y0, x1, y1, blade=None):
+    """A dagger from its pommel (x0, y0) to its tip (x1, y1) on a 45-degree axis: dark grip, gold guard, steel blade."""
+    dx, dy = (1 if x1 > x0 else -1), (1 if y1 > y0 else -1)
+    b = blade or STEEL
+    n = abs(x1 - x0)
+    g = n // 3
+    c.line(x0, y0, x0 + dx * g, y0 + dy * g, EARTH["d"], 1)
+    gx, gy = x0 + dx * g, y0 + dy * g
+    c.line(gx - dx * 2, gy + dy * 2, gx + dx * 2, gy - dy * 2, GOLD["m"], 1)
+    c.line(gx + dx, gy + dy, x1, y1, b["m"], 2)
+    c.line(gx + dx, gy + dy, x1, y1, b["l"], 1)
+
+
+def throw_knife():
+    """Phi đao: one dagger flying up-right with two speed lines."""
+    c = new()
+    _knife(c, 4, 19, 20, 3)
+    c.line(2, 12, 6, 8, WIND["m"], 1)
+    c.line(10, 22, 14, 18, WIND["m"], 1)
+    return done(c)
+
+
+def quick_hands():
+    """Tay lẹ: a glove with three daggers fanned from it."""
+    c = new()
+    for (x1, y1) in ((6, 2), (13, 1), (21, 4)):
+        c.line(12, 14, x1, y1, STEEL["m"], 1)
+    c.ellipse(7, 12, 17, 22, EARTH["m"])
+    c.rect(7, 18, 17, 22, EARTH["d"])
+    return done(c)
+
+
+def keen_blades():
+    """Dao bén: a big dagger blade with a gleam."""
+    c = new()
+    _knife(c, 3, 21, 21, 3)
+    c.pixel(17, 4, "#ffffff")
+    c.pixel(18, 5, "#ffffff")
+    return done(c)
+
+
+def extra_knife():
+    """Thêm dao: two daggers side by side and a gold plus."""
+    c = new()
+    _knife(c, 2, 21, 14, 9)
+    _knife(c, 7, 23, 19, 11)
+    c.rect(17, 1, 18, 8, GOLD["m"])
+    c.rect(14, 4, 21, 5, GOLD["m"])
+    return done(c)
+
+
+def sp_shade_boots():
+    """Bước ảnh (hit: speed rune): a dark boot with a violet afterimage."""
+    c = new()
+    c.polygon([(6, 3), (12, 3), (12, 15), (18, 18), (18, 21), (5, 21)], VOID["d"])
+    c.polygon([(10, 3), (16, 3), (16, 15), (22, 18), (22, 21), (9, 21)], EARTH["d"])
+    c.polygon([(11, 4), (15, 4), (15, 15), (20, 18), (11, 18)], EARTH["m"])
+    return done(c)
+
+
+def sp_shade_gloves():
+    """Săn mồi (kills heal): a dagger over a small heart."""
+    c = new()
+    c.ellipse(3, 10, 10, 17, HEART["m"])
+    c.ellipse(9, 10, 16, 17, HEART["m"])
+    c.polygon([(3, 14), (16, 14), (9, 22)], HEART["m"])
+    _knife(c, 8, 20, 22, 6)
+    return done(c)
+
+
+def sp_shade_cloak():
+    """Màn đêm (shield): a dark hooded cloak shaped like a shield, a crescent moon on it."""
+    c = new()
+    c.polygon([(12, 1), (21, 6), (19, 18), (12, 23), (5, 18), (3, 6)], VOID["d"])
+    c.polygon([(12, 3), (19, 7), (17, 17), (12, 21), (7, 17), (5, 7)], VOID["m"])
+    c.ellipse(8, 7, 15, 14, GOLD["l"])
+    c.ellipse(10, 6, 17, 13, VOID["m"])
+    return done(c)
+
+
+def sp_shade_ring():
+    """Vòng dao (pulse): a ring with four daggers pointing out."""
+    c = new()
+    c.ellipse(6, 6, 17, 17, VOID["l"], fill=False)
+    for (x0, y0, x1, y1) in ((9, 9, 2, 2), (14, 9, 21, 2), (9, 14, 2, 21), (14, 14, 21, 21)):
+        _knife(c, x0, y0, x1, y1)
+    return done(c)
+
+
+def sp_shade_hood():
+    """Dao sấm (chain shock): a dagger wrapped by a lightning bolt."""
+    c = new()
+    _knife(c, 3, 21, 19, 5)
+    c.polygon([(14, 1), (8, 11), (12, 11), (8, 20), (17, 8), (13, 8), (17, 1)], BOLT["m"])
+    c.line(14, 2, 10, 10, BOLT["l"], 1)
+    return done(c)
+
+
+def sp_shade_dagger():
+    """Ảnh tốc (reset cooldowns): a dagger over a turning arrow."""
+    c = new()
+    c.ellipse(2, 2, 21, 21, VOID["l"], fill=False)
+    c.polygon([(17, 1), (22, 4), (17, 7)], VOID["l"])
+    _knife(c, 5, 18, 18, 5)
+    return done(c)
+
+
 ICONS = {f.__name__: f for f in (blade_arc, whirlwind, earth_strike, ground_slam, cleave_wave, holy_column, dash,
                                  earthquake, solar_ray, god_hammer, arcane_bolt, fireball, frost_nova, lightning,
                                  thunder_javelin, meteor, void_orb, blizzard, storm, back_slash, sharpen, haste, reach,
@@ -906,7 +1013,9 @@ ICONS = {f.__name__: f for f in (blade_arc, whirlwind, earth_strike, ground_slam
                                  sp_star_pants, sp_star_bracer, sp_star_shoes, sp_star_staff, nav_character, nav_deck,
                                  nav_gacha, nav_missions, nav_settings, nav_title, nav_tree, nav_equipment, nav_stages, ev_tornado, ev_falling_tree,
                                  ev_poison_tide, quick_arrow, steady_hand, sharp_arrows, extra_arrow, sp_ranger_boots,
-                                 sp_ranger_gloves, sp_ranger_cloak, sp_ranger_ring, sp_ranger_hood, sp_ranger_bow)}
+                                 sp_ranger_gloves, sp_ranger_cloak, sp_ranger_ring, sp_ranger_hood, sp_ranger_bow,
+                                 throw_knife, quick_hands, keen_blades, extra_knife, sp_shade_boots, sp_shade_gloves,
+                                 sp_shade_cloak, sp_shade_ring, sp_shade_hood, sp_shade_dagger)}
 
 if __name__ == "__main__":
     anims = [(n, [f()], 1, False, {}) for n, f in ICONS.items()]

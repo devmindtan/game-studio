@@ -1,5 +1,5 @@
 {
-  "frames": 56,
+  "frames": 76,
   "frame_size": [
     24,
     24
@@ -400,6 +400,146 @@
     {
       "name": "sun_gloves",
       "start": 55,
+      "frames": 1,
+      "fps": 1.0,
+      "loop": false
+    },
+    {
+      "name": "dusk_hood",
+      "start": 56,
+      "frames": 1,
+      "fps": 1.0,
+      "loop": false
+    },
+    {
+      "name": "night_hood",
+      "start": 57,
+      "frames": 1,
+      "fps": 1.0,
+      "loop": false
+    },
+    {
+      "name": "blood_hood",
+      "start": 58,
+      "frames": 1,
+      "fps": 1.0,
+      "loop": false
+    },
+    {
+      "name": "phantom_hood",
+      "start": 59,
+      "frames": 1,
+      "fps": 1.0,
+      "loop": false
+    },
+    {
+      "name": "dusk_tunic",
+      "start": 60,
+      "frames": 1,
+      "fps": 1.0,
+      "loop": false
+    },
+    {
+      "name": "night_tunic",
+      "start": 61,
+      "frames": 1,
+      "fps": 1.0,
+      "loop": false
+    },
+    {
+      "name": "blood_tunic",
+      "start": 62,
+      "frames": 1,
+      "fps": 1.0,
+      "loop": false
+    },
+    {
+      "name": "phantom_tunic",
+      "start": 63,
+      "frames": 1,
+      "fps": 1.0,
+      "loop": false
+    },
+    {
+      "name": "dusk_dagger",
+      "start": 64,
+      "frames": 1,
+      "fps": 1.0,
+      "loop": false
+    },
+    {
+      "name": "night_dagger",
+      "start": 65,
+      "frames": 1,
+      "fps": 1.0,
+      "loop": false
+    },
+    {
+      "name": "blood_dagger",
+      "start": 66,
+      "frames": 1,
+      "fps": 1.0,
+      "loop": false
+    },
+    {
+      "name": "phantom_dagger",
+      "start": 67,
+      "frames": 1,
+      "fps": 1.0,
+      "loop": false
+    },
+    {
+      "name": "dusk_boots",
+      "start": 68,
+      "frames": 1,
+      "fps": 1.0,
+      "loop": false
+    },
+    {
+      "name": "night_boots",
+      "start": 69,
+      "frames": 1,
+      "fps": 1.0,
+      "loop": false
+    },
+    {
+      "name": "blood_boots",
+      "start": 70,
+      "frames": 1,
+      "fps": 1.0,
+      "loop": false
+    },
+    {
+      "name": "phantom_boots",
+      "start": 71,
+      "frames": 1,
+      "fps": 1.0,
+      "loop": false
+    },
+    {
+      "name": "dusk_gloves",
+      "start": 72,
+      "frames": 1,
+      "fps": 1.0,
+      "loop": false
+    },
+    {
+      "name": "night_gloves",
+      "start": 73,
+      "frames": 1,
+      "fps": 1.0,
+      "loop": false
+    },
+    {
+      "name": "blood_gloves",
+      "start": 74,
+      "frames": 1,
+      "fps": 1.0,
+      "loop": false
+    },
+    {
+      "name": "phantom_gloves",
+      "start": 75,
       "frames": 1,
       "fps": 1.0,
       "loop": false

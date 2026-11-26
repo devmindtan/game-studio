@@ -1,5 +1,5 @@
 {
-  "frames": 68,
+  "frames": 78,
   "frame_size": [
     24,
     24
@@ -484,6 +484,76 @@
     {
       "name": "sp_ranger_bow",
       "start": 67,
+      "frames": 1,
+      "fps": 1.0,
+      "loop": false
+    },
+    {
+      "name": "throw_knife",
+      "start": 68,
+      "frames": 1,
+      "fps": 1.0,
+      "loop": false
+    },
+    {
+      "name": "quick_hands",
+      "start": 69,
+      "frames": 1,
+      "fps": 1.0,
+      "loop": false
+    },
+    {
+      "name": "keen_blades",
+      "start": 70,
+      "frames": 1,
+      "fps": 1.0,
+      "loop": false
+    },
+    {
+      "name": "extra_knife",
+      "start": 71,
+      "frames": 1,
+      "fps": 1.0,
+      "loop": false
+    },
+    {
+      "name": "sp_shade_boots",
+      "start": 72,
+      "frames": 1,
+      "fps": 1.0,
+      "loop": false
+    },
+    {
+      "name": "sp_shade_gloves",
+      "start": 73,
+      "frames": 1,
+      "fps": 1.0,
+      "loop": false
+    },
+    {
+      "name": "sp_shade_cloak",
+      "start": 74,
+      "frames": 1,
+      "fps": 1.0,
+      "loop": false
+    },
+    {
+      "name": "sp_shade_ring",
+      "start": 75,
+      "frames": 1,
+      "fps": 1.0,
+      "loop": false
+    },
+    {
+      "name": "sp_shade_hood",
+      "start": 76,
+      "frames": 1,
+      "fps": 1.0,
+      "loop": false
+    },
+    {
+      "name": "sp_shade_dagger",
+      "start": 77,
       "frames": 1,
       "fps": 1.0,
       "loop": false

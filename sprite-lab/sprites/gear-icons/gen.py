@@ -35,7 +35,8 @@ OUTLINE = "#1b1726"
 RARITIES = ["common", "rare", "epic", "legendary"]
 SLOTS = ["head", "chest", "legs", "arms", "feet", "weapon"]
 CLASS_SLOTS = {"knight": ["head", "chest", "feet", "weapon", "shield"], "mage": ["head", "chest", "feet", "weapon"],
-               "archer": ["quiver", "chest", "weapon", "feet", "arms"]}   # user 2026-11-25: knight set
+               "archer": ["quiver", "chest", "weapon", "feet", "arms"],
+               "assassin": ["head", "chest", "weapon", "feet", "arms"]}   # user 2026-11-25: knight set
 
 # --- palettes: class -> rarity -> role letter -> colour -------------------------
 _K = "#1b1726"
@@ -389,6 +390,11 @@ ITEMS = {
     ("archer", "weapon"): ["hunting_bow", "forest_bow", "shadow_bow", "sun_bow"],
     ("archer", "feet"): ["leather_boots", "forest_boots", "shadow_boots", "sun_boots"],
     ("archer", "arms"): ["leather_gloves", "forest_gloves", "shadow_gloves", "sun_gloves"],
+    ("assassin", "head"): ["dusk_hood", "night_hood", "blood_hood", "phantom_hood"],
+    ("assassin", "chest"): ["dusk_tunic", "night_tunic", "blood_tunic", "phantom_tunic"],
+    ("assassin", "weapon"): ["dusk_dagger", "night_dagger", "blood_dagger", "phantom_dagger"],
+    ("assassin", "feet"): ["dusk_boots", "night_boots", "blood_boots", "phantom_boots"],
+    ("assassin", "arms"): ["dusk_gloves", "night_gloves", "blood_gloves", "phantom_gloves"],
     ("mage", "head"): ["cloth_hat", "wizard_hat", "void_hat", "star_hat"],
     ("mage", "chest"): ["cloth_robe", "mage_robe", "void_robe", "star_robe"],
     ("mage", "feet"): ["cloth_shoes", "mage_shoes", "void_shoes", "star_shoes"],
@@ -408,7 +414,7 @@ def grid(cls, slot, rarity):
 
 
 MADE_ICONS = {"knight": HERE.parent / "knight" / "icons", "mage": HERE.parent / "wizard" / "icons",
-              "archer": HERE.parent / "bowman" / "icons"}   # user's art
+              "archer": HERE.parent / "bowman" / "icons", "assassin": HERE.parent / "assassin" / "icons"}   # user's art
 
 
 def icon(cls, slot, rarity):
@@ -436,7 +442,7 @@ def review(path):
     img = Image.new("RGB", (len(SLOTS) * cell + 110, 12 * cell + 8), (24, 21, 34))
     d = ImageDraw.Draw(img)
     r = 0
-    for cls in ["knight", "mage", "archer"]:
+    for cls in ["knight", "mage", "archer", "assassin"]:
         for k, rarity in enumerate(RARITIES):
             d.text((6, r * cell + cell // 2 - 6), f"{cls[:6]} {rarity[:4]}", fill=(220, 220, 220))
             for s, slot in enumerate(CLASS_SLOTS[cls]):
@@ -447,7 +453,7 @@ def review(path):
 
 
 ANIMATIONS = [(ITEMS[(cls, slot)][k], [icon(cls, slot, rarity)], 1, False, {})
-              for cls in ["knight", "mage", "archer"] for slot in CLASS_SLOTS[cls] for k, rarity in enumerate(RARITIES)]
+              for cls in ["knight", "mage", "archer", "assassin"] for slot in CLASS_SLOTS[cls] for k, rarity in enumerate(RARITIES)]
 
 if __name__ == "__main__":
     export(HERE, NAME, ANIMATIONS, anchor=(12.0, 12.0), preview_scale=4, gif_scale=4)

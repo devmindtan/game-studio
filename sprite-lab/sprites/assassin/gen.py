@@ -158,10 +158,12 @@ def anims(gear=None):
             ("death", death, 8, False, {"durations_ms": [120, 140, 140, 100, 400], "hitbox": dict(hb, active=[0, 4])})]
 
 
-# --- equipment tiers: tier 1 is the user's own colours; the others recolour the drawing's ramps -------------------
+# --- equipment tiers: the user's purple is the default look (unequipped), like the mage's robe; every tier recolours
+# the drawing's ramps so wearing an item always shows
 # c* cloth ramp (hood, tunic), m* blade metal, t* trims (hilt, belt), b* leather (gloves, boots)
 TIERS = {
-    "dusk": None,
+    "dusk": {"d": "#3a3028", "m": "#5a4a3c", "l": "#7a6652", "h": "#9a846c", "M": "#9a9a9a", "Mh": "#d7d7d7",
+             "t": "#6d6949", "T": "#ada56b", "b": "#3a2418", "B": "#5e3c26"},
     "night": {"d": "#1a1c24", "m": "#2c3040", "l": "#444a5e", "h": "#626a82", "M": "#8a94a6", "Mh": "#d8e0ea",
               "t": "#7a7f8c", "T": "#b8bec8", "b": "#2a2228", "B": "#463a40"},
     "blood": {"d": "#3a0c14", "m": "#6a1622", "l": "#962232", "h": "#c03a44", "M": "#9a9a9a", "Mh": "#e8e8e8",
