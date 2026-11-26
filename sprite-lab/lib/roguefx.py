@@ -208,3 +208,37 @@ def shadow_strike(S, R):
         c.outline(OUT)
         out.append(c)
     return out
+
+
+EXEC = [("#5a0c18", "#c0283a", "#ff8a8a"), ("#5a0c18", "#e0364a", "#ffb0b0"), ("#3a1660", "#c0283a", "#ffd0d0"),
+        ("#3a1660", "#e0364a", "#ffffff"), ("#7a4a10", "#e0364a", "#fff4b0")]
+
+
+def execute_burst(S, R):
+    """Kết liễu: a red slash snaps across the monster, a small skull flashes and fades. Tier = (R - 20) // 2 (0..4):
+    longer slash, brighter colours, more shards."""
+    tier = max(0, min(4, (R - 20) // 2))
+    dark, mid, lit = EXEC[tier]
+    C = S // 2
+    out = []
+    for f in range(N):
+        c = Canvas(S, S)
+        if f <= 4:
+            L = int(R * min(1.0, (f + 1) / 2.0))
+            c.line(C - L, C + L // 2, C + L, C - L // 2, dark, 4)
+            c.line(C - L, C + L // 2, C + L, C - L // 2, lit if f < 3 else mid, 2)
+        if 2 <= f <= 9:   # the skull
+            a = 1 if f < 8 else 0
+            c.ellipse(C - 5, C - 9, C + 5, C - 1, lit if a else mid)
+            c.rect(C - 3, C - 2, C + 3, C + 1, lit if a else mid)
+            c.pixel(C - 2, C - 5, OUT)
+            c.pixel(C + 2, C - 5, OUT)
+        if f >= 3:
+            for k in range(4 + tier * 2):   # shards flying out
+                ang = k * math.tau / (4 + tier * 2) + 0.3
+                d = 6 + (f - 3) * (3 + tier)
+                if d < S // 2 - 2:
+                    c.pixel(int(C + math.cos(ang) * d), int(C + math.sin(ang) * d), mid if f < 9 else dark)
+        c.outline(OUT)
+        out.append(c)
+    return out

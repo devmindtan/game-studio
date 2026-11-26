@@ -6,7 +6,11 @@ Chạy: gamekit art run <tên>
 TIER_FILE = globals().get("TIER_FILE", __file__)
 SPRITES = {"arrow-rain": ["arrow_rain", 112, 40, [3, 7]], "thorn-trap": ["thorn_trap", 96, 32, [4, 7]],
            "hawk-dive": ["hawk_dive", 112, 28, [4, 6]], "smoke-bomb": ["smoke_bomb", 112, 44, [1, 5]],
-           "blade-ring": ["blade_ring", 128, 50, [2, 7]], "shadow-strike": ["shadow_strike", 80, 26, [2, 5]]}
+           "blade-ring": ["blade_ring", 128, 50, [2, 7]], "shadow-strike": ["shadow_strike", 80, 26, [2, 5]],
+           # Kết liễu's look-only burst (the kill is made by Enemies), one per tier
+           "execute-i": ["execute_burst", 64, 20, [1, 4]], "execute-ii": ["execute_burst", 72, 22, [1, 4]],
+           "execute-iii": ["execute_burst", 72, 24, [1, 4]], "execute-iv": ["execute_burst", 80, 26, [1, 4]],
+           "execute-v": ["execute_burst", 80, 28, [1, 4]]}
 import json
 import sys
 from pathlib import Path

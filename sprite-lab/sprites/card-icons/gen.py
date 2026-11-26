@@ -1191,6 +1191,18 @@ def boomerang():
     return done(c)
 
 
+def execute():
+    """Kết liễu: a red slash across a small skull."""
+    c = new()
+    c.ellipse(6, 4, 17, 14, STONE["l"])
+    c.rect(8, 13, 15, 17, STONE["l"])
+    c.rect(8, 8, 10, 10, OUTLINE)
+    c.rect(13, 8, 15, 10, OUTLINE)
+    c.line(1, 20, 22, 3, HEART["d"], 3)
+    c.line(1, 20, 22, 3, HEART["l"], 1)
+    return done(c)
+
+
 ICONS = {f.__name__: f for f in (blade_arc, whirlwind, earth_strike, ground_slam, cleave_wave, holy_column, dash,
                                  earthquake, solar_ray, god_hammer, arcane_bolt, fireball, frost_nova, lightning,
                                  thunder_javelin, meteor, void_orb, blizzard, storm, back_slash, sharpen, haste, reach,
@@ -1205,7 +1217,7 @@ ICONS = {f.__name__: f for f in (blade_arc, whirlwind, earth_strike, ground_slam
                                  sp_shade_cloak, sp_shade_ring, sp_shade_hood, sp_shade_dagger, pierce_shot, fan_volley,
                                  fire_arrow, frost_arrow, thunder_arrow, fan_knives, piercing_knife, bleed_knife,
                                  venom_knife, fire_knife, arrow_rain, thorn_trap, hawk, smoke_bomb,
-                                 blade_ring, shadow_strike, ricochet, boomerang)}
+                                 blade_ring, shadow_strike, ricochet, boomerang, execute)}
 
 if __name__ == "__main__":
     anims = [(n, [f()], 1, False, {}) for n, f in ICONS.items()]

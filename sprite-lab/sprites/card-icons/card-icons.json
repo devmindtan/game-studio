@@ -1,5 +1,5 @@
 {
-  "frames": 96,
+  "frames": 97,
   "frame_size": [
     24,
     24
@@ -680,6 +680,13 @@
     {
       "name": "boomerang",
       "start": 95,
+      "frames": 1,
+      "fps": 1.0,
+      "loop": false
+    },
+    {
+      "name": "execute",
+      "start": 96,
       "frames": 1,
       "fps": 1.0,
       "loop": false
