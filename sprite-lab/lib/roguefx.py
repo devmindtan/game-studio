@@ -22,36 +22,44 @@ VOID = ("#14081e", "#3a1660", "#7a3ab8", "#e0b8ff")
 N = 12
 
 
-def _arrow_down(c, x, y, length=14):
+def _arrow_down(c, x, y, length=14, head=STEEL):
     """An arrow falling down-right with its head at (x, y)."""
     c.line(x - length, y - length * 2, x, y, WOOD[1], 2)
-    c.polygon([(x + 1, y + 3), (x - 3, y - 1), (x + 2, y - 2)], STEEL[1])
+    c.polygon([(x + 1, y + 3), (x - 3, y - 1), (x + 2, y - 2)], head[1])
     c.pixel(x - length, y - length * 2, FEATHER[1])
     c.pixel(x - length + 1, y - length * 2, FEATHER[0])
 
 
-def arrow_rain(S, R):
-    """Mưa tên: a volley falls on a circle of radius R, stabs the ground and fades."""
+RAIN_HEADS = [STEEL, ("#6a7590", "#9ee0ff", "#ffffff"), ("#7a1410", "#ff9a2a", "#fff2a0"), ("#3a1660", "#c38df5", "#ffffff"),
+              ("#7a4a10", "#f2c14e", "#ffffff")]
+
+
+def arrow_rain(S, R, tier=0):
+    """Mưa tên: a volley falls on a circle of radius R, stabs the ground and fades. Tier 0..4: more arrows, heads from
+    steel to ice, fire, violet and gold, a glowing ring from tier 2."""
     C = S // 2
-    spots = [(math.cos(k * 2.399) * R * math.sqrt((k + 0.5) / 9), math.sin(k * 2.399) * R * 0.6 * math.sqrt((k + 0.5) / 9))
-             for k in range(9)]
+    head = RAIN_HEADS[tier]
+    n = 9 + tier * 2
+    spots = [(math.cos(k * 2.399) * R * math.sqrt((k + 0.5) / n), math.sin(k * 2.399) * R * 0.6 * math.sqrt((k + 0.5) / n))
+             for k in range(n)]
     out = []
     for f in range(N):
         c = Canvas(S, S)
         if f >= 3:   # the target circle on the ground
-            c.ellipse(C - R, C - int(R * 0.6), C + R, C + int(R * 0.6), EARTH[1] if f < 9 else EARTH[0], fill=False)
+            ring = head[1] if tier >= 2 and f < 9 else (EARTH[1] if f < 9 else EARTH[0])
+            c.ellipse(C - R, C - int(R * 0.6), C + R, C + int(R * 0.6), ring, fill=False)
         for k, (dx, dy) in enumerate(spots):
             land = 3 + k % 4                    # frame it lands
             x, y = int(C + dx), int(C + dy)
             if f < land:
                 fall = (land - f) * 10
                 if fall < S:
-                    _arrow_down(c, x - fall // 2, y - fall)
+                    _arrow_down(c, x - fall // 2, y - fall, head=head)
             elif f < 10:                        # stuck in the ground: a short shaft
                 c.line(x - 4, y - 8, x, y, WOOD[1], 2)
                 c.pixel(x - 4, y - 8, FEATHER[1])
                 if f == land:
-                    c.ellipse(x - 4, y - 2, x + 4, y + 2, EARTH[2], fill=False)
+                    c.ellipse(x - 4, y - 2, x + 4, y + 2, head[2] if tier else EARTH[2], fill=False)
         c.outline(OUT)
         out.append(c)
     return out
@@ -128,9 +136,15 @@ def hawk_dive(S, R):
     return out
 
 
-def smoke_bomb(S, R):
-    """Bom khói: a small bomb bursts into grey puffs that roll out to R, hang and thin away."""
+SMOKE_TIERS = [SMOKE, ("#2a3448", "#4a5a78", "#7a8ab0", "#b8c8e8"), ("#2a1a3a", "#4a3468", "#7a5aa0", "#c0a8e0"),
+               ("#1a1424", "#3a2a48", "#6a4a80", "#e0b8ff"), ("#2a2418", "#5a4a30", "#9a8460", "#fff4b0")]
+
+
+def smoke_bomb(S, R, tier=0):
+    """Bom khói: a small bomb bursts into puffs that roll out to R, hang and thin away. Tier 0..4: grey, blue-grey,
+    violet, night with violet sparks, smoke shot with gold."""
     C = S // 2
+    SMOKE = SMOKE_TIERS[tier]
     out = []
     for f in range(N):
         c = Canvas(S, S)
@@ -151,6 +165,10 @@ def smoke_bomb(S, R):
                 c.ellipse(x - pr, y - pr, x + pr, y + pr, shade)
             if f < 9:
                 c.ellipse(C - 7, C - 6, C + 7, C + 6, SMOKE[3])
+            if tier >= 3 and 2 <= f <= 8:   # sparks inside the cloud
+                for k in range(3 + tier):
+                    a = k * 2.1 + f * 0.7
+                    c.pixel(int(C + math.cos(a) * R * 0.4), int(C + math.sin(a) * R * 0.3), SMOKE[3])
         c.outline(OUT)
         out.append(c)
     return out
@@ -187,9 +205,15 @@ def blade_ring(S, R):
     return out
 
 
-def shadow_strike(S, R):
-    """Ám kích: a violet shadow flickers in, two crossing slashes cut, the cut glows and fades."""
+STRIKE_TIERS = [VOID, ("#14081e", "#3a1660", "#9a4ad0", "#f0d0ff"), ("#1e0810", "#5a0c18", "#c0283a", "#ffb0b0"),
+                ("#14081e", "#3a1660", "#e0364a", "#ffffff"), ("#2a1408", "#7a4a10", "#f2c14e", "#ffffff")]
+
+
+def shadow_strike(S, R, tier=0):
+    """Ám kích: a shadow flickers in, two crossing slashes cut, the cut glows and fades. Tier 0..4: violet, bright
+    violet, blood red, red on night, gold; more shards each tier."""
     C = S // 2
+    VOID = STRIKE_TIERS[tier]
     out = []
     for f in range(N):
         c = Canvas(S, S)
@@ -206,8 +230,8 @@ def shadow_strike(S, R):
                 c.line(C - L, C + L, C + L, C - L, VOID[2], 4)
                 c.line(C - L, C + L, C + L, C - L, col, 2)
         if 5 <= f <= 10:
-            for k in range(6):
-                a = k * math.tau / 6 + 0.4
+            for k in range(6 + tier * 2):
+                a = k * math.tau / (6 + tier * 2) + 0.4
                 d = R * 0.4 + (f - 5) * 4
                 c.pixel(int(C + math.cos(a) * d), int(C + math.sin(a) * d), VOID[3] if f < 9 else VOID[2])
         c.outline(OUT)
