@@ -1224,6 +1224,16 @@ def hunter_mark():
     return done(c)
 
 
+def charged_shot():
+    """Tên tích lực: an arrow with a glowing halo round its head and light gathering on it."""
+    c = new()
+    c.ellipse(12, 1, 22, 11, GOLD["l"], fill=False)
+    _arrow(c, 2, 21, 17, 6)
+    for (x, y) in ((4, 12), (9, 20), (13, 15)):
+        c.pixel(x, y, GOLD["l"])
+    return done(c)
+
+
 ICONS = {f.__name__: f for f in (blade_arc, whirlwind, earth_strike, ground_slam, cleave_wave, holy_column, dash,
                                  earthquake, solar_ray, god_hammer, arcane_bolt, fireball, frost_nova, lightning,
                                  thunder_javelin, meteor, void_orb, blizzard, storm, back_slash, sharpen, haste, reach,
@@ -1238,7 +1248,7 @@ ICONS = {f.__name__: f for f in (blade_arc, whirlwind, earth_strike, ground_slam
                                  sp_shade_cloak, sp_shade_ring, sp_shade_hood, sp_shade_dagger, pierce_shot, fan_volley,
                                  fire_arrow, frost_arrow, thunder_arrow, fan_knives, piercing_knife, bleed_knife,
                                  venom_knife, fire_knife, arrow_rain, thorn_trap, hawk, smoke_bomb,
-                                 blade_ring, shadow_strike, ricochet, boomerang, execute, combo, hunter_mark)}
+                                 blade_ring, shadow_strike, ricochet, boomerang, execute, combo, hunter_mark, charged_shot)}
 
 if __name__ == "__main__":
     anims = [(n, [f()], 1, False, {}) for n, f in ICONS.items()]

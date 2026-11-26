@@ -1,5 +1,5 @@
 {
-  "frames": 99,
+  "frames": 100,
   "frame_size": [
     24,
     24
@@ -701,6 +701,13 @@
     {
       "name": "hunter_mark",
       "start": 98,
+      "frames": 1,
+      "fps": 1.0,
+      "loop": false
+    },
+    {
+      "name": "charged_shot",
+      "start": 99,
       "frames": 1,
       "fps": 1.0,
       "loop": false
