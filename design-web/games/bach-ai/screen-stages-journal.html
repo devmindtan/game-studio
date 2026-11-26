@@ -16,7 +16,7 @@
 /* proposal 2026-11-26: difficulty on the page + the stage's detail sheet (features the game had before the port) */
 .more { float: right; font-size: 20px; color: var(--ink-red); border-bottom: 2px solid var(--ink-red); }
 .sheetx { position: absolute; left: 120px; top: 60px; width: 1040px; height: 600px; background: var(--paper); border: 4px solid var(--edge);
-  box-shadow: 0 10px 0 #0008; padding: 22px 34px; transform: rotate(-.4deg); }
+  box-shadow: 0 10px 0 #0008; padding: 22px 34px; }
 .sheetx::after { content: ""; position: absolute; inset: 10px; border: 2px dashed #b89a6a; pointer-events: none; }
 .sheetx h1 { font-size: 40px; } .cols2 { display: flex; gap: 36px; margin-top: 6px; } .cols2 > div { flex: 1; }
 .mrow { display: flex; align-items: center; gap: 10px; font-size: 21px; border-bottom: 2px dotted var(--dots); padding: 2px 0; }
@@ -24,6 +24,28 @@
 .mrow .n { width: 62px; text-align: right; }
 .trow { display: flex; gap: 12px; font-size: 21px; padding: 1px 0; } .trow b { font-weight: normal; width: 56px; color: var(--ink-soft); }
 .dimx { position: absolute; inset: 0; background: #0b0810a0; }
+/* redesign 2026-11-26 ("thiết kế lại phần này"): A = the whole spread turns to a lookup spread, B = a pinned slip
+   the size of the right page. Both sit exactly on the book, nothing floats at its own size. */
+.spreadA { position: absolute; left: 70px; top: 40px; width: 1100px; height: 640px; z-index: 5; }
+.spreadA .pg { position: absolute; top: 0; width: 550px; height: 640px; background: var(--paper); border: 4px solid var(--edge); padding: 30px 40px; }
+.spreadA .pg::after { content: ""; position: absolute; inset: 12px; border: 2px dashed #b89a6a; pointer-events: none; }
+.spreadA .l { left: 0; } .spreadA .r { left: 550px; }
+.spreadA h1 { font-size: 40px; } .spreadA h2 { font-size: 28px; }
+.mon { display: flex; gap: 12px; align-items: center; border-bottom: 2px dotted var(--dots); padding: 4px 0; }
+.mon .pic { width: 52px; height: 52px; border: 3px solid var(--ink); background: #ddcca0; display: grid; place-items: center; flex: none; }
+.mon .pic img { width: 44px; height: 44px; object-fit: contain; }
+.mon .nm { flex: 1; font-size: 22px; line-height: 1; } .mon .nm small { display: block; font-size: 16px; color: var(--ink-soft); margin-top: 2px; }
+.mon .st { font-size: 18px; text-align: right; line-height: 1.1; color: var(--ink-soft); } .mon .st b { font-weight: normal; color: var(--ink); }
+.tl { position: relative; margin: 10px 0 0 14px; border-left: 3px solid var(--ink); padding-left: 18px; }
+.tl div { position: relative; font-size: 20px; padding: 3px 0; } .tl div::before { content: ""; position: absolute; left: -26px; top: 10px; width: 10px; height: 10px; border-radius: 50%; background: var(--ink); }
+.tl div.ev::before { background: #3a6aaa; } .tl div.el::before { background: var(--ink-red); } .tl div.boss::before { background: var(--ink-red); width: 14px; height: 14px; left: -28px; }
+.tl b { font-weight: normal; color: var(--ink-soft); display: inline-block; width: 56px; }
+.slipB { position: absolute; left: 640px; top: 56px; width: 500px; height: 610px; z-index: 5; background: var(--paper); border: 3px solid var(--edge);
+  box-shadow: 0 6px 0 #0007; padding: 26px 26px 20px; }
+.slipB::before { content: ""; position: absolute; top: -9px; left: 50%; width: 14px; height: 14px; margin-left: -7px; border-radius: 50%; background: var(--seal); border: 2px solid #5a0c08; }
+.minis { display: flex; flex-wrap: wrap; gap: 8px; margin: 6px 0 10px; }
+.mini { width: 140px; border: 3px solid var(--ink); background: #ddcca0; padding: 4px 6px; font-size: 16px; line-height: 1.05; }
+.mini img { width: 34px; height: 34px; object-fit: contain; float: left; margin-right: 6px; } .mini b { font-weight: normal; font-size: 17px; display: block; }
 </style>
 </head>
 <body>
@@ -76,7 +98,7 @@ function draw() {
       <div class="ledger"><span>Máu quái</span><span>×${mul("hp", stage)}</span></div><div class="ledger"><span>Sát thương quái</span><span>×${mul("dmg", stage)}</span></div>
       <div class="ledger"><span>Mật độ quái</span><span>×${mul("rate", stage)}</span></div>` : ""}
     <div class="seal ${stage <= best + 1 ? "on" : ""}" style="right:40px;bottom:30px;width:240px;height:62px;line-height:54px;${stage > best + 1 ? "opacity:.5" : ""}">Vào trận ▶</div>`;
-  document.getElementById("over").innerHTML = view === "detail-open" ? sheet() : "";
+  document.getElementById("over").innerHTML = view === "detail-open" ? sheet() : view === "detail-a" ? sheetA() : view === "detail-b" ? sheetB() : "";
 }
 // the game's formulas (stages.json _doc): hp 1 + lin m + quad m², damage 1 + lin m, rate min(max, 1 + lin m)
 function mul(kind, n) {
@@ -85,6 +107,35 @@ function mul(kind, n) {
   return v.toFixed(2).replace(".", ",");
 }
 const EVN = { ring: "Vòng thử thách", collect: "Thu thập sao", hunt: "Săn tinh anh", tornado: "Lốc xoáy", root_snare: "Rễ trói", poison_tide: "Triều độc" };
+function sheetData() {
+  const r = ST.regions[region], mons = Object.entries(MON).filter(([k, m]) => !m.boss && !m.gold_drop).slice(region * 3, region * 3 + 4);
+  const boss = Object.entries(MON).find(([k, m]) => m.boss);
+  const all = stage % ST.boss_every === 0 ? mons.concat([boss]) : mons;
+  const sp = (m) => { const s = SPC.species[m.species] || {}, e = SPC.elements;
+    return [s.name, ...(s.weak || []).map((x) => "yếu " + e[x]), ...(s.resist || []).map((x) => "kháng " + e[x])].filter(Boolean).join(" · "); };
+  const marks = mons.slice(1).map(([k, m], i) => [20 + i * 25, m.name + " bắt đầu xuất hiện", ""]).concat(
+    (r.events || []).map((e) => [e.t, "Sự kiện: " + (EVN[e.kind] || e.kind), "ev"]), [[40, "3 " + mons[0][1].name + " tinh anh", "el"], [150, "3 " + mons[1][1].name + " tinh anh", "el"]]).sort((a, b) => a[0] - b[0]);
+  if (stage % ST.boss_every === 0) marks.push([300, "Trùm: " + boss[1].name, "boss"]);
+  const mmss = (t) => String(Math.floor(t / 60)).padStart(2, "0") + ":" + String(t % 60).padStart(2, "0");
+  const k = (x) => parseFloat(mul(x, stage).replace(",", "."));
+  return { r, all, sp, marks, mmss, k };
+}
+function sheetA() {   // A: the whole spread becomes the lookup spread
+  const { r, all, sp, marks, mmss, k } = sheetData();
+  return `<div class="spreadA"><div class="pg l"><h1>${stage % ST.boss_every === 0 ? "Trùm · " : ""}Ải ${stage}</h1><div class="sub">${r.name} · quái đã tính độ khó</div>
+    ${all.map(([id, m]) => `<div class="mon"><div class="pic"><img src="${Journal.SP}${m.sprite}/${m.sprite}.png"></div><div class="nm">${m.name}<small>${sp(m)}</small></div>
+      <div class="st">Máu <b>${Math.round(m.hp * k("hp"))}</b><br>ST <b>${Math.round(m.damage * k("dmg"))}</b> · Tốc <b>${m.speed}</b></div></div>`).join("")}</div>
+    <div class="pg r"><h2>Mốc thời gian</h2><div class="sub">Trận 05:00</div><div class="tl">${marks.map(([t, x, c]) => `<div class="${c}"><b>${mmss(t)}</b>${x}</div>`).join("")}</div>
+      <div class="ledger" style="margin-top:12px"><span>Vàng · Đá lần đầu · sau</span><span>${ST.rewards.gold_base + ST.rewards.gold_per_stage * stage} · ${ST.rewards.gems_first} · ${ST.rewards.gems_repeat}</span></div>
+      <div class="muted" style="position:absolute;right:44px;bottom:30px;font-size:20px">D / Esc gấp lại</div></div></div>`;
+}
+function sheetB() {   // B: a slip pinned over the right page; the map stays in view
+  const { r, all, sp, marks, mmss, k } = sheetData();
+  return `<div class="slipB"><h2 style="font-size:28px">Chi tiết · Ải ${stage}</h2><div class="sub">${r.name}</div>
+    <div class="minis">${all.map(([id, m]) => `<div class="mini" title="${sp(m)}"><img src="${Journal.SP}${m.sprite}/${m.sprite}.png"><b>${m.name}</b>♥${Math.round(m.hp * k("hp"))} ⚔${Math.round(m.damage * k("dmg"))}</div>`).join("")}</div>
+    <div class="tl" style="margin-top:4px">${marks.map(([t, x, c]) => `<div class="${c}" style="font-size:18px;padding:1px 0"><b>${mmss(t)}</b>${x}</div>`).join("")}</div>
+    <div class="muted" style="position:absolute;right:26px;bottom:14px;font-size:18px">D / Esc đóng</div></div>`;
+}
 function sheet() {   // the Chi tiết sheet: the stage's monsters (scaled) and its time marks, over the spread
   const r = ST.regions[region], mons = Object.entries(MON).filter(([k, m]) => !m.boss && !m.gold_drop).slice(region * 3, region * 3 + 4);
   const boss = Object.entries(MON).find(([k, m]) => m.boss);

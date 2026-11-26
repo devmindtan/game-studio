@@ -154,6 +154,20 @@
      "page": "screen-stages-journal.html",
      "query": "view=detail",
      "shot": "stages-diff.png"
+    },
+    {
+     "label": "Chi tiết: A · trang sổ",
+     "page": "screen-stages-journal.html",
+     "query": "view=detail-a",
+     "shot": "stages-detail-a.png",
+     "note": "cả hai trang lật sang trang tra cứu"
+    },
+    {
+     "label": "Chi tiết: B · mẩu giấy ghim",
+     "page": "screen-stages-journal.html",
+     "query": "view=detail-b",
+     "shot": "stages-detail-b.png",
+     "note": "mẩu giấy đúng khổ trang phải, bản đồ vẫn thấy"
     }
    ]
   },

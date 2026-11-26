@@ -29,7 +29,7 @@ img { image-rendering: pixelated; }
 .ledger { display: flex; align-items: baseline; gap: 8px; font-size: 24px; border-bottom: 2px dotted var(--dots); padding: 2px 0; }
 .ledger span:first-child { flex: 1; }
 /* an ink stamp (weak / resist) */
-.stamp { display: inline-block; border: 3px solid currentColor; padding: 0 8px; font-size: 20px; transform: rotate(-3deg); margin: 2px 6px 2px 0; }
+.stamp { display: inline-block; border: 3px solid currentColor; padding: 0 8px; font-size: 20px; margin: 2px 6px 2px 0; }
 .stamp.weak { color: #2a7a3a; } .stamp.resist { color: var(--ink-red); }
 /* sketch box (a cell drawn on the page) */
 .sketch { border: 3px solid var(--ink); background: #ddcca0; display: grid; place-items: center; cursor: pointer; position: relative; }

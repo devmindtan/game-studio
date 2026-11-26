@@ -42,3 +42,11 @@ Người dùng 2026-11-26: "bổ sung quy trình thiết kế giao diện trên 
    "Cái nào chưa có trên web thì thiết kế trên web cho tôi xem rồi mới đưa vào game"); không tự thêm vào game. Báo xong phải đặt ảnh game cạnh ảnh
    web của cùng màn và nêu khác biệt còn lại.
 8. **Commit**: repo gốc (`design-web/`), repo game (`src/`, `production/ui/`), kèm ảnh trước / sau.
+
+## Pixel sắc nét và không đè chữ (người dùng 2026-11-26)
+
+- Không xoay/nghiêng khung, mẩu giấy, dấu mộc (kể cả `transform: rotate` trên web): pixel bị lấy mẫu lại nên mờ.
+  Chỉ chữ dọc xoay đúng 90° với toạ độ nguyên.
+- Toạ độ và kích thước khung là số nguyên (mẩu giấy có tâm thì bề rộng chẵn).
+- Nội dung trong vùng cuộn chừa lề phải ~18 px cho thanh cuộn; soi ×2 cột phải của mọi bảng cuộn.
+
