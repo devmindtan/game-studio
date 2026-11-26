@@ -32,3 +32,12 @@ Người dùng 2026-11-26: thiết kế lại giao diện sảnh và menu, "thi�
 
 Cả ba bỏ: panel xanh đen viền vàng, hàng nút icon góc phải trên, bệ rune.
 **Đã chọn: B "Sổ hành trình"** (người dùng xem trong Design Lab, 2026-11-26); đã port sang `games/bach-ai/src/lobby/lobby.gd`. Bước kế: áp phong cách sổ cho các menu còn lại, mỗi màn duyệt trên web trước.
+
+## Góp ý 2026-11-26: nguyên liệu và chỉ số
+
+Người dùng: "thiếu nguyên liệu, còn 1 nguyên liệu nữa đâu; thiếu rất nhiều chỉ số như giáp (thiết kế thêm bảng hiển thị
+chi tiết chỉ số khác nếu vượt quá 6 chỉ số cơ bản)". Sửa trên web:
+- Túi ở chân trang trái hiện đủ 5 nguyên liệu của nhân vật (Slot): vàng, đá, Tinh hoa, Mảnh thẻ, Tẩy Tủy Đan.
+- 6 chỉ số cơ bản: Máu, Sát thương, Giáp, Tốc độ, Chí mạng, Hồi chiêu; dòng "Xem đủ chỉ số (C) ▸".
+- Phím C lật trang phải thành **Phụ lục: chỉ số**: 11 chỉ số (Máu tối đa, Hồi máu, Giáp, Sát thương, Chí mạng, Sát thương
+  chí mạng, Hồi chiêu, Vùng đánh, Số lượng, Tốc độ chạy, Tầm hút) với cột Gốc / Trang bị / Cây / Tổng; C lần nữa về Mục lục.

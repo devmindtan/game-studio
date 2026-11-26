@@ -68,6 +68,13 @@
      "chosen": true
     },
     {
+     "label": "B · Phụ lục chỉ số (C)",
+     "note": "mọi chỉ số: gốc / trang bị / cây / tổng",
+     "page": "screen-lobby-journal.html",
+     "query": "view=stats",
+     "shot": "lobby-stats.png"
+    },
+    {
      "label": "C · Tối giản",
      "note": "danh sách chữ, nhân vật sáng",
      "page": "screen-lobby-stark.html",
