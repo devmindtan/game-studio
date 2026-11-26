@@ -1004,6 +1004,109 @@ def sp_shade_dagger():
     return done(c)
 
 
+def _flame(c, x, y):
+    """A small flame centred at (x, y)."""
+    c.polygon([(x, y - 4), (x + 3, y), (x + 2, y + 3), (x - 2, y + 3), (x - 3, y)], FIRE["d"])
+    c.polygon([(x, y - 2), (x + 2, y + 1), (x, y + 3), (x - 2, y + 1)], FIRE["m"])
+    c.pixel(x, y + 1, FIRE["l"])
+
+
+def _flake(c, x, y):
+    """A small snowflake centred at (x, y)."""
+    c.line(x - 3, y, x + 3, y, ICE["m"], 1)
+    c.line(x, y - 3, x, y + 3, ICE["m"], 1)
+    c.line(x - 2, y - 2, x + 2, y + 2, ICE["l"], 1)
+    c.line(x - 2, y + 2, x + 2, y - 2, ICE["l"], 1)
+
+
+def pierce_shot():
+    """Tên xuyên: one long arrow through two monsters' outlines."""
+    c = new()
+    c.ellipse(5, 11, 11, 17, STONE["d"], fill=False)
+    c.ellipse(11, 6, 17, 12, STONE["d"], fill=False)
+    _arrow(c, 1, 22, 21, 2)
+    return done(c)
+
+
+def fan_volley():
+    """Quạt tên: three arrows fanned out from one point."""
+    c = new()
+    _arrow(c, 3, 21, 20, 4)
+    c.line(3, 21, 12, 2, WOOD["m"], 1)
+    c.polygon([(12, 0), (10, 4), (14, 4)], STEEL["m"])
+    c.line(3, 21, 22, 13, WOOD["m"], 1)
+    c.polygon([(23, 13), (19, 11), (19, 15)], STEEL["m"])
+    return done(c)
+
+
+def fire_arrow():
+    """Tên lửa: an arrow with a flaming head."""
+    c = new()
+    _arrow(c, 3, 21, 16, 8)
+    _flame(c, 18, 6)
+    return done(c)
+
+
+def frost_arrow():
+    """Tên băng: an arrow with an ice head and a snowflake."""
+    c = new()
+    _arrow(c, 3, 21, 18, 6, head=ICE)
+    _flake(c, 17, 16)
+    return done(c)
+
+
+def thunder_arrow():
+    """Tên sét: an arrow riding a yellow bolt."""
+    c = new()
+    c.polygon([(6, 2), (3, 12), (7, 12), (4, 22), (13, 9), (9, 9), (12, 2)], BOLT["m"])
+    _arrow(c, 8, 22, 22, 8)
+    return done(c)
+
+
+def fan_knives():
+    """Quạt dao: three daggers fanned out."""
+    c = new()
+    _knife(c, 4, 21, 20, 5)
+    c.line(4, 21, 11, 4, STEEL["m"], 2)
+    c.line(4, 21, 21, 14, STEEL["m"], 2)
+    return done(c)
+
+
+def piercing_knife():
+    """Dao xuyên: a dagger through two monsters' outlines, with speed lines."""
+    c = new()
+    c.ellipse(6, 11, 12, 17, STONE["d"], fill=False)
+    c.ellipse(11, 6, 17, 12, STONE["d"], fill=False)
+    _knife(c, 2, 21, 21, 2)
+    return done(c)
+
+
+def bleed_knife():
+    """Dao rạch: a dagger with blood drops."""
+    c = new()
+    _knife(c, 3, 21, 19, 5)
+    for (x, y) in ((17, 13), (20, 17), (14, 19)):
+        c.rect(x, y, x + 1, y + 2, HEART["m"])
+    return done(c)
+
+
+def venom_knife():
+    """Dao độc: a green-bladed dagger dripping poison."""
+    c = new()
+    _knife(c, 3, 21, 19, 5, blade=LEAF)
+    for (x, y) in ((18, 11), (21, 15)):
+        c.ellipse(x, y, x + 2, y + 3, LEAF["m"])
+    return done(c)
+
+
+def fire_knife():
+    """Dao lửa: a dagger with a flame at its tip."""
+    c = new()
+    _knife(c, 3, 21, 16, 8)
+    _flame(c, 18, 6)
+    return done(c)
+
+
 ICONS = {f.__name__: f for f in (blade_arc, whirlwind, earth_strike, ground_slam, cleave_wave, holy_column, dash,
                                  earthquake, solar_ray, god_hammer, arcane_bolt, fireball, frost_nova, lightning,
                                  thunder_javelin, meteor, void_orb, blizzard, storm, back_slash, sharpen, haste, reach,
@@ -1015,7 +1118,9 @@ ICONS = {f.__name__: f for f in (blade_arc, whirlwind, earth_strike, ground_slam
                                  ev_poison_tide, quick_arrow, steady_hand, sharp_arrows, extra_arrow, sp_ranger_boots,
                                  sp_ranger_gloves, sp_ranger_cloak, sp_ranger_ring, sp_ranger_hood, sp_ranger_bow,
                                  throw_knife, quick_hands, keen_blades, extra_knife, sp_shade_boots, sp_shade_gloves,
-                                 sp_shade_cloak, sp_shade_ring, sp_shade_hood, sp_shade_dagger)}
+                                 sp_shade_cloak, sp_shade_ring, sp_shade_hood, sp_shade_dagger, pierce_shot, fan_volley,
+                                 fire_arrow, frost_arrow, thunder_arrow, fan_knives, piercing_knife, bleed_knife,
+                                 venom_knife, fire_knife)}
 
 if __name__ == "__main__":
     anims = [(n, [f()], 1, False, {}) for n, f in ICONS.items()]

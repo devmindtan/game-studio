@@ -1,5 +1,5 @@
 {
-  "frames": 78,
+  "frames": 88,
   "frame_size": [
     24,
     24
@@ -554,6 +554,76 @@
     {
       "name": "sp_shade_dagger",
       "start": 77,
+      "frames": 1,
+      "fps": 1.0,
+      "loop": false
+    },
+    {
+      "name": "pierce_shot",
+      "start": 78,
+      "frames": 1,
+      "fps": 1.0,
+      "loop": false
+    },
+    {
+      "name": "fan_volley",
+      "start": 79,
+      "frames": 1,
+      "fps": 1.0,
+      "loop": false
+    },
+    {
+      "name": "fire_arrow",
+      "start": 80,
+      "frames": 1,
+      "fps": 1.0,
+      "loop": false
+    },
+    {
+      "name": "frost_arrow",
+      "start": 81,
+      "frames": 1,
+      "fps": 1.0,
+      "loop": false
+    },
+    {
+      "name": "thunder_arrow",
+      "start": 82,
+      "frames": 1,
+      "fps": 1.0,
+      "loop": false
+    },
+    {
+      "name": "fan_knives",
+      "start": 83,
+      "frames": 1,
+      "fps": 1.0,
+      "loop": false
+    },
+    {
+      "name": "piercing_knife",
+      "start": 84,
+      "frames": 1,
+      "fps": 1.0,
+      "loop": false
+    },
+    {
+      "name": "bleed_knife",
+      "start": 85,
+      "frames": 1,
+      "fps": 1.0,
+      "loop": false
+    },
+    {
+      "name": "venom_knife",
+      "start": 86,
+      "frames": 1,
+      "fps": 1.0,
+      "loop": false
+    },
+    {
+      "name": "fire_knife",
+      "start": 87,
       "frames": 1,
       "fps": 1.0,
       "loop": false
