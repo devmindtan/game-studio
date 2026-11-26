@@ -29,3 +29,11 @@ cuộn giấy, có trạng thái "nhấn phím bất kỳ") đã xoá; màn tron
 | C. Hoàng hôn trước trận | `screen-title-dusk.html` | cảnh rộng: trời hoàng hôn, các dãy cổng ải xa dần, nhân vật trên đồi; tên lớn lệch trái; menu chữ ngang, ←/→ |
 
 Cả ba bỏ: hai nhân vật trên bệ, cột nút giữa, cổng / dải băng / cuộn giấy của bản cũ.
+
+## Góp ý của người dùng (2026-11-26) và sửa
+
+Người dùng thích hướng C, chỉ ra: chữ chồng lấn, chưa đều, mất nét; chỉ có một nhân vật; cổng ở xa như lơ lửng. Đã sửa:
+- Tên dùng font chữ của game (sans đậm, như Godot sẽ vẽ) thay VT323 phóng to: nét liền, dấu đúng chỗ; một vệt tối
+  hình bầu dục sau chữ và menu để không cổng nào cắt qua chữ; menu ở cỡ 32 / 16 px của VT323 (bội số lưới).
+- Bỏ nhân vật; thay bằng **một cổng ải lớn** trên đồi gần (hai cột, mái cong, biển đỏ), in bóng lên mặt trời.
+- Các cổng xa vẽ trước, chân cắm sâu, rồi mới vẽ sườn đồi đè lên: chân cổng nằm trong đất.

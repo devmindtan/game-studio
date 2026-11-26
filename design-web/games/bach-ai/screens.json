@@ -21,9 +21,10 @@
     },
     {
      "label": "C · Hoàng hôn trước trận",
-     "note": "cảnh rộng, dãy cổng ải xa dần",
+     "note": "cảnh rộng, cổng lớn trên đồi, dãy cổng xa dần",
      "page": "screen-title-dusk.html",
-     "shot": "title-c-dusk.png"
+     "shot": "title-c-dusk.png",
+     "chosen": true
     }
    ]
   },

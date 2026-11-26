@@ -10,14 +10,14 @@ html, body { width: 1280px; height: 720px; overflow: hidden; background: #000; f
 img { image-rendering: pixelated; }
 #game { position: relative; width: 1280px; height: 720px; overflow: hidden; }
 canvas { position: absolute; inset: 0; }
-.hero { position: absolute; left: 880px; top: 330px; width: 192px; height: 192px; filter: brightness(.55) saturate(.7) drop-shadow(0 0 0 #000); }
-.title { position: absolute; left: 70px; top: 290px; }
-.title h1 { font-size: 124px; font-weight: normal; line-height: 1; letter-spacing: 4px; color: #fff0d0;
-  text-shadow: 0 6px 0 #6a1a14, 0 0 30px #ff7a3a55; }
-.title p { font-size: 32px; letter-spacing: 10px; color: #ffb070; margin: 8px 0 0 8px; }
+/* the game's own UI font (Godot default sans, DejaVu Sans fallback): whole strokes and Vietnamese marks at any size */
+.title { position: absolute; left: 64px; top: 270px; font-family: "Noto Sans", "Open Sans", "DejaVu Sans", sans-serif; }
+.title h1 { font-size: 112px; font-weight: 800; line-height: 1.05; letter-spacing: 2px; color: #fff0d0;
+  text-shadow: 0 5px 0 #6a1a14; }
+.title p { font-size: 26px; font-weight: 600; letter-spacing: 9px; color: #ffb070; margin: 10px 0 0 6px; }
 .menu { position: absolute; left: 76px; top: 520px; display: flex; gap: 40px; }
-.it { font-size: 34px; color: #c8a890; cursor: pointer; padding-bottom: 4px; border-bottom: 4px solid transparent; }
-.it small { display: block; font-size: 18px; color: #e0b890; }
+.it { font-size: 32px; color: #c8a890; cursor: pointer; padding-bottom: 4px; border-bottom: 4px solid transparent; }
+.it small { display: block; font-size: 16px; color: #e0b890; margin-top: 2px; }
 .it.on { color: #fff6e0; border-color: #ff7a3a; }
 .ver { position: absolute; right: 30px; bottom: 16px; font-size: 22px; color: #a07868; }
 .hint { position: absolute; left: 76px; bottom: 16px; font-size: 22px; color: #a07868; }
@@ -26,32 +26,49 @@ canvas { position: absolute; inset: 0; }
 <body>
 <div id="game">
   <canvas id="sky" width="1280" height="720"></canvas>
-  <img class="hero" src="assets/title/knight.png" alt="">
   <div class="title"><h1>BÁCH ẢI</h1><p>VƯỢT TRĂM ẢI</p></div>
   <div class="menu" id="menu"></div>
   <div class="hint">← → chọn · Enter</div>
   <div class="ver">Phiên bản 0.6.24</div>
 </div>
 <script>
-// dusk: banded sky, a low sun, rows of distant pass gates fading toward the horizon, the hero's hill in front
+// dusk: banded sky, a low sun, rows of distant pass gates fading toward the horizon, one great gate on the near hill
 const c = document.getElementById("sky").getContext("2d");
 const bands = ["#1a1030", "#2e1640", "#4a1c48", "#7a2a44", "#b0443a", "#e0703a", "#f2a04a"];
 bands.forEach((col, i) => { c.fillStyle = col; c.fillRect(0, i * 52, 1280, 52); });
-c.fillStyle = "#ffd890"; c.beginPath(); c.arc(980, 330, 70, 0, Math.PI * 2); c.fill();
-c.fillStyle = "#fff0c0"; c.beginPath(); c.arc(980, 330, 52, 0, Math.PI * 2); c.fill();
-for (let row = 0; row < 4; row++) {   // ridges, far to near, each with its line of gate towers
-  const y = 330 + row * 46, col = ["#8a3a48", "#62283e", "#421c32", "#2a1224"][row];
-  c.fillStyle = col; c.beginPath(); c.moveTo(0, 720);
-  for (let x = 0; x <= 1280; x += 32) c.lineTo(x, y + Math.sin(x / (140 - row * 20) + row) * (14 + row * 6));
-  c.lineTo(1280, 720); c.fill();
+c.fillStyle = "#ffd890"; c.beginPath(); c.arc(1040, 330, 74, 0, Math.PI * 2); c.fill();
+c.fillStyle = "#fff0c0"; c.beginPath(); c.arc(1040, 330, 56, 0, Math.PI * 2); c.fill();
+const ridge = (row, x) => 330 + row * 46 + Math.sin(x / (140 - row * 20) + row) * (14 + row * 6);
+for (let row = 0; row < 4; row++) {   // far to near: gates first, legs sunk deep, then the ridge over their feet
+  const col = ["#8a3a48", "#62283e", "#421c32", "#2a1224"][row];
+  c.fillStyle = col;
   for (let k = 0; k < 9 - row; k++) {
     const gx = 120 + k * (150 + row * 40) + row * 37, gh = 16 + row * 10, gw = 10 + row * 5;
-    const gy = y + Math.sin(gx / (140 - row * 20) + row) * (14 + row * 6);
-    c.fillRect(gx, gy - gh, gw, gh); c.fillRect(gx + gw * 2, gy - gh, gw, gh); c.fillRect(gx, gy - gh - 4, gw * 3, 6);
+    const gy = Math.min(ridge(row, gx), ridge(row, gx + gw * 3));   // stand on the lower foot's ground
+    c.fillRect(gx, gy - gh, gw, gh + 40); c.fillRect(gx + gw * 2, gy - gh, gw, gh + 40);
+    c.fillRect(gx - 2, gy - gh - 5, gw * 3 + 4, 6);
   }
+  c.beginPath(); c.moveTo(0, 720);
+  for (let x = 0; x <= 1280; x += 8) c.lineTo(x, ridge(row, x));
+  c.lineTo(1280, 720); c.fill();
 }
-c.fillStyle = "#140a14"; c.beginPath(); c.moveTo(640, 720);   // the near hill under the hero
-c.quadraticCurveTo(940, 480, 1280, 540); c.lineTo(1280, 720); c.fill();
+// the great gate: two pillars and a double roof with upturned eaves, a silhouette against the sun
+const G = "#140a14", gx0 = 930, gx1 = 1150, gTop = 380, gBase = 660;
+c.fillStyle = G;
+c.fillRect(gx0, gTop + 40, 34, gBase - gTop); c.fillRect(gx1 - 34, gTop + 40, 34, gBase - gTop);
+c.fillRect(gx0 - 40, gTop + 22, gx1 - gx0 + 80, 18);                 // lower beam
+c.fillRect(gx0 - 10, gTop + 52, gx1 - gx0 + 20, 12);                 // tie beam
+c.beginPath(); c.moveTo(gx0 - 70, gTop + 6); c.lineTo(gx0 - 40, gTop + 22); c.lineTo(gx1 + 40, gTop + 22);
+c.lineTo(gx1 + 70, gTop + 6); c.lineTo(gx1 + 10, gTop - 12); c.lineTo(gx0 - 10, gTop - 12); c.fill();   // roof, eaves up
+c.fillRect(gx0 + 70, gTop - 34, gx1 - gx0 - 140, 24);                // the crest
+c.fillStyle = "#c0283a"; c.fillRect((gx0 + gx1) / 2 - 22, gTop + 70, 44, 26);   // a red plaque
+c.fillStyle = G; c.beginPath(); c.moveTo(560, 720);                 // the near hill
+c.quadraticCurveTo(900, 560, 1280, 590); c.lineTo(1280, 720); c.fill();
+// a dark wash behind the title and menu so no gate crosses the letters
+c.save(); c.translate(300, 430); c.scale(1.6, 1);   // an oval wash, fading on every side
+const wash = c.createRadialGradient(0, 0, 0, 0, 0, 300);
+wash.addColorStop(0, "#140a14d9"); wash.addColorStop(0.6, "#140a1499"); wash.addColorStop(1, "#140a1400");
+c.fillStyle = wash; c.fillRect(-300, -300, 600, 600); c.restore();
 const M = [["Tiếp tục", "Ải 10 · Kiếm sĩ"], ["Chọn nhân vật", ""], ["Cài đặt", ""], ["Thoát", ""]];
 let sel = 0;
 const menu = document.getElementById("menu");
