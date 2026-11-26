@@ -62,6 +62,7 @@ addEventListener("keydown", (ev) => {
   if (ev.key === "ArrowRight") sel = (sel + 1) % n; else if (ev.key === "ArrowLeft") sel = (sel + n - 1) % n;
   else if (ev.key === "ArrowDown") sel = Math.min(n - 1, sel + 5); else if (ev.key === "ArrowUp") sel = Math.max(0, sel - 5);
   else if ("qQeE".includes(ev.key)) { kind = 1 - kind; sel = 0; }
+  else if (ev.key === "t" || ev.key === "T") { Journal.go("cardtree"); return; }
   else if (ev.key === "Enter") { const u = list()[sel]; inDeck.has(u.id) ? inDeck.delete(u.id) : inDeck.add(u.id); }
   else return;
   draw();

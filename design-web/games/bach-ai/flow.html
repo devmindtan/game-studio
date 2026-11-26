@@ -21,20 +21,25 @@ iframe { position: absolute; inset: 0; width: 1280px; height: 720px; border: 0; 
 const PAGES = { title: "screen-title-dusk.html", lobby: "screen-lobby-journal.html", characters: "screen-characters-journal.html",
   equipment: "screen-equipment-journal.html", tree: "screen-tree-journal.html", deck: "screen-deck-journal.html",
   gacha: "screen-gacha-journal.html", missions: "screen-missions-journal.html", album: "screen-album-journal.html",
-  settings: "screen-settings-journal.html", stages: "screen-stages-journal.html", run: null };
+  settings: "screen-settings-journal.html", stages: "screen-stages-journal.html", loading: "screen-loading.html",
+  trials: "screen-trials-journal.html", cardtree: "screen-cardtree-journal.html", run: "screen-run-journal.html" };
 const NAMES = { title: "Tiêu đề", lobby: "Sổ (Sảnh)", characters: "Các cuốn sổ", equipment: "Trang bị", tree: "Cây kỹ năng", deck: "Bộ thẻ",
-  gacha: "Quay đồ", missions: "Nhiệm vụ", album: "Album", settings: "Cài đặt", stages: "Chọn ải", run: "Trận" };
+  gacha: "Quay đồ", missions: "Nhiệm vụ", album: "Album", settings: "Cài đặt", stages: "Chọn ải", loading: "Tải trận", trials: "Thử thách", cardtree: "Cây thẻ", run: "Trận" };
 const stack = [];
 const f = document.getElementById("f"), run = document.getElementById("run");
 function show(id, query) {
   document.getElementById("crumb").textContent = stack.map((s) => NAMES[s.id]).join(" › ");
-  run.style.display = id === "run" ? "grid" : "none";
+  run.style.display = "none";
   if (PAGES[id]) { f.src = PAGES[id] + (query ? "?" + query : ""); f.onload = () => f.contentWindow.focus(); }
 }
-function go(id, query) { if (!(id in PAGES)) return; stack.push({ id, query }); show(id, query); }
+function go(id, query) {
+  if (!(id in PAGES)) return;
+  if (stack.length && stack[stack.length - 1].id === "loading") stack.pop();   // the loading page is not a place to go back to
+  stack.push({ id, query }); show(id, query);
+}
 function back() { if (stack.length > 1) { stack.pop(); const t = stack[stack.length - 1]; show(t.id, t.query); } }
 addEventListener("message", (e) => { if (e.data.back) back(); else if (e.data.go) go(e.data.go, e.data.query); });
-addEventListener("keydown", (e) => { if (e.key === "Escape" && stack[stack.length - 1]?.id === "run") back(); });
+// in the run the web shows the in-run sheets: P pause, L level-up, W win, F lose (the run itself is the game)
 const path = new URLSearchParams(location.search).get("path");   // ?path=title,lobby,album opens a flow already walked (shots, links)
 (path ? path.split(",") : ["title"]).forEach((id) => go(id));
 </script>

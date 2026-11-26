@@ -25,32 +25,41 @@
       <div class="seals" id="seals"></div></div>
     <div class="ribbons" id="tabs"></div>
   </div>
-  <div class="hint">Q / E đổi kệ · ← → chọn số lần quay · Enter quay · Esc về sổ</div>
+  <div class="hint">Q / E đổi kệ · ← → chọn số lần quay · Enter quay · H lịch sử · Esc về sổ</div>
 </div>
 <script src="journal.js"></script>
 <script>
-let GA, IC = {}, ICN = 0, banner = 0, pick = 0;
+let GA, IC = {}, ICN = 0, banner = 0, pick = 0, NAME = {};
 const $ = (id) => document.getElementById(id);
 const RN = { rare: "Hiếm", epic: "Sử thi", legendary: "Huyền thoại" }, RC = { rare: "#3a6aaa", epic: "#7a3ab8", legendary: "#c0801a" };
 const LAST = [["steel_sword", "rare"], ["dragon_blade", "epic"], ["forest_bow", "rare"], ["crystal_staff", "rare"], ["night_dagger", "rare"],
   ["steel_sword", "rare"], ["shadow_bow", "epic"], ["mage_robe", "rare"], ["aegis_blade", "legendary"], ["forest_bow", "rare"]];
 const icon = (id, px) => `<div class="ico" style="width:${px}px;height:${px}px;background-image:url(${Journal.SP}gear-icons/gear-icons_strip.png);background-size:${ICN * px}px ${px}px;background-position:${-(IC[id] || 0) * px}px 0"></div>`;
+let hist = new URLSearchParams(location.search).get("view") === "history";
 function draw() {
   const b = GA.banners[banner];
   $("tabs").innerHTML = GA.banners.map((x, i) => `<div class="ribbon ${i === banner ? "on" : ""}" style="background:${["#8a3a3a", "#3a6a8a"][i]}">${x.name}</div>`).join("");
   $("bdesc").textContent = `Kệ ${b.name}: ${b.desc}`;
   $("rates").innerHTML = Object.entries(GA.rates).map(([r, p]) => `<div class="ledger"><span style="color:${RC[r]}">${RN[r]}</span><span>${Math.round(p * 100)}%</span></div>`).join("") +
     `<div class="ledger"><span>Bảo đảm Huyền thoại</span><span>còn 37 / ${GA.pity_at} lần</span></div><div class="ledger"><span>Đá đang có</span><span>142</span></div>`;
+  if (hist) {
+    document.querySelector(".page.r").innerHTML = `<h2>Lịch sử quay · ${b.name}</h2>` + LAST.concat(LAST.slice(0, 4)).map(([id, r], i) =>
+      `<div class="ledger" style="font-size:22px"><span>#${120 - i} ${NAME[id] || id}</span><span style="color:${RC[r]}">${RN[r]}</span></div>`).join("") +
+      `<p class="muted" style="font-size:20px;margin-top:6px">Giữ ${GA.history_keep} lần quay gần nhất mỗi kệ. H: quay lại.</p>`;
+    return;
+  }
   $("pull").innerHTML = LAST.map(([id, r]) => `<div class="sketch" style="border-color:${RC[r]}">${icon(id, 56)}</div>`).join("");
   $("seals").innerHTML = [[1, "Quay ×1"], [10, "Quay ×10"]].map(([n, t], i) => `<div class="seal ${i === pick ? "on" : ""}">${t}<small>${n * GA.cost_per_pull} đá</small></div>`).join("");
 }
 (async () => {
-  const [g, gi] = await Promise.all([Journal.json("data/gacha.json"), Journal.json("sprites/custom/gear-icons/gear-icons.json")]);
+  const [g, gi, it] = await Promise.all([Journal.json("data/gacha.json"), Journal.json("sprites/custom/gear-icons/gear-icons.json"), Journal.json("data/items.json")]);
+  Object.entries(it.equipment).forEach(([k, v]) => { if (typeof v === "object") NAME[k] = v.name; });
   GA = g; gi.animations.forEach((a) => IC[a.name] = a.start); ICN = gi.frames; draw();
 })();
 addEventListener("keydown", (ev) => {
   if (ev.key === "ArrowRight" || ev.key === "ArrowLeft") pick = 1 - pick;
-  else if ("qQeE".includes(ev.key)) banner = 1 - banner; else return;
+  else if ("qQeE".includes(ev.key)) banner = 1 - banner;
+  else if (ev.key === "h" || ev.key === "H") { hist = !hist; if (!hist) location.reload(); } else return;
   draw();
 });
 </script>

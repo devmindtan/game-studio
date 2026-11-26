@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<title>Cây thẻ (sổ hành trình)</title>
+<link rel="stylesheet" href="journal.css">
+<style>
+.cardrow { display: flex; align-items: center; gap: 12px; font-size: 26px; padding: 3px 8px; border-bottom: 2px dotted var(--dots); }
+.cardrow.on { background: var(--ink); color: var(--paper); }
+.ico { image-rendering: pixelated; background-repeat: no-repeat; flex: none; }
+#nodes { position: relative; height: 350px; margin-top: 6px; }
+#nodes svg { position: absolute; inset: 0; }
+.cn { position: absolute; width: 120px; height: 58px; font-size: 19px; line-height: 1; padding: 6px; text-align: center; }
+.cn.got { background: #c88a7a; }
+.cn small { display: block; font-size: 16px; margin-top: 4px; }
+</style>
+</head>
+<body>
+<div id="game">
+  <div class="book">
+    <div class="cover"></div>
+    <div class="page l"><h1>Cây thẻ</h1><div class="sub">Nâng từng thẻ chiêu bằng Mảnh thẻ</div><div id="list" style="margin-top:8px"></div></div>
+    <div class="page r" id="right"></div>
+  </div>
+  <div class="hint">↑ ↓ chọn thẻ · ← → chọn nút · Enter nâng · Esc về Bộ thẻ</div>
+</div>
+<script src="journal.js"></script>
+<script>
+let CT, UP = {}, IC = {}, ICN = 0, ids = [], node = 0;
+const got = { keen: 2 };
+const icon = (id, px) => `<div class="ico" style="width:${px}px;height:${px}px;background-image:url(${Journal.SP}card-icons/card-icons_strip.png);background-size:${ICN * px}px ${px}px;background-position:${-(IC[id] || 0) * px}px 0"></div>`;
+function draw(sel) {
+  document.getElementById("list").innerHTML = ids.map((id, i) => `<div class="cardrow ${i === sel ? "on" : ""}">${icon(id, 36)}<span>${UP[id]?.name || id}</span></div>`).join("");
+  const t = CT.cards[ids[sel]], N = t.nodes; node = Math.min(node, N.length - 1);
+  const at = (n) => [10 + n.col * 160, 4 + n.row * 86];
+  const lines = N.flatMap((n) => (n.requires || []).map((r) => { const p = N.find((x) => x.id === r), [a, b] = at(p), [c, d] = at(n);
+    return `<line x1="${a + 60}" y1="${b + 58}" x2="${c + 60}" y2="${d}" stroke="#3a2414" stroke-width="3"/>`; })).join("");
+  const spent = Object.values(got).reduce((a, b) => a + b, 0), n = N[node];
+  document.getElementById("right").innerHTML = `<h2>${UP[ids[sel]]?.name || ids[sel]}</h2><div class="sub">Điểm đã dùng ${spent}/${t.max_points} · Mảnh thẻ 14</div>
+    <div id="nodes"><svg width="480" height="330">${lines}</svg>${N.map((m, i) => { const [x, y] = at(m);
+      return `<div class="cn sketch ${got[m.id] ? "got" : ""} ${i === node ? "on" : ""}" style="left:${x}px;top:${y}px;${i === node ? "color:var(--paper)" : ""}">${m.name}<small>${got[m.id] || 0}/${m.max_rank}</small></div>`; }).join("")}</div>
+    <p style="font-size:22px">${n.desc}</p><div class="ledger"><span>Giá cấp kế</span><span>${CT.cost_base + CT.cost_step * (got[n.id] || 0)} Mảnh thẻ</span></div>
+    <div class="seal on" style="right:40px;bottom:30px;width:200px;height:60px;line-height:52px">Nâng ▶</div>`;
+}
+(async () => {
+  const [ct, up, ci] = await Promise.all([Journal.json("data/card_trees.json"), Journal.json("data/upgrades_knight.json"), Journal.json("sprites/custom/card-icons/card-icons.json")]);
+  CT = ct; up.upgrades.forEach((u) => UP[u.id] = u); ci.animations.forEach((a) => IC[a.name] = a.start); ICN = ci.frames;
+  ids = Object.keys(ct.cards).filter((k) => UP[k]);
+  const l = Journal.list(() => ids.length, draw); l.set(0);
+  addEventListener("keydown", (ev) => { const n = CT.cards[ids[l.get()]].nodes.length;
+    if (ev.key === "ArrowRight") node = (node + 1) % n; else if (ev.key === "ArrowLeft") node = (node + n - 1) % n; else return; draw(l.get()); });
+})();
+</script>
+</body>
+</html>

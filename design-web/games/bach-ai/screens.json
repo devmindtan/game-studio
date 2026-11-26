@@ -124,6 +124,53 @@
    ]
   },
   {
+   "id": "loading",
+   "title": "Tải trận (mới)",
+   "spec": "specs/menus.md",
+   "views": [
+    {
+     "label": "Tải trận",
+     "page": "screen-loading.html",
+     "shot": "loading.png",
+     "note": "nhẹ: màu phẳng, một sprite chạy",
+     "chosen": true
+    }
+   ]
+  },
+  {
+   "id": "run",
+   "title": "Trong trận: bảng",
+   "spec": "specs/menus.md",
+   "game_shot": "04-level-up.png",
+   "views": [
+    {
+     "label": "Lên cấp",
+     "page": "screen-run-journal.html",
+     "shot": "run-levelup.png",
+     "query": "view=levelup",
+     "chosen": true
+    },
+    {
+     "label": "Tạm dừng",
+     "page": "screen-run-journal.html",
+     "shot": "run-pause.png",
+     "query": "view=pause"
+    },
+    {
+     "label": "Thắng",
+     "page": "screen-run-journal.html",
+     "shot": "run-win.png",
+     "query": "view=win"
+    },
+    {
+     "label": "Thua",
+     "page": "screen-run-journal.html",
+     "shot": "run-lose.png",
+     "query": "view=lose"
+    }
+   ]
+  },
+  {
    "id": "tree",
    "title": "Cây kỹ năng",
    "spec": "specs/menus.md",
@@ -152,6 +199,34 @@
    ]
   },
   {
+   "id": "cardtree",
+   "title": "Cây thẻ",
+   "spec": "specs/menus.md",
+   "game_shot": "01i3-card-tree.png",
+   "views": [
+    {
+     "label": "Cây thẻ",
+     "page": "screen-cardtree-journal.html",
+     "shot": "cardtree.png",
+     "chosen": true
+    }
+   ]
+  },
+  {
+   "id": "trials",
+   "title": "Thử thách",
+   "spec": "specs/menus.md",
+   "game_shot": "01j-trials.png",
+   "views": [
+    {
+     "label": "Thử thách",
+     "page": "screen-trials-journal.html",
+     "shot": "trials.png",
+     "chosen": true
+    }
+   ]
+  },
+  {
    "id": "gacha",
    "title": "Quay đồ",
    "spec": "specs/menus.md",
@@ -162,6 +237,12 @@
      "page": "screen-gacha-journal.html",
      "shot": "gacha.png",
      "chosen": true
+    },
+    {
+     "label": "Lịch sử quay",
+     "page": "screen-gacha-journal.html",
+     "shot": "gacha-history.png",
+     "query": "view=history"
     }
    ]
   },

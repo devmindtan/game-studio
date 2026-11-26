@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<title>Thử thách (sổ hành trình)</title>
+<link rel="stylesheet" href="journal.css">
+<style>
+.trial { padding: 8px 10px; border-bottom: 2px dotted var(--dots); }
+.trial b { font-weight: normal; font-size: 30px; }
+.trial small { display: block; font-size: 20px; color: var(--ink-soft); }
+.trial.on { background: var(--ink); color: var(--paper); } .trial.on small { color: var(--gold); }
+.trial.lock { opacity: .5; }
+.poster { border: 4px solid var(--ink); background: #ddcca0; padding: 14px 18px; margin: 8px 0 12px; transform: rotate(-1deg); }
+.poster h3 { font-weight: normal; font-size: 40px; text-align: center; color: var(--ink-red); }
+.poster p { font-size: 24px; text-align: center; }
+</style>
+</head>
+<body>
+<div id="game">
+  <div class="book">
+    <div class="cover"></div>
+    <div class="page l"><h1>Thử thách</h1><div class="sub">Luật riêng · không tính tiến độ ải · thưởng Tẩy Tủy Đan</div><div id="list" style="margin-top:8px"></div></div>
+    <div class="page r" id="right"></div>
+  </div>
+  <div class="hint">↑ ↓ chọn · Enter nhận thử thách · Esc về bản đồ</div>
+</div>
+<script src="journal.js"></script>
+<script>
+const best = 15;
+(async () => {
+  const C = await Journal.json("data/challenges.json");
+  const L = C.challenges;
+  Journal.list(() => L.length, (sel) => {
+    document.getElementById("list").innerHTML = L.map((c, i) => `<div class="trial ${i === sel ? "on" : ""} ${best < c.unlock ? "lock" : ""}"><b>${c.name}</b>
+      <small>${best < c.unlock ? "Qua ải " + c.unlock + " để mở" : "Trên nền Ải " + c.base + " · " + Math.round(c.duration / 60) + " phút"}</small></div>`).join("");
+    const c = L[sel], open = best >= c.unlock;
+    document.getElementById("right").innerHTML = `<div class="poster"><h3>${c.name}</h3><p>${c.desc}</p></div>
+      <div class="ledger"><span>Ải gốc</span><span>${c.base}</span></div><div class="ledger"><span>Thời gian</span><span>${Math.round(c.duration / 60)}:00</span></div>
+      <div class="ledger"><span>Thắng lần đầu</span><span>${C.pills_first} Tẩy Tủy Đan</span></div><div class="ledger"><span>Thắng lại</span><span>${C.pills} Tẩy Tủy Đan</span></div>
+      <div class="seal ${open ? "on" : ""}" style="right:40px;bottom:30px;width:280px;height:62px;line-height:54px;${open ? "" : "opacity:.5"}">Nhận thử thách ▶</div>`;
+  }, (i) => { if (best >= L[i].unlock) Journal.go("loading"); }).set(0);
+})();
+</script>
+</body>
+</html>

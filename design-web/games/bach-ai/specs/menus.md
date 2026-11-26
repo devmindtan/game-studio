@@ -28,8 +28,30 @@ cảnh kể tiến độ). Thêm: một ngôn ngữ cho mọi màn để ngườ
 | Nhiệm vụ | việc trong ngày: ô tick, thanh tiến độ, thưởng | tổng thưởng, "Nhận thưởng" | ↑↓ |
 | Cài đặt | hình ảnh, điều khiển | âm thanh (thanh %) | ↑↓, ←→ đổi |
 | Album | xem `specs/album.md` | | |
+| Cây thẻ | các thẻ chiêu | cây nâng cấp của thẻ chọn (card_trees.json), điểm đã dùng, Mảnh thẻ, giá cấp kế, "Nâng" | ↑↓ thẻ, ←→ nút |
+| Thử thách | danh sách (khoá "Qua ải N") | áp phích luật, ải gốc, thời gian, Tẩy Tủy Đan, "Nhận thử thách" | ↑↓, Enter |
+| Quay đồ: lịch sử | (như Quay đồ) | sổ kẻ các lần quay gần nhất của kệ, tên tiếng Việt, màu độ hiếm | H |
 
 ## Mô phỏng luồng
 
 `flow.html`: tiêu đề → Enter "Tiếp tục" → Sổ (Sảnh) → Enter một chương → màn đó; Esc quay lại màn trước; "Lên đường" →
 Chọn ải → "Vào trận" → trang báo vào trận. `flow.html?path=title,lobby,equipment` mở luồng đã đi sẵn.
+
+## Tải trận (mới, người dùng 2026-11-26: "màn hình tải trận nhẹ khi vào trận")
+
+`screen-loading.html`: nền tối hoàng hôn phẳng, tên vùng (nhỏ, giãn chữ) + "Ải N" (font chữ của game), một vạch đứt
+nét làm thanh tải với nhân vật chạy dọc theo (một strip sprite, không ảnh khác để chờ), một dòng mẹo. Khoảng 1,5 s rồi
+vào trận. Nhẹ có chủ ý: không cảnh vẽ, không hiệu ứng nặng.
+
+## Trong trận (bảng)
+
+`screen-run-journal.html?view=levelup|pause|win|lose`: trận làm tối phía sau, một tờ giấy sổ ghim đỏ, góc gấp.
+- Lên cấp: 3 "trang" thẻ (icon, tên, độ hiếm đóng dấu, loại + cấp, mô tả), dưới là Đổi (R) / Loại (X) / Bỏ qua.
+- Tạm dừng: danh sách Tiếp tục / Nhân vật / Cài đặt / Bỏ trận + sổ kẻ trận (cấp, quái hạ, vàng, máu).
+- Thắng / Thua: dấu mộc "VƯỢT ẢI N" (xanh) / "GỤC NGÃ" (đỏ), tổng kết + sát thương theo chiêu, "Ải tiếp theo / Thử lại"
+  và "Về sổ". Trong mô phỏng: P, L, W, F đổi giữa bốn bảng.
+
+## Luồng cập nhật
+
+Chọn ải → "Vào trận" → Tải trận → bảng trong trận; chế độ Thử thách → Thử thách → Tải trận; Bộ thẻ → T → Cây thẻ;
+Quay đồ → H → Lịch sử. Trang tải trận không nằm trong đường quay lại (Esc từ trận về Chọn ải).

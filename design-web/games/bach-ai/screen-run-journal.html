@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<title>Trong trận: lên cấp, tạm dừng, thắng, thua</title>
+<link rel="stylesheet" href="journal.css">
+<style>
+#game { background: repeating-conic-gradient(#2a3a22 0% 25%, #243320 0% 50%) 0 0 / 64px 64px; }
+.mob { position: absolute; width: 64px; height: 64px; }
+.dim { position: absolute; inset: 0; background: #0b0810b8; }
+.sheet { position: absolute; left: 200px; top: 70px; width: 880px; height: 580px; background: var(--paper); border: 4px solid var(--edge);
+  box-shadow: 0 10px 0 #0008; padding: 26px 40px; transform: rotate(-.6deg); }
+.sheet::after { content: ""; position: absolute; inset: 10px; border: 2px dashed #b89a6a; pointer-events: none; }
+.sheet .pin { position: absolute; top: -12px; left: 430px; width: 22px; height: 22px; border-radius: 50%; background: var(--seal); border: 3px solid #5a0c08; }
+.sheet .fold { position: absolute; right: -4px; bottom: -4px; width: 0; height: 0; border-left: 40px solid var(--paper-dark); border-top: 40px solid transparent; }
+.cards { display: flex; gap: 22px; margin-top: 14px; }
+.card { flex: 1; height: 330px; border: 4px solid var(--ink); background: #ddcca0; padding: 14px; position: relative; }
+.card.on { outline: 5px solid var(--gold); background: #e8d8b0; transform: translateY(-6px); }
+.card .ico { width: 96px; height: 96px; margin: 0 auto 6px; image-rendering: pixelated; background-repeat: no-repeat; }
+.card h3 { font-weight: normal; font-size: 30px; text-align: center; }
+.card p { font-size: 20px; line-height: 1.05; margin-top: 6px; }
+.card .stamp { position: absolute; top: 10px; right: 10px; font-size: 16px; }
+.tabs { display: flex; gap: 12px; justify-content: center; margin-top: 16px; }
+.tabs span { font-size: 22px; border: 3px solid var(--ink); padding: 0 12px; }
+.menu div { font-size: 34px; padding: 4px 12px; }
+.menu div.on { background: var(--ink); color: var(--paper); }
+.result { font-size: 64px; text-align: center; transform: rotate(-4deg); border: 6px solid currentColor; display: inline-block; padding: 0 24px; }
+.cols { display: flex; gap: 40px; margin-top: 10px; } .cols > div { flex: 1; }
+</style>
+</head>
+<body>
+<div id="game">
+  <img class="mob" src="../../../games/bach-ai/assets/sprites/custom/slime/slime.png" style="left:160px;top:140px">
+  <img class="mob" src="../../../games/bach-ai/assets/sprites/custom/bat/bat.png" style="left:1040px;top:200px">
+  <img class="mob" src="../../../games/bach-ai/assets/sprites/custom/goblin/goblin.png" style="left:980px;top:560px">
+  <img class="mob" src="../../../games/bach-ai/assets/sprites/custom/knight/knight.png" style="left:608px;top:330px;width:96px;height:96px">
+  <div class="dim"></div>
+  <div class="sheet" id="sheet"><div class="pin"></div><div class="fold"></div><div id="body"></div></div>
+  <div class="hint" id="hint"></div>
+</div>
+<script src="journal.js"></script>
+<script>
+const view = new URLSearchParams(location.search).get("view") || "levelup";
+addEventListener("keydown", (ev) => {   // in the flow: switch between the in-run sheets
+  const to = { p: "pause", l: "levelup", w: "win", f: "lose" }[ev.key.toLowerCase()];
+  if (to && to !== view) location.search = "?view=" + to;
+});
+let IC = {}, ICN = 0;
+const $ = (id) => document.getElementById(id);
+const icon = (id, px) => `<div class="ico" style="width:${px}px;height:${px}px;background-image:url(${Journal.SP}card-icons/card-icons_strip.png);background-size:${ICN * px}px ${px}px;background-position:${-(IC[id] || 0) * px}px 0"></div>`;
+const RN = { common: ["Thường", "#6a6a6a"], rare: ["Hiếm", "#3a6aaa"], epic: ["Sử thi", "#7a3ab8"], legendary: ["Huyền thoại", "#c0801a"] };
+const summary = (win) => `<div class="cols"><div>
+  <div class="ledger"><span>Thời gian</span><span>${win ? "05:00" : "03:12"}</span></div><div class="ledger"><span>Quái hạ</span><span>${win ? 1240 : 612}</span></div>
+  <div class="ledger"><span>Cấp đạt</span><span>${win ? 24 : 14}</span></div><div class="ledger"><span>Vàng</span><span>+${win ? 75 : 31}</span></div>
+  <div class="ledger"><span>Đá</span><span>+${win ? 10 : 0}</span></div></div><div>
+  <div class="muted" style="font-size:22px">Sát thương theo chiêu</div>
+  <div class="ledger"><span>Chém kiếm</span><span>41%</span></div><div class="ledger"><span>Lốc xoáy</span><span>27%</span></div>
+  <div class="ledger"><span>Cột thánh quang</span><span>19%</span></div><div class="ledger"><span>Khác</span><span>13%</span></div></div></div>`;
+(async () => {
+  const [up, ci] = await Promise.all([Journal.json("data/upgrades_knight.json"), Journal.json("sprites/custom/card-icons/card-icons.json")]);
+  ci.animations.forEach((a) => IC[a.name] = a.start); ICN = ci.frames;
+  const U = (id) => up.upgrades.find((u) => u.id === id);
+  if (view === "levelup") {
+    const C = ["whirlwind", "sharpen", "holy_column"].map(U);
+    $("hint").textContent = "← → chọn thẻ · Enter lấy · R đổi · X loại · Tab xem nhân vật";
+    Journal.list(() => 3, (sel) => {
+      $("body").innerHTML = `<h1 style="text-align:center">Lên cấp 8</h1><div class="sub" style="text-align:center">Chọn một trang ghi vào sổ</div>
+        <div class="cards">${C.map((u, i) => `<div class="card ${i === sel ? "on" : ""}"><span class="stamp" style="color:${RN[u.rarity][1]}">${RN[u.rarity][0]}</span>
+          ${icon(u.id, 96)}<h3>${u.name}</h3><div class="sub" style="text-align:center;font-size:18px">${u.kind === "skill" ? "Chiêu · cấp 1 → 2" : "Chỉ số"}</div><p>${u.desc}</p></div>`).join("")}</div>
+        <div class="tabs"><span>Đổi (R) ×2</span><span>Loại (X) ×1</span><span>Bỏ qua ×2 · +10 vàng</span></div>`;
+    }, () => Journal.back(), true).set(0);
+  } else if (view === "pause") {
+    const M = ["Tiếp tục", "Nhân vật", "Cài đặt", "Bỏ trận, về sổ"];
+    $("hint").textContent = "↑ ↓ chọn · Enter · Esc tiếp tục";
+    Journal.list(() => M.length, (sel) => {
+      $("body").innerHTML = `<h1>Tạm dừng</h1><div class="sub">Ải 11 · 02:41 / 05:00</div><div class="cols"><div class="menu">
+        ${M.map((m, i) => `<div class="${i === sel ? "on" : ""}">${m}</div>`).join("")}</div><div>
+        <div class="ledger"><span>Cấp</span><span>8</span></div><div class="ledger"><span>Quái hạ</span><span>412</span></div>
+        <div class="ledger"><span>Vàng nhặt</span><span>18</span></div><div class="ledger"><span>Máu</span><span>96 / 118</span></div></div></div>`;
+    }, (i) => { if (i === 2) Journal.go("settings"); else if (i === 3) Journal.go("lobby"); else Journal.back(); }).set(0);
+  } else {
+    const win = view === "win";
+    $("hint").textContent = "← → chọn · Enter";
+    Journal.list(() => 2, (sel) => {
+      $("body").innerHTML = `<div style="text-align:center;color:${win ? "#2a7a3a" : "var(--ink-red)"}"><span class="result">${win ? "VƯỢT ẢI 11" : "GỤC NGÃ"}</span></div>
+        <div class="sub" style="text-align:center;margin-top:6px">${win ? "Ải 12 đã mở · lần đầu: +10 đá" : "Giữ vàng và Tinh hoa đã nhặt"}</div>${summary(win)}
+        <div class="seal ${sel === 0 ? "on" : ""}" style="left:60px;bottom:30px;width:330px;height:60px;line-height:52px">${win ? "Ải tiếp theo ▶" : "Thử lại ▶"}</div>
+        <div class="seal ${sel === 1 ? "on" : ""}" style="right:60px;bottom:30px;width:330px;height:60px;line-height:52px;background:#5a3a24">Về sổ</div>`;
+    }, (i) => Journal.go(i === 0 ? "loading" : "lobby"), true).set(0);
+  }
+})();
+</script>
+</body>
+</html>
