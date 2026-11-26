@@ -115,6 +115,9 @@ xuất kéo dài thì khuyên người dùng mở phiên mới ở đó.
   đổi thứ người chơi thấy thì chạy `gamekit ui-shots <g>`, xem ảnh, commit `production/ui`. Dashboard (`games.html`)
   chỉ hiện bộ này và báo khi nó cũ hơn code; ảnh trong `production/qa/evidence/` là bằng chứng lịch sử, không phải
   giao diện hiện tại.
+- **"Thiết kế lại" = một hướng khác hẳn bản cũ** (người dùng 2026-11-26): không giữ bố cục / khung / màu cũ rồi chỉnh
+  nhẹ. Làm theo skill `.agents/skills/ui-redesign/SKILL.md`: ghi "Bản cũ" để tránh, tham khảo ≥ 2 game, dựng 2–3 hướng
+  trên `design-web/`, người dùng chọn rồi mới port sang Godot.
 - **Thiết kế màn hình trên web trước khi vào Godot** (người dùng 2026-11-22): dựng ở `design-web/` — mỗi màn một
   file `screen-<tên>.html` cố định **1280×720**, font pixel, bàn phím/focus là chính; không cuộn, không thanh
   điều hướng, không card bo tròn kiểu web. Chốt bằng ảnh 1280×720 trong `design-web/shots/` và đặc tả
