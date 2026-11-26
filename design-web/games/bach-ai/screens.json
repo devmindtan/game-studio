@@ -127,6 +127,13 @@
      "query": "view=extra",
      "shot": "equipment-extra.png",
      "note": "phần game có mà bản web chưa có"
+    },
+    {
+     "label": "Bảng Cường hoá (C)",
+     "page": "screen-equipment-journal.html",
+     "query": "view=enhance",
+     "shot": "equipment-enhance.png",
+     "note": "mẩu giấy ghim, mỗi bậc một dòng"
     }
    ]
   },

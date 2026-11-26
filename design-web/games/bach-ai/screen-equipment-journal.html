@@ -22,6 +22,14 @@
 .item p { font-size: 21px; line-height: 1.05; }
 .up { color: #2a7a3a; } .down { color: var(--ink-red); }
 .xlink { font-size: 20px; color: var(--ink-red); border-bottom: 2px solid var(--ink-red); margin-right: 18px; }
+/* Cường hoá sheet (user 2026-11-26 picked "bảng riêng"): a slip pinned over the right page, one row per level */
+.enh { position: absolute; left: 640px; top: 56px; width: 500px; height: 610px; z-index: 5; background: var(--paper); border: 3px solid var(--edge);
+  box-shadow: 0 6px 0 #0007; padding: 24px 26px; }
+.enh::before { content: ""; position: absolute; top: -9px; left: 50%; width: 14px; height: 14px; margin-left: -7px; border-radius: 50%; background: var(--seal); border: 2px solid #5a0c08; }
+.lv { display: flex; gap: 10px; align-items: baseline; font-size: 22px; border-bottom: 2px dotted var(--dots); padding: 2px 6px; }
+.lv b { font-weight: normal; width: 44px; } .lv .fx { flex: 1; } .lv .g { width: 90px; text-align: right; }
+.lv.done { color: var(--ink-soft); } .lv.next { background: var(--ink); color: var(--paper); } .lv.next .g { color: var(--gold); }
+.lv small { display: block; font-size: 18px; color: #2a7a3a; } .lv.next small { color: #9fe0a8; }
 </style>
 </head>
 <body>
@@ -32,6 +40,7 @@
     <div class="page r"><h2>Túi đồ</h2><div class="bagtabs" id="tabs"></div><div class="bag" id="bag"></div><div class="item" id="item"></div>
       <div class="seal on" style="right:40px;bottom:30px;width:200px;height:60px;line-height:52px">Mặc ▶</div></div>
   </div>
+  <div id="enhover"></div>
   <div class="hint">←↑↓→ chọn món · Q / E đổi chỗ mặc · Enter mặc · Esc về sổ</div>
 </div>
 <script src="journal.js"></script>
@@ -45,6 +54,22 @@ const worn = { head: "iron_cap", feet: "iron_boots" };
 const $ = (id) => document.getElementById(id);
 const icon = (id, px) => `<div class="ico" style="width:${px}px;height:${px}px;background-image:url(${Journal.SP}gear-icons/gear-icons_strip.png);background-size:${ICN * px}px ${px}px;background-position:${-(IC[id] || 0) * px}px 0"></div>`;
 function eff(d) { return Object.entries(d.effects || {}).map(([k, v]) => `${({ max_hp: "Máu", armor: "Giáp", damage: "Sát thương", cooldown: "Hồi chiêu", move_speed: "Tốc độ" })[k] || k} ${v.add ? "+" + v.add : (v.mul > 0 ? "+" : "") + Math.round(v.mul * 100) + "%"}`).join(", "); }
+const ENH = new URLSearchParams(location.search).get("view") === "enhance";
+const MAXP = { common: 3, rare: 5, epic: 7, legendary: 10 }, COST = { common: 30, rare: 60, epic: 120, legendary: 200 }, SUB_AT = [2, 4, 6];
+function enhSheet(d, now) {   // every level: its gold, the main line at that level, the sub line it opens
+  const NM = { max_hp: "Máu", armor: "Giáp", damage: "Sát thương", cooldown: "Hồi chiêu", move_speed: "Tốc độ", magnet: "Tầm hút", regen: "Hồi máu" };
+  const at = (k) => Object.entries(d.effects || {}).map(([e, v]) => `${NM[e] || e} ${v.add ? "+" + (v.add * (1 + .2 * k)).toFixed(v.add % 1 ? 1 : 0).replace(".", ",") : (v.mul > 0 ? "+" : "") + Math.round(v.mul * (1 + .2 * k) * 100) + "%"}`).join(", ");
+  const subs = d.subs || [];
+  let rows = "";
+  for (let k = 1; k <= MAXP[d.rarity]; k++) {
+    const si = SUB_AT.indexOf(k), sub = si >= 0 && subs[si] ? `<small>mở dòng phụ ${si + 1}: ${subs[si].desc}</small>` : "";
+    rows += `<div class="lv ${k <= now ? "done" : k === now + 1 ? "next" : ""}"><b>+${k}</b><span class="fx">${at(k)}${sub}</span><span class="g">${k <= now ? "✓" : COST[d.rarity] * k + " vàng"}</span></div>`;
+  }
+  return `<div class="enh"><h2 style="font-size:28px">Cường hoá · ${d.name}</h2><div class="sub">Đang +${now} / ${MAXP[d.rarity]} · mỗi bậc +20% hiệu ứng</div>
+    <div style="margin-top:8px">${rows}</div>
+    <div class="seal on" style="right:26px;bottom:24px;width:240px;height:60px;line-height:52px;font-size:26px">Cường hoá ▸ ${COST[d.rarity] * (now + 1)}</div>
+    <div class="muted" style="position:absolute;left:26px;bottom:34px;font-size:18px">C / Esc đóng</div></div>`;
+}
 function draw() {
   document.getElementById("sortrow")?.remove();
   $("doll").innerHTML = `<div class="portrait"><img src="${Journal.SP}knight/knight.png"></div>` + slotKeys.map((k, i) =>
@@ -58,7 +83,9 @@ function draw() {
   const d = list[sel];
   $("item").innerHTML = d ? `<h3>${d.name} <span class="stamp" style="font-size:18px;color:${["", "#6a6a6a", "#3a6aaa", "#7a3ab8", "#c0801a"][RAR[d.rarity][1]]}">${RAR[d.rarity][0]}</span></h3>
     <p>${eff(d)}</p>${EXTRA ? `<p style="color:#2a7a3a;font-size:19px">Dòng phụ 1: Hồi máu +0,5/giây</p><p class="muted" style="font-size:19px">Dòng phụ 2: Tốc độ chạy +6% (mở ở +4)</p>` : ""}<p class="muted">So với đang mặc:</p><div class="ledger"><span>Máu tối đa</span><span class="up">118 → 152 ▲</span></div>
-    <div class="ledger"><span>Giáp</span><span class="up">1 → 6 ▲</span></div>${EXTRA ? `<div class="ledger" style="margin-top:6px"><span>Cường hoá +0/7 (mỗi bậc +20% hiệu ứng)</span><span>120 vàng</span></div><span class="xlink">Cường hoá ▸ (C)</span>` : ""}` : "";
+    <div class="ledger"><span>Giáp</span><span class="up">1 → 6 ▲</span></div>${ENH ? "" : ""}${EXTRA ? `<div class="ledger" style="margin-top:6px"><span>Cường hoá +0/7 (mỗi bậc +20% hiệu ứng)</span><span>120 vàng</span></div><span class="xlink">Cường hoá ▸ (C)</span>` : ""}` : "";  const ed = ENH ? (ITEMS.find((x) => x.subs && x.rarity === "epic") || d) : null;   // a sample with sub lines
+  document.getElementById("enhover").innerHTML = ed ? enhSheet(ed, 3) : "";
+
 }
 (async () => {
   const [it, gi] = await Promise.all([Journal.json("data/items.json"), Journal.json("sprites/custom/gear-icons/gear-icons.json")]);
