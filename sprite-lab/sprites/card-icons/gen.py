@@ -1244,6 +1244,19 @@ def shadow_clone():
     return done(c)
 
 
+def net_shot():
+    """Lưới: a weighted net opening over two monsters."""
+    c = new()
+    for (x, y) in ((5, 13), (14, 15)):
+        c.ellipse(x, y, x + 6, y + 6, STONE["d"], fill=False)
+    for k in range(5):
+        c.line(2 + k * 5, 2, 12, 14, EARTH["l"], 1)
+    c.ellipse(2, 2, 22, 12, EARTH["l"], fill=False)
+    for (x, y) in ((2, 6), (22, 6), (8, 2), (16, 2)):
+        c.rect(x - 1, y - 1, x + 1, y + 1, STEEL["m"])
+    return done(c)
+
+
 ICONS = {f.__name__: f for f in (blade_arc, whirlwind, earth_strike, ground_slam, cleave_wave, holy_column, dash,
                                  earthquake, solar_ray, god_hammer, arcane_bolt, fireball, frost_nova, lightning,
                                  thunder_javelin, meteor, void_orb, blizzard, storm, back_slash, sharpen, haste, reach,
@@ -1258,7 +1271,7 @@ ICONS = {f.__name__: f for f in (blade_arc, whirlwind, earth_strike, ground_slam
                                  sp_shade_cloak, sp_shade_ring, sp_shade_hood, sp_shade_dagger, pierce_shot, fan_volley,
                                  fire_arrow, frost_arrow, thunder_arrow, fan_knives, piercing_knife, bleed_knife,
                                  venom_knife, fire_knife, arrow_rain, thorn_trap, hawk, smoke_bomb,
-                                 blade_ring, shadow_strike, ricochet, boomerang, execute, combo, hunter_mark, charged_shot, shadow_clone)}
+                                 blade_ring, shadow_strike, ricochet, boomerang, execute, combo, hunter_mark, charged_shot, shadow_clone, net_shot)}
 
 if __name__ == "__main__":
     anims = [(n, [f()], 1, False, {}) for n, f in ICONS.items()]

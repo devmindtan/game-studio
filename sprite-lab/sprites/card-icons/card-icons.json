@@ -1,5 +1,5 @@
 {
-  "frames": 101,
+  "frames": 102,
   "frame_size": [
     24,
     24
@@ -715,6 +715,13 @@
     {
       "name": "shadow_clone",
       "start": 100,
+      "frames": 1,
+      "fps": 1.0,
+      "loop": false
+    },
+    {
+      "name": "net_shot",
+      "start": 101,
       "frames": 1,
       "fps": 1.0,
       "loop": false
