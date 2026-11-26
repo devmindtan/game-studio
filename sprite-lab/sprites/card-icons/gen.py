@@ -1257,6 +1257,19 @@ def net_shot():
     return done(c)
 
 
+def poison_cloud():
+    """Độc vụ: a cracked flask over a bubbling green pool."""
+    c = new()
+    c.ellipse(1, 15, 22, 22, LEAF["d"])
+    c.ellipse(4, 16, 19, 21, LEAF["m"])
+    c.pixel(8, 18, LEAF["l"])
+    c.pixel(15, 17, LEAF["l"])
+    c.ellipse(7, 4, 16, 13, VOID["m"])
+    c.rect(10, 1, 13, 4, STEEL["l"])
+    c.line(9, 7, 13, 11, STEEL["l"], 1)
+    return done(c)
+
+
 ICONS = {f.__name__: f for f in (blade_arc, whirlwind, earth_strike, ground_slam, cleave_wave, holy_column, dash,
                                  earthquake, solar_ray, god_hammer, arcane_bolt, fireball, frost_nova, lightning,
                                  thunder_javelin, meteor, void_orb, blizzard, storm, back_slash, sharpen, haste, reach,
@@ -1271,7 +1284,7 @@ ICONS = {f.__name__: f for f in (blade_arc, whirlwind, earth_strike, ground_slam
                                  sp_shade_cloak, sp_shade_ring, sp_shade_hood, sp_shade_dagger, pierce_shot, fan_volley,
                                  fire_arrow, frost_arrow, thunder_arrow, fan_knives, piercing_knife, bleed_knife,
                                  venom_knife, fire_knife, arrow_rain, thorn_trap, hawk, smoke_bomb,
-                                 blade_ring, shadow_strike, ricochet, boomerang, execute, combo, hunter_mark, charged_shot, shadow_clone, net_shot)}
+                                 blade_ring, shadow_strike, ricochet, boomerang, execute, combo, hunter_mark, charged_shot, shadow_clone, net_shot, poison_cloud)}
 
 if __name__ == "__main__":
     anims = [(n, [f()], 1, False, {}) for n, f in ICONS.items()]

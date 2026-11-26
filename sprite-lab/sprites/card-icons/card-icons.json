@@ -1,5 +1,5 @@
 {
-  "frames": 102,
+  "frames": 103,
   "frame_size": [
     24,
     24
@@ -722,6 +722,13 @@
     {
       "name": "net_shot",
       "start": 101,
+      "frames": 1,
+      "fps": 1.0,
+      "loop": false
+    },
+    {
+      "name": "poison_cloud",
+      "start": 102,
       "frames": 1,
       "fps": 1.0,
       "loop": false
