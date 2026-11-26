@@ -13,6 +13,17 @@
 .modes span { font-size: 22px; padding: 0 10px; border: 2px solid var(--ink); }
 .modes span.on { background: var(--ink); color: var(--paper); }
 .modes span.lock { opacity: .45; }
+/* proposal 2026-11-26: difficulty on the page + the stage's detail sheet (features the game had before the port) */
+.more { float: right; font-size: 20px; color: var(--ink-red); border-bottom: 2px solid var(--ink-red); }
+.sheetx { position: absolute; left: 120px; top: 60px; width: 1040px; height: 600px; background: var(--paper); border: 4px solid var(--edge);
+  box-shadow: 0 10px 0 #0008; padding: 22px 34px; transform: rotate(-.4deg); }
+.sheetx::after { content: ""; position: absolute; inset: 10px; border: 2px dashed #b89a6a; pointer-events: none; }
+.sheetx h1 { font-size: 40px; } .cols2 { display: flex; gap: 36px; margin-top: 6px; } .cols2 > div { flex: 1; }
+.mrow { display: flex; align-items: center; gap: 10px; font-size: 21px; border-bottom: 2px dotted var(--dots); padding: 2px 0; }
+.mrow img { width: 40px; height: 40px; object-fit: contain; } .mrow .nm { flex: 1; line-height: 1; } .mrow small { display: block; font-size: 16px; color: var(--ink-soft); }
+.mrow .n { width: 62px; text-align: right; }
+.trow { display: flex; gap: 12px; font-size: 21px; padding: 1px 0; } .trow b { font-weight: normal; width: 56px; color: var(--ink-soft); }
+.dimx { position: absolute; inset: 0; background: #0b0810a0; }
 </style>
 </head>
 <body>
@@ -23,11 +34,13 @@
     <div class="page r" id="right"></div>
     <div class="ribbons" id="tabs"></div>
   </div>
+  <div id="over"></div>
   <div class="hint">← → chọn ải · Q / E đổi vùng · ↑ ↓ chế độ · Enter vào trận · Esc về sổ</div>
 </div>
 <script src="journal.js"></script>
 <script>
-let ST, MON = {}, region = 1, stage = 11, mode = 0;
+let ST, MON = {}, SPC = {}, region = 1, stage = 11, mode = 0;
+let view = new URLSearchParams(location.search).get("view") || "";   // "detail": the proposal (difficulty + Chi tiết)
 const best = 10, COLS = ["#6a8a3a", "#3a5a3a", "#5a6a2a"];
 const $ = (id) => document.getElementById(id);
 function nodes(r) {   // ten passes on a winding road across the page, the last one the boss
@@ -55,14 +68,44 @@ function draw() {
   const mons = Object.entries(MON).filter(([k, m]) => !m.boss && !m.gold_drop).slice(region * 3, region * 3 + 4);
   $("right").innerHTML = `<h2>${boss ? "Trùm · " : ""}Ải ${stage}</h2><div class="sub">${stage > best + 1 ? "Chưa mở: qua Ải " + (stage - 1) + " trước" : first ? "Lần đầu: thưởng đá nhiều hơn" : "Đã qua"}</div>
     <div class="modes">${["Thường", "Vô tận", "Thử thách"].map((m, i) => `<span class="${i === mode ? "on" : ""} ${i === 2 && best < 10 ? "lock" : ""}">${m}</span>`).join("")}</div>
-    <div class="muted" style="font-size:22px">Quái trong vùng</div>
+    <div class="muted" style="font-size:22px">Quái trong vùng${view ? '<span class="more">Chi tiết ▸ (D)</span>' : ""}</div>
     <div class="mons">${mons.map(([k, m]) => `<div class="sketch"><img src="${Journal.SP}${m.sprite}/${m.sprite}.png"></div>`).join("")}</div>
     <div class="ledger"><span>Thời gian</span><span>05:00</span></div><div class="ledger"><span>Vàng khi thắng</span><span>${gold}</span></div>
     <div class="ledger"><span>Đá</span><span>${gems}</span></div>
+    ${view ? `<div class="muted" style="font-size:22px;margin-top:10px">Độ khó so với Ải 1</div>
+      <div class="ledger"><span>Máu quái</span><span>×${mul("hp", stage)}</span></div><div class="ledger"><span>Sát thương quái</span><span>×${mul("dmg", stage)}</span></div>
+      <div class="ledger"><span>Mật độ quái</span><span>×${mul("rate", stage)}</span></div>` : ""}
     <div class="seal ${stage <= best + 1 ? "on" : ""}" style="right:40px;bottom:30px;width:240px;height:62px;line-height:54px;${stage > best + 1 ? "opacity:.5" : ""}">Vào trận ▶</div>`;
+  document.getElementById("over").innerHTML = view === "detail-open" ? sheet() : "";
+}
+// the game's formulas (stages.json _doc): hp 1 + lin m + quad m², damage 1 + lin m, rate min(max, 1 + lin m)
+function mul(kind, n) {
+  const k = ST.scale, m = n - 1;
+  const v = kind === "hp" ? 1 + k.hp_lin * m + k.hp_quad * m * m : kind === "dmg" ? 1 + k.dmg_lin * m : Math.min(k.rate_max, 1 + k.rate_lin * m);
+  return v.toFixed(2).replace(".", ",");
+}
+const EVN = { ring: "Vòng thử thách", collect: "Thu thập sao", hunt: "Săn tinh anh", tornado: "Lốc xoáy", root_snare: "Rễ trói", poison_tide: "Triều độc" };
+function sheet() {   // the Chi tiết sheet: the stage's monsters (scaled) and its time marks, over the spread
+  const r = ST.regions[region], mons = Object.entries(MON).filter(([k, m]) => !m.boss && !m.gold_drop).slice(region * 3, region * 3 + 4);
+  const boss = Object.entries(MON).find(([k, m]) => m.boss);
+  const all = stage % ST.boss_every === 0 ? mons.concat([boss]) : mons;
+  const sp = (m) => { const s = SPC.species[m.species] || {}, e = SPC.elements;
+    return [s.name, ...(s.weak || []).map((x) => "yếu " + e[x]), ...(s.resist || []).map((x) => "kháng " + e[x])].filter(Boolean).join(" · "); };
+  const marks = mons.slice(1).map(([k, m], i) => [20 + i * 25, m.name + " bắt đầu xuất hiện"]).concat(
+    (r.events || []).map((e) => [e.t, "Sự kiện: " + (EVN[e.kind] || e.kind)]), [[40, "3 " + mons[0][1].name + " tinh anh"], [150, "3 " + mons[1][1].name + " tinh anh"]]).sort((a, b) => a[0] - b[0]);
+  const mmss = (t) => String(Math.floor(t / 60)).padStart(2, "0") + ":" + String(t % 60).padStart(2, "0");
+  return `<div class="dimx"></div><div class="sheetx"><h1>${stage % ST.boss_every === 0 ? "Trùm · " : ""}Ải ${stage} · ${r.name}</h1>
+    <div class="cols2"><div><div class="muted" style="font-size:22px">Quái của ải (đã tính độ khó)</div>
+      <div class="mrow" style="font-size:18px;color:var(--ink-soft)"><span style="width:40px"></span><span class="nm">Tên</span><span class="n">Máu</span><span class="n">ST</span><span class="n">Tốc độ</span></div>
+      ${all.map(([k, m]) => `<div class="mrow"><img src="${Journal.SP}${m.sprite}/${m.sprite}.png"><span class="nm">${m.name}<small>${sp(m)}</small></span>
+        <span class="n">${Math.round(m.hp * parseFloat(mul("hp", stage).replace(",", ".")))}</span><span class="n">${Math.round(m.damage * parseFloat(mul("dmg", stage).replace(",", ".")))}</span><span class="n">${m.speed}</span></div>`).join("")}</div>
+    <div><div class="muted" style="font-size:22px">Mốc thời gian (trận 05:00)</div>
+      ${marks.map(([t, x]) => `<div class="trow"><b>${mmss(t)}</b><span style="${x.startsWith("Sự kiện") ? "color:#3a6aaa" : x.includes("tinh anh") ? "color:var(--ink-red)" : ""}">${x}</span></div>`).join("")}
+      <div class="ledger" style="margin-top:10px"><span>Vàng / Đá lần đầu / Đá các lần sau</span><span>${ST.rewards.gold_base + ST.rewards.gold_per_stage * stage} / ${ST.rewards.gems_first} / ${ST.rewards.gems_repeat}</span></div></div></div>
+    <div class="muted" style="position:absolute;right:40px;bottom:24px;font-size:20px">D / Esc đóng</div></div>`;
 }
 (async () => {
-  [ST, MON] = await Promise.all([Journal.json("data/stages.json"), Journal.json("data/monsters.json")]);
+  [ST, MON, SPC] = await Promise.all([Journal.json("data/stages.json"), Journal.json("data/monsters.json"), Journal.json("data/species.json")]);
   await document.fonts.load("20px VT323");
   delete MON._doc; draw();
 })();
@@ -71,6 +114,8 @@ addEventListener("keydown", (ev) => {
   if (ev.key === "ArrowRight") stage = Math.min(r.to, stage + 1); else if (ev.key === "ArrowLeft") stage = Math.max(r.from, stage - 1);
   else if (ev.key === "ArrowDown") mode = (mode + 1) % 3; else if (ev.key === "ArrowUp") mode = (mode + 2) % 3;
   else if (ev.key === "e" || ev.key === "E" || ev.key === "q" || ev.key === "Q") { region = (region + (ev.key.toLowerCase() === "e" ? 1 : ST.regions.length - 1)) % ST.regions.length; stage = ST.regions[region].from; }
+  else if ((ev.key === "d" || ev.key === "D") && view) { view = view === "detail-open" ? "detail" : "detail-open"; }
+  else if (ev.key === "Escape" && view === "detail-open") { view = "detail"; }
   else if (ev.key === "Enter" && mode === 2) { Journal.go("trials"); return; }
   else if (ev.key === "Enter" && stage <= best + 1) { Journal.go("loading"); return; } else return;
   draw();

@@ -21,3 +21,15 @@ const Journal = {
   },
 };
 addEventListener("keydown", (ev) => { if (ev.key === "Escape") Journal.back(); });
+// "Trở lại" on every journal page (not the lobby: its ribbon already changes character). ?back=b shows direction B.
+addEventListener("DOMContentLoaded", () => {
+  const book = document.querySelector(".book");
+  if (!book || /screen-lobby/.test(location.pathname)) return;
+  const b = new URLSearchParams(location.search).get("back") === "b";
+  const el = document.createElement("div");
+  el.className = b ? "back-b" : "back-a";
+  el.innerHTML = b ? "◂ Trở lại <kbd>· Esc</kbd>" : "Trở lại";
+  el.onclick = () => Journal.back();
+  (b ? document.getElementById("game") : document.getElementById("game")).appendChild(el);
+  if (b) document.body.classList.add("has-back-b");
+});
