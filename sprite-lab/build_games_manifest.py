@@ -577,6 +577,13 @@ def statuses_of(root, data):
         out.append({"id": sid, "name": st.get("name", sid), "kind": "debuff", "desc": st.get("desc", ""),
                     "at": st.get("at", "body"), "tint": st.get("tint", ""), "sprite": sprite_info(root, str(st.get("sprite", ""))),
                     "facts": facts})
+    crit = load(os.path.join(data, "run_config.json")).get("crit", {})
+    if crit.get("sprite"):   # hit effects: the Chí mạng flash (user 2026-11-26 chose Gai nổ)
+        out.append({"id": "crit", "name": "Chí mạng · Gai nổ", "kind": "hit", "anim": crit.get("anim", ""),
+                    "desc": "Đòn trực tiếp chí mạng: ngôi sao gai bật trên quái bị trúng, số sát thương to màu cam có \"!\".",
+                    "sprite": sprite_info(root, str(crit["sprite"])),
+                    "facts": ["Tỉ lệ gốc %g%%, sát thương ×%g" % (float(crit.get("chance", 0)) * 100, float(crit.get("mul", 1))),
+                              "Trúng tinh anh / boss: khựng %g s, rung %g px" % (float(crit.get("hitstop", 0)), float(crit.get("shake_crit", 0)))]})
     for bid, it in clean(items.get("buffs", {})).items():
         if not it.get("aura"):
             continue
