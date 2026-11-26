@@ -22,14 +22,14 @@ Người dùng 2026-11-26: "bổ sung quy trình thiết kế giao diện trên 
 
 1. **Phạm vi**: liệt kê màn trong `games/<g>/production/ui/screens.json` sẽ đổi; chụp bản hiện tại
    (`gamekit ui-shots <g> <màn>`) làm mốc "trước".
-2. **Bản cũ**: ghi vào `design-web/screens/<màn>.md` mục "## Bản cũ" (bố cục, màu, khung, font, điều hướng).
+2. **Bản cũ**: ghi vào `design-web/games/<g>/specs/<màn>.md` mục "## Bản cũ" (bố cục, màu, khung, font, điều hướng).
 3. **Tham khảo**: mục "## Tham khảo" trong cùng file: ≥ 2 game, mỗi game 3 dòng (học gì / tránh gì / quyết định).
    Không có Internet thì ghi rõ đã bỏ bước này.
-4. **2–3 hướng** trên web: `design-web/screen-<màn>-<hướng>.html` (+ css/js), mỗi hướng khác nhau thật sự (ví dụ
+4. **2–3 hướng** trên web: `design-web/games/<g>/screen-<màn>-<hướng>.html` (+ css/js), khai báo trong `design-web/games/<g>/screens.json` (mỗi hướng một "view"; game mới thì thêm vào `design-web/games.json`), mỗi hướng khác nhau thật sự (ví dụ
    sổ tay da / bàn đá rune / bản đồ giấy), cùng dữ liệu thật của game. `design-web/serve.sh` để xem.
-5. **Chụp và soát** mỗi hướng 1280×720 vào `design-web/shots/`, soi từng vùng ×2 (căn chữ, tràn, khoảng cách).
-6. **Người dùng xem trên web rồi chọn.** Chạy `design-web/serve.sh` (nền) và đưa **đường link** từng hướng
-   (`http://localhost:8770/design-web/screen-<màn>-<hướng>.html`) ngay trong tin nhắn, kèm ảnh. Không hỏi chọn chỉ
+5. **Chụp và soát** mỗi hướng 1280×720 vào `design-web/games/<g>/shots/`, soi từng vùng ×2 (căn chữ, tràn, khoảng cách).
+6. **Người dùng xem trên web rồi chọn.** Hướng được chọn ghi `"chosen": true` trong `screens.json`. Chạy `design-web/serve.sh` (nền) và đưa **đường link** từng hướng
+   của **Design Lab** (`http://localhost:8770/design-web/#<g>/<màn>/<số hướng>`: cả các hướng nằm trong trang chính, không mở từng trang riêng, người dùng 2026-11-26) ngay trong tin nhắn, kèm ảnh. Không hỏi chọn chỉ
    bằng đường dẫn file (bài học 2026-11-26: người dùng không xem được nên chọn mò, agent port luôn rồi phải hoàn tác).
    Người dùng chưa nói đã xem và chọn thì không port.
 7. **Port** hướng đã chọn sang Godot (`UiKit` / theme của game), `gamekit ui-shots <g> <màn>`, so với ảnh web, soi ×2.

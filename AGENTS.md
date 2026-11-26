@@ -14,7 +14,7 @@ game-studio/
 ├── .agents/skills/<tên>/SKILL.md skill dùng chung (bản gốc), ví dụ pixel-sprite
 ├── .claude/skills/<tên>          symlink → .agents/skills/<tên> (do `gamekit agents-link` tạo)
 ├── sprite-lab/                   Sprite Lab: project Godot để làm + thử MỌI sprite (sheet, di chuyển), rồi promote vào game
-├── design-web/                   Design Lab: dựng màn hình game trên web (1280×720, bàn phím) trước khi vào Godot
+├── design-web/                   Design Lab chung cho mọi game: games/<slug>/ (screens.json, screen-*.html, specs/, shots/), index.html xem mọi hướng
 ├── templates/
 │   └── claude-code-game-studios/ framework gốc (49 agent, 74 skill), CHỈ ĐỌC. Mỗi game mới clone từ đây
 ├── games/
@@ -118,10 +118,10 @@ xuất kéo dài thì khuyên người dùng mở phiên mới ở đó.
 - **"Thiết kế lại" = một hướng khác hẳn bản cũ** (người dùng 2026-11-26): không giữ bố cục / khung / màu cũ rồi chỉnh
   nhẹ. Làm theo skill `.agents/skills/ui-redesign/SKILL.md`: ghi "Bản cũ" để tránh, tham khảo ≥ 2 game, dựng 2–3 hướng
   trên `design-web/`, người dùng chọn rồi mới port sang Godot.
-- **Thiết kế màn hình trên web trước khi vào Godot** (người dùng 2026-11-22): dựng ở `design-web/` — mỗi màn một
-  file `screen-<tên>.html` cố định **1280×720**, font pixel, bàn phím/focus là chính; không cuộn, không thanh
-  điều hướng, không card bo tròn kiểu web. Chốt bằng ảnh 1280×720 trong `design-web/shots/` và đặc tả
-  `design-web/screens/<tên>.md` (có mục "## Tham khảo"), rồi mới port sang `games/<g>/src/...` và chạy
+- **Thiết kế màn hình trên web trước khi vào Godot** (người dùng 2026-11-22): dựng ở `design-web/games/<g>/` — mỗi màn một
+  file `screen-<tên>.html` khai báo trong `screens.json` của game cố định **1280×720**, font pixel, bàn phím/focus là chính; không cuộn, không thanh
+  điều hướng, không card bo tròn kiểu web. Chốt bằng ảnh 1280×720 trong `design-web/games/<g>/shots/` và đặc tả
+  `design-web/games/<g>/specs/<tên>.md` (có mục "## Tham khảo"), rồi mới port sang `games/<g>/src/...` và chạy
   `gamekit ui-shots`. Tool/asset tham khảo miễn phí tải bằng `design-web/setup.sh`.
 - **Tiết kiệm RAM/thời gian** (người dùng 2026-11-21: làm lâu, ngốn RAM): `gamekit ui-shots <g> <tên màn…>` chỉ chụp lại các màn vừa đổi (mỗi màn là một Godot render bằng CPU trên Xvfb); chụp cả bộ chỉ trước khi xuất bản web. Tra code bằng `tools/gdgraph` / graphify thay vì đọc cả file lớn (`run.gd` > 3000 dòng).
 - **Chụp nhanh:** cần nhiều ảnh thì **một** lệnh `gamekit shot <g> "" 300,320,340 -- …`, không gọi `shot` lặp lại

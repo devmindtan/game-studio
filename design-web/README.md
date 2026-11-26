@@ -4,22 +4,27 @@ Nơi dựng và soát **màn hình game** trước khi viết vào Godot. Mỗi 
 **1280×720 (16:9)**, chạy trong khung game: không cuộn, không thanh điều hướng web, bàn phím là
 input chính. Đây là bản thiết kế để chốt bố cục/màu/chữ, **không phải** giao diện sẽ ship thẳng.
 
+Dùng chung cho **mọi game** của workspace (người dùng 2026-11-26):
+
 ```text
 design-web/
-├── index.html          Design Lab: khung soát, đổi màn/biến thể, lưới, vùng an toàn
-├── screen-title.html   Màn chờ + màn tiêu đề BÁCH ẢI (bản thiết kế)
-├── screen-title.css    Bố cục, màu, chuyển động của màn hình
-├── screen-title.js     Bàn phím, focus, vòng rune, toast
-├── screens/title.md    Đặc tả màn hình + nguồn tham khảo
-├── fonts/              VT323 (OFL), phủ đủ tiếng Việt
-└── vendor/             tool/asset tham khảo, KHÔNG commit (setup.sh tải về)
+├── index.html          Design Lab: chọn game → màn → hướng, xem trong khung 1280×720, lưới / vùng an toàn
+├── games.json          danh sách game có màn thiết kế
+├── fonts/              VT323 (OFL), phủ đủ tiếng Việt, dùng chung
+├── vendor/             tool/asset tham khảo, KHÔNG commit (setup.sh tải về)
+└── games/<slug>/       một thư mục cho mỗi game
+    ├── screens.json    các màn: id, title, spec, game_shot, views [{label, note, page, query, shot, chosen}]
+    ├── screen-*.html   bản thiết kế (+ css/js), font ../../fonts/, sprite ../../../sprite-lab hoặc ../../../games/<slug>
+    ├── specs/<màn>.md  đặc tả: Bản cũ, Tham khảo, các hướng
+    ├── shots/          ảnh 1280×720 của từng hướng
+    └── assets/         tài nguyên riêng của bản thiết kế
 ```
 
 ## Chạy
 
 ```sh
 design-web/setup.sh          # lần đầu: tải font + clone tool tham khảo (vendor/)
-design-web/serve.sh          # http://localhost:8770/design-web/index.html
+design-web/serve.sh          # http://localhost:8770/design-web/  (link chia sẻ: #<game>/<màn>/<số hướng>)
 ```
 
 Mở `index.html`, bấm vào khung game rồi dùng:
@@ -59,8 +64,10 @@ giấy phép OFL, có subset tiếng Việt (đã kiểm `ế ụ ậ Ả ư ợ
 
 ## Thêm màn hình mới
 
-1. Chép `screen-title.html/css/js` thành `screen-<tên>.*`, sửa nội dung.
-2. Thêm mục vào danh sách màn trong `index.html`.
-3. Viết `screens/<tên>.md`: mục tiêu, trạng thái, bố cục, màu/chữ, phím, **## Tham khảo** (≥ 2 nguồn
-   game cùng thể loại, ghi rõ học gì / tránh gì / quyết định).
-4. Chụp 1280×720 ở từng trạng thái, soi từng vùng ×2 trước khi chốt.
+1. Game mới: tạo `games/<slug>/` + `screens.json` (`{"screens": []}`), thêm `{"slug", "name"}` vào `games.json`.
+2. Viết `games/<slug>/screen-<màn>[-<hướng>].html` (mỗi hướng một trang, hoặc một trang đọc `?variant=`).
+3. Khai báo màn trong `screens.json`: mỗi hướng / trạng thái là một mục `views`; hướng người dùng chọn có `"chosen": true`.
+4. Viết `specs/<màn>.md`: **## Bản cũ** (khi thiết kế lại), **## Tham khảo** (≥ 2 game cùng thể loại: học gì / tránh
+   gì / quyết định), các hướng.
+5. Chụp 1280×720 từng hướng vào `shots/` (Chrome headless qua `limited`), soi từng vùng ×2.
+6. Đưa người dùng link Design Lab `http://localhost:8770/design-web/#<slug>/<màn>/<số>`; chưa chọn thì không port.

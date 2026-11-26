@@ -1,0 +1,9 @@
+{
+  "_doc": "Design Lab screens of Thất Tinh Ấn (format: design-web/games/bach-ai/screens.json).",
+  "screens": [
+    {"id": "hud", "title": "HUD (mobile)", "spec": "specs/tta-hud.md",
+     "views": [
+       {"label": "HUD", "page": "screen-tta-hud.html", "shot": "tta-hud-normal.png"}
+     ]}
+  ]
+}

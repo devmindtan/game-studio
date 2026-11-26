@@ -1,6 +1,6 @@
 @font-face {
   font-family: "VT323";
-  src: url("fonts/VT323-Regular.ttf") format("truetype");
+  src: url("../../fonts/VT323-Regular.ttf") format("truetype");
   font-display: block;
 }
 
@@ -615,11 +615,11 @@ body[data-variant="c"][data-state="gate"] .scroll-mark { display: block; }
 }
 
 .hero-slot.left .hero {
-  background-image: url("../games/bach-ai/assets/sprites/custom/swordsman/swordsman_strip.png");
+  background-image: url("../../../games/bach-ai/assets/sprites/custom/swordsman/swordsman_strip.png");
 }
 
 .hero-slot.right .hero {
-  background-image: url("../games/bach-ai/assets/sprites/custom/mage/mage_strip.png");
+  background-image: url("../../../games/bach-ai/assets/sprites/custom/mage/mage_strip.png");
   transform: translateX(-50%) scaleX(-1);
 }
 

@@ -5,7 +5,7 @@
 <title>HUD – Thất Tinh Ấn (thiết kế)</title>
 <!-- 1280×720 = game 640×360 ×2. Mobile cảm ứng: joystick trái, nút phải. Đặc tả: screens/tta-hud.md -->
 <style>
-@font-face { font-family: "VT323"; src: url("fonts/VT323-Regular.ttf") format("truetype"); font-display: block; }
+@font-face { font-family: "VT323"; src: url("../../fonts/VT323-Regular.ttf") format("truetype"); font-display: block; }
 :root { --ink:#0b1016; --panel:#121a22; --gold:#e0b250; --gold-d:#8a6a2a; --jade:#3a7866; --jade-l:#7fd6c0;
   --hp:#e05050; --hp-d:#4a1818; --ki:#4a8ad8; --ki-d:#16283e; --parch:#f2e6c9; --muted:#a9a38f; }
 * { box-sizing: border-box; }
@@ -78,15 +78,15 @@ body.dialog #dlg { display:block; }
   <div class="label" style="left:400px;top:272px">Cụ Hạc</div>
   <div class="label" style="left:400px;top:244px;color:var(--gold);font-size:30px">?</div>
   <div class="shadow" style="left:550px;top:404px"></div>
-  <img src="../sprite-lab/sprites/vo-sinh/vo-sinh.png" style="left:516px;top:320px;width:96px;height:96px">
+  <img src="../../../sprite-lab/sprites/vo-sinh/vo-sinh.png" style="left:516px;top:320px;width:96px;height:96px">
   <div class="shadow" style="left:836px;top:450px"></div>
-  <img src="../sprite-lab/sprites/moc-nhan/moc-nhan.png" style="left:818px;top:392px;width:64px;height:64px">
+  <img src="../../../sprite-lab/sprites/moc-nhan/moc-nhan.png" style="left:818px;top:392px;width:64px;height:64px">
   <div class="label" style="left:850px;top:378px">Bù nhìn rơm</div>
   <div class="float" style="left:820px;top:340px">28</div>
 </div>
 
 <div class="plate" id="who">
-  <div id="face"><img src="../sprite-lab/sprites/vo-sinh/vo-sinh.png"></div>
+  <div id="face"><img src="../../../sprite-lab/sprites/vo-sinh/vo-sinh.png"></div>
   <div class="bar" id="hp"><i></i><b>184/200</b></div>
   <div class="bar" id="ki"><i></i><b>70/100</b></div>
   <div id="pw">Sức mạnh 540<span style="color:var(--muted)"> / 2.000</span><div class="track"><i></i></div></div>

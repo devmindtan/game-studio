@@ -33,7 +33,7 @@ gamekit test dom-dom-dem-mua            # chạy test
 gamekit export dom-dom-dem-mua          # build Linux + Windows + Web → games/<g>/builds/dist/
 
 design-web/setup.sh                     # lần đầu: font + tool tham khảo cho Design Lab
-design-web/serve.sh                     # http://localhost:8770/design-web/index.html
+design-web/serve.sh                     # http://localhost:8770/design-web/ (mọi game, mọi màn, mọi hướng)
 ```
 
 Trong một thư mục game có thể bỏ tên game (`gamekit test`) hoặc dùng `make help`.

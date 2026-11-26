@@ -1,0 +1,96 @@
+{
+ "_doc": "Design Lab screens of Bách Ải. view: one way to see a screen (a direction or a state): page (+ query) in this folder, shot in shots/, chosen = the direction the user picked. spec: specs/<id>.md. game_shot: the screen as the game draws it now (production/ui).",
+ "screens": [
+  {
+   "id": "lobby",
+   "title": "Sảnh (chuẩn bị)",
+   "spec": "specs/lobby.md",
+   "game_shot": "01-lobby.png",
+   "views": [
+    {
+     "label": "A · Trại lửa",
+     "note": "cảnh trại, đồ vật là menu",
+     "page": "screen-lobby-camp.html",
+     "shot": "lobby-a-camp.png"
+    },
+    {
+     "label": "B · Sổ hành trình",
+     "note": "sổ mở, mục lục",
+     "page": "screen-lobby-journal.html",
+     "shot": "lobby-b-journal.png",
+     "chosen": true
+    },
+    {
+     "label": "C · Tối giản",
+     "note": "danh sách chữ, nhân vật sáng",
+     "page": "screen-lobby-stark.html",
+     "shot": "lobby-c-stark.png"
+    }
+   ]
+  },
+  {
+   "id": "title",
+   "title": "Màn tiêu đề",
+   "spec": "specs/title.md",
+   "game_shot": "00-title.png",
+   "views": [
+    {
+     "label": "A · Cổng ải (màn chờ)",
+     "page": "screen-title.html",
+     "query": "state=gate&variant=a",
+     "shot": "gate-a.png"
+    },
+    {
+     "label": "B · Dải băng (màn chờ)",
+     "page": "screen-title.html",
+     "query": "state=gate&variant=b",
+     "shot": "gate-b.png"
+    },
+    {
+     "label": "C · Cuộn giấy (màn chờ)",
+     "page": "screen-title.html",
+     "query": "state=gate&variant=c",
+     "shot": "gate-c.png"
+    },
+    {
+     "label": "A · Cổng ải (menu)",
+     "page": "screen-title.html",
+     "query": "state=menu&variant=a",
+     "shot": "menu-a.png"
+    },
+    {
+     "label": "B · Dải băng (menu)",
+     "page": "screen-title.html",
+     "query": "state=menu&variant=b",
+     "shot": "menu-b.png"
+    },
+    {
+     "label": "C · Cuộn giấy (menu)",
+     "page": "screen-title.html",
+     "query": "state=menu&variant=c",
+     "shot": "menu-c.png"
+    }
+   ]
+  },
+  {
+   "id": "album",
+   "title": "Album",
+   "spec": "specs/album.md",
+   "game_shot": "01n-album.png",
+   "views": [
+    {
+     "label": "Tab Quái",
+     "page": "screen-album.html",
+     "query": "tab=0",
+     "shot": "album-tab0.png"
+    },
+    {
+     "label": "Tab Kỹ năng",
+     "page": "screen-album.html",
+     "query": "tab=2",
+     "shot": "album-tab2.png"
+    }
+   ]
+  }
+ ]
+}

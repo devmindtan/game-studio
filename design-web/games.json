@@ -1,0 +1,7 @@
+{
+  "_doc": "Games with screens in the Design Lab (index.html). Each has games/<slug>/screens.json. Add a game: a folder and a line here.",
+  "games": [
+    {"slug": "bach-ai", "name": "Bách Ải"},
+    {"slug": "that-tinh-an", "name": "Thất Tinh Ấn"}
+  ]
+}
