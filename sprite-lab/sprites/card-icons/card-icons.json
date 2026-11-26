@@ -1,5 +1,5 @@
 {
-  "frames": 98,
+  "frames": 99,
   "frame_size": [
     24,
     24
@@ -694,6 +694,13 @@
     {
       "name": "combo",
       "start": 97,
+      "frames": 1,
+      "fps": 1.0,
+      "loop": false
+    },
+    {
+      "name": "hunter_mark",
+      "start": 98,
       "frames": 1,
       "fps": 1.0,
       "loop": false
