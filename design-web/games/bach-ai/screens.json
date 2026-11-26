@@ -139,16 +139,41 @@
   },
   {
    "id": "run",
-   "title": "Trong trận: bảng",
+   "title": "Trong trận",
    "spec": "specs/menus.md",
    "game_shot": "04-level-up.png",
    "views": [
     {
+     "label": "HUD",
+     "page": "screen-hud-journal.html",
+     "query": "view=hud",
+     "shot": "hud-hud.png",
+     "note": "mẩu giấy ghim ở góc",
+     "chosen": true
+    },
+    {
+     "label": "Thanh máu trùm",
+     "page": "screen-hud-journal.html",
+     "query": "view=boss",
+     "shot": "hud-boss.png"
+    },
+    {
+     "label": "Mốc cấp 10/20/30",
+     "page": "screen-hud-journal.html",
+     "query": "view=milestone",
+     "shot": "hud-milestone.png"
+    },
+    {
+     "label": "Nhân vật (Tab)",
+     "page": "screen-hud-journal.html",
+     "query": "view=character",
+     "shot": "hud-character.png"
+    },
+    {
      "label": "Lên cấp",
      "page": "screen-run-journal.html",
      "shot": "run-levelup.png",
-     "query": "view=levelup",
-     "chosen": true
+     "query": "view=levelup"
     },
     {
      "label": "Tạm dừng",

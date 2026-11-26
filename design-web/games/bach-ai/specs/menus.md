@@ -55,3 +55,11 @@ vào trận. Nhẹ có chủ ý: không cảnh vẽ, không hiệu ứng nặng.
 
 Chọn ải → "Vào trận" → Tải trận → bảng trong trận; chế độ Thử thách → Thử thách → Tải trận; Bộ thẻ → T → Cây thẻ;
 Quay đồ → H → Lịch sử. Trang tải trận không nằm trong đường quay lại (Esc từ trận về Chọn ải).
+
+## HUD và các bảng còn lại trong trận
+
+`screen-hud-journal.html?view=hud|boss|milestone|character`. HUD: mẩu giấy nhỏ ghim đỏ ở góc thay panel tối (nhẹ trên
+màn chơi): trái tên + cấp + máu mực đỏ + thanh kinh nghiệm; giữa đồng hồ / thời lượng / ải; phải quái hạ + vàng; dưới ô
+chiêu phác thảo, chiêu đang hồi tô mực từ dưới lên theo phần còn lại + số giây. Trùm: một băng giấy dưới đồng hồ, tên
+mực đỏ, giai đoạn, thanh máu đỏ thẫm. Mốc cấp: tờ sổ với 4 "trang" phần thưởng dấu "Đặc biệt". Nhân vật (Tab): sổ kẻ chỉ
+số (có Chí mạng, Sát thương chí mạng), chiêu và thẻ chỉ số. Trong mô phỏng: H B M C và P L W F đổi qua lại.

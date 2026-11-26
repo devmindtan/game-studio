@@ -44,6 +44,8 @@ const view = new URLSearchParams(location.search).get("view") || "levelup";
 addEventListener("keydown", (ev) => {   // in the flow: switch between the in-run sheets
   const to = { p: "pause", l: "levelup", w: "win", f: "lose" }[ev.key.toLowerCase()];
   if (to && to !== view) location.search = "?view=" + to;
+  const hud = { h: "hud", b: "boss", m: "milestone", c: "character" }[ev.key.toLowerCase()];
+  if (hud) location.href = "screen-hud-journal.html?view=" + hud;
 });
 let IC = {}, ICN = 0;
 const $ = (id) => document.getElementById(id);
