@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<title>Nhiệm vụ (sổ hành trình)</title>
+<link rel="stylesheet" href="journal.css">
+<style>
+.task { display: flex; gap: 14px; align-items: flex-start; padding: 8px 10px; border-bottom: 2px dotted var(--dots); }
+.task .box { width: 28px; height: 28px; border: 3px solid var(--ink); flex: none; margin-top: 4px; position: relative; }
+.task.done .box::after { content: "✓"; position: absolute; left: 2px; top: -10px; font-size: 34px; color: #2a7a3a; }
+.task b { font-weight: normal; font-size: 28px; display: block; line-height: 1; }
+.task small { font-size: 20px; color: var(--ink-soft); }
+.task .gem { margin-left: auto; font-size: 24px; white-space: nowrap; }
+.task.on { background: var(--ink); color: var(--paper); } .task.on small { color: var(--gold); } .task.on .box { border-color: var(--gold); }
+.bar { height: 10px; border: 2px solid var(--ink); margin-top: 4px; width: 220px; } .bar i { display: block; height: 100%; background: var(--ink-red); }
+</style>
+</head>
+<body>
+<div id="game">
+  <div class="book">
+    <div class="cover"></div>
+    <div class="page l"><h1>Nhiệm vụ</h1><div class="sub">Việc trong ngày · đổi lúc nửa đêm</div><div id="tasks" style="margin-top:10px"></div></div>
+    <div class="page r"><h2>Phần thưởng</h2><div id="sum"></div>
+      <div class="seal on" style="right:40px;bottom:30px;width:260px;height:62px;line-height:54px">Nhận thưởng ▶</div></div>
+  </div>
+  <div class="hint">↑ ↓ chọn · Enter nhận · Esc về sổ</div>
+</div>
+<script src="journal.js"></script>
+<script>
+const PROG = [3, 1, 140, 0];
+(async () => {
+  const m = await Journal.json("data/missions.json");
+  const T = m.pool.slice(0, m.per_day);
+  const done = T.map((t, i) => PROG[i] >= t.target);
+  document.getElementById("sum").innerHTML = T.map((t, i) => `<div class="ledger"><span>${t.name}</span><span>${done[i] ? "+" + t.gems + " đá" : "—"}</span></div>`).join("") +
+    `<div class="ledger"><span>Xong cả ${m.per_day} việc</span><span>+${m.bonus_gems} đá</span></div>
+     <p class="muted" style="font-size:22px;margin-top:10px">Đang chờ nhận: ${T.filter((t, i) => done[i]).reduce((a, t) => a + t.gems, 0)} đá</p>`;
+  Journal.list(() => T.length, (sel) => {
+    document.getElementById("tasks").innerHTML = T.map((t, i) => `<div class="task ${done[i] ? "done" : ""} ${i === sel ? "on" : ""}"><div class="box"></div>
+      <div><b>${t.name}</b><small>${t.desc}</small><div class="bar"><i style="width:${Math.min(100, PROG[i] / t.target * 100)}%"></i></div></div>
+      <span class="gem">${Math.min(PROG[i], t.target)}/${t.target} · ${t.gems} đá</span></div>`).join("");
+  }).set(0);
+})();
+</script>
+</body>
+</html>

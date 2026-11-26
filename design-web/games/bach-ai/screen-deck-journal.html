@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<title>Bộ thẻ (sổ hành trình)</title>
+<link rel="stylesheet" href="journal.css">
+<style>
+.kind { display: flex; gap: 6px; margin: 6px 0 8px; }
+.kind span { font-size: 20px; padding: 0 8px; border: 2px solid var(--ink); }
+.kind span.on { background: var(--ink); color: var(--paper); }
+.cards { display: grid; grid-template-columns: repeat(5, 76px); gap: 8px; }
+.cards .sketch { width: 76px; height: 76px; }
+.cards .sketch.in::after { content: "✓"; position: absolute; right: 2px; top: -6px; font-size: 26px; color: #2a7a3a; }
+.ico { image-rendering: pixelated; background-repeat: no-repeat; }
+.slots { display: grid; grid-template-columns: repeat(8, 54px); gap: 6px; margin: 4px 0 10px; }
+.slots.s6 { grid-template-columns: repeat(6, 54px); }
+.slots div { width: 54px; height: 54px; border: 2px dashed var(--ink); display: grid; place-items: center; }
+.budget { height: 16px; border: 3px solid var(--ink); width: 300px; margin: 4px 0; } .budget i { display: block; height: 100%; background: var(--ink-red); }
+.r1 { border-color: #3a6aaa !important; } .r2 { border-color: #7a3ab8 !important; } .r3 { border-color: #c0801a !important; }
+</style>
+</head>
+<body>
+<div id="game">
+  <div class="book">
+    <div class="cover"></div>
+    <div class="page l"><h1>Bộ thẻ</h1><div class="sub">Thẻ mang vào trận: lên cấp trong trận chỉ ra thẻ trong bộ</div>
+      <div class="kind" id="kind"></div><div class="cards" id="cards"></div></div>
+    <div class="page r"><h2>Bộ đang dùng</h2><div id="deck"></div>
+      <p style="font-size:22px;margin-top:8px">Cây thẻ ▸ <span class="muted">nâng thẻ bằng Mảnh thẻ (phím T)</span></p>
+      <div class="seal on" style="right:40px;bottom:30px;width:260px;height:62px;line-height:54px">Dùng bộ này ▶</div></div>
+    <div class="ribbons"><div class="ribbon on" style="background:#8a3a3a">Bộ 1</div><div class="ribbon" style="background:#3a6a8a">Bộ 2</div><div class="ribbon" style="background:#6a8a3a">Bộ 3</div></div>
+  </div>
+  <div class="hint">←↑↓→ chọn thẻ · Q / E chiêu / chỉ số · Enter thêm / bỏ · Esc về sổ</div>
+</div>
+<script src="journal.js"></script>
+<script>
+let CFG, UP = [], IC = {}, ICN = 0, kind = 0, sel = 0, inDeck = new Set();
+const RANK = { common: 0, rare: 1, epic: 2, legendary: 3 };
+const $ = (id) => document.getElementById(id);
+const icon = (id, px) => `<div class="ico" style="width:${px}px;height:${px}px;background-image:url(${Journal.SP}card-icons/card-icons_strip.png);background-size:${ICN * px}px ${px}px;background-position:${-(IC[id] || 0) * px}px 0"></div>`;
+const list = () => UP.filter((u) => (u.kind === "skill") === (kind === 0) && u.id !== "dash");
+function draw() {
+  $("kind").innerHTML = ["Chiêu", "Chỉ số"].map((k, i) => `<span class="${i === kind ? "on" : ""}">${k}</span>`).join("");
+  $("cards").innerHTML = list().map((u, i) => `<div class="sketch r${RANK[u.rarity] || 0} ${inDeck.has(u.id) ? "in" : ""} ${i === sel ? "on" : ""}">${icon(u.id, 52)}</div>`).join("");
+  const sk = UP.filter((u) => inDeck.has(u.id) && u.kind === "skill"), st = UP.filter((u) => inDeck.has(u.id) && u.kind !== "skill");
+  const cost = [...sk, ...st].reduce((a, u) => a + (CFG.cost[u.rarity] || 0), 0);
+  const slot = (arr, n) => Array.from({ length: n }, (_, i) => `<div>${arr[i] ? icon(arr[i].id, 44) : ""}</div>`).join("");
+  const u = list()[sel];
+  $("deck").innerHTML = `<div class="muted" style="font-size:22px">Chiêu ${sk.length}/${CFG.skills}</div><div class="slots">${slot(sk, CFG.skills)}</div>
+    <div class="muted" style="font-size:22px">Chỉ số ${st.length}/${CFG.stats}</div><div class="slots s6">${slot(st, CFG.stats)}</div>
+    <div class="ledger"><span>Điểm hiếm</span><span>${cost}/${CFG.budget}</span></div><div class="budget"><i style="width:${Math.min(100, cost / CFG.budget * 100)}%"></i></div>
+    ${u ? `<p style="font-size:22px;margin-top:6px"><b style="font-weight:normal;color:var(--ink-red)">${u.name}.</b> ${u.desc}</p>` : ""}`;
+}
+(async () => {
+  const [ct, up, ci] = await Promise.all([Journal.json("data/card_trees.json"), Journal.json("data/upgrades_knight.json"), Journal.json("sprites/custom/card-icons/card-icons.json")]);
+  CFG = ct.deck; UP = up.upgrades.filter((u) => !u.unique && !u.special); ci.animations.forEach((a) => IC[a.name] = a.start); ICN = ci.frames;
+  UP.slice(0, 5).concat(UP.filter((u) => u.kind !== "skill").slice(0, 3)).forEach((u) => inDeck.add(u.id));
+  draw();
+})();
+addEventListener("keydown", (ev) => {
+  const n = list().length;
+  if (ev.key === "ArrowRight") sel = (sel + 1) % n; else if (ev.key === "ArrowLeft") sel = (sel + n - 1) % n;
+  else if (ev.key === "ArrowDown") sel = Math.min(n - 1, sel + 5); else if (ev.key === "ArrowUp") sel = Math.max(0, sel - 5);
+  else if ("qQeE".includes(ev.key)) { kind = 1 - kind; sel = 0; }
+  else if (ev.key === "Enter") { const u = list()[sel]; inDeck.has(u.id) ? inDeck.delete(u.id) : inDeck.add(u.id); }
+  else return;
+  draw();
+});
+</script>
+</body>
+</html>

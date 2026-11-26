@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<title>Trang bị (sổ hành trình)</title>
+<link rel="stylesheet" href="journal.css">
+<style>
+.doll { position: relative; height: 378px; margin-top: 4px; }
+.doll .portrait { position: absolute; left: 150px; top: 40px; width: 180px; height: 220px; border: 4px solid var(--edge); background: #d8c498; display: grid; place-items: center; }
+.doll .portrait img { width: 170px; height: 170px; }
+.slot { position: absolute; width: 84px; height: 84px; }
+.slot .ico, .bag .ico { image-rendering: pixelated; background-repeat: no-repeat; }
+.slot label { position: absolute; top: 86px; left: -10px; width: 104px; text-align: center; font-size: 18px; }
+.bagtabs { display: flex; gap: 6px; margin: 4px 0 8px; }
+.bagtabs span { font-size: 20px; padding: 0 8px; border: 2px solid var(--ink); }
+.bagtabs span.on { background: var(--ink); color: var(--paper); }
+.bag { display: grid; grid-template-columns: repeat(6, 64px); gap: 8px; }
+.bag .sketch { width: 64px; height: 64px; }
+.r1 { border-color: #8a8a8a !important; } .r2 { border-color: #3a6aaa !important; } .r3 { border-color: #7a3ab8 !important; } .r4 { border-color: #c0801a !important; }
+.item { margin-top: 12px; }
+.item h3 { font-weight: normal; font-size: 30px; }
+.item p { font-size: 21px; line-height: 1.05; }
+.up { color: #2a7a3a; } .down { color: var(--ink-red); }
+</style>
+</head>
+<body>
+<div id="game">
+  <div class="book">
+    <div class="cover"></div>
+    <div class="page l"><h1>Trang bị</h1><div class="sub">Nhân vật 1 · Kiếm sĩ</div><div class="doll" id="doll"></div><div id="stats"></div></div>
+    <div class="page r"><h2>Túi đồ</h2><div class="bagtabs" id="tabs"></div><div class="bag" id="bag"></div><div class="item" id="item"></div>
+      <div class="seal on" style="right:40px;bottom:30px;width:200px;height:60px;line-height:52px">Mặc ▶</div></div>
+  </div>
+  <div class="hint">←↑↓→ chọn món · Q / E đổi chỗ mặc · Enter mặc · Esc về sổ</div>
+</div>
+<script src="journal.js"></script>
+<script>
+const SLOTS = { head: "Mũ", chest: "Áo", feet: "Giày", weapon: "Vũ khí", shield: "Khiên" };
+const POS = { head: [30, 10], chest: [30, 140], feet: [30, 260], weapon: [380, 70], shield: [380, 200] };
+const RAR = { common: ["Thường", 1], rare: ["Hiếm", 2], epic: ["Sử thi", 3], legendary: ["Huyền thoại", 4] };
+let ITEMS = [], IC = {}, ICN = 0, slotKeys = Object.keys(SLOTS), tab = 1, sel = 0;
+const worn = { head: "iron_cap", feet: "iron_boots" };
+const $ = (id) => document.getElementById(id);
+const icon = (id, px) => `<div class="ico" style="width:${px}px;height:${px}px;background-image:url(${Journal.SP}gear-icons/gear-icons_strip.png);background-size:${ICN * px}px ${px}px;background-position:${-(IC[id] || 0) * px}px 0"></div>`;
+function eff(d) { return Object.entries(d.effects || {}).map(([k, v]) => `${({ max_hp: "Máu", armor: "Giáp", damage: "Sát thương", cooldown: "Hồi chiêu", move_speed: "Tốc độ" })[k] || k} ${v.add ? "+" + v.add : (v.mul > 0 ? "+" : "") + Math.round(v.mul * 100) + "%"}`).join(", "); }
+function draw() {
+  $("doll").innerHTML = `<div class="portrait"><img src="${Journal.SP}knight/knight.png"></div>` + slotKeys.map((k, i) =>
+    `<div class="slot sketch ${i === tab ? "on" : ""}" style="left:${POS[k][0]}px;top:${POS[k][1]}px">${worn[k] ? icon(worn[k], 64) : ""}<label>${SLOTS[k]}</label></div>`).join("");
+  $("stats").innerHTML = [["Máu", 118], ["Sát thương", 20], ["Giáp", 1], ["Tốc độ", 158]].map(([a, b]) => `<div class="ledger"><span>${a}</span><span>${b}</span></div>`).join("");
+  $("tabs").innerHTML = slotKeys.map((k, i) => `<span class="${i === tab ? "on" : ""}">${SLOTS[k]}</span>`).join("");
+  const list = ITEMS.filter((d) => d.slot === slotKeys[tab]);
+  sel = Math.min(sel, list.length - 1);
+  $("bag").innerHTML = list.map((d, i) => `<div class="sketch r${RAR[d.rarity][1]} ${i === sel ? "on" : ""}">${icon(d.id, 48)}</div>`).join("");
+  const d = list[sel];
+  $("item").innerHTML = d ? `<h3>${d.name} <span class="stamp" style="font-size:18px;color:${["", "#6a6a6a", "#3a6aaa", "#7a3ab8", "#c0801a"][RAR[d.rarity][1]]}">${RAR[d.rarity][0]}</span></h3>
+    <p>${eff(d)}</p><p class="muted">So với đang mặc:</p><div class="ledger"><span>Máu tối đa</span><span class="up">118 → 152 ▲</span></div>
+    <div class="ledger"><span>Giáp</span><span class="up">1 → 6 ▲</span></div>` : "";
+}
+(async () => {
+  const [it, gi] = await Promise.all([Journal.json("data/items.json"), Journal.json("sprites/custom/gear-icons/gear-icons.json")]);
+  gi.animations.forEach((a) => IC[a.name] = a.start); ICN = gi.frames;
+  ITEMS = Object.entries(it.equipment).filter(([k, v]) => typeof v === "object" && v.class === "knight").map(([id, v]) => ({ id, ...v }));
+  draw();
+})();
+addEventListener("keydown", (ev) => {
+  const n = ITEMS.filter((d) => d.slot === slotKeys[tab]).length;
+  if (ev.key === "ArrowRight") sel = (sel + 1) % n; else if (ev.key === "ArrowLeft") sel = (sel + n - 1) % n;
+  else if (ev.key === "e" || ev.key === "E") { tab = (tab + 1) % slotKeys.length; sel = 0; }
+  else if (ev.key === "q" || ev.key === "Q") { tab = (tab + slotKeys.length - 1) % slotKeys.length; sel = 0; }
+  else return;
+  draw();
+});
+</script>
+</body>
+</html>

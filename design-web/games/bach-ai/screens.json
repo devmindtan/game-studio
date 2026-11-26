@@ -2,6 +2,26 @@
  "_doc": "Design Lab screens of Bách Ải. view: one way to see a screen (a direction or a state): page (+ query) in this folder, shot in shots/, chosen = the direction the user picked. spec: specs/<id>.md. game_shot: the screen as the game draws it now (production/ui).",
  "screens": [
   {
+   "id": "flow",
+   "title": "▶ Mô phỏng cả luồng",
+   "spec": "specs/menus.md",
+   "views": [
+    {
+     "label": "Từ tiêu đề",
+     "page": "flow.html",
+     "shot": "flow-lobby.png",
+     "note": "Enter vào, Esc quay lại, như trong game",
+     "chosen": true
+    },
+    {
+     "label": "Đang ở Trang bị",
+     "page": "flow.html",
+     "shot": "flow-equipment.png",
+     "query": "path=title,lobby,equipment"
+    }
+   ]
+  },
+  {
    "id": "title",
    "title": "Màn tiêu đề",
    "spec": "specs/title.md",
@@ -52,6 +72,124 @@
      "note": "danh sách chữ, nhân vật sáng",
      "page": "screen-lobby-stark.html",
      "shot": "lobby-c-stark.png"
+    }
+   ]
+  },
+  {
+   "id": "characters",
+   "title": "Các cuốn sổ (nhân vật)",
+   "spec": "specs/menus.md",
+   "game_shot": "00b-characters.png",
+   "views": [
+    {
+     "label": "Danh sách",
+     "page": "screen-characters-journal.html",
+     "shot": "chars-list.png",
+     "chosen": true
+    },
+    {
+     "label": "Viết sổ mới",
+     "page": "screen-characters-journal.html",
+     "shot": "chars-create.png",
+     "query": "mode=create"
+    }
+   ]
+  },
+  {
+   "id": "equipment",
+   "title": "Trang bị",
+   "spec": "specs/menus.md",
+   "game_shot": "01d-equipment.png",
+   "views": [
+    {
+     "label": "Trang bị",
+     "page": "screen-equipment-journal.html",
+     "shot": "equipment.png",
+     "chosen": true
+    }
+   ]
+  },
+  {
+   "id": "stages",
+   "title": "Chọn ải",
+   "spec": "specs/menus.md",
+   "game_shot": "01f-stage-select.png",
+   "views": [
+    {
+     "label": "Chọn ải",
+     "page": "screen-stages-journal.html",
+     "shot": "stages.png",
+     "chosen": true
+    }
+   ]
+  },
+  {
+   "id": "tree",
+   "title": "Cây kỹ năng",
+   "spec": "specs/menus.md",
+   "game_shot": "01i-skill-tree.png",
+   "views": [
+    {
+     "label": "Cây kỹ năng",
+     "page": "screen-tree-journal.html",
+     "shot": "tree.png",
+     "chosen": true
+    }
+   ]
+  },
+  {
+   "id": "deck",
+   "title": "Bộ thẻ",
+   "spec": "specs/menus.md",
+   "game_shot": "01i2-deck.png",
+   "views": [
+    {
+     "label": "Bộ thẻ",
+     "page": "screen-deck-journal.html",
+     "shot": "deck.png",
+     "chosen": true
+    }
+   ]
+  },
+  {
+   "id": "gacha",
+   "title": "Quay đồ",
+   "spec": "specs/menus.md",
+   "game_shot": "01k-gacha.png",
+   "views": [
+    {
+     "label": "Quay đồ",
+     "page": "screen-gacha-journal.html",
+     "shot": "gacha.png",
+     "chosen": true
+    }
+   ]
+  },
+  {
+   "id": "missions",
+   "title": "Nhiệm vụ",
+   "spec": "specs/menus.md",
+   "game_shot": "01m-missions.png",
+   "views": [
+    {
+     "label": "Nhiệm vụ",
+     "page": "screen-missions-journal.html",
+     "shot": "missions.png",
+     "chosen": true
+    }
+   ]
+  },
+  {
+   "id": "settings",
+   "title": "Cài đặt",
+   "spec": "specs/menus.md",
+   "game_shot": "01b-lobby-settings.png",
+   "views": [
+    {
+     "label": "Cài đặt",
+     "page": "screen-settings-journal.html",
+     "shot": "settings.png",
+     "chosen": true
     }
    ]
   },

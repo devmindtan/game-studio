@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<title>Mô phỏng luồng: Bách Ải</title>
+<style>
+@font-face { font-family: "VT323"; src: url("../../fonts/VT323-Regular.ttf") format("truetype"); }
+html, body { margin: 0; width: 1280px; height: 720px; overflow: hidden; background: #000; font-family: "VT323", monospace; }
+iframe { position: absolute; inset: 0; width: 1280px; height: 720px; border: 0; }
+#crumb { position: absolute; right: 8px; top: 6px; font-size: 18px; color: #fff8; background: #0006; padding: 0 8px; pointer-events: none; z-index: 2; }
+#run { position: absolute; inset: 0; display: none; place-items: center; text-align: center; color: #f3e6c8; font-size: 34px;
+  background: repeating-linear-gradient(0deg, #1b2a1c 0 8px, #16220f 8px 16px); }
+</style>
+</head>
+<body>
+<iframe id="f" title="Màn hình"></iframe>
+<div id="run"><div>Vào trận (trận là game thật, không thiết kế lại)<br><small style="font-size:22px;color:#c8b48a">Esc: về bản đồ chọn ải</small></div></div>
+<div id="crumb"></div>
+<script>
+// the web flow of the redesigned menus: screens ask "go" / "back" (journal.js postMessage); Esc anywhere goes back
+const PAGES = { title: "screen-title-dusk.html", lobby: "screen-lobby-journal.html", characters: "screen-characters-journal.html",
+  equipment: "screen-equipment-journal.html", tree: "screen-tree-journal.html", deck: "screen-deck-journal.html",
+  gacha: "screen-gacha-journal.html", missions: "screen-missions-journal.html", album: "screen-album-journal.html",
+  settings: "screen-settings-journal.html", stages: "screen-stages-journal.html", run: null };
+const NAMES = { title: "Tiêu đề", lobby: "Sổ (Sảnh)", characters: "Các cuốn sổ", equipment: "Trang bị", tree: "Cây kỹ năng", deck: "Bộ thẻ",
+  gacha: "Quay đồ", missions: "Nhiệm vụ", album: "Album", settings: "Cài đặt", stages: "Chọn ải", run: "Trận" };
+const stack = [];
+const f = document.getElementById("f"), run = document.getElementById("run");
+function show(id, query) {
+  document.getElementById("crumb").textContent = stack.map((s) => NAMES[s.id]).join(" › ");
+  run.style.display = id === "run" ? "grid" : "none";
+  if (PAGES[id]) { f.src = PAGES[id] + (query ? "?" + query : ""); f.onload = () => f.contentWindow.focus(); }
+}
+function go(id, query) { if (!(id in PAGES)) return; stack.push({ id, query }); show(id, query); }
+function back() { if (stack.length > 1) { stack.pop(); const t = stack[stack.length - 1]; show(t.id, t.query); } }
+addEventListener("message", (e) => { if (e.data.back) back(); else if (e.data.go) go(e.data.go, e.data.query); });
+addEventListener("keydown", (e) => { if (e.key === "Escape" && stack[stack.length - 1]?.id === "run") back(); });
+const path = new URLSearchParams(location.search).get("path");   // ?path=title,lobby,album opens a flow already walked (shots, links)
+(path ? path.split(",") : ["title"]).forEach((id) => go(id));
+</script>
+</body>
+</html>

@@ -31,6 +31,7 @@ canvas { position: absolute; inset: 0; }
   <div class="hint">← → chọn · Enter</div>
   <div class="ver">Phiên bản 0.6.24</div>
 </div>
+<script src="journal.js"></script>
 <script>
 // dusk: banded sky, a low sun, rows of distant pass gates fading toward the horizon, one great gate on the near hill
 const c = document.getElementById("sky").getContext("2d");
@@ -82,6 +83,7 @@ function draw() { [...menu.children].forEach((e, i) => e.classList.toggle("on", 
 addEventListener("keydown", (ev) => {
   if (ev.key === "ArrowRight" || ev.key === "d") sel = (sel + 1) % M.length;
   if (ev.key === "ArrowLeft" || ev.key === "a") sel = (sel + M.length - 1) % M.length;
+  if (ev.key === "Enter") { const to = ["lobby", "characters", "settings", null][sel]; if (to) Journal.go(to); }
   draw();
 });
 draw();

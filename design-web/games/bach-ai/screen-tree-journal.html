@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<title>Cây kỹ năng (sổ hành trình)</title>
+<link rel="stylesheet" href="journal.css">
+<style>
+#tree { position: absolute; left: 24px; top: 104px; width: 500px; height: 520px; }
+#tree svg.lines { position: absolute; inset: 0; }
+.node { position: absolute; width: 64px; height: 64px; display: grid; place-items: center; }
+.node img { width: 40px; height: 40px; image-rendering: auto; }
+.node.got { background: #c88a7a; }
+.node .rk { position: absolute; right: -6px; bottom: -8px; font-size: 18px; background: var(--paper); border: 2px solid var(--ink); padding: 0 3px; line-height: 1; }
+.node.on img { filter: invert(1) sepia(1) saturate(3) hue-rotate(5deg); }
+</style>
+</head>
+<body>
+<div id="game">
+  <div class="book">
+    <div class="cover"></div>
+    <div class="page l"><h1>Cây kỹ năng</h1><div class="sub">Kiếm sĩ · mỗi hàng đắt hơn hàng trên</div><div id="tree"></div></div>
+    <div class="page r" id="right"></div>
+  </div>
+  <div class="hint">←↑↓→ chọn nút · Enter học · Esc về sổ</div>
+</div>
+<script src="journal.js"></script>
+<script>
+let T, N = [], sel = 0;
+const rank = { k_root: 3, k_b0_1: 2, k_b1_1: 1 };   // a sample save
+const $ = (id) => document.getElementById(id);
+const at = (n) => [26 + n.col * 96, 8 + n.row * 102];
+function draw() {
+  const lines = N.flatMap((n) => (n.requires || []).map((r) => { const p = N.find((x) => x.id === r); const [x1, y1] = at(p), [x2, y2] = at(n);
+    return `<line x1="${x1 + 32}" y1="${y1 + 32}" x2="${x2 + 32}" y2="${y2 + 32}" stroke="#3a2414" stroke-width="3" stroke-dasharray="${rank[r] ? "0" : "6 6"}"/>`; })).join("");
+  $("tree").innerHTML = `<svg class="lines" width="500" height="520">${lines}</svg>` + N.map((n, i) => { const [x, y] = at(n);
+    return `<div class="node sketch ${rank[n.id] ? "got" : ""} ${i === sel ? "on" : ""}" style="left:${x}px;top:${y}px"><img src="${Journal.G}icons/tree/${n.vicon || "anvil"}.svg"><span class="rk">${rank[n.id] || 0}/${n.max_rank}</span></div>`; }).join("");
+  const n = N[sel], cost = T.row_cost[n.row], ok = (n.requires || []).every((r) => rank[r]);
+  $("right").innerHTML = `<h2>${n.name}</h2><div class="sub">Hàng ${n.row + 1} · cấp ${rank[n.id] || 0}/${n.max_rank}</div>
+    <p style="font-size:24px;margin:10px 0">${n.desc}</p>
+    <div class="ledger"><span>Giá mỗi cấp</span><span>${cost} Tinh hoa</span></div><div class="ledger"><span>Tinh hoa đang có</span><span>18</span></div>
+    <div class="ledger"><span>Cần</span><span>${(n.requires || []).map((r) => N.find((x) => x.id === r).name).join(", ") || "—"}</span></div>
+    <p class="muted" style="font-size:20px;margin-top:12px">Tẩy tuỷ: 1 Tẩy Tủy Đan + vàng, trả lại mọi Tinh hoa.</p>
+    <div class="seal ${ok ? "on" : ""}" style="right:40px;bottom:30px;width:220px;height:62px;line-height:54px;${ok ? "" : "opacity:.5"}">Học ▶</div>`;
+}
+(async () => { T = await Journal.json("data/skill_tree.json"); N = T.classes.knight; draw(); })();
+addEventListener("keydown", (ev) => {
+  const n = N[sel]; let best = -1, bd = 1e9;
+  const dir = { ArrowRight: [1, 0], ArrowLeft: [-1, 0], ArrowDown: [0, 1], ArrowUp: [0, -1] }[ev.key];
+  if (!dir) return;
+  N.forEach((m, i) => { const dx = m.col - n.col, dy = m.row - n.row;
+    if ((dir[0] && Math.sign(dx) === dir[0]) || (dir[1] && Math.sign(dy) === dir[1])) { const d = Math.abs(dx) + Math.abs(dy) * 1.2; if (d < bd) { bd = d; best = i; } } });
+  if (best >= 0) { sel = best; draw(); }
+});
+</script>
+</body>
+</html>

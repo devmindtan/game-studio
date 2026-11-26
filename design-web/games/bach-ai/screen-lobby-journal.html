@@ -32,8 +32,9 @@ h1 { font-size: 54px; font-weight: normal; line-height: .9; }
 .wallet img { width: 24px; height: 24px; vertical-align: -4px; }
 /* right page: the contents */
 .toc h2 { font-size: 40px; font-weight: normal; border-bottom: 3px solid #3a2414; padding-bottom: 2px; margin-bottom: 8px; }
-.row { display: flex; align-items: center; gap: 14px; font-size: 30px; padding: 4px 8px; cursor: pointer; }
-.row img { width: 32px; height: 32px; }
+.row { display: flex; align-items: center; gap: 14px; font-size: 28px; padding: 1px 8px; cursor: pointer; }
+.row img { width: 32px; height: 32px; filter: brightness(0) saturate(100%) invert(14%) sepia(30%) saturate(1500%) hue-rotate(350deg); }
+.row.on img { filter: brightness(0) invert(92%) sepia(20%); }
 .row .dots { flex: 1; border-bottom: 2px dotted #a08060; margin: 0 6px; transform: translateY(-6px); }
 .row .pg { color: #8a6a3a; }
 .row.on { background: #3a2414; color: #f3e6c8; }
@@ -77,32 +78,37 @@ h1 { font-size: 54px; font-weight: normal; line-height: .9; }
   </div>
   <div class="hint">↑ ↓ chọn chương · Enter mở · Esc đổi nhân vật</div>
 </div>
+<script src="journal.js"></script>
 <script>
-const R = [
-  ["equip", "Trang bị", "I", "Mũ, áo, giày, vũ khí, khiên của nhân vật; cường hoá bằng vàng."],
-  ["tree", "Cây kỹ năng", "II", "Điểm kỹ năng mở chỉ số lâu dài."],
-  ["deck", "Bộ thẻ", "III", "Chọn thẻ mang vào trận; cây thẻ nâng thẻ."],
-  ["gacha", "Quay đồ", "IV", "Dùng đá quay trang bị hiếm."],
-  ["missions", "Nhiệm vụ", "V", "Việc trong ngày và phần thưởng."],
-  ["settings", "Cài đặt", "VI", "Âm thanh, hiệu ứng, phím."],
-  [null, "Lên đường", "", "Mở bản đồ, chọn Ải 11 rồi vào trận."],
+const R = [   // the same nine chapters as the game's lobby; [screen, icon, name, page, what it does]
+  ["equipment", "nav_equipment", "Trang bị", "I", "Mũ, áo, giày, vũ khí của nhân vật; cường hoá bằng vàng."],
+  ["tree", "nav_tree", "Cây kỹ năng", "II", "Điểm kỹ năng mở chỉ số lâu dài."],
+  ["deck", "nav_deck", "Bộ thẻ", "III", "Chọn thẻ mang vào trận."],
+  ["gacha", "nav_gacha", "Quay đồ", "IV", "Dùng đá quay trang bị hiếm."],
+  ["missions", "nav_missions", "Nhiệm vụ", "V", "Việc trong ngày và phần thưởng chờ nhận."],
+  ["album", "nav_album", "Album", "VI", "Bách khoa: quái, boss và kỹ năng."],
+  ["settings", "nav_settings", "Cài đặt", "VII", "Âm thanh, hiển thị, phím."],
+  ["characters", "nav_character", "Đổi nhân vật", "VIII", "Chọn hoặc tạo nhân vật khác (Esc)."],
+  ["title", "nav_title", "Về tiêu đề", "IX", "Về màn hình tiêu đề."],
+  ["stages", null, "Lên đường", "", "Mở bản đồ, chọn Ải 11 rồi vào trận."],
 ];
 let sel = R.length - 1;
 const rows = document.getElementById("rows");
-R.slice(0, -1).forEach(([id, n, pg], i) => {
+R.slice(0, -1).forEach(([, ic, n, pg], i) => {
   const e = document.createElement("div"); e.className = "row";
-  e.innerHTML = `<img src="assets/lobby/${id}.png"><span>${n}</span><span class="dots"></span><span class="pg">${pg}</span>`;
+  e.innerHTML = `<img src="../../../games/bach-ai/assets/icons/lobby/${ic}.svg" style="image-rendering:auto"><span>${n}</span><span class="dots"></span><span class="pg">${pg}</span>`;
   e.onclick = () => { sel = i; draw(); };
   rows.appendChild(e);
 });
 function draw() {
   [...rows.children].forEach((e, i) => e.classList.toggle("on", i === sel));
   document.getElementById("seal").classList.toggle("on", sel === R.length - 1);
-  document.getElementById("desc").textContent = R[sel][3];
+  document.getElementById("desc").textContent = R[sel][4];
 }
 addEventListener("keydown", (ev) => {
   if (ev.key === "ArrowDown" || ev.key === "s") sel = (sel + 1) % R.length;
   if (ev.key === "ArrowUp" || ev.key === "w") sel = (sel + R.length - 1) % R.length;
+  if (ev.key === "Enter") Journal.go(R[sel][0]);
   draw();
 });
 draw();

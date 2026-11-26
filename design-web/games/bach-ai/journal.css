@@ -22,7 +22,7 @@ img { image-rendering: pixelated; }
 .muted { color: var(--ink-soft); }
 /* ribbons out of the right edge: tabs */
 .ribbons { position: absolute; left: 1100px; top: 50px; display: flex; flex-direction: column; gap: 10px; }
-.ribbon { width: 52px; height: 92px; border: 3px solid #0006; color: #f3e6c8; font-size: 20px; writing-mode: vertical-rl;
+.ribbon { width: 52px; min-height: 92px; padding: 10px 0; border: 3px solid #0006; color: #f3e6c8; font-size: 20px; writing-mode: vertical-rl;
   text-align: center; line-height: 46px; cursor: pointer; }
 .ribbon.on { width: 74px; filter: brightness(1.15); outline: 3px solid var(--gold); }
 /* a ledger row: name, dotted leader, value */
