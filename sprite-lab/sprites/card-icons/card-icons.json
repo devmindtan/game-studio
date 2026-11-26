@@ -1,5 +1,5 @@
 {
-  "frames": 97,
+  "frames": 98,
   "frame_size": [
     24,
     24
@@ -687,6 +687,13 @@
     {
       "name": "execute",
       "start": 96,
+      "frames": 1,
+      "fps": 1.0,
+      "loop": false
+    },
+    {
+      "name": "combo",
+      "start": 97,
       "frames": 1,
       "fps": 1.0,
       "loop": false

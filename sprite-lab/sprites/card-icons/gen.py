@@ -1203,6 +1203,17 @@ def execute():
     return done(c)
 
 
+def combo():
+    """Liên hoàn: three slashes one after another and a row of rising pips."""
+    c = new()
+    for k, x in enumerate((3, 9, 15)):
+        c.line(x, 15, x + 6, 3, VOID["d"], 2)
+        c.line(x, 15, x + 6, 3, VOID["l"] if k < 2 else GOLD["l"], 1)
+    for k in range(5):
+        c.rect(2 + k * 4, 21 - k, 3 + k * 4, 22, GOLD["m"] if k == 4 else VOID["m"])
+    return done(c)
+
+
 ICONS = {f.__name__: f for f in (blade_arc, whirlwind, earth_strike, ground_slam, cleave_wave, holy_column, dash,
                                  earthquake, solar_ray, god_hammer, arcane_bolt, fireball, frost_nova, lightning,
                                  thunder_javelin, meteor, void_orb, blizzard, storm, back_slash, sharpen, haste, reach,
@@ -1217,7 +1228,7 @@ ICONS = {f.__name__: f for f in (blade_arc, whirlwind, earth_strike, ground_slam
                                  sp_shade_cloak, sp_shade_ring, sp_shade_hood, sp_shade_dagger, pierce_shot, fan_volley,
                                  fire_arrow, frost_arrow, thunder_arrow, fan_knives, piercing_knife, bleed_knife,
                                  venom_knife, fire_knife, arrow_rain, thorn_trap, hawk, smoke_bomb,
-                                 blade_ring, shadow_strike, ricochet, boomerang, execute)}
+                                 blade_ring, shadow_strike, ricochet, boomerang, execute, combo)}
 
 if __name__ == "__main__":
     anims = [(n, [f()], 1, False, {}) for n, f in ICONS.items()]
