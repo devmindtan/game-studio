@@ -54,9 +54,9 @@ h1 { font-size: 54px; font-weight: normal; line-height: .9; }
 .seal.on { background: #d0402a; outline: 4px solid #ffd36b; }
 /* bookmark ribbons on the right edge: the chapters */
 /* the ribbons are the three book-keeping entries (user 2026-11-26): settings, change character, title */
-.ribbon { position: absolute; right: -44px; width: 56px; padding: 10px 0; border: 3px solid #0006; color: #f3e6c8; font-size: 20px;
-  writing-mode: vertical-rl; text-align: center; line-height: 50px; cursor: pointer; }
-.ribbon.on { right: -66px; width: 78px; filter: brightness(1.15); outline: 3px solid #ffd36b; }
+.ribbon { position: absolute; right: -66px; width: 54px; height: 52px; z-index: 2; border: 3px solid #0006; display: grid; place-items: center; cursor: pointer; }
+.ribbon img { width: 30px; height: 30px; image-rendering: auto; filter: brightness(0) invert(92%) sepia(20%); }
+.ribbon.on { right: -80px; width: 68px; filter: brightness(1.15); outline: 3px solid #ffd36b; }
 .hint { position: absolute; left: 70px; bottom: 6px; font-size: 20px; color: #c8a878; }
 </style>
 </head>
@@ -105,12 +105,14 @@ const R = [   // the same nine chapters as the game's lobby; [screen, icon, name
 ];
 let sel = R.length - 1;
 // the ribbons on the book's edge: → moves there, ↑ ↓ between them, ← back to the contents
-const RIB = [["settings", "Cài đặt", "#3a6a8a", "Âm thanh, hiển thị, phím."], ["characters", "Đổi nhân vật", "#6a8a3a", "Chọn hoặc tạo nhân vật khác (Esc)."],
-  ["title", "Tiêu đề", "#8a3a6a", "Về màn hình tiêu đề."]];
+const RIB = [["settings", "Cài đặt", "#3a6a8a", "Cài đặt: âm thanh, hiển thị, phím.", "nav_settings"],
+  ["characters", "Đổi nhân vật", "#6a8a3a", "Đổi nhân vật: chọn hoặc tạo nhân vật khác (Esc).", "nav_character"],
+  ["title", "Tiêu đề", "#8a3a6a", "Tiêu đề: về màn hình tiêu đề.", "nav_title"]];
 let rib = +(new URLSearchParams(location.search).get("rib") ?? -1);   // -1: the focus is in the contents (?rib= for shots)
 function drawRibbons() {
-  document.getElementById("ribbons").innerHTML = RIB.map(([, n, c], i) =>
-    `<div class="ribbon ${i === rib ? "on" : ""}" style="top:${50 + i * 150}px;background:${c}" onclick="rib=${i};draw()">${n}</div>`).join("");
+  document.getElementById("ribbons").innerHTML = RIB.map(([, n, c, , ic], i) =>   // icon only, stacked close (user 2026-11-26)
+    `<div class="ribbon ${i === rib ? "on" : ""}" title="${n}" style="top:${56 + i * 60}px;background:${c}" onclick="rib=${i};draw()">
+      <img src="../../../games/bach-ai/assets/icons/lobby/${ic}.svg" alt="${n}"></div>`).join("");
 }
 let apx = new URLSearchParams(location.search).get("view") === "stats";
 let rows;

@@ -45,6 +45,6 @@ chi tiết chỉ số khác nếu vượt quá 6 chỉ số cơ bản)". Sửa t
 ## Góp ý 2026-11-26: dải đánh dấu
 
 3 dải màu ở mép sổ trước chỉ để trang trí. Người dùng: đưa Cài đặt, Về tiêu đề (tên ngắn hơn) và Đổi nhân vật lên đó.
-Giờ dải là ba mục "Cài đặt", "Đổi nhân vật", "Tiêu đề"; Mục lục còn 6 chương (Trang bị, Cây kỹ năng, Bộ thẻ, Quay đồ,
+Giờ dải là ba mục "Cài đặt", "Đổi nhân vật", "Tiêu đề" (chỉ icon, xếp sát nhau, tên hiện ở dòng mô tả và khi rê chuột); Mục lục còn 6 chương (Trang bị, Cây kỹ năng, Bộ thẻ, Quay đồ,
 Nhiệm vụ, Album) + con dấu Lên đường. → sang cột dải, ↑ ↓ giữa các dải, ← về Mục lục, Enter mở; dải đang chọn dài ra,
 viền vàng; dòng mô tả dưới Mục lục nói việc của dải.
