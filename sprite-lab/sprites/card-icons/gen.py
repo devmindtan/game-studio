@@ -1182,6 +1182,15 @@ def ricochet():
     return done(c)
 
 
+def boomerang():
+    """Dao hồi: a dagger on a curved path that comes back round."""
+    c = new()
+    c.ellipse(3, 3, 20, 20, VOID["m"], fill=False)
+    c.polygon([(3, 9), (1, 14), (6, 13)], VOID["l"])
+    _knife(c, 8, 16, 20, 4)
+    return done(c)
+
+
 ICONS = {f.__name__: f for f in (blade_arc, whirlwind, earth_strike, ground_slam, cleave_wave, holy_column, dash,
                                  earthquake, solar_ray, god_hammer, arcane_bolt, fireball, frost_nova, lightning,
                                  thunder_javelin, meteor, void_orb, blizzard, storm, back_slash, sharpen, haste, reach,
@@ -1196,7 +1205,7 @@ ICONS = {f.__name__: f for f in (blade_arc, whirlwind, earth_strike, ground_slam
                                  sp_shade_cloak, sp_shade_ring, sp_shade_hood, sp_shade_dagger, pierce_shot, fan_volley,
                                  fire_arrow, frost_arrow, thunder_arrow, fan_knives, piercing_knife, bleed_knife,
                                  venom_knife, fire_knife, arrow_rain, thorn_trap, hawk, smoke_bomb,
-                                 blade_ring, shadow_strike, ricochet)}
+                                 blade_ring, shadow_strike, ricochet, boomerang)}
 
 if __name__ == "__main__":
     anims = [(n, [f()], 1, False, {}) for n, f in ICONS.items()]

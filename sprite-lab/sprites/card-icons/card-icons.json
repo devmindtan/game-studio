@@ -1,5 +1,5 @@
 {
-  "frames": 95,
+  "frames": 96,
   "frame_size": [
     24,
     24
@@ -673,6 +673,13 @@
     {
       "name": "ricochet",
       "start": 94,
+      "frames": 1,
+      "fps": 1.0,
+      "loop": false
+    },
+    {
+      "name": "boomerang",
+      "start": 95,
       "frames": 1,
       "fps": 1.0,
       "loop": false
