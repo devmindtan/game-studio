@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<title>Tiêu đề: Bản đồ trăm ải (hướng B)</title>
+<style>
+@font-face { font-family: "VT323"; src: url("../../fonts/VT323-Regular.ttf") format("truetype"); font-display: block; }
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { width: 1280px; height: 720px; overflow: hidden; background: #000; font-family: "VT323", monospace; color: #3a2414; }
+img { image-rendering: pixelated; }
+#game { position: relative; width: 1280px; height: 720px; overflow: hidden; background: #d8c498; }
+canvas { position: absolute; inset: 0; }
+.cart { position: absolute; left: 40px; top: 30px; padding: 14px 30px 12px; background: #e8d8b0; border: 4px solid #3a2414;
+  outline: 4px solid #e8d8b0; box-shadow: 0 0 0 8px #3a2414; text-align: center; }
+.cart h1 { font-size: 88px; font-weight: normal; line-height: .85; letter-spacing: 6px; color: #8a2a1a; }
+.cart p { font-size: 26px; letter-spacing: 5px; }
+.legend { position: absolute; right: 40px; bottom: 40px; width: 380px; padding: 16px 22px; background: #e8d8b0;
+  border: 4px solid #3a2414; box-shadow: 6px 6px 0 #3a241466; }
+.legend h2 { font-size: 26px; font-weight: normal; letter-spacing: 4px; border-bottom: 3px solid #3a2414; margin-bottom: 8px; }
+.it { font-size: 34px; padding: 2px 10px; cursor: pointer; display: flex; align-items: center; gap: 12px; }
+.it i { width: 18px; height: 18px; border: 3px solid #3a2414; transform: rotate(45deg); flex: none; }
+.it small { font-size: 20px; color: #6a4a2c; margin-left: auto; }
+.it.on { background: #3a2414; color: #f3e6c8; }
+.it.on i { border-color: #ffd36b; background: #c0283a; }
+.it.on small { color: #ffd36b; }
+.you { position: absolute; width: 96px; height: 96px; }
+.flag { position: absolute; font-size: 22px; background: #3a2414; color: #ffd36b; padding: 0 8px; }
+.ver { position: absolute; left: 40px; bottom: 16px; font-size: 22px; color: #6a4a2c; }
+.hint { position: absolute; left: 300px; bottom: 16px; font-size: 22px; color: #6a4a2c; }
+</style>
+</head>
+<body>
+<div id="game">
+  <canvas id="map" width="1280" height="720"></canvas>
+  <div class="cart"><h1>BÁCH ẢI</h1><p>VƯỢT TRĂM ẢI</p></div>
+  <img class="you" id="you" src="assets/title/knight.png" alt="">
+  <div class="flag" id="flag">Ải 10 · đang tới Ải 11</div>
+  <div class="legend"><h2>CHÚ GIẢI</h2><div id="menu"></div></div>
+  <div class="hint">↑ ↓ chọn · Enter</div>
+  <div class="ver">Phiên bản 0.6.24</div>
+</div>
+<script>
+document.fonts.load("24px VT323").then(() => {
+// a hand-drawn map: hills, a river, a dotted road through the passes; passes 1..10 cleared (red), the rest ahead
+const c = document.getElementById("map").getContext("2d");
+c.fillStyle = "#d8c498"; c.fillRect(0, 0, 1280, 720);
+for (let k = 0; k < 900; k++) { c.fillStyle = k % 3 ? "#cfb98a" : "#e2d2a8"; c.fillRect((k * 131) % 1280, (k * 71) % 720, 3, 3); }
+c.strokeStyle = "#7a9ab8"; c.lineWidth = 10; c.beginPath(); c.moveTo(0, 520);
+for (let x = 0; x <= 1280; x += 40) c.lineTo(x, 520 + Math.sin(x / 90) * 40 - x * 0.12); c.stroke();
+for (let k = 0; k < 26; k++) {   // hills drawn as ink humps
+  const x = 80 + (k * 197) % 1150, y = 120 + (k * 113) % 330;
+  c.strokeStyle = "#6a4a2c"; c.lineWidth = 3; c.beginPath(); c.moveTo(x - 22, y); c.lineTo(x, y - 18); c.lineTo(x + 22, y); c.stroke();
+}
+const P = [];   // the road: a winding path from bottom left to top right
+for (let k = 0; k < 24; k++) P.push([90 + k * 48, 640 - k * 22 + Math.sin(k * 0.9) * 50]);
+c.setLineDash([10, 10]); c.strokeStyle = "#3a2414"; c.lineWidth = 4; c.beginPath();
+P.forEach(([x, y], i) => i ? c.lineTo(x, y) : c.moveTo(x, y)); c.stroke(); c.setLineDash([]);
+P.forEach(([x, y], i) => {   // each mark a pass gate: cleared ones in red
+  const done = i < 10;
+  c.fillStyle = done ? "#a0281c" : "#e8d8b0"; c.strokeStyle = "#3a2414"; c.lineWidth = 3;
+  c.fillRect(x - 9, y - 12, 18, 18); c.strokeRect(x - 9, y - 12, 18, 18);
+  c.fillStyle = "#3a2414"; c.fillRect(x - 3, y - 4, 6, 10);
+});
+c.font = "24px VT323"; c.fillStyle = "#3a2414"; c.fillText("Ải 1", P[0][0] - 14, P[0][1] - 22);
+c.fillText("… Ải 100", 1170, 70);
+const [hx, hy] = P[10];
+document.getElementById("you").style.left = (hx - 48) + "px"; document.getElementById("you").style.top = (hy - 100) + "px";
+document.getElementById("flag").style.left = (hx + 40) + "px"; document.getElementById("flag").style.top = (hy - 70) + "px";
+});
+const M = [["Tiếp tục", "Kiếm sĩ"], ["Chọn nhân vật", ""], ["Cài đặt", ""], ["Thoát", ""]];
+let sel = 0;
+const menu = document.getElementById("menu");
+M.forEach(([n, d], i) => {
+  const e = document.createElement("div"); e.className = "it";
+  e.innerHTML = `<i></i>${n}${d ? `<small>${d}</small>` : ""}`;
+  e.onclick = () => { sel = i; draw(); };
+  menu.appendChild(e);
+});
+function draw() { [...menu.children].forEach((e, i) => e.classList.toggle("on", i === sel)); }
+addEventListener("keydown", (ev) => {
+  if (ev.key === "ArrowDown" || ev.key === "s") sel = (sel + 1) % M.length;
+  if (ev.key === "ArrowUp" || ev.key === "w") sel = (sel + M.length - 1) % M.length;
+  draw();
+});
+draw();
+</script>
+</body>
+</html>

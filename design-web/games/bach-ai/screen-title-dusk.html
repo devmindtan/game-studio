@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<title>Tiêu đề: Hoàng hôn trước trận (hướng C)</title>
+<style>
+@font-face { font-family: "VT323"; src: url("../../fonts/VT323-Regular.ttf") format("truetype"); font-display: block; }
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { width: 1280px; height: 720px; overflow: hidden; background: #000; font-family: "VT323", monospace; color: #f3e6c8; }
+img { image-rendering: pixelated; }
+#game { position: relative; width: 1280px; height: 720px; overflow: hidden; }
+canvas { position: absolute; inset: 0; }
+.hero { position: absolute; left: 880px; top: 330px; width: 192px; height: 192px; filter: brightness(.55) saturate(.7) drop-shadow(0 0 0 #000); }
+.title { position: absolute; left: 70px; top: 290px; }
+.title h1 { font-size: 124px; font-weight: normal; line-height: 1; letter-spacing: 4px; color: #fff0d0;
+  text-shadow: 0 6px 0 #6a1a14, 0 0 30px #ff7a3a55; }
+.title p { font-size: 32px; letter-spacing: 10px; color: #ffb070; margin: 8px 0 0 8px; }
+.menu { position: absolute; left: 76px; top: 520px; display: flex; gap: 40px; }
+.it { font-size: 34px; color: #c8a890; cursor: pointer; padding-bottom: 4px; border-bottom: 4px solid transparent; }
+.it small { display: block; font-size: 18px; color: #e0b890; }
+.it.on { color: #fff6e0; border-color: #ff7a3a; }
+.ver { position: absolute; right: 30px; bottom: 16px; font-size: 22px; color: #a07868; }
+.hint { position: absolute; left: 76px; bottom: 16px; font-size: 22px; color: #a07868; }
+</style>
+</head>
+<body>
+<div id="game">
+  <canvas id="sky" width="1280" height="720"></canvas>
+  <img class="hero" src="assets/title/knight.png" alt="">
+  <div class="title"><h1>BÁCH ẢI</h1><p>VƯỢT TRĂM ẢI</p></div>
+  <div class="menu" id="menu"></div>
+  <div class="hint">← → chọn · Enter</div>
+  <div class="ver">Phiên bản 0.6.24</div>
+</div>
+<script>
+// dusk: banded sky, a low sun, rows of distant pass gates fading toward the horizon, the hero's hill in front
+const c = document.getElementById("sky").getContext("2d");
+const bands = ["#1a1030", "#2e1640", "#4a1c48", "#7a2a44", "#b0443a", "#e0703a", "#f2a04a"];
+bands.forEach((col, i) => { c.fillStyle = col; c.fillRect(0, i * 52, 1280, 52); });
+c.fillStyle = "#ffd890"; c.beginPath(); c.arc(980, 330, 70, 0, Math.PI * 2); c.fill();
+c.fillStyle = "#fff0c0"; c.beginPath(); c.arc(980, 330, 52, 0, Math.PI * 2); c.fill();
+for (let row = 0; row < 4; row++) {   // ridges, far to near, each with its line of gate towers
+  const y = 330 + row * 46, col = ["#8a3a48", "#62283e", "#421c32", "#2a1224"][row];
+  c.fillStyle = col; c.beginPath(); c.moveTo(0, 720);
+  for (let x = 0; x <= 1280; x += 32) c.lineTo(x, y + Math.sin(x / (140 - row * 20) + row) * (14 + row * 6));
+  c.lineTo(1280, 720); c.fill();
+  for (let k = 0; k < 9 - row; k++) {
+    const gx = 120 + k * (150 + row * 40) + row * 37, gh = 16 + row * 10, gw = 10 + row * 5;
+    const gy = y + Math.sin(gx / (140 - row * 20) + row) * (14 + row * 6);
+    c.fillRect(gx, gy - gh, gw, gh); c.fillRect(gx + gw * 2, gy - gh, gw, gh); c.fillRect(gx, gy - gh - 4, gw * 3, 6);
+  }
+}
+c.fillStyle = "#140a14"; c.beginPath(); c.moveTo(640, 720);   // the near hill under the hero
+c.quadraticCurveTo(940, 480, 1280, 540); c.lineTo(1280, 720); c.fill();
+const M = [["Tiếp tục", "Ải 10 · Kiếm sĩ"], ["Chọn nhân vật", ""], ["Cài đặt", ""], ["Thoát", ""]];
+let sel = 0;
+const menu = document.getElementById("menu");
+M.forEach(([n, d], i) => {
+  const e = document.createElement("div"); e.className = "it";
+  e.innerHTML = n + (d ? `<small>${d}</small>` : "");
+  e.onclick = () => { sel = i; draw(); };
+  menu.appendChild(e);
+});
+function draw() { [...menu.children].forEach((e, i) => e.classList.toggle("on", i === sel)); }
+addEventListener("keydown", (ev) => {
+  if (ev.key === "ArrowRight" || ev.key === "d") sel = (sel + 1) % M.length;
+  if (ev.key === "ArrowLeft" || ev.key === "a") sel = (sel + M.length - 1) % M.length;
+  draw();
+});
+draw();
+</script>
+</body>
+</html>
