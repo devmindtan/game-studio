@@ -108,6 +108,7 @@ ARMED = _split((0, 0, 32, 30), 0, _armed_layer)
 
 
 PARTS = _parts()
+ARMED_DEFAULT = {k for k in SLOT_OF if ARMED[k].getbbox()}   # gear layers the armed drawing has
 # after the mirror the feet sit at x 6..14 of the 32-wide crop: centre the pair on the anchor
 OX = 24 - 10
 OY = FLOOR - FEET_Y - 1   # the feet row sits just above the anchor line
@@ -128,7 +129,9 @@ def frame(up=(0, 0), a=(0, 0), b=(0, 0), flash=False, gear=None):
     for k in LAYER_ORDER:
         worn = (gear or {}).get(SLOT_OF.get(k, ""))
         fn, extra = worn if isinstance(worn, tuple) else (worn, [])
-        src = ARMED[k].copy() if worn else PARTS[k]      # a worn slot shows the armed drawing's piece
+        # user 2026-11-26: no bare look; an empty slot shows the armed drawing's own piece in the user's colours, a
+        # worn one the same piece recoloured by its tier
+        src = ARMED[k].copy() if (worn or k in ARMED_DEFAULT) else PARTS[k]
         if worn and k == "head":
             for (ex, ey, col) in extra:                    # tier details on the helmet (horns, wings)
                 src.putpixel((ex, ey), (*_rgb(col), 255))
@@ -277,11 +280,13 @@ def iron_plate(p):
 
 
 def tier_fn(tier, slot):
-    """iron keeps the user's own colours; the other tiers recolour (and the helmet gets its details)."""
+    """Every tier recolours (and the helmet gets its details). user 2026-11-26: the knight's default look is the armed
+    drawing in the user's colours, so iron uses its own gunmetal ramp to show when worn; the iron chest stays the grey
+    plate over the red tunic."""
     if tier == "iron" and slot == "chest":
-        fn = iron_plate                              # the red tunic is the bare body's: iron chest is a grey plate
+        fn = iron_plate
     else:
-        fn = (lambda p: p) if tier == "iron" else recolour(tier, armour=slot in ("legs", "arms", "feet"))
+        fn = recolour(tier, armour=slot in ("legs", "arms", "feet"))
     return (fn, HELM_EXTRA[tier]) if slot == "head" else (fn, [])
 
 

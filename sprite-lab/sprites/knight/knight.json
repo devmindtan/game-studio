@@ -27,15 +27,15 @@
       "hitbox": {
         "shape": "rect",
         "center": [
-          25.0,
-          34.5
+          30.0,
+          30.5
         ],
         "active": [
           0,
           3
         ],
-        "half_w": 6.0,
-        "half_h": 9.5
+        "half_w": 15.0,
+        "half_h": 13.5
       }
     },
     {
@@ -47,15 +47,15 @@
       "hitbox": {
         "shape": "rect",
         "center": [
-          25.0,
-          34.5
+          30.0,
+          30.5
         ],
         "active": [
           0,
           7
         ],
-        "half_w": 6.0,
-        "half_h": 9.5
+        "half_w": 15.0,
+        "half_h": 13.5
       }
     },
     {
@@ -72,15 +72,15 @@
       "hitbox": {
         "shape": "rect",
         "center": [
-          24.5,
-          34.5
+          29.5,
+          30.5
         ],
         "active": [
           0,
           2
         ],
-        "half_w": 6.5,
-        "half_h": 9.5
+        "half_w": 15.5,
+        "half_h": 13.5
       }
     },
     {
@@ -99,15 +99,15 @@
       "hitbox": {
         "shape": "rect",
         "center": [
-          25.5,
-          34.5
+          31.0,
+          30.5
         ],
         "active": [
           0,
           4
         ],
-        "half_w": 7.5,
-        "half_h": 9.5
+        "half_w": 16.0,
+        "half_h": 13.5
       }
     },
     {
@@ -126,15 +126,15 @@
       "hitbox": {
         "shape": "rect",
         "center": [
-          24.0,
-          34.5
+          28.0,
+          29.0
         ],
         "active": [
           0,
           4
         ],
-        "half_w": 9.0,
-        "half_h": 9.5
+        "half_w": 17.0,
+        "half_h": 15.0
       }
     }
   ],
@@ -142,10 +142,10 @@
   "body": {
     "anim": "idle",
     "center": [
-      24.5,
-      35.0
+      25.5,
+      32.5
     ],
-    "radius": 7.5
+    "radius": 10.5
   },
   "layers": [
     "legs_back",
