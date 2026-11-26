@@ -16,8 +16,8 @@
 .bar { height: 16px; border: 3px solid var(--ink); margin-top: 4px; position: relative; } .bar i { display: block; height: 100%; }
 .bar span { position: absolute; inset: -4px 0 0; text-align: center; font-size: 18px; color: #fff; text-shadow: 1px 1px 0 #000; }
 .xp { height: 6px; border-width: 2px; }
-.clock { left: 560px; top: 12px; width: 160px; text-align: center; font-size: 34px; transform: rotate(.6deg); }
-.clock small { font-size: 18px; color: var(--ink-soft); }
+.clock { left: 520px; top: 12px; width: 240px; text-align: center; font-size: 30px; line-height: 1; padding: 4px 10px; transform: rotate(.6deg); white-space: nowrap; }
+.clock small { font-size: 20px; color: var(--ink-soft); }
 .tally { right: 16px; top: 14px; font-size: 26px; transform: rotate(1deg); display: flex; gap: 14px; }
 .tally img { width: 20px; height: 20px; vertical-align: -2px; }
 .skills { position: absolute; left: 50%; bottom: 14px; transform: translateX(-50%); display: flex; gap: 8px; }
@@ -25,7 +25,7 @@
 .skills .cd { position: absolute; left: 0; right: 0; bottom: 0; background: #3a2414bb; }
 .skills .t { position: absolute; inset: 0; display: grid; place-items: center; font-size: 22px; color: #fff; text-shadow: 1px 1px 0 #000; }
 .ico { image-rendering: pixelated; background-repeat: no-repeat; }
-.boss { left: 340px; top: 100px; width: 600px; text-align: center; transform: rotate(-.4deg); }
+.boss { left: 340px; top: 70px; width: 600px; text-align: center; transform: rotate(-.4deg); }
 .boss b { font-weight: normal; font-size: 30px; color: var(--ink-red); }
 .dim { position: absolute; inset: 0; background: #0b0810b8; }
 .sheet { position: absolute; left: 160px; top: 60px; width: 960px; height: 600px; background: var(--paper); border: 4px solid var(--edge); box-shadow: 0 10px 0 #0008; padding: 24px 40px; transform: rotate(-.5deg); }
@@ -49,7 +49,7 @@
   <img class="mob" src="../../../games/bach-ai/assets/sprites/custom/knight/knight.png" style="left:608px;top:330px;width:96px;height:96px">
   <div class="slip me"><b>Nhân vật 1</b><span class="lv">Cấp 8</span>
     <div class="bar"><i style="width:78%;background:#c0283a"></i><span>92 / 118</span></div><div class="bar xp"><i style="width:45%;background:#3a6aaa"></i></div></div>
-  <div class="slip clock">02:41<br><small>/ 05:00 · Ải 11</small></div>
+  <div class="slip clock">02:41 <small>/ 05:00 · Ải 11</small></div>
   <div class="slip tally"><span><img src="assets/lobby/star.png"> 412</span><span><img src="assets/lobby/coin.png"> 18</span></div>
   <div class="skills" id="skills"></div>
   <div id="over"></div>
