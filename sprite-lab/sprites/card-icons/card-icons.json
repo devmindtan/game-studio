@@ -1,5 +1,5 @@
 {
-  "frames": 100,
+  "frames": 101,
   "frame_size": [
     24,
     24
@@ -708,6 +708,13 @@
     {
       "name": "charged_shot",
       "start": 99,
+      "frames": 1,
+      "fps": 1.0,
+      "loop": false
+    },
+    {
+      "name": "shadow_clone",
+      "start": 100,
       "frames": 1,
       "fps": 1.0,
       "loop": false
