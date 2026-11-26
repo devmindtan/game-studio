@@ -247,6 +247,41 @@
      "page": "screen-run-journal.html",
      "shot": "run-lose.png",
      "query": "view=lose"
+    },
+    {
+     "label": "Lên cấp (đủ thông tin)",
+     "page": "screen-run-journal.html",
+     "query": "view=levelup-full",
+     "shot": "run-levelup-full.png",
+     "note": "tỉ lệ bậc, bậc tiến hoá, chỉ số trước → sau, chiêu đã có"
+    },
+    {
+     "label": "Tạm dừng (đủ thông tin)",
+     "page": "screen-run-journal.html",
+     "query": "view=pause-full",
+     "shot": "run-pause-full.png",
+     "note": "thẻ đã chọn theo loại + cấp; ← → xem thẻ"
+    },
+    {
+     "label": "Thắng (đủ thông tin)",
+     "page": "screen-run-journal.html",
+     "query": "view=win-full",
+     "shot": "run-win-full.png",
+     "note": "bảng sát thương 3 mục (Q/E), trang bị nhận"
+    },
+    {
+     "label": "Thua (đủ thông tin)",
+     "page": "screen-run-journal.html",
+     "query": "view=lose-full",
+     "shot": "run-lose-full.png",
+     "note": "như game: Thử lại / Về sổ"
+    },
+    {
+     "label": "Nhân vật (đủ thông tin)",
+     "page": "screen-hud-journal.html",
+     "query": "view=character-full",
+     "shot": "hud-character-full.png",
+     "note": "chỉ số kèm nguồn, chiêu thức, buff, thẻ chỉ số"
     }
    ]
   },

@@ -26,6 +26,40 @@
 .menu div.on { background: var(--ink); color: var(--paper); }
 .result { font-size: 64px; text-align: center; border: 6px solid currentColor; display: inline-block; padding: 0 24px; }
 .cols { display: flex; gap: 40px; margin-top: 10px; } .cols > div { flex: 1; }
+/* levelup-full: the game's whole level-up (odds, tier marks, stats before -> after, owned skills) on the sheet */
+.sheet.tall { top: 24px; height: 640px; }
+.odds { display: flex; gap: 18px; justify-content: center; font-size: 18px; margin-top: 2px; }
+.top-links { position: absolute; right: 40px; top: 30px; display: flex; gap: 16px; font-size: 18px; }
+.top-links span, .lnk { color: var(--ink-red); text-decoration: underline; text-underline-offset: 3px; }
+.fcard { flex: 1; height: 372px; border: 4px solid var(--ink); background: #ddcca0; padding: 12px; position: relative; }
+.fcard.on { outline: 5px solid var(--gold); background: #e8d8b0; }
+.fcard .head { display: flex; gap: 10px; align-items: flex-start; }
+.fcard .ico { margin: 0; flex: 0 0 auto; border: 3px solid var(--ink); background-color: #c8b088; }
+.fcard h3 { font-weight: normal; font-size: 26px; line-height: 1; }
+.fcard .kind { font-size: 16px; margin-top: 4px; }
+.fcard .marks { display: flex; gap: 6px; margin: 10px 0 4px; height: 16px; align-items: center; }
+.fcard .marks i { font-style: normal; font-size: 20px; line-height: 16px; color: var(--ink-soft); }   /* ■ □ level, ◆ ◇ tier: glyphs, never rotated boxes */
+.fcard .marks i.f { color: var(--ink); } .fcard .marks i.n { color: #c0801a; }
+.fcard .evo { font-size: 17px; color: #8a5a10; }
+.fcard .ledger { font-size: 19px; } .fcard .ledger b { font-weight: normal; color: #2a7a3a; }
+.fcard p { font-size: 17px; line-height: 1.1; margin-top: 6px; }
+.owned { display: flex; gap: 8px; align-items: center; justify-content: center; margin-top: 12px; font-size: 18px; }
+.owned .ico { margin: 0; border: 3px solid var(--ink); background-color: #c8b088; }
+/* pause-full: the picked cards with levels and the focused card's numbers */
+.pcard { width: 52px; height: 58px; border: 3px solid var(--ink); background: #ddcca0; position: relative; display: grid; justify-items: center; padding-top: 3px; }
+.pcard.on { outline: 4px solid var(--gold); background: #e8d8b0; }
+.pcard .ico { margin: 0; }
+.pcard b { position: absolute; right: -3px; top: -3px; font-weight: normal; font-size: 16px; color: var(--paper); background: var(--ink); padding: 0 3px; line-height: 16px; }
+.pcard .pips { position: absolute; left: 4px; right: 4px; bottom: 3px; display: flex; gap: 2px; } .pcard .pips i { flex: 1; height: 4px; background: #b89a6a; } .pcard .pips i.f { background: var(--ink-red); }
+.pgrid { display: flex; flex-wrap: wrap; gap: 8px; margin: 4px 0 10px; }
+/* win-full: tabs and the damage table */
+.rtabs { display: flex; gap: 10px; justify-content: center; margin-top: 10px; }
+.rtabs span { font-size: 20px; border: 3px solid var(--ink); padding: 0 16px; } .rtabs span.on { background: var(--ink); color: var(--paper); }
+table.dmg { width: 100%; border-collapse: collapse; margin-top: 8px; font-size: 19px; }
+table.dmg th { font-weight: normal; color: var(--ink-soft); font-size: 16px; text-align: right; padding: 0 6px; } table.dmg th:first-child { text-align: left; }
+table.dmg td { border-bottom: 2px dotted var(--dots); padding: 1px 6px; text-align: right; height: 34px; }
+table.dmg td.n { text-align: left; } table.dmg td.n div { display: flex; gap: 8px; align-items: center; }
+table.dmg .bar { width: 150px; height: 12px; border: 2px solid var(--ink); } table.dmg .bar i { display: block; height: 100%; background: var(--ink-red); }
 </style>
 </head>
 <body>
@@ -42,7 +76,7 @@
 <script>
 const view = new URLSearchParams(location.search).get("view") || "levelup";
 addEventListener("keydown", (ev) => {   // in the flow: switch between the in-run sheets
-  const to = { p: "pause", l: "levelup", w: "win", f: "lose" }[ev.key.toLowerCase()];
+  const to = { p: "pause", l: "levelup", w: "win", f: "lose", 1: "levelup-full", 2: "pause-full", 3: "win-full", 4: "lose-full" }[ev.key.toLowerCase()];
   if (to && to !== view) location.search = "?view=" + to;
   const hud = { h: "hud", b: "boss", m: "milestone", c: "character" }[ev.key.toLowerCase()];
   if (hud) location.href = "screen-hud-journal.html?view=" + hud;
@@ -62,7 +96,74 @@ const summary = (win) => `<div class="cols"><div>
   const [up, ci] = await Promise.all([Journal.json("data/upgrades_knight.json"), Journal.json("sprites/custom/card-icons/card-icons.json")]);
   ci.animations.forEach((a) => IC[a.name] = a.start); ICN = ci.frames;
   const U = (id) => up.upgrades.find((u) => u.id === id);
-  if (view === "levelup") {
+  if (view === "levelup-full") {   // the game's level-up, all of it (04-level-up), on the journal sheet
+    $("sheet").classList.add("tall");
+    const C = [
+      { u: U("sharpen"), kind: "Chỉ số", tag: "Mới", lv: "Cấp 0 → 1 · không giới hạn", marks: "", rows: [["Sát thương", "17", "20"]] },
+      { u: U("dash"), kind: "Chiêu", tag: "Mới", lv: "Cấp 0 → 1", marks: "n....", rows: [["Sát thương", "—", "22"], ["Cỡ", "—", "×0.90"], ["Hồi chiêu", "—", "2.6s"]] },
+      { u: U("blade_arc"), kind: "Chiêu", tag: "Đã có", lv: "Cấp 1 → 2", marks: "fn...", evo: "★ Bậc II · hình mới", rows: [["Sát thương", "27", "31"], ["Hồi chiêu", "0.9s", "0.9s"]] },
+    ];
+    const mk = (m) => m ? [...m.padEnd(5, ".")].map((c, k) => `<i class="${c === "f" ? "f" : c === "n" ? "n" : ""}">${k % 2 ? (c === "." ? "□" : "■") : (c === "." ? "◇" : "◆")}</i>`).join("") : "";
+    const odds = [["common", 60], ["rare", 30], ["epic", 9], ["legendary", 1]];
+    $("hint").textContent = "← → chọn thẻ · Enter lấy · R đổi · X loại · H ẩn bảng · Tab nhân vật";
+    Journal.list(() => 3, (sel) => {
+      $("body").innerHTML = `<div class="top-links"><span>Ẩn bảng (H)</span><span>Nhân vật (Tab)</span></div>
+        <h1 style="text-align:center">Lên cấp 8</h1><div class="sub" style="text-align:center">Chọn một trang ghi vào sổ</div>
+        <div class="odds">${odds.map(([t, w]) => `<span style="color:${RN[t][1]}">${RN[t][0]} ${w}%</span>`).join("")}</div>
+        <div class="cards">${C.map((c, i) => { const u = c.u || { id: "", name: "?", desc: "", rarity: "common" }; return `<div class="fcard ${i === sel ? "on" : ""}">
+          <div class="head">${icon(u.id, 56)}<div><h3>${i + 1}. ${u.name}</h3>
+          <div class="kind" style="color:${RN[u.rarity][1]}">${c.kind} · ${RN[u.rarity][0]} · ${c.tag}</div></div></div>
+          <div class="kind muted" style="margin:10px 0 0">${c.lv}</div>${c.marks ? `<div class="marks">${mk(c.marks)}</div>` : ""}
+          ${c.evo ? `<div class="evo">${c.evo}</div>` : ""}
+          ${c.rows.map(([n, a, b]) => `<div class="ledger"><span>${n}</span><span>${a} → <b>${b}</b></span></div>`).join("")}
+          <p>${u.desc}</p></div>`; }).join("")}</div>
+        <div class="tabs"><span>Đổi (R) ×2</span><span>Loại (X) ×1</span><span>Bỏ qua ×2 · +10 vàng</span></div>
+        <div class="owned"><span class="muted">Đã có:</span>${["blade_arc", "whirlwind"].map((id) => icon(id, 36)).join("")}</div>`;
+    }, () => Journal.back(), true).set(0);
+  } else if (view === "pause-full") {   // the game's pause (05-pause): menu, picked cards by kind with levels, the focused card's numbers
+    const M = ["Tiếp tục (Esc)", "Nhân vật (Tab)", "Cài đặt", "Chơi lại", "Về sổ"];
+    $("sheet").style.cssText = "top:110px;height:500px";
+    const SK = [["blade_arc", 5, 5], ["whirlwind", 2, 5], ["earth_strike", 4, 5], ["ground_slam", 2, 5], ["cleave_wave", 3, 5], ["holy_column", 1, 5], ["dash", 2, 5]];
+    const ST = [["back_slash", 2, 3], ["sharpen", 2, 0], ["haste", 5, 0], ["reach", 3, 0], ["extra_strike", 1, 0], ["swift", 2, 0], ["magnet", 1, 0], ["regen", 3, 0], ["toughness", 1, 0]];
+    const cell = ([id, lv, mx], on) => `<div class="pcard ${on ? "on" : ""}">${icon(id, 36)}<b>${lv}</b>${mx ? `<div class="pips">${Array.from({ length: mx }, (_, k) => `<i class="${k < lv ? "f" : ""}"></i>`).join("")}</div>` : ""}</div>`;
+    $("hint").textContent = "↑ ↓ chọn · Enter · Esc tiếp tục · ← → xem thẻ";
+    let card = 0;
+    addEventListener("keydown", (ev) => { if (ev.key === "ArrowRight" || ev.key === "ArrowLeft") { card = (card + (ev.key === "ArrowRight" ? 1 : SK.length + ST.length - 1)) % (SK.length + ST.length); draw(); } });
+    let sel0 = 0; const draw = () => {
+      const all = SK.concat(ST), f = all[card], u = U(f[0]) || { name: f[0] };
+      $("body").innerHTML = `<h1 style="text-align:center">Tạm dừng</h1><div class="sub" style="text-align:center">Ải 11 · 02:41 / 05:00 · Cấp 8</div>
+        <div class="cols" style="gap:30px"><div class="menu" style="flex:0 0 260px">${M.map((m, i) => `<div class="${i === sel0 ? "on" : ""}" style="font-size:28px">${m}</div>`).join("")}</div><div>
+        <div style="font-size:24px">Thẻ đã chọn (${all.length})</div>
+        <div class="muted" style="font-size:18px">Chiêu · ${SK.length}</div><div class="pgrid">${SK.map((c, i) => cell(c, i === card)).join("")}</div>
+        <div class="muted" style="font-size:18px">Chỉ số · ${ST.length}</div><div class="pgrid">${ST.map((c, i) => cell(c, i + SK.length === card)).join("")}</div>
+        <div class="ledger" style="border:none"><span>${u.name} <span class="sub" style="font-size:18px">Cấp ${f[1]}${f[2] ? "/" + f[2] : ""}</span></span></div>
+        <div class="muted" style="font-size:18px">Sát thương 57 · Hồi chiêu 0.54 s · Vùng ×1.30</div></div></div>`; };
+    Journal.list(() => M.length, (sel) => { sel0 = sel; draw(); }, (i) => { if (i === 2) Journal.go("settings"); else if (i === 3) Journal.go("loading"); else if (i === 4) Journal.go("lobby"); else Journal.back(); }).set(0);
+  } else if (view === "win-full" || view === "lose-full") {   // the game's result (07-win / 06-lose): totals, rewards, damage table by tab, gear, three seals
+    $("sheet").classList.add("tall");
+    const win = view === "win-full";
+    const T = { "Gây ra": [["cleave_wave", 7234, 41, 920, 221, 24.1], ["blade_arc", 4694, 27, 303, 187, 15.6], ["whirlwind", 3025, 17, 215, 125, 10.1], ["earth_strike", 2664, 15, 182, 113, 8.9], ["ground_slam", 92, 1, 6, 5, 0.3]],
+      "Nhận vào": [["", 640, 55, 31, 0, 2.1, "Yêu tinh"], ["", 330, 28, 22, 0, 1.1, "Dơi"], ["", 200, 17, 9, 0, 0.7, "Thạch nhầy"]],
+      "Hồi máu": [["regen", 412, 78, 0, 0, 1.4, "Hồi phục"], ["", 116, 22, 0, 0, 0.4, "Bình máu"]] };
+    const tabs = Object.keys(T);
+    let tab = 0;
+    addEventListener("keydown", (ev) => { if (ev.key.toLowerCase() === "q" || ev.key.toLowerCase() === "e") { tab = (tab + (ev.key.toLowerCase() === "e" ? 1 : 2)) % 3; draw(); } });
+    let s0 = 1; const draw = () => {
+      const rows = T[tabs[tab]], max = Math.max(...rows.map((r) => r[1]));
+      const B = win ? ["Chơi lại (R)", "Ải tiếp ▶", "Về sổ"] : ["Thử lại (R)", "Về sổ"];
+      $("body").innerHTML = `<div style="text-align:center;color:${win ? "#2a7a3a" : "var(--ink-red)"}"><span class="result" style="font-size:52px">${win ? "VƯỢT ẢI 1" : "GỤC NGÃ · ẢI 1"}</span></div>
+        <div class="odds" style="font-size:22px;margin-top:8px"><span>Thời gian ${win ? "05:00" : "03:12"}</span><span>Cấp ${win ? 21 : 14}</span><span>Quái hạ ${win ? 651 : 312}</span><span>Vàng ${win ? 79 : 31}</span></div>
+        <div class="sub" style="text-align:center;font-size:19px">${win ? "Vàng +0 (ải) +79 (nhặt) · Đá +0 · Tinh hoa +3 · Mảnh thẻ +6" : "Giữ lại vàng nhặt +31 · Tinh hoa +1 · Mảnh thẻ +1"}</div>
+        <div class="rtabs">${tabs.map((t, i) => `<span class="${i === tab ? "on" : ""}">${t}</span>`).join("")}</div>
+        <table class="dmg"><tr><th>${tab === 1 ? "Quái" : "Nguồn"}</th><th></th><th>${tab === 2 ? "Máu hồi" : "Sát thương"}</th><th>%</th><th>${tab === 2 ? "" : "Trúng"}</th><th>${tab === 0 ? "Hạ" : ""}</th><th>${tab === 2 ? "/s" : "DPS"}</th></tr>
+        ${rows.map((r) => { const u = U(r[0]); return `<tr><td class="n"><div>${r[0] ? icon(r[0], 28) : ""}<span>${r[6] || (u ? u.name : r[0])}</span></div></td>
+          <td><div class="bar"><i style="width:${Math.round(r[1] / max * 100)}%"></i></div></td><td>${r[1]}</td><td>${r[2]}%</td><td>${r[3] || ""}</td><td>${r[4] || ""}</td><td>${r[5]}</td></tr>`; }).join("")}</table>
+        ${win ? `<div class="odds" style="margin-top:10px;font-size:20px"><span class="muted">Trang bị nhận được:</span><span style="color:#c0801a">Giáp Thần Hộ</span><span style="color:#c0801a">Mũ Thần Hộ</span></div>` : ""}
+        <div class="odds muted" style="font-size:17px;margin-top:4px">Tổng sát thương 17710 · Sát thương nhận 1170 · Máu đã hồi 528</div>
+        ${B.map((b, i) => `<div class="seal ${i === s0 ? "on" : ""}" style="left:${(win ? 40 : 175) + i * 270}px;bottom:28px;width:250px;height:56px;line-height:48px;${i === B.length - 1 ? "background:#5a3a24" : ""}">${b}</div>`).join("")}`; };
+    $("hint").textContent = "← → chọn · Enter · Q / E đổi bảng · R chơi lại";
+    Journal.list(() => (win ? 3 : 2), (sel) => { s0 = sel; draw(); }, (i) => Journal.go(i === (win ? 2 : 1) ? "lobby" : "loading"), true).set(win ? 1 : 0);
+  } else if (view === "levelup") {
     const C = ["whirlwind", "sharpen", "holy_column"].map(U);
     $("hint").textContent = "← → chọn thẻ · Enter lấy · R đổi · X loại · Tab xem nhân vật";
     Journal.list(() => 3, (sel) => {

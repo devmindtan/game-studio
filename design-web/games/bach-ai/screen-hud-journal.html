@@ -38,6 +38,20 @@
 .rw .stamp { position: absolute; top: 8px; right: 8px; font-size: 16px; color: #c0801a; }
 .cols { display: flex; gap: 36px; margin-top: 8px; } .cols > div { flex: 1; }
 .skrow { display: flex; gap: 10px; align-items: center; font-size: 22px; border-bottom: 2px dotted var(--dots); padding: 2px 0; }
+/* character-full: the game's whole sheet (05c-character) as three journal columns */
+.csheet { left: 40px; top: 16px; width: 1200px; height: 660px; padding: 20px 30px; }
+.c3 { display: grid; grid-template-columns: 330px 1fr 330px; gap: 26px; margin-top: 6px; height: 560px; }
+.c3 h2 { font-weight: normal; font-size: 24px; color: var(--ink-red); border-bottom: 3px solid var(--ink); margin-bottom: 4px; }
+.st { border-bottom: 2px dotted var(--dots); padding: 2px 0 3px; }
+.st .l { display: flex; justify-content: space-between; font-size: 20px; } .st .l b { font-weight: normal; color: #2a7a3a; }
+.st .src { font-size: 15px; color: var(--ink-soft); }
+.skc { border: 3px solid var(--ink); background: #ddcca0; padding: 6px 8px; margin-bottom: 8px; display: flex; gap: 10px; }
+.skc .ico { flex: 0 0 auto; border: 2px solid var(--ink); background-color: #c8b088; }
+.skc .t { font-size: 21px; } .skc .t i { font-style: normal; font-size: 16px; color: var(--ink-soft); margin-left: 6px; letter-spacing: 1px; }
+.skc .n { font-size: 17px; } .skc .g { font-size: 15px; color: #2a7a3a; } .skc .x { font-size: 15px; color: var(--ink-red); }
+.bf { border-bottom: 2px dotted var(--dots); padding: 3px 0; font-size: 15px; } .bf b { font-weight: normal; font-size: 19px; color: var(--ink); }
+.c3 .scrollcol { overflow: hidden; padding-right: 18px; position: relative; }
+.c3 .more { position: absolute; right: 18px; bottom: 0; font-size: 15px; color: var(--ink-red); background: var(--paper); padding-left: 6px; }
 </style>
 </head>
 <body>
@@ -62,7 +76,7 @@ let IC = {}, ICN = 0;
 const $ = (id) => document.getElementById(id);
 const icon = (id, px) => `<div class="ico" style="width:${px}px;height:${px}px;background-image:url(${Journal.SP}card-icons/card-icons_strip.png);background-size:${ICN * px}px ${px}px;background-position:${-(IC[id] || 0) * px}px 0"></div>`;
 addEventListener("keydown", (ev) => {
-  const to = { h: "hud", b: "boss", m: "milestone", c: "character" }[ev.key.toLowerCase()];
+  const to = { h: "hud", b: "boss", m: "milestone", c: "character", 5: "character-full" }[ev.key.toLowerCase()];
   if (to && to !== view) location.search = "?view=" + to;
   const sheet = { p: "pause", l: "levelup", w: "win", f: "lose" }[ev.key.toLowerCase()];   // the other in-run sheets
   if (sheet) location.href = "screen-run-journal.html?view=" + sheet;
@@ -87,6 +101,26 @@ addEventListener("keydown", (ev) => {
         <div class="rewards">${R.map((u, i) => `<div class="rw ${i === sel ? "on" : ""}"><span class="stamp">Đặc biệt</span>
           <div style="width:88px;margin:0 auto">${icon(u.id, 88)}</div><h3>${u.name}</h3><p>${u.desc}</p></div>`).join("")}</div></div>`;
     }, () => location.search = "?view=hud", true).set(0);
+  } else if (view === "character-full") {   // the game's character sheet (05c-character), all of it, on one journal sheet
+    const ST = [["Máu tối đa", "128", "gốc 100 · Tầm với +20 · giáp +8"], ["Sát thương", "28", "gốc 20 · Mài kiếm +30% · Ngọc sức mạnh +35% · Ăn mòn −15%"],
+      ["Chí mạng", "5%", "gốc 5%"], ["Sát thương chí mạng", "×1,75", "gốc ×1,75"], ["Hồi chiêu", "−40% (tối đa)", "gốc 0% · Nhanh tay −40% · Rune −25%"],
+      ["Vùng đánh", "×1,30", "gốc ×1,00 · Tầm với +45% · −10%"], ["Tốc độ chạy", "233", "gốc 150 · Nhẹ chân +20% · Rune +30%"],
+      ["Hồi máu", "8,0/s", "gốc 0 · Hồi phục +1 · Hoa +7"], ["Tầm hút", "×4,00", "gốc ×1 · Nam châm +40% · Khiên từ +250%"], ["Giáp", "4 (−21%)", "gốc 0 · Da thép +3 · +1"]];
+    const SKL = [["blade_arc", 3, "58 · 0,41 s · ×1,30", "Sát thương +125% · Hồi chiêu −52% · Vùng +45%", "Nhát sau 75%"],
+      ["whirlwind", 2, "38 · 2,88 s · ×2,35 · ×6 lần", "Sát thương +115% · Hồi chiêu −52% · Vùng +65%", ""],
+      ["earth_strike", 4, "56 · 3,15 s · ×1,72 · ×3 lần", "Sát thương +165% · Hồi chiêu −52% · Vùng +77%", "Làm chậm 1,5 s · Choáng 0,5 s"],
+      ["ground_slam", 2, "52 · 3,60 s · ×1,51", "Sát thương +115% · Hồi chiêu −52% · Vùng +61%", "Theo: sát thương ×1,0 + máu tối đa ×0,05"]];
+    const BF = [["Rune tốc độ", "còn 6 s", "Tốc độ chạy +30%, hồi chiêu −25%."], ["Ngọc sức mạnh", "còn 6 s", "Sát thương mọi đòn +35%."], ["Hoa hồi phục", "còn 4 s", "Hồi 7 máu mỗi giây."]];
+    const SC = [["back_slash", "Chém ngược · Cấp 2/3", "Nhát chém sau 75% sát thương của Chém kiếm"], ["sharpen", "Mài kiếm · Cấp 2", "Sát thương +30% · áp lên mọi chiêu"], ["haste", "Nhanh tay · Cấp 4", "Hồi chiêu −40% (tối đa)"]];
+    const marks = (lv) => Array.from({ length: 5 }, (_, k) => k % 2 ? (k < lv ? "■" : "□") : (k < lv ? "◆" : "◇")).join("");
+    $("hint").textContent = "Tab / Esc đóng · ↑ ↓ cuộn cột chiêu";
+    $("over").innerHTML = `<div class="dim"></div><div class="sheet csheet"><h1 style="display:inline">Nhân vật</h1> <span class="sub">Kiếm sĩ · Cấp 8</span>
+      <div class="c3"><div><h2>Chỉ số</h2><div class="st"><div class="l" style="color:var(--ink-red)">Nội tại: ${cls.knight.passive.name}</div><div class="src">${cls.knight.passive.desc || ""}</div></div>
+        ${ST.map(([n, v, src]) => `<div class="st"><div class="l"><span>${n}</span><b>${v}</b></div><div class="src">${src}</div></div>`).join("")}</div>
+      <div class="scrollcol"><h2>Chiêu thức</h2>${SKL.map(([id, lv, n, g, x]) => `<div class="skc">${icon(id, 44)}<div><div class="t">${U(id).name}<i>${marks(lv)}</i></div>
+        <div class="n">${n}</div><div class="g">${g}</div>${x ? `<div class="x">${x}</div>` : ""}</div></div>`).join("")}<span class="more">▾ còn 3 chiêu</span></div>
+      <div><h2>Buff đang có</h2>${BF.map(([n, t, d]) => `<div class="bf"><b>${n}</b> <span class="sub" style="font-size:15px">· ${t}</span><div>${d}</div></div>`).join("")}
+        <h2 style="margin-top:12px">Thẻ chỉ số</h2>${SC.map(([id, n, d]) => `<div class="bf" style="display:flex;gap:8px">${icon(id, 28)}<div><b>${n}</b><div>${d}</div></div></div>`).join("")}</div></div></div>`;
   } else if (view === "character") {
     const st = cls.knight.stats, crit = cfg.crit;
     const rows = [["Máu tối đa", "118"], ["Sát thương", "20"], ["Chí mạng", Math.round((crit.chance + (st.crit_chance || 0)) * 100) + "%"],
