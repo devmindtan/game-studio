@@ -57,9 +57,14 @@ def arrow_rain(S, R):
     return out
 
 
+THORN_TIERS = [THORN, ("#1e4a1e", "#3a8a2a", "#7ad04a", "#e0ff9a"), ("#3a2a10", "#6a8a20", "#b0d040", "#fff4b0"),
+               ("#4a1a10", "#8a3a20", "#e07040", "#ffd0a0"), ("#5a3a08", "#c08020", "#f2c14e", "#ffffff")]
+
+
 def thorn_trap(S, R):
-    """Bẫy gai: cracks open in a ring, green thorns burst up, hold, then sink."""
+    """Bẫy gai: cracks open in a ring, thorns burst up, hold, then sink. R 28..36 picks the tier (green .. gold)."""
     C = S // 2
+    THORN = THORN_TIERS[max(0, min(4, (R - 28) // 2))]
     out = []
     heights = [0, 0, 0, 4, 10, 16, 18, 16, 14, 10, 5, 0]
     for f in range(N):

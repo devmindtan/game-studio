@@ -5,6 +5,9 @@ Chạy: gamekit art run <tên>
 """
 TIER_FILE = globals().get("TIER_FILE", __file__)
 SPRITES = {"arrow-rain": ["arrow_rain", 112, 40, [3, 7]], "thorn-trap": ["thorn_trap", 96, 32, [4, 7]],
+           "thorn-trap-i": ["thorn_trap", 80, 28, [4, 7]], "thorn-trap-ii": ["thorn_trap", 88, 30, [4, 7]],
+           "thorn-trap-iii": ["thorn_trap", 96, 32, [4, 7]], "thorn-trap-iv": ["thorn_trap", 96, 34, [4, 7]],
+           "thorn-trap-v": ["thorn_trap", 104, 36, [4, 7]],
            "hawk-dive": ["hawk_dive", 112, 28, [4, 6]], "smoke-bomb": ["smoke_bomb", 112, 44, [1, 5]],
            "blade-ring": ["blade_ring", 128, 50, [2, 7]], "shadow-strike": ["shadow_strike", 80, 26, [2, 5]],
            # Kết liễu's look-only burst (the kill is made by Enemies), one per tier
