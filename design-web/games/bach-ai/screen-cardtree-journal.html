@@ -13,6 +13,7 @@
 .cn { position: absolute; width: 120px; height: 58px; font-size: 19px; line-height: 1; padding: 6px; text-align: center; }
 .cn.got { background: #c88a7a; }
 .cn small { display: block; font-size: 16px; margin-top: 4px; }
+.xlink { font-size: 20px; color: var(--ink-red); border-bottom: 2px solid var(--ink-red); margin-right: 18px; }
 </style>
 </head>
 <body>
@@ -26,6 +27,7 @@
 </div>
 <script src="journal.js"></script>
 <script>
+const EXTRA = new URLSearchParams(location.search).get("view") === "extra";   // proposal 2026-11-26: the game features the page lacked
 let CT, UP = {}, IC = {}, ICN = 0, ids = [], node = 0;
 const got = { keen: 2 };
 const icon = (id, px) => `<div class="ico" style="width:${px}px;height:${px}px;background-image:url(${Journal.SP}card-icons/card-icons_strip.png);background-size:${ICN * px}px ${px}px;background-position:${-(IC[id] || 0) * px}px 0"></div>`;
@@ -39,7 +41,7 @@ function draw(sel) {
   document.getElementById("right").innerHTML = `<h2>${UP[ids[sel]]?.name || ids[sel]}</h2><div class="sub">Điểm đã dùng ${spent}/${t.max_points} · Mảnh thẻ 14</div>
     <div id="nodes"><svg width="480" height="330">${lines}</svg>${N.map((m, i) => { const [x, y] = at(m);
       return `<div class="cn sketch ${got[m.id] ? "got" : ""} ${i === node ? "on" : ""}" style="left:${x}px;top:${y}px;${i === node ? "color:var(--paper)" : ""}">${m.name}<small>${got[m.id] || 0}/${m.max_rank}</small></div>`; }).join("")}</div>
-    <p style="font-size:22px">${n.desc}</p><div class="ledger"><span>Giá cấp kế</span><span>${CT.cost_base + CT.cost_step * (got[n.id] || 0)} Mảnh thẻ</span></div>
+    <p style="font-size:22px">${n.desc}</p><div class="ledger"><span>Giá cấp kế</span><span>${CT.cost_base + CT.cost_step * (got[n.id] || 0)} Mảnh thẻ</span></div>${EXTRA ? `<p style="margin-top:8px"><span class="xlink">Đặt lại thẻ ▸ (R) · hoàn 6 Mảnh thẻ</span></p>` : ""}
     <div class="seal on" style="right:40px;bottom:30px;width:200px;height:60px;line-height:52px">Nâng ▶</div>`;
 }
 (async () => {

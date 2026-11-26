@@ -12,6 +12,7 @@
 .node.got { background: #c88a7a; }
 .node .rk { position: absolute; right: -6px; bottom: -8px; font-size: 18px; background: var(--paper); border: 2px solid var(--ink); padding: 0 3px; line-height: 1; }
 .node.on img { filter: invert(1) sepia(1) saturate(3) hue-rotate(5deg); }
+.xlink { font-size: 20px; color: var(--ink-red); border-bottom: 2px solid var(--ink-red); margin-right: 18px; }
 </style>
 </head>
 <body>
@@ -25,6 +26,7 @@
 </div>
 <script src="journal.js"></script>
 <script>
+const EXTRA = new URLSearchParams(location.search).get("view") === "extra";   // proposal 2026-11-26: the game features the page lacked
 let T, N = [], sel = 0;
 const rank = { k_root: 3, k_b0_1: 2, k_b1_1: 1 };   // a sample save
 const $ = (id) => document.getElementById(id);
@@ -39,7 +41,7 @@ function draw() {
     <p style="font-size:24px;margin:10px 0">${n.desc}</p>
     <div class="ledger"><span>Giá mỗi cấp</span><span>${cost} Tinh hoa</span></div><div class="ledger"><span>Tinh hoa đang có</span><span>18</span></div>
     <div class="ledger"><span>Cần</span><span>${(n.requires || []).map((r) => N.find((x) => x.id === r).name).join(", ") || "—"}</span></div>
-    <p class="muted" style="font-size:20px;margin-top:12px">Tẩy tuỷ: 1 Tẩy Tủy Đan + vàng, trả lại mọi Tinh hoa.</p>
+    <p class="muted" style="font-size:20px;margin-top:12px">Tẩy tuỷ: 1 Tẩy Tủy Đan + vàng, trả lại mọi Tinh hoa.</p>${EXTRA ? `<span class="xlink">Tẩy tuỷ ▸ (R) · 1 Tẩy Tủy Đan + 60 vàng</span>` : ""}
     <div class="seal ${ok ? "on" : ""}" style="right:40px;bottom:30px;width:220px;height:62px;line-height:54px;${ok ? "" : "opacity:.5"}">Học ▶</div>`;
 }
 (async () => { T = await Journal.json("data/skill_tree.json"); N = T.classes.knight; draw(); })();

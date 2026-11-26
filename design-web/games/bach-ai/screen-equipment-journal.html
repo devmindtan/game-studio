@@ -12,7 +12,7 @@
 .slot .ico, .bag .ico { image-rendering: pixelated; background-repeat: no-repeat; }
 .slot label { position: absolute; top: 86px; left: -10px; width: 104px; text-align: center; font-size: 18px; }
 .bagtabs { display: flex; gap: 6px; margin: 4px 0 8px; }
-.bagtabs span { font-size: 20px; padding: 0 8px; border: 2px solid var(--ink); }
+.bagtabs span { white-space: nowrap; font-size: 20px; padding: 0 8px; border: 2px solid var(--ink); }
 .bagtabs span.on { background: var(--ink); color: var(--paper); }
 .bag { display: grid; grid-template-columns: repeat(6, 64px); gap: 8px; }
 .bag .sketch { width: 64px; height: 64px; }
@@ -21,6 +21,7 @@
 .item h3 { font-weight: normal; font-size: 30px; }
 .item p { font-size: 21px; line-height: 1.05; }
 .up { color: #2a7a3a; } .down { color: var(--ink-red); }
+.xlink { font-size: 20px; color: var(--ink-red); border-bottom: 2px solid var(--ink-red); margin-right: 18px; }
 </style>
 </head>
 <body>
@@ -35,6 +36,7 @@
 </div>
 <script src="journal.js"></script>
 <script>
+const EXTRA = new URLSearchParams(location.search).get("view") === "extra";   // proposal 2026-11-26: the game features the page lacked
 const SLOTS = { head: "Mũ", chest: "Áo", feet: "Giày", weapon: "Vũ khí", shield: "Khiên" };
 const POS = { head: [30, 10], chest: [30, 140], feet: [30, 260], weapon: [380, 70], shield: [380, 200] };
 const RAR = { common: ["Thường", 1], rare: ["Hiếm", 2], epic: ["Sử thi", 3], legendary: ["Huyền thoại", 4] };
@@ -44,17 +46,19 @@ const $ = (id) => document.getElementById(id);
 const icon = (id, px) => `<div class="ico" style="width:${px}px;height:${px}px;background-image:url(${Journal.SP}gear-icons/gear-icons_strip.png);background-size:${ICN * px}px ${px}px;background-position:${-(IC[id] || 0) * px}px 0"></div>`;
 function eff(d) { return Object.entries(d.effects || {}).map(([k, v]) => `${({ max_hp: "Máu", armor: "Giáp", damage: "Sát thương", cooldown: "Hồi chiêu", move_speed: "Tốc độ" })[k] || k} ${v.add ? "+" + v.add : (v.mul > 0 ? "+" : "") + Math.round(v.mul * 100) + "%"}`).join(", "); }
 function draw() {
+  document.getElementById("sortrow")?.remove();
   $("doll").innerHTML = `<div class="portrait"><img src="${Journal.SP}knight/knight.png"></div>` + slotKeys.map((k, i) =>
     `<div class="slot sketch ${i === tab ? "on" : ""}" style="left:${POS[k][0]}px;top:${POS[k][1]}px">${worn[k] ? icon(worn[k], 64) : ""}<label>${SLOTS[k]}</label></div>`).join("");
   $("stats").innerHTML = [["Máu", 118], ["Sát thương", 20], ["Giáp", 1], ["Tốc độ", 158]].map(([a, b]) => `<div class="ledger"><span>${a}</span><span>${b}</span></div>`).join("");
-  $("tabs").innerHTML = slotKeys.map((k, i) => `<span class="${i === tab ? "on" : ""}">${SLOTS[k]}</span>`).join("");
+  $("tabs").innerHTML = (EXTRA ? `<span>Tất cả</span>` : "") + slotKeys.map((k, i) => `<span class="${i === tab ? "on" : ""}">${SLOTS[k]}</span>`).join("");
+  if (EXTRA) $("tabs").insertAdjacentHTML("afterend", `<div class="bagtabs" id="sortrow"><span style="border:0;padding:0">Xếp theo</span><span class="on">Độ hiếm</span><span>Mới nhất</span></div>`);
   const list = ITEMS.filter((d) => d.slot === slotKeys[tab]);
   sel = Math.min(sel, list.length - 1);
   $("bag").innerHTML = list.map((d, i) => `<div class="sketch r${RAR[d.rarity][1]} ${i === sel ? "on" : ""}">${icon(d.id, 48)}</div>`).join("");
   const d = list[sel];
   $("item").innerHTML = d ? `<h3>${d.name} <span class="stamp" style="font-size:18px;color:${["", "#6a6a6a", "#3a6aaa", "#7a3ab8", "#c0801a"][RAR[d.rarity][1]]}">${RAR[d.rarity][0]}</span></h3>
-    <p>${eff(d)}</p><p class="muted">So với đang mặc:</p><div class="ledger"><span>Máu tối đa</span><span class="up">118 → 152 ▲</span></div>
-    <div class="ledger"><span>Giáp</span><span class="up">1 → 6 ▲</span></div>` : "";
+    <p>${eff(d)}</p>${EXTRA ? `<p style="color:#2a7a3a;font-size:19px">Dòng phụ 1: Hồi máu +0,5/giây</p><p class="muted" style="font-size:19px">Dòng phụ 2: Tốc độ chạy +6% (mở ở +4)</p>` : ""}<p class="muted">So với đang mặc:</p><div class="ledger"><span>Máu tối đa</span><span class="up">118 → 152 ▲</span></div>
+    <div class="ledger"><span>Giáp</span><span class="up">1 → 6 ▲</span></div>${EXTRA ? `<div class="ledger" style="margin-top:6px"><span>Cường hoá +0/7 (mỗi bậc +20% hiệu ứng)</span><span>120 vàng</span></div><span class="xlink">Cường hoá ▸ (C)</span>` : ""}` : "";
 }
 (async () => {
   const [it, gi] = await Promise.all([Journal.json("data/items.json"), Journal.json("sprites/custom/gear-icons/gear-icons.json")]);

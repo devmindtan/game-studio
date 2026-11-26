@@ -120,6 +120,13 @@
      "page": "screen-equipment-journal.html",
      "shot": "equipment.png",
      "chosen": true
+    },
+    {
+     "label": "Đề xuất: tính năng game đang có",
+     "page": "screen-equipment-journal.html",
+     "query": "view=extra",
+     "shot": "equipment-extra.png",
+     "note": "phần game có mà bản web chưa có"
     }
    ]
   },
@@ -233,6 +240,13 @@
      "page": "screen-tree-journal.html",
      "shot": "tree.png",
      "chosen": true
+    },
+    {
+     "label": "Đề xuất: tính năng game đang có",
+     "page": "screen-tree-journal.html",
+     "query": "view=extra",
+     "shot": "tree-extra.png",
+     "note": "phần game có mà bản web chưa có"
     }
    ]
   },
@@ -247,6 +261,13 @@
      "page": "screen-deck-journal.html",
      "shot": "deck.png",
      "chosen": true
+    },
+    {
+     "label": "Đề xuất: tính năng game đang có",
+     "page": "screen-deck-journal.html",
+     "query": "view=extra",
+     "shot": "deck-extra.png",
+     "note": "phần game có mà bản web chưa có"
     }
    ]
   },
@@ -261,6 +282,13 @@
      "page": "screen-cardtree-journal.html",
      "shot": "cardtree.png",
      "chosen": true
+    },
+    {
+     "label": "Đề xuất: tính năng game đang có",
+     "page": "screen-cardtree-journal.html",
+     "query": "view=extra",
+     "shot": "cardtree-extra.png",
+     "note": "phần game có mà bản web chưa có"
     }
    ]
   },

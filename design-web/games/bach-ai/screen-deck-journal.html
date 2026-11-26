@@ -17,6 +17,7 @@
 .slots div { width: 54px; height: 54px; border: 2px dashed var(--ink); display: grid; place-items: center; }
 .budget { height: 16px; border: 3px solid var(--ink); width: 300px; margin: 4px 0; } .budget i { display: block; height: 100%; background: var(--ink-red); }
 .r1 { border-color: #3a6aaa !important; } .r2 { border-color: #7a3ab8 !important; } .r3 { border-color: #c0801a !important; }
+.xlink { font-size: 20px; color: var(--ink-red); border-bottom: 2px solid var(--ink-red); margin-right: 18px; }
 </style>
 </head>
 <body>
@@ -27,6 +28,7 @@
       <div class="kind" id="kind"></div><div class="cards" id="cards"></div></div>
     <div class="page r"><h2>Bộ đang dùng</h2><div id="deck"></div>
       <p style="font-size:22px;margin-top:8px">Cây thẻ ▸ <span class="muted">nâng thẻ bằng Mảnh thẻ (phím T)</span></p>
+      <p id="xl" style="margin-top:8px"></p>
       <div class="seal on" style="right:40px;bottom:30px;width:260px;height:62px;line-height:54px">Dùng bộ này ▶</div></div>
     <div class="ribbons"><div class="ribbon on" style="background:#8a3a3a">Bộ 1</div><div class="ribbon" style="background:#3a6a8a">Bộ 2</div><div class="ribbon" style="background:#6a8a3a">Bộ 3</div></div>
   </div>
@@ -34,6 +36,7 @@
 </div>
 <script src="journal.js"></script>
 <script>
+const EXTRA = new URLSearchParams(location.search).get("view") === "extra";   // proposal 2026-11-26: the game features the page lacked
 let CFG, UP = [], IC = {}, ICN = 0, kind = 0, sel = 0, inDeck = new Set();
 const RANK = { common: 0, rare: 1, epic: 2, legendary: 3 };
 const $ = (id) => document.getElementById(id);
@@ -56,6 +59,7 @@ function draw() {
   CFG = ct.deck; UP = up.upgrades.filter((u) => !u.unique && !u.special); ci.animations.forEach((a) => IC[a.name] = a.start); ICN = ci.frames;
   UP.slice(0, 5).concat(UP.filter((u) => u.kind !== "skill").slice(0, 3)).forEach((u) => inDeck.add(u.id));
   draw();
+  if (EXTRA) document.getElementById("xl").innerHTML = `<span class="xlink">Bộ mặc định ▸ (R)</span><span class="xlink">Tỉ lệ thẻ ▸ (O)</span>`;
 })();
 addEventListener("keydown", (ev) => {
   const n = list().length;
