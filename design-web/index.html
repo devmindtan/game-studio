@@ -142,13 +142,26 @@
     fit();
   }
 
+  function zoomPage() {
+    try { $("frame").contentDocument.documentElement.style.zoom = ui.k; } catch (e) { /* not loaded yet */ }
+  }
+  $("frame").addEventListener("load", zoomPage);
+
   function setLink(id, href) { $(id).classList.toggle("off", !href); if (href) $(id).href = href; }
 
   function fit() {
     const z = $("zoom").value;
     const sc = z === "fit" ? Math.min(($("area").clientWidth - 44) / 1280, ($("area").clientHeight - 44) / 720) : Number(z);
     const k = Math.max(0.2, Math.min(sc, 1));
-    $("frame").style.transform = $("ov").style.transform = `scale(${k})`;
+    // the page draws itself smaller (CSS zoom) instead of being shrunk as a picture: a transform resamples the
+    // pixel art and blurs it; zoom keeps image-rendering: pixelated (user 2026-11-26: the hero looked blurry)
+    ui.k = k;
+    const f = $("frame");
+    f.style.transform = "none";
+    f.style.width = Math.round(1280 * k) + "px";
+    f.style.height = Math.round(720 * k) + "px";
+    zoomPage();
+    $("ov").style.transform = `scale(${k})`;
     $("stage").style.width = Math.round(1280 * k) + "px";
     $("stage").style.height = Math.round(720 * k) + "px";
   }
