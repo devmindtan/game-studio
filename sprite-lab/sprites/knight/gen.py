@@ -61,8 +61,10 @@ def _armed_layer(x, y, rgb):
         return "weapon"                                   # the sword
     if 15 <= x <= 16 and 21 <= y <= 24:
         return "arms_front"                               # the sword hand
+    if 16 <= x <= 23 and 13 <= y <= 18 and not _grey(rgb):
+        return "body"                                     # the face (skin, mouth, both eyes) under the helmet
     if 17 <= x <= 24 and 13 <= y <= 19 and not _grey(rgb):
-        return None                                       # the face under the helmet
+        return None
     if y <= 19:
         return "head"                                     # helmet and plume
     return "chest"
@@ -108,6 +110,23 @@ ARMED = _split((0, 0, 32, 30), 0, _armed_layer)
 
 
 PARTS = _parts()
+# user 2026-11-26 ("mất con mắt"): the face is the armed drawing's own (both eyes), not the bare figure's, and lives
+# in the body layer so no helmet tier recolours or hides an eye
+PARTS["body"].alpha_composite(ARMED["body"])
+
+
+def _check_face():
+    """Refuse to render when a dark face pixel (an eye) of the user's drawing is not in the face layer: a helmet
+    tier would recolour or hide it (user 2026-11-26: "mất con mắt")."""
+    src = Image.open(SRC).convert("RGBA")
+    for y in range(13, 19):
+        for x in range(17, 23):                            # inside the face, away from the helmet edge
+            p = src.getpixel((x, y))
+            if p[3] and max(p[:3]) < 40 and not PARTS["body"].getpixel((CROP[2] - 1 - x, y))[3]:
+                raise SystemExit(f"knight: eye pixel ({x},{y}) of the drawing is missing from the face layer")
+
+
+_check_face()
 ARMED_DEFAULT = {k for k in SLOT_OF if ARMED[k].getbbox()}   # gear layers the armed drawing has
 # after the mirror the feet sit at x 6..14 of the 32-wide crop: centre the pair on the anchor
 OX = 24 - 10
