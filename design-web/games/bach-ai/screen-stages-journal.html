@@ -51,7 +51,7 @@ function nodes(r) {   // ten passes on a winding road across the page, the last 
 function draw() {
   const r = ST.regions[region];
   $("rname").textContent = r.name; $("rsub").textContent = `Ải ${r.from}–${r.to} · trùm ở Ải ${r.to}`;
-  $("tabs").innerHTML = ST.regions.map((x, i) => `<div class="ribbon ${i === region ? "on" : ""}" style="background:${COLS[i]}">${x.name}</div>`).join("");
+  $("tabs").innerHTML = ST.regions.map((x, i) => `<div class="ribbon ${i === region ? "on" : ""} ${x.from > best + 1 ? "lock" : ""}" title="${x.from > best + 1 ? "Mở khi vượt ải " + (x.from - 1) : ""}" style="background:${COLS[i]}">${x.name}</div>`).join("");
   const c = $("map").getContext("2d"); c.clearRect(0, 0, 480, 500);
   const N = nodes(region);
   c.setLineDash([8, 8]); c.strokeStyle = "#3a2414"; c.lineWidth = 3; c.beginPath(); N.forEach(([x, y], i) => i ? c.lineTo(x, y) : c.moveTo(x, y)); c.stroke(); c.setLineDash([]);

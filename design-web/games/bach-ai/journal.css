@@ -21,8 +21,8 @@ img { image-rendering: pixelated; }
 .sub { font-size: 22px; color: var(--ink-red); }
 .muted { color: var(--ink-soft); }
 /* ribbons out of the right edge: tabs */
-.ribbons { position: absolute; left: 1100px; top: 50px; display: flex; flex-direction: column; gap: 10px; }
-.ribbon { width: 52px; min-height: 92px; padding: 10px 0; border: 3px solid #0006; color: #f3e6c8; font-size: 20px; writing-mode: vertical-rl;
+.ribbons { position: absolute; left: 1114px; top: 50px; display: flex; flex-direction: column; gap: 10px; }
+.ribbon { width: 52px; padding: 12px 0; border: 3px solid #0006; color: #f3e6c8; font-size: 20px; writing-mode: vertical-rl;
   text-align: center; line-height: 46px; cursor: pointer; }
 .ribbon.on { width: 74px; filter: brightness(1.15); outline: 3px solid var(--gold); }
 /* a ledger row: name, dotted leader, value */
@@ -46,3 +46,6 @@ img { image-rendering: pixelated; }
 .back-tab img { width: 30px; height: 30px; }
 .back-tab:hover, .back-tab.on { width: 68px; filter: brightness(1.15); outline: 3px solid var(--gold); }
 body.has-back .ribbons { top: 118px; }
+/* a locked ribbon (user 2026-11-26: regions not reached are locked): grey, a padlock, not clickable */
+.ribbon.lock { background: #52463a !important; color: #a89a88; cursor: default; pointer-events: none; }
+.ribbon.lock::before { content: ""; display: inline-block; width: 18px; height: 18px; margin-bottom: 6px; background: url(assets/lobby/lock.svg) center / contain no-repeat; }
