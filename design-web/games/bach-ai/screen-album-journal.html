@@ -1,0 +1,118 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<title>Album: Bách khoa (sổ hành trình)</title>
+<link rel="stylesheet" href="journal.css">
+<style>
+.grid { display: grid; grid-template-columns: repeat(5, 84px); gap: 10px; margin-top: 8px; }
+.grid .sketch { width: 84px; height: 84px; }
+.grid .sketch img { width: 64px; height: 64px; object-fit: contain; }
+.grid .ico { width: 48px; height: 48px; image-rendering: pixelated; background-repeat: no-repeat; }
+.subtabs { display: flex; gap: 6px; margin-top: 6px; }
+.subtabs span { font-size: 20px; padding: 0 8px; border: 2px solid var(--ink); cursor: pointer; }
+.subtabs span.on { background: var(--ink); color: var(--paper); }
+.count { position: absolute; right: 44px; top: 32px; font-size: 22px; }
+.art { width: 200px; height: 200px; margin: 6px auto 10px; border: 4px solid var(--edge); background: #d8c498; display: grid; place-items: center; }
+.art img { width: 176px; height: 176px; object-fit: contain; }
+.art .ico { width: 144px; height: 144px; image-rendering: pixelated; background-repeat: no-repeat; }
+.page.r h1 { text-align: center; font-size: 44px; }
+.page.r .sub { text-align: center; }
+.stamps { text-align: center; margin: 8px 0; min-height: 34px; }
+.notes { font-size: 22px; line-height: 1.05; margin-top: 8px; }
+</style>
+</head>
+<body>
+<div id="game">
+  <div class="book">
+    <div class="cover"></div>
+    <div class="page l"><h1>Bách khoa</h1><div class="sub" id="tabname"></div><div class="count" id="count"></div><div class="subtabs" id="sub"></div><div class="grid" id="grid"></div></div>
+    <div class="page r" id="detail"></div>
+    <div class="ribbons" id="tabs"></div>
+  </div>
+  <div class="hint">←↑↓→ chọn · Q / E đổi dải · Z / C đổi lớp (Kỹ năng) · Esc về sổ</div>
+</div>
+<script>
+// real data, read from the game (monsters.json, species.json, classes.json, upgrades_<class>.json, card-icons)
+const G = "../../../games/bach-ai/assets/", SP = G + "sprites/custom/";
+const j = (p) => fetch(G + p).then((r) => r.json());
+let TABS = [], tab = 0, sel = 0, cls = 0, CLASSES = [], ICON = {}, ICON_N = 0, SPEC = {}, ELEM = {};
+const $ = (id) => document.getElementById(id);
+const seenSet = new Set(["slime", "bat", "goblin", "spore", "wisp", "wolf", "king_slime"]);   // sample save: killed once
+
+function icon(id, px) {
+  const i = ICON[id] ?? 0;
+  return `<div class="ico" style="background-image:url(${SP}card-icons/card-icons_strip.png);background-size:${ICON_N * px}px ${px}px;background-position:${-i * px}px 0;width:${px}px;height:${px}px"></div>`;
+}
+function shown() { const t = TABS[tab]; return t.name === "Kỹ năng" ? t.list.filter((e) => e.cls === CLASSES[cls] || (e.id === "dash" && cls === 0)) : t.list; }
+function render() {
+  const t = TABS[tab], list = shown();
+  $("sub").innerHTML = t.name === "Kỹ năng" ? CLASSES.map((c, i) => `<span class="${i === cls ? "on" : ""}" onclick="cls=${i};sel=0;render()">${c}</span>`).join("") : "";
+  $("tabname").textContent = `Chương: ${t.name} · ${t.list.length} mục`;
+  const mons = TABS[0].list.concat(TABS[1].list);
+  $("count").textContent = `Đã mở ${mons.filter((m) => m.seen).length}/${mons.length}`;
+  $("tabs").innerHTML = TABS.map((x, i) => `<div class="ribbon ${i === tab ? "on" : ""}" style="background:${x.col}" onclick="tab=${i};sel=0;render()">${x.name}</div>`).join("");
+  $("grid").innerHTML = list.map((e, i) => {
+    const inner = e.kind === "skill" ? icon(e.id, 48) : `<img src="${SP}${e.sprite}/${e.sprite}.png">`;
+    return `<div class="sketch ${i === sel ? "on" : ""} ${e.kind !== "skill" && !e.seen ? "lock" : ""}" onclick="sel=${i};render()">${inner}</div>`;
+  }).join("");
+  const e = list[sel];
+  if (!e) { $("detail").innerHTML = ""; return; }
+  if (e.kind === "skill") {
+    $("detail").innerHTML = `<div class="art">${icon(e.id, 144)}</div><h1>${e.name}</h1>
+      <div class="sub">${e.cls} · Hệ ${ELEM[e.element] || "—"}</div>
+      <div class="ledger"><span>Hồi chiêu</span><span>${e.cd ? e.cd.toFixed(1).replace(".", ",") + " s" : "—"}</span></div>
+      <div class="ledger"><span>Số cấp</span><span>${e.max}</span></div>
+      <div class="notes">${e.desc}</div>`;
+    return;
+  }
+  if (!e.seen) {
+    $("detail").innerHTML = `<div class="art"><img src="${SP}${e.sprite}/${e.sprite}.png" style="filter:brightness(0) opacity(.55)"></div>
+      <h1>???</h1><div class="sub">Hạ một lần để ghi vào sổ</div>`;
+    return;
+  }
+  const sp = SPEC[e.species] || {};
+  const st = (sp.weak || []).map((w) => `<span class="stamp weak">Yếu ${ELEM[w]}</span>`).join("") +
+    (sp.resist || []).map((w) => `<span class="stamp resist">Kháng ${ELEM[w]}</span>`).join("");
+  $("detail").innerHTML = `<div class="art"><img src="${SP}${e.sprite}/${e.sprite}.png"></div><h1>${e.name}</h1>
+    <div class="sub">${sp.name || "—"}${e.kind === "boss" ? " · Trùm" : ""}</div><div class="stamps">${st || '<span class="muted">Không yếu, không kháng hệ nào</span>'}</div>
+    <div class="ledger"><span>Máu (ải 1)</span><span>${Math.round(e.hp)}</span></div>
+    <div class="ledger"><span>Sát thương</span><span>${Math.round(e.damage)}</span></div>
+    <div class="ledger"><span>Tốc độ</span><span>${Math.round(e.speed)}</span></div>
+    <div class="notes muted">Đã hạ: 1.240 · Lần đầu gặp: ải 3</div>`;
+}
+(async () => {
+  const [mon, spc, clsData, ci] = await Promise.all([j("data/monsters.json"), j("data/species.json"), j("data/classes.json"), j("sprites/custom/card-icons/card-icons.json")]);
+  ci.animations.forEach((a) => ICON[a.name] = a.start); ICON_N = ci.frames;
+  SPEC = spc.species; ELEM = spc.elements;
+  const ms = Object.entries(mon).filter(([k]) => !k.startsWith("_")).map(([k, m]) => ({ id: k, ...m, kind: m.boss ? "boss" : "mon", seen: seenSet.has(k) }));
+  const skills = [];
+  let dash = false;
+  for (const [cid, c] of Object.entries(clsData).filter(([k]) => !k.startsWith("_"))) {
+    const up = await j("data/" + c.upgrades);
+    for (const u of up.upgrades.filter((x) => x.kind === "skill")) {
+      if (u.id === "dash") { if (dash) continue; dash = true; }
+      skills.push({ id: u.id, kind: "skill", name: u.name, element: u.element, cls: c.name, desc: u.desc, max: u.max_level, cd: (up.skills[u.id] || {}).cooldown });
+    }
+  }
+  TABS = [{ name: "Quái", col: "#3a6a8a", list: ms.filter((m) => m.kind === "mon") }, { name: "Boss", col: "#8a3a3a", list: ms.filter((m) => m.kind === "boss") },
+    { name: "Kỹ năng", col: "#6a8a3a", list: skills }];
+  CLASSES = Object.entries(clsData).filter(([k]) => !k.startsWith("_")).map(([, c]) => c.name);
+  const q = new URLSearchParams(location.search); tab = +(q.get("tab") || 0); sel = +(q.get("sel") || 0); cls = +(q.get("cls") || 0);
+  render();
+})();
+addEventListener("keydown", (ev) => {
+  const n = shown().length, k = ev.key;
+  if (k === "ArrowRight") sel = Math.min(n - 1, sel + 1);
+  else if (k === "ArrowLeft") sel = Math.max(0, sel - 1);
+  else if (k === "ArrowDown") sel = Math.min(n - 1, sel + 5);
+  else if (k === "ArrowUp") sel = Math.max(0, sel - 5);
+  else if ((k === "z" || k === "c") && TABS[tab].name === "Kỹ năng") { cls = (cls + (k === "c" ? 1 : CLASSES.length - 1)) % CLASSES.length; sel = 0; }
+  else if (k === "e" || k === "E") { tab = (tab + 1) % TABS.length; sel = 0; }
+  else if (k === "q" || k === "Q") { tab = (tab + TABS.length - 1) % TABS.length; sel = 0; }
+  else return;
+  ev.preventDefault(); render();
+});
+</script>
+</body>
+</html>

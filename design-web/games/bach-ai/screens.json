@@ -57,21 +57,30 @@
   },
   {
    "id": "album",
-   "title": "Album",
+   "title": "Album (Bách khoa)",
    "spec": "specs/album.md",
    "game_shot": "01n-album.png",
    "views": [
     {
-     "label": "Tab Quái",
-     "page": "screen-album.html",
-     "query": "tab=0",
-     "shot": "album-tab0.png"
+     "label": "Quái",
+     "note": "dải Quái; quái chưa hạ là bóng đen",
+     "page": "screen-album-journal.html",
+     "query": "tab=0&sel=1",
+     "shot": "album-journal-mon.png",
+     "chosen": true
     },
     {
-     "label": "Tab Kỹ năng",
-     "page": "screen-album.html",
-     "query": "tab=2",
-     "shot": "album-tab2.png"
+     "label": "Boss",
+     "page": "screen-album-journal.html",
+     "query": "tab=1&sel=0",
+     "shot": "album-journal-boss.png"
+    },
+    {
+     "label": "Kỹ năng (Cung thủ)",
+     "note": "chia theo lớp, Z / C đổi lớp",
+     "page": "screen-album-journal.html",
+     "query": "tab=2&cls=2&sel=3",
+     "shot": "album-journal-skill.png"
     }
    ]
   }
