@@ -1,0 +1,124 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<title>Sảnh: Trại lửa (hướng A)</title>
+<style>
+@font-face { font-family: "VT323"; src: url("fonts/VT323-Regular.ttf") format("truetype"); font-display: block; }
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { width: 1280px; height: 720px; overflow: hidden; background: #000; font-family: "VT323", monospace; color: #f3e6c8; }
+img { image-rendering: pixelated; }
+#game { position: relative; width: 1280px; height: 720px; overflow: hidden;
+  background: linear-gradient(#0b1030 0%, #1a1c48 38%, #2a2448 55%, #1b2a1c 56%, #14200f 100%); }
+/* stars and treeline */
+.star { position: absolute; width: 3px; height: 3px; background: #fff6c8; }
+.trees { position: absolute; left: 0; right: 0; top: 330px; height: 80px;
+  background: repeating-linear-gradient(90deg, #0d1a12 0 40px, #102016 40px 72px);
+  clip-path: polygon(0 60%, 3% 20%, 6% 55%, 9% 10%, 12% 50%, 15% 25%, 18% 60%, 21% 15%, 24% 45%, 27% 5%, 30% 50%, 33% 22%,
+    36% 58%, 39% 12%, 42% 48%, 45% 20%, 48% 55%, 51% 8%, 54% 50%, 57% 25%, 60% 60%, 63% 15%, 66% 45%, 69% 10%, 72% 52%,
+    75% 20%, 78% 58%, 81% 12%, 84% 48%, 87% 22%, 90% 55%, 93% 10%, 96% 50%, 100% 25%, 100% 100%, 0 100%); }
+.moon { position: absolute; left: 1040px; top: 70px; width: 56px; height: 56px; border-radius: 50%; background: #f3e6c8;
+  box-shadow: inset -12px -6px 0 #d8c8a0, 0 0 0 8px #f3e6c814; }
+/* fire glow on the ground */
+.glow { position: absolute; left: 640px; top: 520px; width: 760px; height: 300px; transform: translate(-50%, -50%);
+  background: radial-gradient(ellipse at center, #ff9a2a40 0%, #ff9a2a18 35%, transparent 70%); animation: glow 1.4s steps(4) infinite; }
+@keyframes glow { 50% { opacity: .75; } }
+/* the fire */
+.fire { position: absolute; left: 616px; top: 452px; width: 48px; height: 64px; }
+.fire i { position: absolute; bottom: 12px; background: #d9361e; }
+.fire i:nth-child(1) { left: 8px; width: 32px; height: 36px; animation: f1 .5s steps(2) infinite; }
+.fire i:nth-child(2) { left: 14px; width: 20px; height: 48px; background: #ff9a2a; animation: f2 .4s steps(2) infinite; }
+.fire i:nth-child(3) { left: 20px; width: 8px; height: 28px; background: #fff2a0; animation: f1 .3s steps(2) infinite; }
+.fire b { position: absolute; bottom: 0; height: 12px; background: #5a3618; }
+.fire b:nth-of-type(1) { left: -6px; width: 60px; transform: rotate(8deg); }
+.fire b:nth-of-type(2) { left: -6px; width: 60px; transform: rotate(-8deg); background: #6a4020; }
+@keyframes f1 { 50% { height: 30px; } }
+@keyframes f2 { 50% { height: 54px; } }
+.hero { position: absolute; left: 470px; top: 372px; width: 192px; height: 192px; }
+/* the props */
+.prop { position: absolute; width: 150px; text-align: center; cursor: pointer; }
+.prop .art { width: 96px; height: 96px; margin: 0 auto; padding: 12px; background: #2a1e14; border: 4px solid #5a3e24;
+  box-shadow: inset 0 0 0 4px #3e2a18, 0 6px 0 #0006; }
+.prop .art img { width: 64px; height: 64px; }
+.prop .post { width: 12px; height: 34px; margin: 0 auto; background: #4a3220; border-left: 4px solid #6a4a2c; }
+.prop .name { margin-top: 4px; font-size: 24px; color: #c8b48a; text-shadow: 2px 2px 0 #000; }
+.prop.on .art { border-color: #ffd36b; box-shadow: inset 0 0 0 4px #8a6a2a, 0 0 0 4px #000, 0 0 24px 6px #ff9a2a88; transform: translateY(-8px); }
+.prop.on .name { color: #fff2a0; }
+.prop.main .art { background: #5a1a14; border-color: #c0402e; }
+.prop.main.on .art { background: #7a2418; border-color: #fff2a0; }
+/* the sign that explains the chosen prop */
+.sign { position: absolute; left: 340px; top: 600px; width: 600px; height: 96px; padding: 10px 18px;
+  background: #3a2818; border: 4px solid #6a4a2c; box-shadow: inset 0 0 0 4px #2a1c10, 0 6px 0 #0008; }
+.sign h2 { font-size: 34px; font-weight: normal; color: #ffd36b; line-height: 1; }
+.sign p { font-size: 22px; color: #e0d0a8; line-height: 1.05; margin-top: 4px; }
+.sign .key { position: absolute; right: 14px; top: 10px; font-size: 22px; color: #a89070; }
+/* hero tag on the left, wallet on the right: small, not a panel */
+.tag { position: absolute; left: 24px; top: 20px; }
+.tag h1 { font-size: 46px; font-weight: normal; color: #f3e6c8; line-height: 1; text-shadow: 3px 3px 0 #000; }
+.tag .cls { font-size: 24px; color: #ff8a6a; text-shadow: 2px 2px 0 #000; }
+.tag .st { display: flex; gap: 14px; margin-top: 6px; font-size: 24px; text-shadow: 2px 2px 0 #000; }
+.tag .st img { width: 20px; height: 20px; vertical-align: -3px; }
+.wallet { position: absolute; right: 24px; top: 20px; display: flex; gap: 18px; font-size: 28px; text-shadow: 2px 2px 0 #000; }
+.wallet img { width: 24px; height: 24px; vertical-align: -4px; }
+.hint { position: absolute; left: 24px; bottom: 10px; font-size: 20px; color: #8a8070; }
+</style>
+</head>
+<body>
+<div id="game">
+  <div class="moon"></div>
+  <div class="trees"></div>
+  <div class="glow"></div>
+  <img class="hero" src="assets/lobby/knight.png" alt="">
+  <div class="fire"><i></i><i></i><i></i><b></b><b></b></div>
+  <div class="tag">
+    <h1>Nhân vật 1</h1>
+    <div class="cls">Kiếm sĩ · Ải 10</div>
+    <div class="st"><span><img src="assets/lobby/heart.png">118</span><span><img src="assets/lobby/sword.png">20</span>
+      <span><img src="assets/lobby/boot.png">158</span></div>
+  </div>
+  <div class="wallet"><span><img src="assets/lobby/coin.png"> 545</span><span><img src="assets/lobby/gem.png"> 142</span></div>
+  <div id="props"></div>
+  <div class="sign"><span class="key">← → chọn · Enter</span><h2 id="sn"></h2><p id="sd"></p></div>
+  <div class="hint">Esc: đổi nhân vật</div>
+</div>
+<script>
+const P = [
+  ["equip", "Lều: Trang bị", "Thay mũ, áo, giày, vũ khí, khiên; cường hoá đồ.", 120, 270],
+  ["tree", "Cây cổ thụ: Cây kỹ năng", "Điểm kỹ năng mở chỉ số lâu dài cho nhân vật này.", 290, 190],
+  ["deck", "Bàn bài: Bộ thẻ", "Chọn thẻ mang vào trận.", 820, 190],
+  ["gacha", "Đền đá: Quay đồ", "Dùng đá quay trang bị hiếm.", 990, 270],
+  ["missions", "Bảng tin: Nhiệm vụ", "Việc trong ngày, nhận thưởng.", 1100, 430],
+  ["settings", "Rương: Cài đặt", "Âm thanh, hiệu ứng, phím.", 20, 430],
+  ["stages", "Bàn bản đồ: Lên đường", "Chọn ải tiếp theo (Ải 11) rồi vào trận.", 700, 330, true],
+];
+let sel = P.length - 1;
+const box = document.getElementById("props");
+P.forEach(([id, n, d, x, y, main], i) => {
+  const e = document.createElement("div");
+  e.className = "prop" + (main ? " main" : "");
+  e.style.left = x + "px"; e.style.top = y + "px";
+  e.innerHTML = `<div class="art"><img src="assets/lobby/${id}.png"></div><div class="post"></div><div class="name">${n.split(": ")[1]}</div>`;
+  e.onclick = () => { sel = i; draw(); };
+  box.appendChild(e);
+});
+function draw() {
+  [...box.children].forEach((e, i) => e.classList.toggle("on", i === sel));
+  document.getElementById("sn").textContent = P[sel][1];
+  document.getElementById("sd").textContent = P[sel][2];
+}
+addEventListener("keydown", (ev) => {
+  if (ev.key === "ArrowRight" || ev.key === "d") sel = (sel + 1) % P.length;
+  if (ev.key === "ArrowLeft" || ev.key === "a") sel = (sel + P.length - 1) % P.length;
+  draw();
+});
+for (let k = 0; k < 40; k++) {
+  const s = document.createElement("div"); s.className = "star";
+  const x = k * 97 % 1280, y = k * 53 % 300;
+  if (x < 300 && y < 140 || x > 1060 && y < 60) continue;   // keep the text corners clear
+  s.style.left = x + "px"; s.style.top = y + "px";
+  document.getElementById("game").prepend(s);
+}
+draw();
+</script>
+</body>
+</html>

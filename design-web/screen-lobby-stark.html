@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<title>Sảnh: Danh sách tối giản (hướng C)</title>
+<style>
+@font-face { font-family: "VT323"; src: url("fonts/VT323-Regular.ttf") format("truetype"); font-display: block; }
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { width: 1280px; height: 720px; overflow: hidden; background: #000; font-family: "VT323", monospace; color: #d8d0c8; }
+img { image-rendering: pixelated; }
+#game { position: relative; width: 1280px; height: 720px; overflow: hidden;
+  background: radial-gradient(ellipse 520px 560px at 900px 420px, #3a0c10 0%, #1a0608 45%, #070405 100%); }
+/* the hero, lit from below in crimson */
+.hero { position: absolute; left: 700px; top: 150px; width: 384px; height: 384px; filter: drop-shadow(0 0 18px #c0283a66); }
+.floor { position: absolute; left: 720px; top: 500px; width: 340px; height: 40px; border-radius: 50%; background: #c0283a33; }
+.name { position: absolute; left: 700px; top: 560px; width: 384px; text-align: center; }
+.name h1 { font-size: 48px; font-weight: normal; letter-spacing: 4px; color: #f0e8e0; }
+.name div { font-size: 24px; color: #c0283a; letter-spacing: 3px; }
+.line { position: absolute; left: 700px; top: 642px; width: 384px; display: flex; justify-content: space-between; font-size: 24px; color: #a09890; }
+.line img { width: 20px; height: 20px; vertical-align: -3px; margin-right: 4px; }
+/* the list */
+.menu { position: absolute; left: 80px; top: 110px; }
+.item { position: relative; font-size: 46px; letter-spacing: 3px; color: #6a5e58; padding: 2px 0 2px 34px; cursor: pointer; line-height: 1.05; }
+.item.on { color: #f0e8e0; }
+.item.on::before { content: ""; position: absolute; left: 0; top: 14px; width: 18px; height: 26px; background: #c0283a; }
+.item .d { display: none; font-size: 22px; letter-spacing: 1px; color: #a09890; margin: 0 0 6px; }
+.item.on .d { display: block; }
+.item.go { color: #8a2a30; }
+.item.go.on { color: #ff5a5a; }
+.top { position: absolute; left: 80px; top: 36px; font-size: 26px; letter-spacing: 6px; color: #6a5e58; }
+.wallet { position: absolute; right: 40px; top: 32px; display: flex; gap: 22px; font-size: 28px; }
+.wallet img { width: 24px; height: 24px; vertical-align: -4px; }
+.hint { position: absolute; left: 80px; bottom: 20px; font-size: 20px; color: #5a5048; letter-spacing: 1px; }
+</style>
+</head>
+<body>
+<div id="game">
+  <div class="top">BÁCH ẢI · CHUẨN BỊ</div>
+  <div class="wallet"><span><img src="assets/lobby/coin.png"> 545</span><span><img src="assets/lobby/gem.png"> 142</span></div>
+  <div class="floor"></div>
+  <img class="hero" src="assets/lobby/knight.png" alt="">
+  <div class="name"><h1>NHÂN VẬT 1</h1><div>KIẾM SĨ · ẢI 10</div></div>
+  <div class="line"><span><img src="assets/lobby/heart.png">118</span><span><img src="assets/lobby/sword.png">20</span>
+    <span><img src="assets/lobby/boot.png">158</span><span><img src="assets/lobby/star.png">5%</span></div>
+  <div class="menu" id="menu"></div>
+  <div class="hint">↑ ↓ chọn · Enter · Esc đổi nhân vật</div>
+</div>
+<script>
+const M = [
+  ["LÊN ĐƯỜNG", "Chọn Ải 11 rồi vào trận.", true],
+  ["TRANG BỊ", "Mũ, áo, giày, vũ khí, khiên; cường hoá."],
+  ["CÂY KỸ NĂNG", "Chỉ số lâu dài cho nhân vật."],
+  ["BỘ THẺ", "Thẻ mang vào trận."],
+  ["QUAY ĐỒ", "Dùng đá quay trang bị hiếm."],
+  ["NHIỆM VỤ", "Việc trong ngày."],
+  ["CÀI ĐẶT", "Âm thanh, hiệu ứng, phím."],
+];
+let sel = 0;
+const menu = document.getElementById("menu");
+M.forEach(([n, d, go], i) => {
+  const e = document.createElement("div"); e.className = "item" + (go ? " go" : "");
+  e.innerHTML = `${n}<div class="d">${d}</div>`;
+  e.onclick = () => { sel = i; draw(); };
+  menu.appendChild(e);
+});
+function draw() { [...menu.children].forEach((e, i) => e.classList.toggle("on", i === sel)); }
+addEventListener("keydown", (ev) => {
+  if (ev.key === "ArrowDown" || ev.key === "s") sel = (sel + 1) % M.length;
+  if (ev.key === "ArrowUp" || ev.key === "w") sel = (sel + M.length - 1) % M.length;
+  draw();
+});
+draw();
+</script>
+</body>
+</html>
