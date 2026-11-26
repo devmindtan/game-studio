@@ -1,0 +1,37 @@
+{
+  "frames": 8,
+  "frame_size": [
+    96,
+    96
+  ],
+  "fps": 14.0,
+  "loop": true,
+  "anchor": [
+    48.0,
+    48.0
+  ],
+  "anchor_source": "explicit",
+  "animations": [
+    {
+      "name": "spin",
+      "start": 0,
+      "frames": 8,
+      "fps": 14.0,
+      "loop": true,
+      "hitbox": {
+        "shape": "circle",
+        "center": [
+          48.0,
+          48.0
+        ],
+        "active": [
+          0,
+          7
+        ],
+        "radius": 42.0,
+        "inner": 30.0
+      }
+    }
+  ],
+  "px_scale": 0.5
+}
