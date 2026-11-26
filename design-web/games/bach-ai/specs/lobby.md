@@ -31,4 +31,4 @@ Người dùng 2026-11-26: thiết kế lại giao diện sảnh và menu, "thi�
 | C. Tối giản | `screen-lobby-stark.html` | nền đen đỏ thẫm, danh sách chữ lớn bên trái (mục chọn sáng lên, có một dòng mô tả), nhân vật to được chiếu sáng bên phải |
 
 Cả ba bỏ: panel xanh đen viền vàng, hàng nút icon góc phải trên, bệ rune.
-Bước kế: người dùng chọn hướng → áp cho các màn menu còn lại → port sang Godot → `gamekit ui-shots`.
+**Đã chọn: B "Sổ hành trình"** (người dùng xem trong Design Lab, 2026-11-26); đã port sang `games/bach-ai/src/lobby/lobby.gd`. Bước kế: áp phong cách sổ cho các menu còn lại, mỗi màn duyệt trên web trước.
