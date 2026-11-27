@@ -96,7 +96,7 @@ addEventListener("keydown", (ev) => {
   } else if (view === "milestone") {
     const R = ["sp_aegis_boots", "sp_aegis_gauntlets", "sp_aegis_helm", "sp_aegis_blade"].map((id) => U(id) || { id, name: id, desc: "" }).filter(Boolean);
     Journal.list(() => R.length, (sel) => {
-      $("over").innerHTML = `<div class="dim"></div><div class="sheet" style="top:110px;height:500px"><h1 style="text-align:center">Mốc cấp 10</h1>
+      $("over").innerHTML = `<div class="dim"></div><div class="sheet" style="top:110px;height:500px"><h1 style="text-align:center">Mốc cấp 7</h1>
         <div class="sub" style="text-align:center">Chọn một phần thưởng đặc biệt cho trận này</div>
         <div class="rewards">${R.map((u, i) => `<div class="rw ${i === sel ? "on" : ""}"><span class="stamp">Đặc biệt</span>
           <div style="width:88px;margin:0 auto">${icon(u.id, 88)}</div><h3>${u.name}</h3><p>${u.desc}</p></div>`).join("")}</div></div>`;

@@ -213,7 +213,7 @@
      "shot": "hud-boss.png"
     },
     {
-     "label": "Mốc cấp 10/20/30",
+     "label": "Mốc cấp 7/14/21",
      "page": "screen-hud-journal.html",
      "query": "view=milestone",
      "shot": "hud-milestone.png"
