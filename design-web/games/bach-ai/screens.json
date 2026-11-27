@@ -331,6 +331,13 @@
      "query": "view=extra",
      "shot": "tree-extra.png",
      "note": "phần game có mà bản web chưa có"
+    },
+    {
+     "label": "Đề xuất: hiện rõ giá Tinh hoa",
+     "page": "screen-tree-journal.html",
+     "query": "view=cost",
+     "shot": "tree-cost.png",
+     "note": "ví Tinh hoa góc trang, giá từng hàng cạnh cây, nút Học ghi −giá, báo thiếu, nguồn Tinh hoa"
     }
    ]
   },

@@ -11,22 +11,31 @@
 .node img { width: 40px; height: 40px; image-rendering: auto; }
 .node.got { background: #c88a7a; }
 .node .rk { position: absolute; right: -6px; bottom: -8px; font-size: 18px; background: var(--paper); border: 2px solid var(--ink); padding: 0 3px; line-height: 1; }
-.node.on img { filter: invert(1) sepia(1) saturate(3) hue-rotate(5deg); }
+.node.on > img { filter: invert(1) sepia(1) saturate(3) hue-rotate(5deg); }
 .xlink { font-size: 20px; color: var(--ink-red); border-bottom: 2px solid var(--ink-red); margin-right: 18px; }
+/* ?view=cost (user 2026-11-27: "nâng cấp mà không biết tiêu hao nằm ở đâu"): Tinh hoa shown with its icon everywhere */
+.ei { width: 22px; height: 22px; image-rendering: pixelated; vertical-align: -4px; }
+.purse { position: absolute; right: 36px; top: 30px; font-size: 26px; border: 3px solid var(--ink); background: #ddcca0; padding: 2px 10px; }
+.node .pc { position: absolute; left: -8px; top: -10px; font-size: 18px; background: var(--paper); border: 2px solid var(--ink-red); color: var(--ink-red); padding: 0 3px 0 1px; line-height: 1; white-space: nowrap; }
+.node .pc img { width: 14px; height: 14px; vertical-align: -2px; image-rendering: pixelated; }
+.seal small { font-size: 22px; }
+.short { position: absolute; right: 40px; bottom: 100px; font-size: 20px; color: var(--ink-red); }
+.where { font-size: 19px; margin-top: 10px; }
 </style>
 </head>
 <body>
 <div id="game">
   <div class="book">
     <div class="cover"></div>
-    <div class="page l"><h1>Cây kỹ năng</h1><div class="sub">Kiếm sĩ · mỗi hàng đắt hơn hàng trên</div><div id="tree"></div></div>
+    <div class="page l"><div class="purse" id="purse" hidden></div><h1>Cây kỹ năng</h1><div class="sub">Kiếm sĩ · mỗi hàng đắt hơn hàng trên</div><div id="tree"></div></div>
     <div class="page r" id="right"></div>
   </div>
   <div class="hint">←↑↓→ chọn nút · Enter học · Esc về sổ</div>
 </div>
 <script src="journal.js"></script>
 <script>
-const EXTRA = new URLSearchParams(location.search).get("view") === "extra";   // proposal 2026-11-26: the game features the page lacked
+const VIEW = new URLSearchParams(location.search).get("view"), EXTRA = VIEW === "extra" || VIEW === "cost", COST = VIEW === "cost", HAVE = COST ? 5 : 18;
+const EI = `<img class="ei" src="${Journal.SP}essence-pickup/essence-pickup.png">`;   // proposal 2026-11-26: the game features the page lacked
 let T, N = [], sel = 0;
 const rank = { k_root: 3, k_b0_1: 2, k_b1_1: 1 };   // a sample save
 const $ = (id) => document.getElementById(id);
@@ -35,16 +44,19 @@ function draw() {
   const lines = N.flatMap((n) => (n.requires || []).map((r) => { const p = N.find((x) => x.id === r); const [x1, y1] = at(p), [x2, y2] = at(n);
     return `<line x1="${x1 + 32}" y1="${y1 + 32}" x2="${x2 + 32}" y2="${y2 + 32}" stroke="#3a2414" stroke-width="3" stroke-dasharray="${rank[r] ? "0" : "6 6"}"/>`; })).join("");
   $("tree").innerHTML = `<svg class="lines" width="500" height="520">${lines}</svg>` + N.map((n, i) => { const [x, y] = at(n);
-    return `<div class="node sketch ${rank[n.id] ? "got" : ""} ${i === sel ? "on" : ""}" style="left:${x}px;top:${y}px"><img src="${Journal.G}icons/tree/${n.vicon || "anvil"}.svg"><span class="rk">${rank[n.id] || 0}/${n.max_rank}</span></div>`; }).join("");
-  const n = N[sel], cost = T.row_cost[n.row], ok = (n.requires || []).every((r) => rank[r]);
+    return `<div class="node sketch ${rank[n.id] ? "got" : ""} ${i === sel ? "on" : ""}" style="left:${x}px;top:${y}px"><img src="${Journal.G}icons/tree/${n.vicon || "anvil"}.svg"><span class="rk">${rank[n.id] || 0}/${n.max_rank}</span>${COST && (rank[n.id] || 0) < n.max_rank ? `<span class="pc"><img src="${Journal.SP}essence-pickup/essence-pickup.png">${T.row_cost[n.row]}</span>` : ""}</div>`; }).join("");
+  const n = N[sel], cost = T.row_cost[n.row], full = (rank[n.id] || 0) >= n.max_rank, ok = !full && (n.requires || []).every((r) => rank[r]);
   $("right").innerHTML = `<h2>${n.name}</h2><div class="sub">Hàng ${n.row + 1} · cấp ${rank[n.id] || 0}/${n.max_rank}</div>
     <p style="font-size:24px;margin:10px 0">${n.desc}</p>
-    <div class="ledger"><span>Giá mỗi cấp</span><span>${cost} Tinh hoa</span></div><div class="ledger"><span>Tinh hoa đang có</span><span>18</span></div>
+    ${COST && full ? `<div class="ledger"><span>${EI} Giá</span><span>đã đủ cấp</span></div>` : COST ? `<div class="ledger"><span>${EI} Giá cấp ${(rank[n.id] || 0) + 1}</span><span>${cost} Tinh hoa</span></div><div class="ledger"><span>${EI} Đang có</span><span>${HAVE} → ${HAVE - cost >= 0 ? HAVE - cost : "thiếu " + (cost - HAVE)}</span></div>` :
+    `<div class="ledger"><span>Giá mỗi cấp</span><span>${cost} Tinh hoa</span></div><div class="ledger"><span>Tinh hoa đang có</span><span>18</span></div>`}
     <div class="ledger"><span>Cần</span><span>${(n.requires || []).map((r) => N.find((x) => x.id === r).name).join(", ") || "—"}</span></div>
     <p class="muted" style="font-size:20px;margin-top:12px">Tẩy tuỷ: 1 Tẩy Tủy Đan + vàng, trả lại mọi Tinh hoa.</p>${EXTRA ? `<span class="xlink">Tẩy tuỷ ▸ (R) · 1 Tẩy Tủy Đan + 60 vàng</span>` : ""}
-    <div class="seal ${ok ? "on" : ""}" style="right:40px;bottom:30px;width:220px;height:62px;line-height:54px;${ok ? "" : "opacity:.5"}">Học ▶</div>`;
+    ${COST ? `<p class="where muted">Tinh hoa: quái tinh anh rơi 1, trùm rơi 10; nhặt được giữ lại cả khi thua.</p>` : ""}
+    ${COST && !full && HAVE < cost ? `<div class="short">Thiếu ${cost - HAVE} Tinh hoa</div>` : ""}
+    <div class="seal ${ok && (!COST || HAVE >= cost) ? "on" : ""}" style="right:40px;bottom:30px;width:${COST ? 260 : 220}px;height:62px;line-height:54px;${ok && (!COST || HAVE >= cost) ? "" : "opacity:.5"}">Học ▶${COST && !full ? ` <small>−${cost}</small> ${EI}` : ""}</div>`;
 }
-(async () => { T = await Journal.json("data/skill_tree.json"); N = T.classes.knight; draw(); })();
+(async () => { T = await Journal.json("data/skill_tree.json"); N = T.classes.knight; if (COST) { $("purse").hidden = false; $("purse").innerHTML = `${EI} ${HAVE}`; } if (COST) sel = N.findIndex((x) => x.id === "k_b0_1"); draw(); })();
 addEventListener("keydown", (ev) => {
   const n = N[sel]; let best = -1, bd = 1e9;
   const dir = { ArrowRight: [1, 0], ArrowLeft: [-1, 0], ArrowDown: [0, 1], ArrowUp: [0, -1] }[ev.key];
