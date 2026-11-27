@@ -21,6 +21,15 @@
 .cls .sketch b { font-weight: normal; font-size: 24px; }
 .cls .sketch.on { color: var(--paper); }
 .cls .stamp { position: absolute; top: 40px; color: var(--ink-red); background: #e8d8b0cc; font-size: 20px; }
+/* ?view=full: everything the game's page shows (gear, three stats, the passive's words, rename / delete, a broken save) */
+.full .portrait { width: 132px; height: 132px; margin: 0 auto 6px; } .full .portrait img { width: 116px; height: 116px; }
+.full h1 { font-size: 34px; line-height: 1; }
+.gear { display: flex; gap: 6px; justify-content: center; margin: 6px 0 4px; } .gear i { width: 34px; height: 34px; border: 3px solid var(--ink); background: #d8c498; display: grid; place-items: center; }
+.gear img { width: 26px; height: 26px; image-rendering: pixelated; }
+.full .ledger { font-size: 21px; padding: 0; }
+.passive { font-size: 17px; margin-top: 6px; line-height: 1.1; } .passive b { font-weight: normal; color: var(--ink-red); font-size: 20px; }
+.links { margin-top: 10px; display: flex; gap: 22px; font-size: 22px; } .links span { color: var(--ink-red); text-decoration: underline; text-underline-offset: 3px; }
+.row.bad { color: var(--ink-red); font-size: 20px; height: 44px; cursor: default; }
 .nameline { margin-top: 16px; font-size: 26px; border-bottom: 3px solid var(--ink); padding: 0 4px; }
 </style>
 </head>
@@ -28,7 +37,7 @@
 <div id="game">
   <div class="book">
     <div class="cover"></div>
-    <div class="page l"><h1>Các cuốn sổ</h1><div class="sub">Mỗi nhân vật một cuốn sổ riêng: túi đồ, tiến độ, vàng, đá</div>
+    <div class="page l"><h1>Các cuốn sổ</h1><div class="sub" id="lead">Mỗi nhân vật một cuốn sổ riêng: túi đồ, tiến độ, vàng, đá</div>
       <div id="rows" style="margin-top:12px"></div></div>
     <div class="page r" id="right"></div>
   </div>
@@ -37,18 +46,34 @@
 <script src="journal.js"></script>
 <script>
 const SAVES = [["Nhân vật 1", "knight", 10], ["Lam Vân", "mage", 3]];
+const FULL = new URLSearchParams(location.search).get("view") === "full";
 let CLS = [], UNL = {}, mode = new URLSearchParams(location.search).get("mode") === "create" ? "create" : "list", pick = 0;
 const SPRITE = { knight: "knight", mage: "wizard", archer: "bowman", assassin: "assassin" };
 const $ = (id) => document.getElementById(id);
 function drawRows(sel) {
   $("rows").innerHTML = SAVES.map(([n, c, b], i) => `<div class="row ${i === sel ? "on" : ""}"><img src="${Journal.SP}${SPRITE[c]}/${SPRITE[c]}.png">
     <div><b>${n}</b><small>${CLS.find((x) => x.id === c)?.name || c} · đã qua Ải ${b}</small></div></div>`).join("") +
+    (FULL ? `<div class="row bad">Không đọc được (file hỏng)</div>` : "") +
     `<div class="row new ${sel === SAVES.length ? "on" : ""}">+ Viết sổ mới</div>`;
   mode = sel === SAVES.length ? "create" : "list";
   drawRight(sel);
 }
 function drawRight(sel) {
-  if (mode === "list") {
+  if (mode === "list" && FULL) {
+    const [n, c, b] = SAVES[sel], cd = CLS.find((x) => x.id === c) || {}, st = cd.stats || {};
+    const G = [1, 0, 8, 0, 0];   // gear-icons frames: steel helm, (empty), iron boots
+    $("right").className = "page r full";
+    $("right").innerHTML = `<div class="portrait"><img src="${Journal.SP}${SPRITE[c]}/${SPRITE[c]}.png"></div>
+      <h1 style="text-align:center">${n}</h1><div class="sub" style="text-align:center;font-size:19px">${cd.name} · ${(cd.role || "").toLowerCase()}</div>
+      <div class="gear">${G.map((g) => `<i>${g ? `<span style="width:24px;height:24px;background:url(${Journal.SP}gear-icons/gear-icons_strip.png) ${-g * 24}px 0;image-rendering:pixelated;display:block;transform:none"></span>` : ""}</i>`).join("")}</div>
+      <div class="ledger"><span>Ải cao nhất</span><span>${b}</span></div><div class="ledger"><span>Vàng</span><span>545</span></div>
+      <div class="ledger"><span>Đá</span><span>142</span></div><div class="ledger"><span>Máu</span><span>${st.max_hp || 118}</span></div>
+      <div class="ledger"><span>Sát thương</span><span>${st.damage || 20}</span></div><div class="ledger"><span>Tốc độ chạy</span><span>${st.move_speed || 158}</span></div>
+      <div class="passive"><b>Nội tại: ${cd.passive?.name || ""}.</b> ${cd.passive?.desc || ""}</div>
+      <div class="links"><span>Đổi tên (R)</span><span>Xóa sổ (Del)</span></div>
+      <div class="seal on" style="right:40px;bottom:30px;width:260px;height:66px;line-height:58px">Dùng sổ này ▶</div>`;
+  } else if (mode === "list") {
+    $("right").className = "page r";
     const [n, c, b] = SAVES[sel], cd = CLS.find((x) => x.id === c) || {};
     $("right").innerHTML = `<div class="portrait"><img src="${Journal.SP}${SPRITE[c]}/${SPRITE[c]}.png"></div>
       <h1 style="text-align:center">${n}</h1><div class="sub" style="text-align:center">${cd.name} · ${(cd.role || "").toLowerCase()}</div>
@@ -56,6 +81,7 @@ function drawRight(sel) {
       <div class="ledger"><span>Đá</span><span>142</span></div><div class="ledger"><span>Nội tại</span><span>${cd.passive?.name || ""}</span></div>
       <div class="seal on" style="right:40px;bottom:30px;width:260px;height:66px;line-height:58px">Dùng sổ này ▶</div>`;
   } else {
+    $("right").className = "page r";
     const best = Math.max(...SAVES.map((s) => s[2]));
     $("right").innerHTML = `<h2>Viết sổ mới</h2><div class="sub">Chọn lớp (gắn với nhân vật, không đổi được)</div>
       <div class="cls">${CLS.map((c, i) => { const need = UNL["class_" + c.id] || 0, lock = best < need;
@@ -66,6 +92,7 @@ function drawRight(sel) {
 }
 (async () => {
   const [c, u] = await Promise.all([Journal.json("data/classes.json"), Journal.json("data/unlocks.json")]);
+  if (FULL) $("lead").textContent += " (tối đa 4)";
   CLS = Object.entries(c).filter(([k]) => !k.startsWith("_")).map(([id, v]) => ({ id, ...v })); UNL = u;
   const l = Journal.list(() => SAVES.length + 1, drawRows, (i) => Journal.go("lobby"));
   l.set(mode === "create" ? SAVES.length : 0);

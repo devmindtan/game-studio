@@ -106,6 +106,13 @@
      "page": "screen-characters-journal.html",
      "shot": "chars-create.png",
      "query": "mode=create"
+    },
+    {
+     "label": "Danh sách (đủ thông tin)",
+     "page": "screen-characters-journal.html",
+     "query": "view=full",
+     "shot": "chars-list-full.png",
+     "note": "trang bị, Máu/Sát thương/Tốc độ, lời nội tại, Đổi tên/Xóa sổ, sổ hỏng"
     }
    ]
   },
