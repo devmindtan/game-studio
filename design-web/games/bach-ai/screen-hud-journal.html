@@ -52,6 +52,25 @@
 .bf { border-bottom: 2px dotted var(--dots); padding: 3px 0; font-size: 15px; } .bf b { font-weight: normal; font-size: 19px; color: var(--ink); }
 .c3 .scrollcol { overflow: hidden; padding-right: 18px; position: relative; }
 .c3 .more { position: absolute; right: 18px; bottom: 0; font-size: 15px; color: var(--ink-red); background: var(--paper); padding-left: 6px; }
+/* compact HUD directions (user 2026-11-27: "mấy cái bảng khá chiếm chỗ"): A edge strips, B one corner card, C no frames */
+.cA .slip, .cB .slip, .cC .slip, .cA .skills, .cB .skills, .cC .skills { display: none; }
+.ol { color: #f3e6c8; text-shadow: 2px 0 0 #000, -2px 0 0 #000, 0 2px 0 #000, 0 -2px 0 #000; }
+.hb { position: absolute; }
+.xpline { left: 0; top: 0; width: 1280px; height: 8px; background: #1a1208; border-bottom: 2px solid #000; } .xpline i { display: block; height: 100%; background: #6a9ad8; }
+.aL { left: 12px; top: 14px; font-size: 22px; } .aL .bar { width: 220px; height: 18px; margin-top: 2px; background: #1a1208; } .aL .bar span { font-size: 18px; top: -4px; }
+.aC { left: 0; width: 1280px; top: 12px; text-align: center; font-size: 30px; line-height: 1; } .aC small { font-size: 18px; }
+.aR { right: 12px; top: 14px; font-size: 22px; display: flex; gap: 12px; } .aR img, .bC img { width: 18px; height: 18px; vertical-align: -2px; }
+.ski { display: flex; gap: 4px; } .ski .sk { width: 40px; height: 40px; border: 2px solid #000; background: #3a2414cc; position: relative; display: grid; place-items: center; }
+.ski .cd { position: absolute; left: 0; right: 0; bottom: 0; background: #000a; } .ski .t { position: absolute; inset: 0; display: grid; place-items: center; font-size: 18px; }
+.aS { left: 50%; bottom: 8px; transform: translateX(-50%); }
+.bCard { left: 12px; top: 12px; width: 236px; background: #e8d8b0e6; border: 3px solid var(--edge); padding: 4px 8px 6px; font-size: 20px; line-height: 1; }
+.bCard .r { display: flex; justify-content: space-between; } .bCard .bar { height: 18px; border-width: 2px; margin-top: 3px; } .bCard .bar span { font-size: 18px; top: -3px; }
+.bCard .xp { height: 5px; }
+.bS { left: 12px; bottom: 10px; flex-direction: column-reverse; } .bS .sk { border-color: var(--edge); background: #e8d8b0e6; }
+.cTop { left: 12px; top: 10px; font-size: 22px; } .cTop .row2 { display: flex; gap: 14px; }
+.chp { position: absolute; left: 616px; top: 430px; width: 80px; height: 8px; border: 2px solid #000; background: #1a1208; } .chp i { display: block; height: 100%; background: #c0283a; }
+.cxp { position: absolute; left: 616px; top: 440px; width: 80px; height: 5px; border: 2px solid #000; border-top: 0; background: #1a1208; } .cxp i { display: block; height: 100%; background: #6a9ad8; }
+.cS { right: 12px; bottom: 10px; } .cS .sk { width: 36px; height: 36px; border-width: 2px; }
 </style>
 </head>
 <body>
@@ -88,7 +107,23 @@ addEventListener("keydown", (ev) => {
   const U = (id) => up.upgrades.find((u) => u.id === id);
   const SK = [["blade_arc", 0, ""], ["whirlwind", 0.6, "3,8"], ["holy_column", 0.25, "1,5"], ["dash", 0, ""]];
   $("skills").innerHTML = SK.map(([id, k, t]) => `<div class="sk">${icon(id, 44)}${k ? `<div class="cd" style="height:${k * 100}%"></div><div class="t">${t}</div>` : ""}</div>`).join("");
+  const SK7 = [...SK, ["earth_strike", 0.4, "2,1"], ["ground_slam", 0, ""], ["arcane_bolt", 0.8, "4,0"]].filter(([id]) => IC[id] !== undefined);
   $("hint").textContent = "H HUD · B trùm · M mốc cấp · C nhân vật · P tạm dừng · L lên cấp · W thắng · F thua";
+  if (view.startsWith("hud-")) {   // compact directions: same data as the HUD view
+    const d = view.slice(4), skl = (cls_, px) => `<div class="hb ski ${cls_}">${SK7.map(([id, k, t]) => `<div class="sk">${icon(id, px)}${k ? `<div class="cd" style="height:${k * 100}%"></div><div class="t ol">${t}</div>` : ""}</div>`).join("")}</div>`;
+    $("game").classList.add("c" + d.toUpperCase());
+    const tally = `<span><img src="assets/lobby/star.png"> 412</span><span><img src="assets/lobby/coin.png"> 18</span>`;
+    if (d === "a") $("over").innerHTML = `<div class="hb xpline"><i style="width:45%"></i></div>
+      <div class="hb aL ol">Nhân vật 1 · Cấp 8<div class="bar"><i style="width:78%;background:#c0283a"></i><span>92 / 118</span></div></div>
+      <div class="hb aC ol">02:41 <small>/ 05:00 · Ải 11</small></div><div class="hb aR ol">${tally}</div>${skl("aS", 32)}`;
+    if (d === "b") $("over").innerHTML = `<div class="hb bCard"><div class="r"><span>Nhân vật 1</span><span style="color:var(--ink-red)">Cấp 8</span></div>
+      <div class="bar"><i style="width:78%;background:#c0283a"></i><span>92 / 118</span></div><div class="bar xp"><i style="width:45%;background:#3a6aaa"></i></div>
+      <div class="r" style="margin-top:4px"><span>02:41 <small class="muted">/ 05:00</small></span><span class="muted">Ải 11</span></div>
+      <div class="r" style="margin-top:3px">${tally}</div></div>${skl("bS", 32)}`;
+    if (d === "c") $("over").innerHTML = `<div class="hb cTop ol"><div>02:41 / 05:00 · Ải 11 · Cấp 8</div><div class="row2">${tally}</div></div>
+      <div class="chp"><i style="width:78%"></i></div><div class="cxp"><i style="width:45%"></i></div>${skl("cS", 28)}`;
+    $("hint").textContent = "";
+  }
   if (view === "boss") {
     $("bossimg").style.display = "block";
     $("over").innerHTML = `<div class="slip boss"><b>Vua Thạch Nhầy</b> <span class="muted" style="font-size:20px">· giai đoạn 2</span>

@@ -63,3 +63,18 @@ màn chơi): trái tên + cấp + máu mực đỏ + thanh kinh nghiệm; giữa
 chiêu phác thảo, chiêu đang hồi tô mực từ dưới lên theo phần còn lại + số giây. Trùm: một băng giấy dưới đồng hồ, tên
 mực đỏ, giai đoạn, thanh máu đỏ thẫm. Mốc cấp: tờ sổ với 4 "trang" phần thưởng dấu "Đặc biệt". Nhân vật (Tab): sổ kẻ chỉ
 số (có Chí mạng, Sát thương chí mạng), chiêu và thẻ chỉ số. Trong mô phỏng: H B M C và P L W F đổi qua lại.
+
+## HUD gọn trong trận (2026-11-27)
+
+Người dùng: "khi vào trận tôi thấy mấy cái bảng khá chiếm chỗ".
+
+### Bản cũ
+Ba mẩu giấy ghim (tên+máu 330×80 trái, đồng hồ 240 giữa, đếm quái/vàng phải) và thanh chiêu ô 60 px giữa đáy: viền giấy che ~100 px trên cùng và ~75 px dưới.
+
+### Tham khảo
+- Vampire Survivors (wikiwand, Steam): XP kẻ ngang hết mép trên, đồng hồ chữ to không khung giữa. Học: một đường mảnh thay khung. Tránh: chữ nhỏ quá. Quyết định: hướng A.
+- Bình luận người chơi survivors-like trên itch.io (itch.io/post/5671685, itch.io/post/14876746): thanh trên to che sân, hàng chiêu dưới bắt mắt nhảy trên↔dưới; đồng hồ không nên thu quá nhỏ. Học: dồn thông tin một chỗ. Quyết định: hướng B (một thẻ góc), C (máu dưới chân nhân vật).
+- Brotato (nhớ từ chơi, không mở lại được): máu/XP là hai thanh trơn góc trái không khung. Quyết định: chữ viền đen trên nền sân ở A và C.
+
+### Hướng
+A dải mép · B một thẻ góc · C máu dưới chân. Chữ ≥ 18 px, thanh máu cao 18 px.

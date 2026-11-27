@@ -214,6 +214,27 @@
      "chosen": true
     },
     {
+     "label": "HUD gọn A: dải mép",
+     "page": "screen-hud-journal.html",
+     "query": "view=hud-a",
+     "shot": "hud-a.png",
+     "note": "không khung; XP kẻ ngang mép trên, chữ viền đen, chiêu 40 px"
+    },
+    {
+     "label": "HUD gọn B: một thẻ góc",
+     "page": "screen-hud-journal.html",
+     "query": "view=hud-b",
+     "shot": "hud-b.png",
+     "note": "mọi thông tin dồn vào một thẻ giấy nhỏ góc trái; chiêu xếp dọc góc trái dưới"
+    },
+    {
+     "label": "HUD gọn C: máu dưới chân",
+     "page": "screen-hud-journal.html",
+     "query": "view=hud-c",
+     "shot": "hud-c.png",
+     "note": "máu/XP dưới nhân vật, chỉ một dòng chữ góc trên, chiêu nhỏ góc phải dưới"
+    },
+    {
      "label": "Thanh máu trùm",
      "page": "screen-hud-journal.html",
      "query": "view=boss",
