@@ -33,7 +33,10 @@ Người dùng 2026-11-26: "bổ sung quy trình thiết kế giao diện trên 
    bằng đường dẫn file (bài học 2026-11-26: người dùng không xem được nên chọn mò, agent port luôn rồi phải hoàn tác).
    Người dùng chưa nói đã xem và chọn thì không port.
 7. **Port** hướng đã chọn sang Godot (`UiKit` / theme của game), `gamekit ui-shots <g> <màn>`, so với ảnh web, soi ×2.
-   **Port = chép đúng bản web**, không tự chế (người dùng 2026-11-26: "trên web đã thiết kế hết rồi mà bạn chế cái gì
+   **Đưa thông tin game lên web: giữ cả icon** (người dùng 2026-11-27: "sao bạn dùng toàn chữ không vậy icon của nó
+   đâu"): dòng nào trong game có icon (ngôi sao, vàng, đá, tim, kiếm, giày, nội tại…) thì bản web cũng có icon đó,
+   lấy từ `design-web/games/<g>/assets/` hoặc sprite của game; trước khi chụp, so từng dòng với ảnh game.
+      **Port = chép đúng bản web**, không tự chế (người dùng 2026-11-26: "trên web đã thiết kế hết rồi mà bạn chế cái gì
    vậy"): cùng bố cục trang, cùng tiêu đề/chữ, cùng loại điều khiển (dải đánh dấu là dải đánh dấu, không đổi thành tab;
    màn hai trang là hai trang, không đổi thành hộp nổi). Trước khi code một màn, mở file `screen-*.html` của nó, liệt kê
    từng khối (trang trái / phải / dải / con dấu / gợi ý phím) rồi làm đủ. Chỗ nào game cần mà web không có (nút của
