@@ -32,10 +32,10 @@
 .sheet::after { content: ""; position: absolute; inset: 10px; border: 2px dashed #b89a6a; pointer-events: none; }
 .rewards { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-top: 14px; }
 .rw { height: 330px; border: 4px solid var(--ink); background: #ddcca0; padding: 12px; position: relative; }
-.rw.on { outline: 5px solid var(--gold); transform: translateY(-6px); }
+.rw.on { outline: 5px solid var(--gold); background: #e8d8b0; }
 .rw h3 { font-weight: normal; font-size: 26px; text-align: center; margin-top: 4px; }
 .rw p { font-size: 19px; line-height: 1.05; margin-top: 6px; }
-.rw .stamp { position: absolute; top: 8px; right: 8px; font-size: 16px; color: #c0801a; }
+.rw .kind { font-size: 16px; color: #c0801a; text-align: center; }   /* under the name, like the game (a corner stamp covered the icon) */
 .cols { display: flex; gap: 36px; margin-top: 8px; } .cols > div { flex: 1; }
 .skrow { display: flex; gap: 10px; align-items: center; font-size: 22px; border-bottom: 2px dotted var(--dots); padding: 2px 0; }
 /* character-full: the game's whole sheet (05c-character) as three journal columns */
@@ -98,8 +98,8 @@ addEventListener("keydown", (ev) => {
     Journal.list(() => R.length, (sel) => {
       $("over").innerHTML = `<div class="dim"></div><div class="sheet" style="top:110px;height:500px"><h1 style="text-align:center">Mốc cấp 7</h1>
         <div class="sub" style="text-align:center">Chọn một phần thưởng đặc biệt cho trận này</div>
-        <div class="rewards">${R.map((u, i) => `<div class="rw ${i === sel ? "on" : ""}"><span class="stamp">Đặc biệt</span>
-          <div style="width:88px;margin:0 auto">${icon(u.id, 88)}</div><h3>${u.name}</h3><p>${u.desc}</p></div>`).join("")}</div></div>`;
+        <div class="rewards">${R.map((u, i) => `<div class="rw ${i === sel ? "on" : ""}">
+          <div style="width:88px;margin:0 auto">${icon(u.id, 88)}</div><h3>${u.name}</h3><div class="kind">Thẻ đặc biệt</div><p>${u.desc}</p></div>`).join("")}</div></div>`;
     }, () => location.search = "?view=hud", true).set(0);
   } else if (view === "character-full") {   // the game's character sheet (05c-character), all of it, on one journal sheet
     const ST = [["Máu tối đa", "128", "gốc 100 · Tầm với +20 · giáp +8"], ["Sát thương", "28", "gốc 20 · Mài kiếm +30% · Ngọc sức mạnh +35% · Ăn mòn −15%"],
