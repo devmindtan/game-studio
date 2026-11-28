@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<title>Cảm giác nút</title>
+<link rel="stylesheet" href="journal.css">
+<style>
+/* user 2026-11-28: "khựng ở đây là các thao tác button... chưa mượt như các game khác, thiếu 1 cái gì đấy".
+   Left page = how the game does it now (style swap only, sound on press only). Right page = proposal:
+   a gold bookmark slides between rows, the row nudges, a paper tick on every move, the seal squashes and bounces,
+   a locked one shakes with a dull thud, a page fades in. Tab switches page, ↑↓ move, Enter presses, R replays the open. */
+.col { position: absolute; top: 120px; width: 420px; display: flex; flex-direction: column; gap: 14px; }
+.row { position: relative; font-size: 30px; padding: 6px 18px; border: 3px solid var(--ink); background: #ddcca0; }
+.row.lock { color: #8a7a60; border-style: dashed; }
+.now .row.on { background: var(--ink); color: var(--gold); outline: 4px solid var(--gold); }
+.new .row { transition: transform 90ms ease-out, background 90ms, color 90ms; }
+.new .row.on { transform: translateX(8px); background: var(--ink); color: var(--gold); }
+.mark { position: absolute; left: -26px; width: 14px; height: 50px; background: var(--gold); border: 3px solid #5a3a10;
+  transition: top 110ms cubic-bezier(.2,.9,.3,1.2); }
+.press { animation: press 170ms ease-out; }
+@keyframes press { 0% { transform: translateX(8px) scale(1); } 30% { transform: translateX(8px) scale(.93, .88); }
+  65% { transform: translateX(8px) scale(1.05, 1.06); } 100% { transform: translateX(8px) scale(1); } }
+.shake { animation: shake 220ms linear; }
+@keyframes shake { 0%,100% { transform: translateX(8px); } 20% { transform: translateX(2px); } 40% { transform: translateX(14px); }
+  60% { transform: translateX(4px); } 80% { transform: translateX(11px); } }
+.ink { position: absolute; inset: 0; pointer-events: none; background: radial-gradient(circle, #ffd36b88 0 30%, transparent 60%); opacity: 0; }
+.press .ink { animation: ink 200ms ease-out; }
+@keyframes ink { 0% { opacity: 1; transform: scale(.3); } 100% { opacity: 0; transform: scale(1.4); } }
+.page.r.open .col > * { animation: rise 160ms ease-out backwards; }
+.page.r.open .col > *:nth-child(2) { animation-delay: 30ms; } .page.r.open .col > *:nth-child(3) { animation-delay: 60ms; }
+.page.r.open .col > *:nth-child(4) { animation-delay: 90ms; } .page.r.open .col > *:nth-child(5) { animation-delay: 120ms; }
+@keyframes rise { from { opacity: 0; transform: translateY(10px); } }
+.new .col { margin-left: 22px; width: 400px; }
+.side { font-size: 22px; color: var(--ink-red); }
+.page.act { outline: 4px solid var(--gold); outline-offset: -4px; }
+</style>
+</head>
+<body>
+<div id="game">
+  <div class="book"><div class="cover"></div>
+    <div class="page l now" id="L"><h1>Bây giờ</h1><div class="side">đổi màu tức thì · chỉ kêu khi bấm</div><div class="col"></div></div>
+    <div class="page r new" id="R"><h1>Đề xuất</h1><div class="side">dấu trượt · tiếng giấy · nút nảy</div><div class="col"><div class="mark"></div></div></div>
+  </div>
+  <div class="hint" id="hint">Tab đổi trang · ↑↓ chọn · Enter bấm · R mở lại trang · chuột cũng được</div>
+</div>
+<script src="journal.js"></script>
+<script>
+const ITEMS = [["Vào trận", 0], ["Túi đồ", 0], ["Cây kỹ năng", 0], ["Ải thử thách", 1], ["Cài đặt", 0]];
+let ac; const A = () => (ac ||= new AudioContext());
+function tone(f, d, type = "square", vol = .08, slide = 0) {
+  const a = A(), o = a.createOscillator(), g = a.createGain(); o.type = type; o.frequency.value = f;
+  if (slide) o.frequency.exponentialRampToValueAtTime(f * slide, a.currentTime + d);
+  g.gain.setValueAtTime(vol, a.currentTime); g.gain.exponentialRampToValueAtTime(.001, a.currentTime + d);
+  o.connect(g).connect(a.destination); o.start(); o.stop(a.currentTime + d);
+}
+const tick = () => tone(1800, .03, "triangle", .05), stamp = () => { tone(220, .09, "square", .07, .5); tone(660, .05, "triangle", .04); },
+  thud = () => tone(110, .14, "sawtooth", .06, .7), click = () => tone(900, .05);
+const sides = { L: { el: L, i: 0, now: true }, R: { el: R, i: 0, now: false } };
+let act = "R";
+for (const k in sides) {
+  const s = sides[k], col = s.el.querySelector(".col");
+  s.rows = ITEMS.map(([t, lock], i) => { const d = document.createElement("div"); d.className = "row" + (lock ? " lock" : "");
+    d.innerHTML = t + (lock ? " (khoá)" : "") + '<i class="ink"></i>'; col.appendChild(d);
+    d.onmouseenter = () => { act = k; focus(i); }; d.onclick = () => { act = k; press(); }; return d; });
+  s.mark = col.querySelector(".mark");
+}
+function paint() { for (const k in sides) { const s = sides[k]; s.el.classList.toggle("act", k === act);
+  s.rows.forEach((r, i) => r.classList.toggle("on", i === s.i)); if (s.mark) s.mark.style.top = s.rows[s.i].offsetTop + "px"; } }
+function focus(i) { const s = sides[act]; if (i === s.i) return; s.i = (i + s.rows.length) % s.rows.length; if (!s.now) tick(); paint(); }
+function press() { const s = sides[act], r = s.rows[s.i], lock = ITEMS[s.i][1];
+  if (s.now) { if (!lock) click(); return; }
+  r.classList.remove("press", "shake"); void r.offsetWidth; r.classList.add(lock ? "shake" : "press"); lock ? thud() : stamp(); }
+addEventListener("keydown", (e) => {
+  if (e.key === "Tab") { e.preventDefault(); act = act === "L" ? "R" : "L"; paint(); }
+  else if (e.key === "ArrowDown") focus(sides[act].i + 1); else if (e.key === "ArrowUp") focus(sides[act].i - 1);
+  else if (e.key === "Enter") press();
+  else if (e.key === "r" || e.key === "R") { R.classList.remove("open"); void R.offsetWidth; R.classList.add("open"); tick(); }
+});
+paint(); R.classList.add("open");
+</script>
+</body>
+</html>

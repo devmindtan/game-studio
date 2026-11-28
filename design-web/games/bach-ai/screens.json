@@ -520,6 +520,19 @@
      "note": "góc phải trên, tự ẩn 2 s"
     }
    ]
+  },
+  {
+   "id": "feel",
+   "title": "Cảm giác nút",
+   "spec": "specs/menus.md",
+   "views": [
+    {
+     "label": "Bây giờ vs đề xuất (bấm thử, có tiếng)",
+     "page": "screen-feel-journal.html",
+     "query": "",
+     "shot": "feel.png"
+    }
+   ]
   }
  ]
 }
