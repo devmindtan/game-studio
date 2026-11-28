@@ -41,3 +41,14 @@ xấu". Đã xoá. Tránh: giấy be, gỗ, font VT323 (game vẽ bằng DejaVu 
 
 Font: DejaVu Sans của game (`design-web/fonts/DejaVuSans.ttf`). Dữ liệu: thẻ thật của 04-level-up (Mài kiếm, Chém kiếm)
 và Đất nứt (Hiếm) của 04b.
+
+## Vòng 3: kiểu tối cũ, làm đẹp (`screen-levelup-polish.html`)
+
+Người dùng 2026-11-28: "tôi vẫn thích theo phong cách cũ trước khi đổi hơn, từ cái đó cải thiện hơn đẹp hơn và hiệu ứng
+mượt hơn", "không phải là tấm giấy mà là trước đó nữa" (màn trước commit 6c5ff68a), "các button cần được thiết kế chỉnh
+chu hơn". Giữ: bố cục (tiêu đề, 2 nút, tỉ lệ, 3 thẻ ngang, 3 nút), thẻ tím tối trên trận, tiêu đề vàng.
+Làm đẹp: dải màu độ hiếm trên đỉnh thẻ và chip độ hiếm; hốc icon 72 px; dấu MỚI; dòng chỉ số kẻ mảnh, số không đổi
+không tô xanh; thẻ khác tối nhẹ (không mờ). Nút: tấm nổi có gờ, nắp phím vàng, tên + dòng phụ, huy hiệu số lượt (hết
+lượt: ổ khoá). Hiệu ứng: tiêu đề rơi vào, thẻ chia lần lượt, thẻ chọn nhô lên, lấy thẻ loé sáng và hai thẻ kia rơi
+xuống, Đổi lật thẻ, nút nhô khi trỏ và nén khi bấm.
+

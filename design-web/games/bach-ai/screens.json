@@ -23,25 +23,35 @@
   },
   {
    "id": "levelup",
-   "title": "Lên cấp: chọn thẻ (thiết kế lại, vòng 2: không giấy)",
+   "title": "Lên cấp: chọn thẻ (kiểu tối trước khi đổi sang giấy, làm đẹp)",
    "spec": "specs/levelup.md",
    "game_shot": "04-level-up.png",
    "views": [
     {
-     "label": "D · Ngọc ấn",
-     "note": "thẻ đá tối, viền và viên ngọc phát sáng theo độ hiếm, một con số lớn; dải chi tiết dưới",
+     "label": "Đề xuất · kiểu tối làm đẹp",
+     "note": "giữ bố cục tối cũ; thẻ có dải độ hiếm, hốc icon lớn, dấu MỚI; nút có nắp phím, dòng phụ, huy hiệu lượt; thẻ chia ra, thẻ chọn nhô lên, lấy thì loé, Đổi lật thẻ. Tab xem bản trước",
+     "page": "screen-levelup-polish.html",
+     "shot": "levelup-polish.png"
+    },
+    {
+     "label": "Trước (kiểu tối cũ)",
+     "note": "màn lên cấp trước commit 6c5ff68a (27/11)",
+     "page": "screen-levelup-polish.html",
+     "query": "v=now",
+     "shot": "levelup-polish-before.png"
+    },
+    {
+     "label": "D · Ngọc ấn (vòng 2)",
      "page": "screen-levelup-gem.html",
      "shot": "levelup-gem.png"
     },
     {
-     "label": "E · Dải kính",
-     "note": "3 dải kính mờ ngang, màu độ hiếm tràn từ trái, icon lớn tràn khỏi dải; dải chọn mở chi tiết; Đang mang bên phải",
+     "label": "E · Dải kính (vòng 2)",
      "page": "screen-levelup-glass.html",
      "shot": "levelup-glass.png"
     },
     {
-     "label": "F · Vòng quanh nhân vật",
-     "note": "trận vẫn thấy, đèn rọi quanh nhân vật; 3 huy hiệu tròn trên vòng; thẻ chi tiết mở bên cạnh",
+     "label": "F · Vòng quanh nhân vật (vòng 2)",
      "page": "screen-levelup-orbit.html",
      "shot": "levelup-orbit.png"
     }

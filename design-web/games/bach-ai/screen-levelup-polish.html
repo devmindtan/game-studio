@@ -1,0 +1,156 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<title>Lên cấp · Làm đẹp</title>
+<link rel="stylesheet" href="levelup-base.css">
+<style>
+/* User 2026-11-28: "tôi vẫn thích theo phong cách cũ trước khi đổi hơn ... cải thiện hơn đẹp hơn và hiệu ứng mượt hơn",
+   then "không phải là tấm giấy mà là trước đó nữa": the dark level-up before the journal look (6c5ff68a, 2026-11-27).
+   Tab "Trước": that screen as it was. "Đề xuất": the same layout and colours (dark violet cards on the field, gold
+   title, gold-edged buttons), polished: a rarity band and glow, a big icon socket, MỚI stamp, ruled stats; motion:
+   the cards deal in, the chosen card lifts, a pick flares and the others fall away, Đổi flips the cards. */
+.veil { background: #0000; } .veil::after { display: none; }
+:root { --panel: #2a2438; --panel2: #332c44; --line: #8a8098; --text: #eee8f6; --muted: #a8a0b8; --gold: #ffd36b; --title: #d8b070; }
+.sheet { position: absolute; inset: 0; text-align: center; color: var(--text); }
+h1 { font-size: 40px; color: var(--title); margin-top: 98px; text-shadow: 0 2px 0 #0008; }
+.links { margin-top: 18px; display: flex; justify-content: center; gap: 16px; }
+.links > span { width: 190px; padding: 6px 0; font-size: 19px; background: var(--panel); border: 2px solid #c8a060; cursor: pointer; }
+.odds { margin-top: 18px; font-size: 13px; }
+.odds b { display: inline-block; width: 9px; height: 9px; margin: 0 4px 0 12px; transform: rotate(45deg); }
+.hand { position: absolute; left: 170px; right: 170px; top: 262px; display: flex; gap: 20px; }
+.card { --c: #8a8a8a; position: relative; flex: 1; height: 304px; text-align: left; padding: 12px 14px; background: var(--panel); border: 2px solid var(--line); cursor: pointer; }
+.card .h { display: flex; gap: 10px; align-items: center; }
+.card .ico { width: 56px; height: 56px; border: 2px solid var(--line); display: grid; place-items: center; background: #1c1828; }
+.card .ico img { width: 44px; height: 44px; }
+.card .nm { font-size: 20px; } .card .mt { font-size: 13px; color: #6aa0e8; }
+.card .ln { display: flex; justify-content: space-between; font-size: 15px; margin-top: 6px; }
+.card .ln .up { color: #7ee08a; } .card .d { font-size: 14px; margin-top: 8px; line-height: 1.45; color: #d8d0e4; }
+.card .mile { color: var(--gold); font-size: 14px; margin-top: 6px; }
+.card .pips { display: flex; gap: 5px; margin-top: 8px; } .card .pip { width: 16px; height: 10px; border: 2px solid #6a6080; } .card .pip.on { background: #6a6080; } .card .pip.new { background: var(--gold); border-color: var(--gold); }
+.card.on { border-color: #fff; border-width: 3px; }
+.acts { position: absolute; left: 0; right: 0; top: 584px; display: flex; justify-content: center; gap: 16px; }
+.act { width: 230px; padding: 6px 0; white-space: nowrap; border: 2px solid #c8a060; background: var(--panel); font-size: 20px; cursor: pointer; }
+
+/* ---------- proposal: same layout, polished ---------- */
+.new .sheet::before { content: ""; position: absolute; inset: 0; background: radial-gradient(ellipse at 50% 55%, #0a081450 0 30%, #0a0814c8 80%); }
+.new h1, .new .links, .new .odds, .new .hand, .new .acts { position: relative; }
+.new .hand, .new .acts { position: absolute; }
+.new h1 { font-size: 44px; color: var(--gold); text-shadow: 0 0 18px #ffb02060, 0 3px 0 #000a; }
+.new .links > span { background: #241e32e8; border-color: #c8a06099; box-shadow: 0 3px 0 #0008; transition: transform 90ms, border-color 90ms; }
+.new .links > span:hover { transform: translateY(-2px); border-color: var(--gold); }
+.new .card { height: 300px; padding: 0; background: linear-gradient(#352d48, #262036); border: 2px solid #0b0910;
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--c) 70%, #000), 0 6px 0 #0009;
+  transition: transform 150ms cubic-bezier(.2,.9,.3,1.25), box-shadow 150ms, filter 150ms; }
+.new .card::before { content: ""; display: block; height: 6px; background: var(--c); box-shadow: 0 0 12px var(--c); }
+.new .card .tier { position: absolute; top: 14px; right: 12px; font-size: 11px; font-weight: bold; letter-spacing: 1px; color: #10101a; background: var(--c); padding: 2px 7px; }
+.new .card .h { padding: 12px 14px 0; gap: 12px; }
+.new .card .ico { width: 72px; height: 72px; border: 2px solid var(--c); background: radial-gradient(color-mix(in srgb, var(--c) 35%, #2a2438), #15121e 75%); }
+.new .card .ico img { width: 56px; height: 56px; }
+.new .card .nm { font-size: 22px; font-weight: bold; } .new .card .mt { color: var(--muted); font-size: 13px; margin-top: 2px; }
+.new .card .stamp { position: absolute; left: 62px; top: 74px; font-size: 11px; font-weight: bold; color: #10101a; background: var(--gold); padding: 1px 5px; box-shadow: 0 0 8px #ffd36b88; }
+.new .card .body { padding: 8px 14px 0; }
+.new .card .ln { border-bottom: 1px solid #ffffff18; padding: 3px 0; margin-top: 0; } .new .card .ln > span:first-child { color: var(--muted); }
+.new .card .d { border-top: 1px solid #ffffff22; padding-top: 6px; }
+.new .card:not(.on) { filter: brightness(.82) saturate(.85); }
+.new .card.on { transform: translateY(-10px); box-shadow: 0 0 0 3px var(--gold), 0 0 26px 4px color-mix(in srgb, var(--c) 60%, var(--gold)), 0 14px 0 #000a; filter: none; }
+.new .card .key { position: absolute; right: 10px; bottom: 8px; font-size: 12px; color: #6a6080; }
+.new .act { background: #241e32e8; border-color: #c8a06099; box-shadow: 0 3px 0 #0008; transition: transform 90ms, border-color 90ms; }
+.new .act:hover { transform: translateY(-2px); border-color: var(--gold); }
+.new .act kbd { font-size: 13px; padding: 0 5px; margin-right: 8px; }
+.new h1 small { display: block; font-size: 18px; color: var(--muted); text-shadow: none; margin-top: 4px; font-weight: normal; }
+.new h1 { margin-top: 84px; }
+.new .hand { top: 262px; } .new .card { height: 326px; }
+.new .odds { margin-top: 16px; }
+/* buttons (user 2026-11-28: "các button cần được thiết kế chỉnh chu hơn"): a raised dark plate with a light top bevel
+   and a dark bottom lip, a gold keycap on the left, the label, a small second line, a count badge on the right;
+   hover / focus: gold edge and lift; press: squash; no charges left: a lock instead of the count, never faded. */
+.new .acts { top: 606px; gap: 18px; }
+.new .act, .new .links > span { position: relative; display: flex; align-items: center; gap: 10px; text-align: left; width: 262px; height: 56px; padding: 0 12px;
+  background: linear-gradient(#3c3352, #2a2438 55%, #221d2e); border: 2px solid #0b0910;
+  box-shadow: inset 0 2px 0 #ffffff22, inset 0 -3px 0 #00000055, 0 0 0 2px #8a7048, 0 4px 0 2px #000a;
+  font-size: 19px; color: var(--text); cursor: pointer; transition: transform 90ms ease-out, box-shadow 90ms; }
+.new .links > span { width: 200px; height: 44px; font-size: 17px; border-bottom: 2px solid #0b0910; }
+.new .act:hover, .new .links > span:hover, .new .act.focus { transform: translateY(-3px);
+  box-shadow: inset 0 2px 0 #ffffff33, inset 0 -3px 0 #00000055, 0 0 0 2px var(--gold), 0 0 14px 2px #ffd36b55, 0 7px 0 2px #000a; }
+.new .act:active, .new .links > span:active { transform: translateY(2px) scale(.97); box-shadow: inset 0 2px 0 #ffffff22, 0 0 0 2px var(--gold), 0 1px 0 2px #000a; }
+.cap { flex: none; font-style: normal; display: grid; place-items: center; width: 30px; height: 30px; background: linear-gradient(#ffe39a, #e0a840); color: #2a1a08;
+  font-weight: bold; font-size: 16px; box-shadow: inset 0 -3px 0 #a0701c, 0 0 0 2px #0b0910; }
+.lbl { flex: 1; line-height: 1.05; } .lbl small { display: block; font-size: 12px; color: var(--muted); margin-top: 2px; }
+.badge { flex: none; min-width: 34px; padding: 2px 6px; text-align: center; font-size: 15px; font-weight: bold; color: var(--gold); background: #15121e; box-shadow: 0 0 0 2px #5a4a30; }
+.act.out .badge { color: var(--muted); } .act.out .cap { background: linear-gradient(#a8a0b8, #6a6080); box-shadow: inset 0 -3px 0 #4a4060, 0 0 0 2px #0b0910; }
+/* motion */
+.new.open h1 { animation: drop-in 220ms cubic-bezier(.2,.9,.3,1.2) backwards; }
+@keyframes drop-in { from { opacity: 0; transform: translateY(-16px); } }
+.new.open .card { animation: deal 280ms cubic-bezier(.2,.9,.3,1.2) backwards; }
+.new.open .card:nth-child(1) { animation-delay: 90ms; } .new.open .card:nth-child(2) { animation-delay: 150ms; } .new.open .card:nth-child(3) { animation-delay: 210ms; }
+@keyframes deal { from { opacity: 0; transform: translateY(46px) scale(.96); } }
+.new.open .act { animation: drop-in 200ms ease-out 260ms backwards; }
+.new .card.pick { animation: pick 300ms ease-out forwards; }
+@keyframes pick { 0% { transform: translateY(-10px); } 40%, 100% { transform: translateY(-18px) scale(1.06); box-shadow: 0 0 0 4px var(--gold), 0 0 50px 14px var(--gold), 0 14px 0 #000a; } }
+.new .card.drop { animation: fall 240ms ease-in forwards; }
+@keyframes fall { to { opacity: 0; transform: translateY(70px); } }
+.new .card.flip { animation: flip 300ms ease-in-out backwards; }
+@keyframes flip { 0%, 100% { transform: scaleX(1); } 50% { transform: scaleX(0); filter: brightness(2); } }
+.new.close .sheet { animation: fade 180ms ease-in forwards; }
+@keyframes fade { to { opacity: 0; } }
+.tabs { position: absolute; top: 14px; right: 18px; display: flex; gap: 6px; z-index: 5; font-size: 15px; }
+.tabs span { padding: 4px 12px; background: #1c1822; border: 2px solid #5a5068; cursor: pointer; } .tabs .on { border-color: var(--gold); color: var(--gold); }
+.hint { position: absolute; bottom: 8px; width: 100%; text-align: center; font-size: 14px; color: #c8b088; z-index: 5; }
+</style>
+</head>
+<body>
+<div id="game"><div class="veil"></div>
+  <div class="tabs"><span id="tNow">Trước</span><span id="tNew">Đề xuất</span></div>
+  <div id="stage"></div>
+  <div class="hint">Tab đổi Trước / Đề xuất · ← → chọn · Enter lấy · R đổi · O mở lại</div>
+</div>
+<script src="levelup-data.js"></script>
+<script>
+let mode = new URLSearchParams(location.search).get("v") === "now" ? "now" : "new", on = 0;
+const ICON = { thuong: "⬤", hiem: "◆", suthi: "⬟", huyenthoai: "✸" };
+function card(c, i) {
+  const meta = `${c.kind.toUpperCase()} · ${LU.tierName[c.tier]}${c.isNew ? " · Mới" : ""}`;
+  const lines = c.lines.map(([n, a, b]) => `<div class="ln"><span>${n}</span><span>${a} → <span class="${a === b ? "" : "up"}">${b}</span></span></div>`).join("");   // unchanged: not a gain
+  if (mode === "now")
+    return `<div class="card${i === on ? " on" : ""}" onmouseenter="sel(${i})" onclick="take(${i})"><div class="h"><div class="ico">${LU.img(c)}</div>
+      <div><div class="nm">${i + 1}. ${c.name}</div><div class="mt">${ICON[c.tier]} ${meta}</div>${c.isNew ? "" : `<div class="mt" style="color:#6a4a30">Cấp ${c.lv[0]} → ${c.lv[1]}</div>`}</div></div>
+      ${c.max ? `<div class="pips">${LU.pips(c)}</div>` : ""}${c.milestone ? `<div class="mile">★ ${c.milestone}</div>` : ""}${lines}<div class="d">${c.desc}</div></div>`;
+  return `<div class="card${i === on ? " on" : ""}" style="--c:${LU.tierCol[c.tier]}" onmouseenter="sel(${i})" onclick="take(${i})">
+    <span class="tier">${LU.tierName[c.tier].toUpperCase()}</span>
+    <div class="h"><div class="ico">${LU.img(c)}</div><div><div class="nm">${c.name}</div><div class="mt">${c.kind} · Cấp ${c.lv[0]} → ${c.lv[1]}</div>
+      ${c.max ? `<div class="pips">${LU.pips(c)}</div>` : ""}</div></div>${c.isNew ? '<span class="stamp">MỚI</span>' : ""}
+    <div class="body">${c.milestone ? `<div class="mile">★ ${c.milestone}</div>` : ""}${lines}<div class="d">${c.desc}</div></div><span class="key">${i + 1}</span></div>`;
+}
+// Đổi / Loại / Bỏ qua: keycap, label + what it does, charges left (×0 shows a lock)
+const SUB = { R: "ba thẻ mới", X: "bỏ thẻ khỏi bộ", S: "+10 vàng" };
+const ACT = (k, n, x) => { const c = x.split(" ")[0]; const out = c === "×0";
+  return `<div class="act${out ? " out" : ""}" onclick="${k === "R" ? "reroll()" : ""}"><i class="cap">${k}</i><span class="lbl">${n}<small>${SUB[k]}</small></span><span class="badge">${out ? "🔒" : c}</span></div>`; };
+function render(open) {
+  tNow.className = mode === "now" ? "on" : ""; tNew.className = mode === "new" ? "on" : "";
+  stage.className = mode + (open ? " open" : "");
+  stage.innerHTML = `<div class="sheet"><h1>${mode === "new" ? `Lên cấp ${LU.level}!<small>Chọn một thẻ</small>` : `Lên cấp ${LU.level}! Chọn một`}</h1>
+    <div class="links">${mode === "new" ? `<span><i class="cap">H</i><span class="lbl">Ẩn bảng<small>nhìn trận</small></span></span><span><i class="cap">⇥</i><span class="lbl">Nhân vật<small>chỉ số, chiêu</small></span></span>` : `<span>Ẩn bảng (H)</span><span>Nhân vật (Tab)</span>`}</div>
+    <div class="odds">${LU.odds.map(([n, p, t]) => `<b style="background:${LU.tierCol[t]}"></b>${n} ${p}%`).join("")}</div>
+    <div class="hand" id="hand">${LU.cards.map(card).join("")}</div>
+    <div class="acts">${LU.actions.map(([k, n, x]) => mode === "new" ? ACT(k, n, x) : `<div class="act">${n} (${k}) ${x}</div>`).join("")}</div></div>`;
+}
+function sel(i) { if (i === on) return; on = (i + 3) % 3; [...hand.children].forEach((c, k) => c.classList.toggle("on", k === on)); }
+function take(i) {
+  if (mode !== "new") return;
+  sel(i); [...hand.children].forEach((c, k) => c.classList.add(k === on ? "pick" : "drop"));
+  setTimeout(() => stage.classList.add("close"), 260); setTimeout(() => render(true), 900);
+}
+function reroll() { if (mode === "new") [...hand.children].forEach((c, k) => { c.classList.remove("flip"); void c.offsetWidth; c.style.animationDelay = k * 50 + "ms"; c.classList.add("flip"); }); }
+addEventListener("keydown", (e) => {
+  if (e.key === "Tab") { e.preventDefault(); mode = mode === "now" ? "new" : "now"; render(true); }
+  else if (e.key === "ArrowLeft") sel(on - 1); else if (e.key === "ArrowRight") sel(on + 1);
+  else if ("123".includes(e.key)) sel(+e.key - 1);
+  else if (e.key === "Enter") take(on);
+  else if (e.key.toLowerCase() === "r") reroll(); else if (e.key.toLowerCase() === "o") render(true);
+});
+tNow.onclick = () => { mode = "now"; render(true); }; tNew.onclick = () => { mode = "new"; render(true); };
+render(true);
+</script>
+</body>
+</html>
