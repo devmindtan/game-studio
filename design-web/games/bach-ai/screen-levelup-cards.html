@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<title>Lên cấp · Ba lá bài</title>
+<link rel="stylesheet" href="journal.css">
+<style>
+/* Direction B "Ba lá bài" (Slay the Spire card reward / Balatro): no sheet, three tall playing cards stand on the dimmed
+   field; the card's colour is its rarity; one big picture and one big number; the chosen card rises and shows the rest. */
+#game { background: url(assets/levelup/field.png) center / cover; }
+#game::before { content: ""; position: absolute; inset: 0; background: linear-gradient(#08070cf4 0 18%, #08070cc8 30%); }
+.title { position: absolute; top: 34px; width: 100%; text-align: center; color: var(--gold); font-size: 60px; line-height: 1; text-shadow: 0 4px 0 #000; }
+.odds { position: absolute; top: 98px; width: 100%; text-align: center; font-size: 20px; color: #c8b088; }
+.odds b { display: inline-block; width: 12px; height: 12px; margin: 0 6px 0 16px; }
+.hand { position: absolute; top: 150px; left: 0; width: 100%; display: flex; justify-content: center; gap: 36px; }
+.card { position: relative; width: 300px; height: 420px; background: #efe0bc; border: 6px solid; box-shadow: 0 8px 0 #000a;
+  transition: transform 110ms cubic-bezier(.2,.9,.3,1.2), filter 110ms; cursor: pointer; color: var(--ink); }
+.card:not(.on) { filter: brightness(.72); transform: translateY(18px); }
+.card.on { transform: translateY(-10px); }
+.card .band { height: 54px; display: flex; align-items: center; justify-content: space-between; padding: 0 12px; color: #fff; font-size: 22px; }
+.card .num { font-size: 30px; }
+.card .art { height: 150px; display: grid; place-items: center; background: #d8c498; border-bottom: 3px solid #0003; }
+.card .art img { width: 112px; height: 112px; }
+.card .name { text-align: center; font-size: 38px; margin-top: 6px; line-height: 1; }
+.card .tag { text-align: center; font-size: 20px; color: var(--ink-soft); }
+.card .tag .new { color: var(--ink-red); }
+.card .key { text-align: center; margin-top: 12px; font-size: 22px; color: var(--ink-soft); }
+.card .key .n { font-size: 48px; color: #2a7a3a; line-height: 1; }
+.pips { display: flex; gap: 5px; justify-content: center; margin-top: 8px; }
+.pip { width: 20px; height: 8px; background: #c8b088; } .pip.on { background: var(--ink-soft); } .pip.new { background: var(--ink-red); }
+.detail { position: absolute; left: 240px; right: 240px; top: 600px; height: 76px; padding: 8px 18px; background: #efe0bc; border: 4px solid var(--ink);
+  font-size: 20px; display: grid; grid-template-columns: auto 1fr; gap: 0 22px; align-content: center; }
+.detail .ln { white-space: nowrap; } .detail .up { color: #2a7a3a; } .detail .mile { color: var(--ink-red); }
+.keys { position: absolute; bottom: 10px; width: 100%; text-align: center; font-size: 20px; color: #c8b088; }
+.keys kbd { color: var(--gold); font-family: inherit; }
+.card .art img[style] { filter: brightness(.35) sepia(.6); }
+</style>
+</head>
+<body>
+<div id="game">
+  <div class="title">Lên cấp 8</div>
+  <div class="odds" id="odds"></div>
+  <div class="hand" id="hand"></div>
+  <div class="detail" id="detail"></div>
+  <div class="keys" id="keys"></div>
+</div>
+<script src="levelup-data.js"></script>
+<script>
+odds.innerHTML = LU.odds.map(([n, p, t]) => `<b style="background:${LU.tierCol[t]}"></b>${n} ${p}%`).join("");
+keys.innerHTML = ["← → chọn · Enter lấy", ...LU.actions.map(([k, n, x]) => `<kbd>${k}</kbd> ${n} ${x}`), "<kbd>H</kbd> xem trận", "<kbd>Tab</kbd> nhân vật"].join(" · ");
+const paint = (on) => {
+  hand.innerHTML = LU.cards.map((c, i) => {
+    const [kn, a, b] = c.key, col = LU.tierCol[c.tier];
+    return `<div class="card${i === on ? " on" : ""}" style="border-color:${col}" onmouseenter="go(${i})">
+      <div class="band" style="background:${col}"><span class="num">${i + 1}</span><span>${c.kind} · ${LU.tierName[c.tier]}</span></div>
+      <div class="art">${LU.img(c)}</div>
+      <div class="name">${c.name}</div>
+      <div class="tag">${c.isNew ? '<span class="new">Mới</span>' : `Cấp ${c.lv[0]} → ${c.lv[1]}`}</div>
+      <div class="key">${kn}<br>${a} → <span class="n">${b}</span></div>
+      <div class="pips">${LU.pips(c)}</div></div>`;
+  }).join("");
+  const c = LU.cards[on];
+  detail.innerHTML = `<div>${c.milestone ? `<div class="mile">★ ${c.milestone}</div>` : ""}${c.lines.map(([n, a, b]) => `<div class="ln">${n} ${a} → <span class="up">${b}</span></div>`).join("")}</div><div>${c.desc}</div>`;
+};
+const go = LU.bind(3, paint);
+</script>
+</body>
+</html>

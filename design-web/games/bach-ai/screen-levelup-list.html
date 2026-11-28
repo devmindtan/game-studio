@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<title>Lên cấp · Danh sách</title>
+<link rel="stylesheet" href="journal.css">
+<style>
+/* Direction A "Bảng lệnh" (Hades boon list / Vampire Survivors list): no paper sheet. The field stays visible on the
+   right; a dark lacquer column on the left holds three wide rows, one big change per row; the build so far sits under. */
+#game { background: url(assets/levelup/field.png) center / cover; }
+#game::before { content: ""; position: absolute; inset: 0; background: linear-gradient(90deg, #0b0a10f8 0 58%, #0b0a1060 80%, #0b0a1020); }
+.col { position: absolute; left: 56px; top: 36px; width: 680px; color: #f3e6c8; }
+.col h1 { font-size: 56px; font-weight: normal; color: var(--gold); line-height: 1; }
+.col .sub { color: #c8b088; font-size: 24px; margin-bottom: 18px; }
+.odds { display: flex; gap: 18px; font-size: 20px; margin-bottom: 14px; }
+.odds b { display: inline-block; width: 12px; height: 12px; margin-right: 6px; }
+.row { position: relative; display: grid; grid-template-columns: 96px 1fr auto; gap: 18px; align-items: center; height: 118px;
+  padding: 0 20px 0 14px; margin-bottom: 12px; background: #1c1822; border: 3px solid #3a3444; border-left-width: 10px;
+  transition: transform 90ms ease-out, background 90ms; cursor: pointer; }
+.row.on { background: #2a2230; border-color: var(--gold); transform: translateX(14px); }
+.row .ico { width: 96px; height: 96px; background: #0e0c12; border: 3px solid #0006; display: grid; place-items: center; }
+.row .ico img { width: 80px; height: 80px; }
+.row .ico img.v { filter: invert(.9) sepia(.4); }
+.row .name { font-size: 36px; line-height: 1; }
+.row .tag { font-size: 20px; color: #c8b088; }
+.row .tag .new { color: var(--gold); }
+.row .big { text-align: right; font-size: 22px; color: #c8b088; }
+.row .big .n { font-size: 40px; color: #7adf8a; line-height: 1; }
+.row .big .was { color: #8a8090; }
+.pips { display: flex; gap: 5px; justify-content: flex-end; margin-top: 6px; }
+.pip { width: 16px; height: 8px; background: #3a3444; } .pip.on { background: #c8b088; } .pip.new { background: var(--gold); }
+.more { margin: -4px 0 12px 24px; padding: 10px 16px; background: #14111a; border-left: 4px solid var(--gold); font-size: 21px; color: #d8c8a8; }
+.more .ln { display: flex; gap: 16px; } .more .ln span:first-child { width: 130px; color: #a89880; }
+.more .ln .up { color: #7adf8a; } .more .mile { color: var(--gold); }
+.keys { position: absolute; left: 56px; bottom: 26px; display: flex; gap: 14px; font-size: 22px; color: #f3e6c8; }
+.key { padding: 4px 14px; border: 3px solid #5a5068; background: #1c1822; }
+.key kbd { color: var(--gold); font-family: inherit; }
+.build { position: absolute; right: 40px; bottom: 26px; text-align: right; color: #f3e6c8; font-size: 20px; }
+.build .ic { display: inline-grid; place-items: center; width: 52px; height: 52px; background: #1c1822; border: 3px solid #5a5068; position: relative; margin-left: 6px; }
+.build .ic img { width: 40px; } .build .ic i { position: absolute; right: 2px; bottom: 0; font-style: normal; font-size: 18px; color: var(--gold); }
+</style>
+</head>
+<body>
+<div id="game">
+  <div class="col">
+    <h1>Lên cấp 8</h1><div class="sub">Chọn một · ↑ ↓ rồi Enter · 1 2 3</div>
+    <div class="odds" id="odds"></div>
+    <div id="rows"></div>
+  </div>
+  <div class="keys" id="keys"></div>
+  <div class="build">Đang mang<br><span id="build"></span></div>
+</div>
+<script src="levelup-data.js"></script>
+<script>
+odds.innerHTML = LU.odds.map(([n, p, t]) => `<span><b style="background:${LU.tierCol[t]}"></b>${n} ${p}%</span>`).join("");
+keys.innerHTML = LU.actions.map(([k, n, x]) => `<span class="key"><kbd>${k}</kbd> ${n} ${x}</span>`).join("") + `<span class="key"><kbd>H</kbd> Xem trận</span>`;
+build.innerHTML = LU.owned.map(([s, l]) => `<span class="ic"><img src="${s}"><i>${l}</i></span>`).join("");
+const paint = (on) => {
+  rows.innerHTML = LU.cards.map((c, i) => {
+    const [kn, a, b] = c.key;
+    const row = `<div class="row${i === on ? " on" : ""}" style="border-left-color:${LU.tierCol[c.tier]}" onmouseenter="go(${i})">
+      <div class="ico">${LU.img(c, c.vector ? "v" : "")}</div>
+      <div><div class="name">${i + 1}. ${c.name}</div>
+        <div class="tag">${c.kind} · ${LU.tierName[c.tier]} · ${c.isNew ? '<span class="new">Mới</span>' : `Cấp ${c.lv[0]} → ${c.lv[1]}`}</div></div>
+      <div class="big">${kn}<br><span class="was">${a} →</span> <span class="n">${b}</span><div class="pips">${LU.pips(c)}</div></div></div>`;
+    if (i !== on) return row;
+    return row + `<div class="more">${c.milestone ? `<div class="mile">★ ${c.milestone}</div>` : ""}${c.lines.map(([n, a, b]) =>
+      `<div class="ln"><span>${n}</span><span>${a} → <span class="up">${b}</span></span></div>`).join("")}<div>${c.desc}</div></div>`;
+  }).join("");
+};
+const go = LU.bind(3, paint, "y");
+</script>
+</body>
+</html>
