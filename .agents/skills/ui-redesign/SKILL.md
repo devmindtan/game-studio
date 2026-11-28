@@ -13,6 +13,9 @@ Người dùng 2026-11-26: "bổ sung quy trình thiết kế giao diện trên 
 - **Thiết kế lại = hướng mới.** Không giữ bố cục, khung, bảng màu, kiểu panel của bản cũ rồi chỉnh vài chỗ. Trước khi
   vẽ, ghi ra "Bản cũ" (bố cục, màu, kiểu khung, font, cách điều hướng) để tránh lặp lại; bản mới khác ít nhất ở bố cục
   và ngôn ngữ hình ảnh (khung, màu chủ đạo).
+- **Hướng mới không mặc định theo phong cách chung của game** (người dùng 2026-11-28, bach-ai lên cấp: ba hướng đều là
+  giấy/gỗ, "cả 3 đều xấu... đừng bám vào cái giấy nữa"): ít nhất 2 trong 3 hướng dùng chất liệu khác phong cách đang
+  có; chữ dùng đúng font của game (font của `assets/fonts/` hoặc theme), không dùng font trang trí của lab.
 - **Không đoán mò** (AGENTS.md): tham khảo ≥ 2 game cùng thể loại cho màn đó, ghi nguồn + điều học / điều tránh.
 - **Web trước.** Không sửa `games/<g>/src` cho tới khi người dùng chọn hướng trên ảnh 1280×720.
 - Màn hình game, không phải trang web: 1280×720 cố định, bàn phím/gamepad là chính, chữ ≥ 18 px (xem
