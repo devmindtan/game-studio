@@ -64,7 +64,7 @@ def _armed_layer(x, y, rgb):
     if 16 <= x <= 23 and 13 <= y <= 18 and not _grey(rgb):
         return "body"                                     # the face (skin, mouth, both eyes) under the helmet
     if 17 <= x <= 24 and 13 <= y <= 19 and not _grey(rgb):
-        return None
+        return "body"                                     # the jaw line and the face edge: the face layer keeps the user's outline (2026-11-28: "mất nét ở cổ")
     if y <= 19:
         return "head"                                     # helmet and plume
     return "chest"
@@ -96,6 +96,8 @@ def _split(box, dy, rule):
             if not p[3]:
                 continue
             k = rule(x, y - dy, p[:3])
+            if k is None and rule is _armed_layer:   # a dropped pixel left a hole at the neck (2026-11-28)
+                raise SystemExit(f"knight: pixel ({x},{y}) of the user's drawing is in no layer")
             if k:
                 out[k].putpixel((x, y - dy), p)
     flip = Image.Transpose.FLIP_LEFT_RIGHT              # face right like the other heroes; pixels unchanged
