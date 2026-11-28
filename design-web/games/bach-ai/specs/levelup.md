@@ -25,13 +25,19 @@ Màn trong game: `04-level-up`, `04b-level-up-milestones`, `04d-level-up-hidden`
   khác tối đi. Tránh: chữ mô tả dài nhét trong lá. Quyết định: mô tả dài để ở dải chi tiết dưới (hướng B, C).
 - Tìm Halls of Torment không ra mô tả bố cục màn chọn; không dùng.
 
-## Ba hướng (design-web/games/bach-ai)
+## Vòng 1 (bỏ)
 
-- **A · Bảng lệnh** `screen-levelup-list.html`: cột sơn mài tối bên trái, 3 hàng rộng (icon 96 px, tên 36 px, một con
-  số lớn), hàng đang chọn đẩy ra và mở phần chi tiết; trận vẫn thấy ở bên phải; "Đang mang" góc phải dưới. ↑ ↓.
-- **B · Ba lá bài** `screen-levelup-cards.html`: không khung giấy, 3 lá bài 300×420 trên trận làm tối; dải màu đầu lá
-  = độ hiếm; lá chọn nhô lên, hai lá kia tối; dải chi tiết dưới. ← →.
-- **C · Cuộn treo** `screen-levelup-scrolls.html`: 3 cuộn treo trên thanh gỗ, cuộn chọn dài ra; bảng gỗ dọc mép dưới
-  đọc đủ chỉ số, mô tả và các phím. ← →.
+A Bảng lệnh / B Ba lá bài / C Cuộn treo: người dùng 2026-11-28 "cả 3 đều xấu ... đừng bám vào cái giấy nữa vì nó khá
+xấu". Đã xoá. Tránh: giấy be, gỗ, font VT323 (game vẽ bằng DejaVu Sans).
 
-Dữ liệu: thẻ thật của 04-level-up (Mài kiếm, Chém kiếm) và Đất nứt (Hiếm) của 04b để thấy màu độ hiếm.
+## Vòng 2: ba hướng (design-web/games/bach-ai, chung `levelup-base.css`, `levelup-data.js`)
+
+- **D · Ngọc ấn** `screen-levelup-gem.html`: 3 thẻ đá tối viền pixel bậc thang, viên ngọc độ hiếm phát sáng trên đỉnh,
+  icon trong hốc lớn, một con số lớn; thẻ chọn nhô lên và sáng; dải chi tiết dưới. ← →.
+- **E · Dải kính** `screen-levelup-glass.html`: 3 dải kính mờ ngang màn, màu độ hiếm tràn từ trái, icon 116 px tràn khỏi
+  dải; dải chọn trượt ra và mở chi tiết; "Đang mang" bên phải. ↑ ↓.
+- **F · Vòng quanh nhân vật** `screen-levelup-orbit.html`: trận vẫn thấy với đèn rọi quanh nhân vật; 3 huy hiệu tròn trên
+  vòng phía trên nhân vật; thẻ chi tiết mở ở phía đối diện. ← →.
+
+Font: DejaVu Sans của game (`design-web/fonts/DejaVuSans.ttf`). Dữ liệu: thẻ thật của 04-level-up (Mài kiếm, Chém kiếm)
+và Đất nứt (Hiếm) của 04b.

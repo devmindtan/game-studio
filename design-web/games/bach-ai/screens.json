@@ -23,27 +23,27 @@
   },
   {
    "id": "levelup",
-   "title": "Lên cấp: chọn thẻ (thiết kế lại)",
+   "title": "Lên cấp: chọn thẻ (thiết kế lại, vòng 2: không giấy)",
    "spec": "specs/levelup.md",
    "game_shot": "04-level-up.png",
    "views": [
     {
-     "label": "A · Bảng lệnh",
-     "note": "danh sách 3 hàng rộng bên trái, một con số lớn mỗi hàng, trận vẫn thấy bên phải",
-     "page": "screen-levelup-list.html",
-     "shot": "levelup-list.png"
+     "label": "D · Ngọc ấn",
+     "note": "thẻ đá tối, viền và viên ngọc phát sáng theo độ hiếm, một con số lớn; dải chi tiết dưới",
+     "page": "screen-levelup-gem.html",
+     "shot": "levelup-gem.png"
     },
     {
-     "label": "B · Ba lá bài",
-     "note": "3 lá bài đứng, màu lá = độ hiếm, lá đang chọn nhô lên, chi tiết ở dải dưới",
-     "page": "screen-levelup-cards.html",
-     "shot": "levelup-cards.png"
+     "label": "E · Dải kính",
+     "note": "3 dải kính mờ ngang, màu độ hiếm tràn từ trái, icon lớn tràn khỏi dải; dải chọn mở chi tiết; Đang mang bên phải",
+     "page": "screen-levelup-glass.html",
+     "shot": "levelup-glass.png"
     },
     {
-     "label": "C · Cuộn treo",
-     "note": "3 cuộn treo trên thanh gỗ, cuộn chọn dài ra, bảng gỗ dưới đọc đủ số",
-     "page": "screen-levelup-scrolls.html",
-     "shot": "levelup-scrolls.png"
+     "label": "F · Vòng quanh nhân vật",
+     "note": "trận vẫn thấy, đèn rọi quanh nhân vật; 3 huy hiệu tròn trên vòng; thẻ chi tiết mở bên cạnh",
+     "page": "screen-levelup-orbit.html",
+     "shot": "levelup-orbit.png"
     }
    ]
   },

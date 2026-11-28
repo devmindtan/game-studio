@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<title>Lên cấp · Ngọc ấn</title>
+<link rel="stylesheet" href="levelup-base.css">
+<style>
+/* D "Ngọc ấn": obsidian cards with a stepped pixel frame, the rarity is a glowing gem on top and the card's edge light;
+   the icon sits in a big socket; one big number. The chosen card lifts and glows; the full text opens under it. */
+.head { position: absolute; top: 36px; width: 100%; text-align: center; }
+.head h1 { font-size: 46px; letter-spacing: 2px; color: #ffd36b; text-shadow: 0 0 18px #ffb02088, 0 3px 0 #000; }
+.head .odds { margin-top: 8px; font-size: 15px; color: #a8aec4; }
+.head .odds i { display: inline-block; width: 10px; height: 10px; margin: 0 6px 0 14px; transform: rotate(45deg); }
+.row { position: absolute; top: 150px; width: 100%; display: flex; justify-content: center; gap: 40px; }
+.card { --c: #9aa0b0; position: relative; width: 290px; height: 380px; background: linear-gradient(#20243a, #12141f 60%);
+  box-shadow: 0 0 0 3px #05060a, 0 0 0 6px var(--c), 0 0 0 9px #05060a, 0 10px 0 9px #000a;
+  transition: transform 120ms cubic-bezier(.2,.9,.3,1.25), box-shadow 120ms; cursor: pointer; text-align: center; }
+.card.on { transform: translateY(-16px) scale(1.04); box-shadow: 0 0 0 3px #05060a, 0 0 0 6px var(--c), 0 0 0 9px #05060a, 0 0 40px 8px var(--c); }
+.card:not(.on) { filter: saturate(.6) brightness(.8); }
+.gem { position: absolute; top: -20px; left: 50%; width: 34px; height: 34px; margin-left: -17px; transform: rotate(45deg);
+  background: var(--c); box-shadow: 0 0 0 3px #05060a, 0 0 16px var(--c); }
+.kind { padding-top: 28px; font-size: 14px; letter-spacing: 3px; text-transform: uppercase; color: var(--c); font-weight: bold; }
+.sock { width: 128px; height: 128px; margin: 14px auto 0; display: grid; place-items: center;
+  background: radial-gradient(#2e3452, #151827); box-shadow: inset 0 0 0 3px #05060a, inset 0 0 0 6px #3a4060; }
+.sock img { width: 96px; height: 96px; }
+.name { margin-top: 14px; font-size: 30px; font-weight: bold; }
+.tag { font-size: 15px; color: #a8aec4; margin-top: 2px; } .tag .new { color: #ffd36b; font-weight: bold; }
+.key { margin-top: 16px; font-size: 15px; color: #a8aec4; }
+.key .n { display: block; font-size: 40px; font-weight: bold; color: #7ee08a; line-height: 1.1; }
+.key .was { color: #8a90a8; font-size: 22px; }
+.pips { display: flex; gap: 5px; justify-content: center; margin-top: 8px; }
+.pip { width: 18px; height: 6px; background: #343a56; } .pip.on { background: #a8aec4; } .pip.new { background: #ffd36b; box-shadow: 0 0 8px #ffd36b; }
+.num { position: absolute; left: 12px; top: 10px; font-size: 18px; color: #6a7090; font-weight: bold; }
+.detail { position: absolute; left: 190px; right: 190px; top: 560px; height: 92px; padding: 10px 22px; background: #0c0e18e8;
+  box-shadow: 0 0 0 3px #05060a, 0 0 0 5px #3a4060; display: grid; grid-template-columns: 250px 1fr; gap: 20px; font-size: 15px; align-items: center; }
+.detail .ln { display: flex; justify-content: space-between; } .detail .mile { color: #ffd36b; }
+.keys { position: absolute; bottom: 18px; width: 100%; text-align: center; font-size: 15px; color: #a8aec4; }
+.keys span { margin: 0 10px; }
+</style>
+</head>
+<body>
+<div id="game"><div class="veil"></div>
+  <div class="head"><h1>LÊN CẤP 8</h1><div class="odds" id="odds"></div></div>
+  <div class="row" id="row"></div>
+  <div class="detail" id="detail"></div>
+  <div class="keys" id="keys"></div>
+</div>
+<script src="levelup-data.js"></script>
+<script>
+odds.innerHTML = LU.odds.map(([n, p, t]) => `<i style="background:${LU.tierCol[t]}"></i>${n} ${p}%`).join("");
+keys.innerHTML = [`<kbd>←</kbd> <kbd>→</kbd> chọn`, `<kbd>Enter</kbd> lấy`, ...LU.actions.map(([k, n, x]) => `<kbd>${k}</kbd> ${n} ${x}`), `<kbd>H</kbd> xem trận`]
+  .map((s) => `<span>${s}</span>`).join("");
+const paint = (on) => {
+  row.innerHTML = LU.cards.map((c, i) => {
+    const [kn, a, b] = c.key;
+    return `<div class="card${i === on ? " on" : ""}" style="--c:${LU.tierCol[c.tier]}" onmouseenter="go(${i})">
+      <div class="gem"></div><div class="num">${i + 1}</div><div class="kind">${c.kind} · ${LU.tierName[c.tier]}</div>
+      <div class="sock">${LU.img(c)}</div><div class="name">${c.name}</div>
+      <div class="tag">${c.isNew ? '<span class="new">MỚI</span>' : `Cấp ${c.lv[0]} → ${c.lv[1]}`}</div>
+      <div class="key">${kn}<span class="n"><span class="was">${a} → </span>${b}</span></div><div class="pips">${LU.pips(c)}</div></div>`;
+  }).join("");
+  const c = LU.cards[on];
+  detail.innerHTML = `<div>${c.milestone ? `<div class="mile">★ ${c.milestone}</div>` : ""}${c.lines.map(([n, a, b]) =>
+    `<div class="ln"><span class="dim">${n}</span><span>${a} → <span class="up">${b}</span></span></div>`).join("")}</div><div>${c.desc}</div>`;
+};
+const go = LU.bind(3, paint);
+</script>
+</body>
+</html>
