@@ -492,6 +492,34 @@
      "shot": "album-journal-skill.png"
     }
    ]
+  },
+  {
+   "id": "notices",
+   "title": "Xác nhận và thông báo",
+   "spec": "specs/menus.md",
+   "views": [
+    {
+     "label": "Hỏi trước khi xóa sổ",
+     "page": "screen-notices-journal.html",
+     "query": "view=delete",
+     "shot": "notice-delete.png",
+     "note": "xóa sổ luôn hỏi"
+    },
+    {
+     "label": "Hỏi trước khi tẩy tuỷ (có Không hỏi lại)",
+     "page": "screen-notices-journal.html",
+     "query": "view=reset",
+     "shot": "notice-reset.png",
+     "note": "giá và thứ nhận lại; Space: không hỏi lại"
+    },
+    {
+     "label": "Thông báo khi mặc / học / cường hoá",
+     "page": "screen-notices-journal.html",
+     "query": "view=toast",
+     "shot": "notice-toast.png",
+     "note": "góc phải trên, tự ẩn 2 s"
+    }
+   ]
   }
  ]
 }

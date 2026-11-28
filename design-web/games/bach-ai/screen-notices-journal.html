@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<title>Xác nhận và thông báo</title>
+<link rel="stylesheet" href="journal.css">
+<style>
+/* user 2026-11-28: "các chức năng xóa, thêm, cập nhật cần phải hiện thông báo (có thể cho phép bỏ qua cho lần sau)".
+   Delete / reset: a confirm slip pinned over the book (Enter / Esc), with "Không hỏi lại" (Space) except for Xóa sổ.
+   Add / update: a short note slides from the top-right corner, gone after 2 s, Esc closes it. */
+.dim { position: absolute; inset: 0; background: #0b0810a8; }
+.ask { position: absolute; left: 380px; top: 210px; width: 520px; background: var(--paper); border: 4px solid var(--edge); box-shadow: 0 8px 0 #0008; padding: 26px 30px 24px; }
+.ask::before { content: ""; position: absolute; top: -10px; left: 50%; width: 16px; height: 16px; margin-left: -8px; border-radius: 50%; background: var(--seal); border: 2px solid #5a0c08; }
+.ask h2 { font-size: 34px; font-weight: normal; color: var(--ink-red); }
+.ask p { font-size: 22px; margin-top: 8px; line-height: 1.1; }
+.ask .cost { font-size: 20px; margin-top: 8px; color: var(--ink-soft); }
+.ask .cost img { width: 20px; height: 20px; vertical-align: -3px; image-rendering: pixelated; }
+.ask .row { display: flex; gap: 16px; margin-top: 20px; justify-content: flex-end; }
+.btn { font-size: 24px; padding: 6px 18px; border: 3px solid var(--ink); background: #ddcca0; }
+.btn.on { outline: 4px solid var(--gold); }
+.btn.red { background: var(--seal); color: #ffe0b0; border-color: #5a0c08; }
+.skip { font-size: 20px; margin-top: 16px; display: flex; gap: 8px; align-items: center; }
+.skip i { width: 20px; height: 20px; border: 3px solid var(--ink); display: inline-grid; place-items: center; font-style: normal; font-size: 18px; line-height: 1; }
+.note { position: absolute; right: 104px; z-index: 5; width: 360px; background: var(--paper); border: 3px solid var(--edge); border-left: 8px solid #2a7a3a; box-shadow: 0 4px 0 #0007; padding: 8px 14px; font-size: 21px; display: flex; gap: 10px; align-items: center; }
+.note img { width: 32px; height: 32px; image-rendering: pixelated; }
+.note small { display: block; font-size: 17px; color: var(--ink-soft); }
+.note.warn { border-left-color: var(--ink-red); }
+</style>
+</head>
+<body>
+<div id="game">
+  <div class="book"><div class="cover"></div>
+    <div class="page l"><h1>Các cuốn sổ</h1><div class="sub">Mỗi nhân vật một cuốn sổ riêng</div></div>
+    <div class="page r"><h2>Nhân vật 1</h2><div class="sub">Kiếm sĩ · đã qua Ải 10</div></div></div>
+  <div id="over"></div>
+  <div class="hint" id="hint"></div>
+</div>
+<script src="journal.js"></script>
+<script>
+const view = new URLSearchParams(location.search).get("view") || "delete";
+const $ = (id) => document.getElementById(id);
+const ESS = `<img src="${Journal.SP}essence-pickup/essence-pickup.png">`;
+const ask = (title, text, cost, yes, skip, on) => `<div class="dim"></div><div class="ask"><h2>${title}</h2><p>${text}</p>${cost ? `<div class="cost">${cost}</div>` : ""}
+  ${skip ? `<div class="skip"><i>${skip === 2 ? "✓" : ""}</i> Không hỏi lại (Space)</div>` : ""}
+  <div class="row"><span class="btn ${on ? "" : "on"}">Thôi (Esc)</span><span class="btn red ${on ? "on" : ""}">${yes} (Enter)</span></div></div>`;
+if (view === "delete") {
+  $("over").innerHTML = ask("Xóa sổ Nhân vật 1?", "Mất hết túi đồ, tiến độ, vàng, đá của nhân vật này. Không lấy lại được.", "", "Xóa sổ", 0, false);
+  $("hint").textContent = "← → chọn · Enter xác nhận · Esc thôi (xóa sổ luôn hỏi, không có Không hỏi lại)";
+} else if (view === "reset") {
+  $("over").innerHTML = ask("Tẩy tuỷ cây kỹ năng?", "Bỏ hết các nút đã học, trả lại toàn bộ Tinh hoa.",
+    `Tốn: 1 Tẩy Tủy Đan + 60 vàng · Nhận lại: 31 ${ESS}`, "Tẩy tuỷ", 2, true);
+  $("hint").textContent = "Space bật/tắt Không hỏi lại · bật lại ở Cài đặt › Hỏi trước khi làm";
+} else {
+  const N = [["ok", "equip", "Đã mặc Giáp rồng", "Máu tối đa 118 → 152 · Giáp 1 → 6"], ["ok", "essence-pickup", "Đã học Rèn thân · cấp 3", "−3 Tinh hoa · còn 21"],
+    ["warn", "coin", "Thiếu vàng", "Cần 240 vàng, đang có 120"]];
+  $("over").innerHTML = N.map(([k, ic, t, s], i) => `<div class="note ${k === "warn" ? "warn" : ""}" style="top:${20 + i * 74}px">
+    <img src="${ic === "equip" || ic === "coin" ? "assets/lobby/" + ic + ".png" : Journal.SP + ic + "/" + ic + ".png"}"><div>${t}<small>${s}</small></div></div>`).join("");
+  $("hint").textContent = "Thông báo tự ẩn sau 2 giây (tối đa 3 cái chồng nhau) · không chặn phím";
+}
+</script>
+</body>
+</html>
