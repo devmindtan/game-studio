@@ -30,6 +30,21 @@
 .lv b { font-weight: normal; width: 44px; } .lv .fx { flex: 1; } .lv .g { width: 90px; text-align: right; }
 .lv.done { color: var(--ink-soft); } .lv.next { background: var(--ink); color: var(--paper); } .lv.next .g { color: var(--gold); }
 .lv small { display: block; font-size: 18px; color: #2a7a3a; } .lv.next small { color: #9fe0a8; }
+/* ?view=full (user 2026-11-28: "túi đồ khá chật chội, thiếu icon, thiếu hiện chỉ số chi tiết") */
+.full .li { width: 20px; height: 20px; image-rendering: pixelated; vertical-align: -3px; margin-right: 6px; }
+.full #stats { display: grid; grid-template-columns: 1fr 1fr; column-gap: 22px; margin-top: 18px; }
+.full #stats .ledger { font-size: 19px; padding: 1px 0; }
+.full .bagtabs span { font-size: 18px; padding: 0 6px; }
+.full .bag { grid-template-columns: repeat(7, 56px); gap: 6px; }
+.full .bag .sketch { width: 56px; height: 56px; position: relative; display: grid; place-items: center; }
+.full .bag .pl { position: absolute; right: -2px; bottom: -4px; font-size: 16px; background: var(--paper); border: 2px solid var(--ink); padding: 0 2px; line-height: 1; }
+.full .bag .wr { position: absolute; left: -4px; top: -6px; font-size: 16px; background: var(--gold); color: var(--ink); border: 2px solid var(--ink); padding: 0 2px; line-height: 1; }
+.it2 { display: flex; gap: 12px; margin-top: 10px; align-items: center; }
+.it2 .big { width: 64px; height: 64px; border: 3px solid; display: grid; place-items: center; background: #ddcca0; }
+.it2 h3 { font-weight: normal; font-size: 28px; line-height: 1; } .it2 .k { font-size: 18px; color: var(--ink-soft); }
+.lines { margin-top: 6px; font-size: 19px; line-height: 1.15; } .lines .lock { color: var(--ink-soft); }
+.cmp { margin-top: 6px; } .cmp .ledger { font-size: 19px; padding: 0; } .cmp .ledger span:last-child { white-space: nowrap; }
+.cmph { font-size: 18px; color: var(--ink-soft); margin-top: 4px; }
 </style>
 </head>
 <body>
@@ -45,7 +60,7 @@
 </div>
 <script src="journal.js"></script>
 <script>
-const EXTRA = new URLSearchParams(location.search).get("view") === "extra";   // proposal 2026-11-26: the game features the page lacked
+const VIEW = new URLSearchParams(location.search).get("view"), FULL = VIEW === "full", EXTRA = VIEW === "extra" || FULL;   // proposal 2026-11-26: the game features the page lacked
 const SLOTS = { head: "Mũ", chest: "Áo", feet: "Giày", weapon: "Vũ khí", shield: "Khiên" };
 const POS = { head: [30, 10], chest: [30, 140], feet: [30, 260], weapon: [380, 70], shield: [380, 200] };
 const RAR = { common: ["Thường", 1], rare: ["Hiếm", 2], epic: ["Sử thi", 3], legendary: ["Huyền thoại", 4] };
@@ -70,7 +85,35 @@ function enhSheet(d, now) {   // every level: its gold, the main line at that le
     <div class="seal on" style="right:26px;bottom:24px;width:240px;height:60px;line-height:52px;font-size:26px">Cường hoá ▸ ${COST[d.rarity] * (now + 1)}</div>
     <div class="muted" style="position:absolute;left:26px;bottom:34px;font-size:18px">C / Esc đóng</div></div>`;
 }
+const LI = (n) => `<img class="li" src="assets/lobby/${n}.png">`;
+const ST = [["heart", "Máu tối đa", "118", "152"], ["sword", "Sát thương", "20", "20"], ["shield", "Giáp", "1 (−6%)", "6 (−26%)"], ["boot", "Tốc độ chạy", "158", "158"],
+  ["haste", "Hồi chiêu", "0%", "0%"], ["reach", "Vùng đánh", "×1,00", "×1,00"], ["regen", "Hồi máu", "0/giây", "0,5/giây"], ["magnet", "Tầm hút", "×1,00", "×1,00"]];
+function drawFull() {
+  document.querySelector(".book").classList.add("full");
+  $("doll").innerHTML = `<div class="portrait"><img src="${Journal.SP}knight/knight.png"></div>` + slotKeys.map((k, i) =>
+    `<div class="slot sketch ${i === tab ? "on" : ""}" style="left:${POS[k][0]}px;top:${POS[k][1]}px">${worn[k] ? icon(worn[k], 64) : ""}<label>${SLOTS[k]}</label></div>`).join("");
+  $("doll").style.height = "370px";
+  $("stats").innerHTML = ST.map(([ic, a, b]) => `<div class="ledger"><span>${LI(ic)}${a}</span><span>${b}</span></div>`).join("");
+  $("tabs").innerHTML = `<span>Tất cả</span>` + slotKeys.map((k, i) => `<span class="${i === tab ? "on" : ""}">${SLOTS[k]}</span>`).join("") +
+    `<span style="border:0;margin-left:auto">Xếp: <u>Độ hiếm</u></span>`;
+  const list = ITEMS.filter((d) => d.slot === slotKeys[tab]);
+  sel = Math.min(sel, list.length - 1);
+  $("bag").innerHTML = list.map((d, i) => `<div class="sketch r${RAR[d.rarity][1]} ${i === sel ? "on" : ""}">${icon(d.id, 44)}${i === 1 ? `<span class="pl">+2</span>` : ""}${worn[d.slot] === d.id ? `<span class="wr">✓</span>` : ""}</div>`).join("");
+  const d = list[sel];
+  if (!d) { $("item").innerHTML = ""; return; }
+  const col = ["", "#6a6a6a", "#3a6aaa", "#7a3ab8", "#c0801a"][RAR[d.rarity][1]];
+  $("item").innerHTML = `<div class="it2"><div class="big" style="border-color:${col}">${icon(d.id, 52)}</div><div><h3>${d.name} <span class="stamp" style="font-size:17px;color:${col}">${RAR[d.rarity][0]}</span></h3>
+      <div class="k">${SLOTS[d.slot]} · chỉ Kiếm sĩ · +2/${MAXP[d.rarity]}</div></div></div>
+    <div class="lines"><div>${LI("heart")}Chính: ${eff(d)}</div><div class="up">${LI("regen")}Dòng phụ 1: Hồi máu +0,5/giây</div>
+      <div class="lock">${LI("boot")}Dòng phụ 2: Tốc độ chạy +6% · mở ở +4</div></div>
+    <div class="cmph">So với đang mặc (${worn[d.slot] ? "Mũ sắt" : "trống"}):</div>
+    <div class="cmp">${ST.filter((r) => r[2] !== r[3]).map(([ic, a, b, c]) => `<div class="ledger"><span>${LI(ic)}${a}</span><span class="up">${b} → ${c} ▲</span></div>`).join("")}</div>
+    <div class="ledger" style="font-size:19px;margin-top:6px"><span>${LI("coin")}Cường hoá lên +3 (mỗi bậc +20%)</span><span>${COST[d.rarity] * 3} vàng</span></div>
+    <span class="xlink" style="display:inline-block;margin-top:6px">Cường hoá ▸ (C)</span>
+    <div class="muted" style="font-size:17px;margin-top:4px">✓ đang mặc · +N bậc cường hoá</div>`;
+}
 function draw() {
+  if (FULL) return drawFull();
   document.getElementById("sortrow")?.remove();
   $("doll").innerHTML = `<div class="portrait"><img src="${Journal.SP}knight/knight.png"></div>` + slotKeys.map((k, i) =>
     `<div class="slot sketch ${i === tab ? "on" : ""}" style="left:${POS[k][0]}px;top:${POS[k][1]}px">${worn[k] ? icon(worn[k], 64) : ""}<label>${SLOTS[k]}</label></div>`).join("");
@@ -90,6 +133,7 @@ function draw() {
 (async () => {
   const [it, gi] = await Promise.all([Journal.json("data/items.json"), Journal.json("sprites/custom/gear-icons/gear-icons.json")]);
   gi.animations.forEach((a) => IC[a.name] = a.start); ICN = gi.frames;
+  if (FULL) { tab = 0; sel = 1; }
   ITEMS = Object.entries(it.equipment).filter(([k, v]) => typeof v === "object" && v.class === "knight").map(([id, v]) => ({ id, ...v }));
   draw();
 })();

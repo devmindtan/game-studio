@@ -141,6 +141,20 @@
      "query": "view=enhance",
      "shot": "equipment-enhance.png",
      "note": "mẩu giấy ghim, mỗi bậc một dòng"
+    },
+    {
+     "label": "Đề xuất: túi đồ rộng, icon, chỉ số chi tiết",
+     "page": "screen-equipment-journal.html",
+     "query": "view=full",
+     "shot": "equipment-full.png",
+     "note": "chỉ số có icon (8 dòng), ô đồ +bậc và Đang mặc, món: icon lớn, dòng chính/phụ có icon, so sánh mọi chỉ số đổi, giá cường hoá"
+    },
+    {
+     "label": "Đề xuất: lật trang khi vào màn (bấm F xem lại)",
+     "page": "screen-equipment-journal.html",
+     "query": "view=full&flip=1",
+     "shot": "pageflip.png",
+     "note": "mọi màn sổ: tờ giấy lật từ trang phải qua gáy sang trái, 0,32 s, 8 bước pixel nguyên, không xoay"
     }
    ]
   },
